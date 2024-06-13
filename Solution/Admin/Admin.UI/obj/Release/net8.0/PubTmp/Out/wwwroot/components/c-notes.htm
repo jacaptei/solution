@@ -1,0 +1,66 @@
+<template>
+	<div class="s-note">
+			<div v-if="$validator.is(notes)">
+				<div v-for="(item,index) in notes" class="s-note-item">
+					<i class="fa fa-caret-right"></i> <span v-html="item"></span> 
+				</div>
+			</div>
+			<div v-if="$validator.is(apiNotes)">
+				<div v-for="(item,index) in apiNotes" class="s-note-item">
+					<i class="fa fa-caret-right"></i> <span v-html="item.info"></span>  <span v-if="$validator.is(item.complement)" v-html="item.complement"></span>
+				</div>
+			</div>
+	</div>
+</template>
+
+<script>
+module.exports = {
+    components: {
+
+	},	
+	
+	data: function () {
+		return {
+		}
+	},computed: {
+      
+	},
+	
+	props:{
+        notes:			{ type: Array, required: false, default: [] },
+        apiNotes:		{ type: Array, required: false, default: [] },
+	},
+	watch:{
+	},
+	created: function () {
+	 },
+	mounted(){
+		
+	},		  
+	methods: {
+	}				
+		
+}
+
+</script>
+
+
+<style scoped>
+.s-note{
+	margin:20px;margin-top:0px;
+	text-align:left
+}
+.s-note-item{
+    color: rgb(173 173 173);
+    font-size: 16px;
+    font-weight: 600;
+	margin-bottom:10px;
+}
+.s-note-item > i{
+    font-size: 16px;
+    font-weight: 600;
+	margin-right:6px;
+}
+</style>
+
+

@@ -1,0 +1,134 @@
+<template>
+    <div class="caret" @click="Back()">
+        <i class="fa fa-caret-left"></i>
+    </div>
+    <div style="display:inline-block;float:left" v-if="$validator.IsSet(title)">
+        <!--<span style="padding-right:10px">
+            <i :class="icon"></i>
+        </span>-->
+        <span v-for="(item,index) in title.split(',')">
+            <span v-if="index==0">
+                <span @click="$router.back()" style="cursor:pointer">{{item}}</span>
+            </span>
+            <span v-else>
+                <span class="angle">
+                    <i class="fa fa-angle-right"></i>
+                </span>
+                <span>
+                    {{item}}
+                </span>
+            </span>
+        </span>
+    </div>
+
+    <div class="user_drop">
+        <el-dropdown>
+            <span class="el-dropdown-link">
+                <span class="el-dropdown-label">
+                    <el-icon class="el-icon--left">
+                        <i class="fa fa-user-gear"></i>
+                    </el-icon>
+                    &nbsp;&nbsp;{{$root.user.name}} 
+                </span>
+            </span>
+            <template #dropdown>
+                <el-dropdown-menu>
+                    <el-dropdown-item><el-icon class="el-icon--left"><i class="fa fa-edit"      /></el-icon> &nbsp;&nbsp;Ver perfil</el-dropdown-item>
+                    <el-dropdown-item @click="$root.Exit()"><el-icon class="el-icon--left"><i class="fa fa-sign-out"  /></el-icon> &nbsp;&nbsp;Sair</el-dropdown-item>
+                </el-dropdown-menu>
+            </template>
+        </el-dropdown>
+    </div>
+
+
+
+
+
+</template>
+
+
+<script>
+module.exports = {
+    components: {
+
+	},	
+	
+	data: function () {
+		return {
+
+		}
+	},computed: {
+      
+	},
+	
+	props:{
+        title:  { type: String, required: false, default: "Home" },
+        icon:   { type: String, required: false, default: "fa fa-house" }
+	},
+	watch:{
+	},
+	created: function () {
+		
+		
+	 },
+	mounted(){
+	},		  
+	methods: {
+        Back() {
+            //this.$root.RouteTo($root.lastRoute);
+            this.$router.back();
+        }
+	}				
+
+}
+
+</script>
+
+
+<style scoped>
+
+    .angle {
+        padding: 10px;
+		font-size:12px;
+	}
+    .caret {
+        margin-top:-12px;
+        padding: 10px;
+        vertical-align: middle;
+        height: 20px;
+        line-height: 20px;
+        text-align: left;
+        float: left;
+        display: inline-block;
+		font-size:24px;
+		cursor:pointer;
+		color:#fff;
+		background-color:#000144;
+    }
+
+    .user_drop {
+        display: inline-block;
+        max-width: 1600px;
+        text-align: end;
+        display: inherit;
+    }
+
+    .user_drop .el-dropdown-link {
+        cursor: pointer;
+        color: var(--el-color-primary);
+        display: flex;
+        align-items: center;
+        outline: none;
+    }
+
+    .user_drop .el-dropdown-label {
+        color: #a4a5ff;
+    }
+    .user_drop .el-dropdown-label:hover {
+        color: #fff;
+    }
+
+
+</style>
+
+

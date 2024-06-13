@@ -1,0 +1,155 @@
+﻿<template>
+    <div>
+
+		<div class="row">
+
+
+
+
+			<div class="col-6">
+
+					<q-tabs
+					v-model="tab"
+					dense
+					no-caps
+					align="left"
+					narrow-indicator
+ 					class="text-grey"
+					active-color="primary"
+					indicator-color="primary"
+					>
+					<q-tab name="texts" 	icon="fa fa-flag" label="Texts" />
+					<q-tab name="forms"		icon="fa fa-flag" label="Forms" />
+					<q-tab name="buttons"	icon="fa fa-flag" label="Buttons" />
+					</q-tabs>
+					<q-tab-panels v-model="tab" animated>
+
+						<q-tab-panel name="texts">
+							<div class="text-h6">Texts</div>
+							<s_texts />
+						</q-tab-panel>
+
+						<q-tab-panel name="forms">
+							<div class="text-h6">Forms</div>
+							<s_forms />
+						</q-tab-panel>
+
+						<q-tab-panel name="buttons">
+							<div class="text-h6">Buttons</div>
+							<s_buttons />
+						</q-tab-panel>
+
+					</q-tab-panels>
+
+
+			</div>
+			
+
+
+
+			
+			
+			<div class="col-6">
+
+				<div class="q-pa-md">
+					<div class="q-gutter-y-md" style="max-width: 600px">
+					  <q-card>
+						<q-tabs
+						  v-model="tab"
+						  dense
+						  inline-label
+						  class="text-grey"
+						  active-color="primary"
+						  indicator-color="primary"
+						  align="justify"
+						  narrow-indicator
+						>
+							<q-tab name="texts" 	icon="fa fa-flag" label="Texts" />
+							<q-tab name="forms"		icon="fa fa-flag" label="Forms" />
+							<q-tab name="buttons"	icon="fa fa-flag" label="Buttons" />
+						</q-tabs>
+
+						<q-separator />
+
+						<q-tab-panels v-model="tab" animated>
+						  <q-tab-panel name="texts">
+							<div class="text-h6">Tests</div>
+							<s_texts />
+						  </q-tab-panel>
+
+						  <q-tab-panel name="forms">
+							<div class="text-h6">Forms</div>
+							<s_forms />
+						  </q-tab-panel>
+
+						  <q-tab-panel name="buttons">
+							<div class="text-h6">Buttons</div>
+							<s_buttons />
+						  </q-tab-panel>
+						</q-tab-panels>
+					  </q-card>
+
+					</div>
+				  </div>
+
+			</div>
+
+
+
+		</div>
+		
+
+
+
+        </div>
+
+
+</template>
+
+
+
+<script>
+	module.exports = {
+
+		name: 'Navs',
+
+		components: {
+			s_texts:	LoadComponent("./pages/tests/Texts.htm"),
+			s_buttons:	LoadComponent("./pages/tests/Buttons.htm"),
+			s_forms:	LoadComponent("./pages/tests/Forms.htm"),
+		},
+
+		data: function () {
+			return {
+				 tab:"texts"
+			}
+		}, computed: {
+
+		},
+
+		props: {
+
+		},
+		watch: {
+
+		},
+		created: function () {
+
+		},
+		mounted() {
+		},
+		methods: {
+
+		}
+
+	}
+
+
+</script>
+
+
+<style>
+
+</style>
+
+

@@ -1,0 +1,113 @@
+﻿<template>
+	<div>
+			<el-row justify="center" @keyup.enter="Login()">
+				<el-col :xs="1"  :sm="7"  :md="8" :lg="9"  :xl="9"></el-col>
+				<el-col :xs="22" :sm="10" :md="8" :lg="6"  :xl="3" >
+						<div class="s-input-login" style="text-align:left">
+								    <div><i class="fa fa-envelope" ></i> E-MAIL <s-tip :show="validator.GetNote('email').show" :note="validator.GetNote('email')" /> <span></span> </div>
+								    <el-input v-model="$root.user.email" placeholder="" ref="email" maxlength="40" class="input-lower"></el-input>
+						</div>
+						<div class="s-input-login" style="margin-top:20px;text-align:left">
+								    <div><i class="fa fa-key" ></i> SENHA <s-tip :show="validator.GetNote('password').show" :note="validator.GetNote('password')" /> </div>
+								    <el-input v-model="$root.user.password" placeholder="" ref="password" maxlength="40"  class="input-no-text-transform" type="password" show-password></el-input>
+						</div>
+						<div class="s-input-login" style="margin-top:30px;text-align:center">
+				   					<el-button type="primary" @click="Login()">ENVIAR</el-button>
+						</div>
+                </el-col>
+				<el-col :xs="1"  :sm="7" :md="8" :lg="9" :xl="9"></el-col>
+            </el-row>
+	</div>
+</template>
+
+
+
+
+<script>
+	module.exports = {
+
+		name: '',
+
+		components: {
+
+		},
+
+		data: function () {
+			return {
+                api			: this.$api.New(),
+                validator	: this.$validator.New(),
+			}
+		}, computed: {
+
+		},
+
+		props: {
+
+		},
+		watch: {
+
+		},
+		created: function () {
+			 this.$root.SetTitle("LOGIN","fa fa-rigth-to-bracket");
+             this.validator.InitNoteKey("email"     );
+             this.validator.InitNoteKey("password"  );
+		},
+		mounted() {
+			//this.$root.SignIn();
+			this.$refs.email.focus();
+		},
+		methods: {
+
+
+			Login(){
+				
+                this.validator.StartValidations();
+
+				if(this.validator.not(this.$root.user.email))      
+						this.validator.SetNote("email"      ,"Necessário informar o <b>E-MAIL</b>"          );
+				else if(!this.validator.IsEmail(this.$root.user.email))      
+						this.validator.SetNote("email"      ,"<b>E-MAIL</b> inválido"						);
+				if(this.validator.not(this.$root.user.password))      
+						this.validator.SetNote("password"      ,"Necessário informar a <b>SENHA</b>"        );
+				else if(this.$root.user.password.length < 6)      
+						this.validator.SetNote("password"      ,"<b>SENHA</b> inválida (necessário mínimo de 6 caracteres)"	);
+                
+				if(this.validator.hasNotes)
+                    this.validator.Alert();
+				else
+					this.$root.SignIn();
+			}
+		}
+
+	}
+
+
+</script>
+
+
+<style scoped>
+.s-input-login{
+    /*max-width:240px !important;*/
+    letter-spacing: 0.02em;
+    color: #4c9afb;
+    margin-top:30px;
+}
+.s-input-login > div:first-child{
+    color: #4c9afb;
+    font-size: 0.9em;
+    line-height: 24px;
+    font-weight: 600;
+    text-decoration: inherit;
+    padding-left:2px;
+}
+.s-input-login > div:first-child > span{
+    color:#a0a0a0;
+    font-weight: 400;
+    font-size:0.9em;
+}
+.s-input-login > div:first-child > i{
+    padding-right:2px;
+}
+</style>
+
+

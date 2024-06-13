@@ -1,0 +1,433 @@
+<template>
+
+    <!--<el-affix :offset="offset" style="position:absolute">
+        <el-button type="primary">Offset top 120px</el-button>
+    </el-affix>-->          
+
+   <el-aside id="side-search" :style="showForm? 'width:320px':'width:0px'">
+    
+
+         <div  style="font-weight:800;z-index:100">
+            <div v-if="showForm">
+                <div style="float:left;padding:10px;padding-left:20px;color:var(--s-alt-color)">Filtrar Resultados</div>
+                <div class="link-collapser" style="float:right;color:var(--s-accent-color);padding:10px;cursor:pointer" v-if="showForm"   @click="ToggleShowForm" ><i  class="fa fa-chevron-left " />     </div>
+            </div>
+             <div  v-else style="height:40px;position:fixed;z-index:1000">
+                <q-btn color="primary" icon="fa fa-filter"  label="Filtrar"  @click="ToggleShowForm" style="height:30px;"></q-btn>
+             </div>
+         </div>
+
+        <div  v-if="showForm" class="search-wrapper" @click="enableFilterButton = true">
+                <div>
+                    <div style="z-index:-100;margin-top:30px;" >
+                        <!--<q-btn  color="primary" text-color="white" label="Venda"   style="width:49%" @click="()=>{$tools.Alert('Somente vendas disponíveis no momento');}" ></q-btn>
+                        <q-btn  color="white" text-color="primary" label="Aluguel" style="width:49%" @click="()=>{$tools.Alert('Somente vendas disponíveis no momento');}" ></q-btn>-->
+                    </div>
+                    <div class="search-form">
+
+								<el-row :gutter="20">
+                                        <el-col :md="24">
+								                        <div><p>Código</p><span></span></div>
+								                        <el-input input-style="color:var(--s-accent-color)" @keyup.enter="RequestSearch()" v-model="$root.search.imovelBusca.imovel.cod" placeholder="qualquer" maxlength="20"  ></el-input>
+                                        </el-col>
+                                </el-row>
+                        
+								<el-row :gutter="20">
+                                        <el-col :md="24">
+								                        <div><p>Estado</p><span></span></div>
+                                                        <el-select filterable v-model="$root.search.estado" class="m-4" placeholder="Selecionar" size="large" style="width:100%" @change="(item)=>{$root.search.DefinirEstado(item);enableFilterButton = true;}">
+                                                                <el-option
+                                                                    v-for="item in $root.search.opcoes.estados"
+                                                                    :key="item.id"
+                                                                    :label="item.label"
+                                                                    :value="item"
+                                                                ></el-option>
+                                                        </el-select>
+                                        </el-col>
+                                </el-row>
+
+								<el-row :gutter="20">
+                                        <el-col :md="24">
+								                        <div><p>Cidade</p><span></span></div>
+                                                        <div style="height:40px" v-if="$root.search.carregandoCidades">
+                                                            <c-loading size="30px" style="padding-left:5px"></c-loading>
+                                                        </div>
+                                                        <el-select v-else v-model="$root.search.cidade" filterable class="m-4" placeholder="Selecionar" size="large" style="width:100%" @click="()=>{ if($validator.not($root.search.estado)){ $tools.Alert('Selecione um <b>Estado</b> antes');} }" @change="(item)=>{$root.search.DefinirCidade(item);enableFilterButton = true;}">
+                                                                <el-option
+                                                                    v-for="item in $root.search.opcoes.cidades"
+                                                                    :key="item.id"
+                                                                    :label="item.label"
+                                                                    :value="item"
+                                                                ></el-option>
+                                                        </el-select>
+                                        </el-col>
+                                </el-row>
+
+								<el-row :gutter="20">
+                                        <el-col :md="24">
+								                        <div><p v-if="$root.search.bairros.length <= 1">Bairro</p><p v-else>Bairros</p><span></span></div>
+                                                        <div style="height:40px" v-if="$root.search.carregandoBairros">
+                                                            <c-loading size="30px" style="padding-left:5px"></c-loading>
+                                                        </div>
+                                                        <el-select v-else v-model="$root.search.bairros" multiple filterable :clearable="true" class="m-4" placeholder="qualquer" size="large" style="width:100%" @click="()=>{ if($validator.not($root.search.estado)){ $tools.Alert('Selecione <b>Estado</b> e <b>Cidade</b> antes');} }" @change="(item)=>{$root.search.DefinirBairros(item);enableFilterButton = true;}">
+                                                                <el-option
+                                                                    v-for="item in $root.search.opcoes.bairros"
+                                                                    :key="item.id"
+                                                                    :label="item.label"
+                                                                    :value="item"
+                                                                ></el-option>
+                                                        </el-select>
+                                        </el-col>
+                                </el-row>
+
+								<el-row :gutter="20">
+                                        <el-col :md="24">
+								                        <div><p>Tipo de imóvel</p><span></span></div>
+                                                        <el-select v-model="$root.search.tipoImovel" filterable class="m-4" placeholder="qualquer" size="large" style="width:100%" @change="enableFilterButton = true">
+                                                                <el-option
+                                                                    v-for="item in $root.search.opcoes.tiposImoveis"
+                                                                    :key="item.id"
+                                                                    :label="item.label"
+                                                                    :value="item"
+                                                                ></el-option>
+                                                        </el-select>
+                                        </el-col>
+                                </el-row>
+
+								<el-row :gutter="20">
+                                        <el-col :md="12" :sm="12" :xs="12">
+								                        <p>Valor Mínimo R$</p>
+								                        <!--<el-input input-style="color:var(--s-accent-color)" @blur="CheckValues" @keyup.enter="RequestSearch()" v-model="valorMinimo" placeholder="qualquer" maxlength="20"    :formatter="(value) => `R$ ${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, '.')"    :parser="(value) => value.replace(/\R\$\s?|(\.*)/g, '').replace(/[a-zA-Z]/g, '')"></el-input>-->
+								                        <el-input input-style="color:var(--s-accent-color)" @keyup.enter="RequestSearch()" v-model="valorMinimo" placeholder="qualquer" maxlength="20"    :formatter="(value) => `R$ ${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, '.')"    :parser="(value) => value.replace(/\R\$\s?|(\.*)/g, '').replace(/[a-zA-Z]/g, '')"></el-input>
+                                        </el-col>
+                                        <el-col :md="12" :sm="12" :xs="12">
+								                        <p>Valor Máximo R$</p>
+								                        <el-input input-style="color:var(--s-accent-color)" @keyup.enter="RequestSearch()" v-model="valorMaximo" placeholder="qualquer" maxlength="20"    :formatter="(value) => `R$ ${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, '.')"    :parser="(value) => value.replace(/\R\$\s?|(\.*)/g, '').replace(/[a-zA-Z]/g, '')"></el-input>
+                                        </el-col>
+                                </el-row>
+
+
+								<el-row :gutter="20">
+                                        <el-col :md="12" :sm="12" :xs="12">
+								                        <p>Área Mínima M²</p>
+								                        <el-input input-style="color:var(--s-accent-color)" @keyup.enter="RequestSearch()" v-model="areaMinima" placeholder="qualquer" maxlength="20"   :formatter="(value) => `${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, '.')"    :parser="(value) => value.replace(/(\.*)/g, '').replace(/[a-zA-Z]/g, '')"></el-input>
+                                        </el-col>
+                                        <el-col :md="12" :sm="12" :xs="12">
+								                        <p>Área Máxima M²</p>
+								                        <el-input input-style="color:var(--s-accent-color)" @keyup.enter="RequestSearch()" v-model="areaMaxima" placeholder="qualquer" maxlength="20"   :formatter="(value) => `${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, '.')"    :parser="(value) => value.replace(/(\.*)/g, '').replace(/[a-zA-Z]/g, '')"></el-input>
+                                        </el-col>
+                                </el-row>
+
+                        
+
+
+								<el-row :gutter="20">
+                                        <el-col :md="12" :sm="12" :xs="12">
+								                        <p>Quartos</p>
+                                                        <el-select v-model="quartos" filterable class="m-4" placeholder="qualquer" size="large"  input-style="color:var(--s-accent-color)" :teleported="false" @change="enableFilterButton = true">
+                                                                <el-option v-for="item in $root.search.opcoes.quantidades" :key="item.id"  :label="item.label + item.complement.replace('ou','')" :value="item.value">
+                                                                     <span :style="(item.id > 0)? 'font-weight:bold;margin-right:6px':''">{{ item.label }}</span>
+                                                                     <span style="font-size:12px">{{ item.complement }}</span>
+                                                                </el-option>
+                                                        </el-select>
+                                        </el-col>
+                                        <el-col :md="12" :sm="12" :xs="12">
+								                        <p>Vagas</p>
+                                                        <el-select v-model="vagas" filterable class="m-4" placeholder="qualquer" size="large"  input-style="color:var(--s-accent-color)" :teleported="false" @change="enableFilterButton = true">
+                                                                <el-option v-for="item in $root.search.opcoes.quantidades" :key="item.id"  :label="item.label + item.complement.replace('ou','')" :value="item.value">
+                                                                     <span :style="(item.id > 0)? 'font-weight:bold;margin-right:6px':''">{{ item.label }}</span>
+                                                                     <span style="font-size:12px">{{ item.complement }}</span>
+                                                                </el-option>
+                                                        </el-select>
+                                        </el-col>
+                                </el-row>
+
+                        
+								<el-row :gutter="20">
+                                        <el-col :md="12" :sm="12" :xs="12">
+								                        <p>Banheiros</p>
+                                                        <el-select v-model="banheiros" filterable class="m-4" placeholder="qualquer" size="large"  input-style="color:var(--s-accent-color)" :teleported="false" @change="enableFilterButton = true">
+                                                                <el-option v-for="item in $root.search.opcoes.quantidades" :key="item.id"  :label="item.label + item.complement.replace('ou','')" :value="item.value">
+                                                                     <span :style="(item.id > 0)? 'font-weight:bold;margin-right:6px':''">{{ item.label }}</span>
+                                                                     <span style="font-size:12px">{{ item.complement }}</span>
+                                                                </el-option>
+                                                        </el-select>
+                                        </el-col>
+                                        <el-col :md="12" :sm="12" :xs="12">
+								                        <p>Suítes</p>
+                                                        <el-select v-model="suites" filterable class="m-4" placeholder="qualquer" size="large" input-style="color:var(--s-accent-color)" :teleported="false" @change="enableFilterButton = true">
+                                                                <el-option v-for="item in $root.search.opcoes.quantidades" :key="item.id"  :label="item.label + item.complement.replace('ou','')" :value="item.value">
+                                                                     <span :style="(item.id > 0)? 'font-weight:bold;margin-right:6px':''">{{ item.label }}</span>
+                                                                     <span style="font-size:12px">{{ item.complement }}</span>
+                                                                </el-option>
+                                                        </el-select>
+                                        </el-col>
+                                </el-row>
+
+								<el-row :gutter="20">
+                                        <el-col :md="24" style="margin-top:5px;margin-bottom:10px">
+    					                        <p>Características</p>
+                                        </el-col>
+                                        <el-col :md="12" :sm="12" :xs="12">
+                                                <el-checkbox v-model="$root.search.imovelBusca.imovel.aguaIndividual     " label="Água individual  "></el-checkbox>
+                                                <el-checkbox v-model="$root.search.imovelBusca.imovel.alarme             " label="Alarme           "></el-checkbox>
+                                                <el-checkbox v-model="$root.search.imovelBusca.imovel.areaServico        " label="Área de Serviço  "></el-checkbox>
+                                                <el-checkbox v-model="$root.search.imovelBusca.imovel.armarioCozinha     " label="Armário cozinha  "></el-checkbox>
+                                                <el-checkbox v-model="$root.search.imovelBusca.imovel.armarioBanheiro    " label="Armário banheiro "></el-checkbox>
+                                                <el-checkbox v-model="$root.search.imovelBusca.imovel.armarioQuarto      " label="Armário quarto   "></el-checkbox>
+                                                <el-checkbox v-model="$root.search.imovelBusca.imovel.boxDespejo         " label="Box despejo      "></el-checkbox>
+                                                <el-checkbox v-model="$root.search.imovelBusca.imovel.cercaEletrica      " label="Cerca elétrica   "></el-checkbox>
+                                                <el-checkbox v-model="$root.search.imovelBusca.imovel.churrasqueira      " label="Churrasqueira    "></el-checkbox>
+                                                <el-checkbox v-model="$root.search.imovelBusca.imovel.closet             " label="Closet           "></el-checkbox>
+                                                <el-checkbox v-model="$root.search.imovelBusca.imovel.dce                " label="DCE              "></el-checkbox>
+                                        </el-col>
+                                        <el-col :md="12" :sm="12" :xs="12">
+                                                <el-checkbox v-model="$root.search.imovelBusca.imovel.gasCanalizado      " label="Gás canalizado   "></el-checkbox>
+                                                <el-checkbox v-model="$root.search.imovelBusca.imovel.hidromassagem     " label="Hidromassagem     "></el-checkbox>
+                                                <el-checkbox v-model="$root.search.imovelBusca.imovel.interfone         " label="Interfone         "></el-checkbox>
+                                                <el-checkbox v-model="$root.search.imovelBusca.imovel.jardim            " label="Jardim            "></el-checkbox>
+                                                <el-checkbox v-model="$root.search.imovelBusca.imovel.lavabo            " label="Lavabo            "></el-checkbox>
+                                                <el-checkbox v-model="$root.search.imovelBusca.imovel.piscina           " label="Piscina           "></el-checkbox>
+                                                <el-checkbox v-model="$root.search.imovelBusca.imovel.portaoEletronico  " label="Portao eletrônico "></el-checkbox>
+                                                <el-checkbox v-model="$root.search.imovelBusca.imovel.salas             " label="Salas             "></el-checkbox>
+                                                <el-checkbox v-model="$root.search.imovelBusca.imovel.salaoFestas       " label="Salão de festas   "></el-checkbox>
+                                                <el-checkbox v-model="$root.search.imovelBusca.imovel.quadraEsportiva   " label="Quadra esportiva  "></el-checkbox>
+                                        </el-col>
+                                </el-row>
+
+
+
+
+                    </div>
+					<el-row :gutter="20" class="search-form">
+                            <el-col :md="24" style="margin-top:-20px">
+                                <q-btn flat color="grey" icon="fa fa-cancel" label="limpar filtro"  @click="ClearFilter" style="width:160px"></q-btn><br />
+		                        <q-btn label="Aplicar filtro" color="secondary" :disable="!enableFilterButton" style="width:100%;height:40px" @click="RequestSearch"></q-btn>
+                            </el-col>
+                    </el-row>
+         
+
+                </div>
+        </div>
+   </el-aside>
+
+</template>
+
+<script>
+module.exports = {
+
+    components: {
+
+	},	
+	
+        data: function () {
+            return {
+                language            : "PT-BR",
+                labels              : [],
+                isMobile            : window.screen.width < 1000,
+                showForm            : window.screen.width > 1000,
+                offset              : window.screen.height - 200,
+                model               : "Aluguel",
+                isValidValues       :true,
+                enableFilterButton  :false,
+                currencyMask        : {},
+                            
+                tipoImovel          : "",
+                tipoOperacao        : "",
+                estado              : "",
+                cidade              : "",
+                bairro              : "",
+
+                valorMinimo         : "",
+                valorMaximo         : "",
+                
+                areaMinima          : "",
+                areaMaxima          : "",
+                
+                quartos             : "",
+                vagas               : "",
+                banheiros           : "",
+                suites              : "",
+
+
+            }
+        }, computed: {
+
+        },
+
+        props: {
+                show:			{ type: Boolean, required: false, default: (window.screen.width > 1000) },
+        },
+        watch: {
+        },
+        created: function () {
+
+
+           if(this.$validator.is(this.$root.search.imovelBusca.imovel.valorMaximo) && this.$root.search.imovelBusca.imovel.valorMaximo > 0){
+               this.valorMaximo = "R$ "+this.$root.search.imovelBusca.imovel.valorMaximo;
+           }
+           if(this.$validator.is(this.$root.search.imovelBusca.imovel.quartos))
+               this.quartos = this.$root.search.imovelBusca.imovel.quartos;
+
+          //c2("this.$root.search.estado",this.$root.search.estado)
+           //if(!this.$root.search.isSetUpOK){
+           //     this.$root.search.estado = "";
+           //     this.$root.search.cidade = "";
+           //     this.$root.search.SetUpOptions();
+           //}
+            this.showForm = this.show;
+            this.$root.search.opcoes.estados = [{label:"MG - Minas Gerais",value:"MG"}];
+	    },
+	    mounted(){
+           // cclear();
+           //this.isCollapse = this.$root.isMenuCollapse;
+            this.RequestSearch();
+
+
+	    },		  
+	    methods: {
+
+            ToggleShowForm() {
+                this.$tools.Top();
+                this.showForm = !this.showForm;
+                this.$emit("showform");
+            },
+
+            CheckValues(){
+
+                this.isValidValues = true;
+
+                this.$root.search.imovelBusca.imovel.valorMinimo    =  this.$validator.is(this.valorMinimo   )?  parseInt(this.valorMinimo.replace("R$ ","").replaceAll(".","")) : 0;
+                this.$root.search.imovelBusca.imovel.valorMaximo    =  this.$validator.is(this.valorMaximo   )?  parseInt(this.valorMaximo.replace("R$ ","").replaceAll(".","")) : 0;
+
+                this.$root.search.imovelBusca.imovel.areaMinima     =  this.$validator.is(this.areaMinima    )?  parseInt(this.areaMinima.replace("m² ","").replaceAll(".","")) : 0;
+                this.$root.search.imovelBusca.imovel.areaMaxima     =  this.$validator.is(this.areaMaxima    )?  parseInt(this.areaMaxima.replace("m² ","").replaceAll(".","")) : 0;
+
+                c2("this.$root.search.imovelBusca.imovel.valorMinim0",this.$root.search.imovelBusca.imovel.valorMinimo);
+                c2("this.$root.search.imovelBusca.imovel.valorMaxim0",this.$root.search.imovelBusca.imovel.valorMaximo);
+
+                if(this.$root.search.imovelBusca.imovel.valorMaximo > 0 && (this.$root.search.imovelBusca.imovel.valorMaximo < this.$root.search.imovelBusca.imovel.valorMinimo)){
+                    this.$tools.Alert("<b>Valor Máximo</b> deve ser maior ou igual ao <b>Valor Mínimo</b>")
+                    this.isValidValues = false;
+                }
+                if(this.$root.search.imovelBusca.imovel.areaMaxima > 0 && (this.$root.search.imovelBusca.imovel.areaMaxima < this.$root.search.imovelBusca.imovel.areaMinima)){
+                    this.$tools.Alert("<b>Área Máxima</b> deve ser maior ou igual à <b>Área Mínima</b>");
+                    this.isValidValues = false;
+                }
+            },
+
+            RequestSearch(){
+
+                    this.CheckValues();
+
+                    if(this.isValidValues){
+
+                            this.$root.search.imovelBusca.page                  = 0;
+
+                            this.$root.search.imovelBusca.imovel.quartos        =  this.$validator.is(this.quartos  )? parseInt(this.quartos    ) : 0;
+                            this.$root.search.imovelBusca.imovel.vagas          =  this.$validator.is(this.vagas    )? parseInt(this.vagas      ) : 0;
+                            this.$root.search.imovelBusca.imovel.banheiros      =  this.$validator.is(this.banheiros)? parseInt(this.banheiros  ) : 0;
+                            this.$root.search.imovelBusca.imovel.suites         =  this.$validator.is(this.suites   )? parseInt(this.suites     ) : 0;
+
+                            this.$root.search.imovelBusca.imovel.valorMinimo    =  this.$validator.is(this.valorMinimo   )?  this.$tools.ParseInt(this.valorMinimo.replace("R$ ","").replaceAll(".","")) : 0;
+                            this.$root.search.imovelBusca.imovel.valorMaximo    =  this.$validator.is(this.valorMaximo   )?  this.$tools.ParseInt(this.valorMaximo.replace("R$ ","").replaceAll(".","")) : 0;
+                            //c2("this.valorMinimo",this.valorMinimo)
+                            //c2("this.$root.search.imovelBusca.imovel.valorMinimo",this.$root.search.imovelBusca.imovel.valorMinimo)
+
+                            this.$root.search.imovelBusca.imovel.areaMinima     =  this.$validator.is(this.areaMinima    )?  this.$tools.ParseInt(this.areaMinima.replace("m² ","").replaceAll(".","")) : 0;
+                            this.$root.search.imovelBusca.imovel.areaMaxima     =  this.$validator.is(this.areaMaxima    )?  this.$tools.ParseInt(this.areaMaxima.replace("m² ","").replaceAll(".","")) : 0;
+                    
+                            if(this.$validator.is(this.$root.search.tipoImovel))
+                                  this.$root.search.imovelBusca.imovel.tipo = this.$root.search.tipoImovel.label;  
+                    
+                            if(this.$validator.is(this.$root.search.estado))
+                                  this.$root.search.imovelBusca.imovel.estado = this.$root.search.estado.value;  
+                    
+                            if(this.$validator.is(this.$root.search.cidade))
+                                  this.$root.search.imovelBusca.imovel.cidade = this.$root.search.cidade.label;  
+                    
+                            this.$root.search.imovelBusca.imovel.bairros = [];
+                            if(this.$root.search.bairros?.length > 0)
+                                  this.$root.search.bairros.forEach(item => this.$root.search.imovelBusca.imovel.bairros.push(item.label));  
+                    
+                            this.$root.search.imovelBusca.imovel.finalidade = "Venda";
+                             //console.table(this.$root.search.imovelBusca.imovel.bairros);
+                        //c(this.$root.search.imovelBusca.imovel);
+
+							if (this.isMobile && this.showForm)
+							   this.ToggleShowForm();
+
+                           this.$emit("requestsearch");
+                    }
+
+
+            },
+
+
+            ClearFilter(){
+
+
+                this.$root.search.imovelBusca =    this.$models.imovelBusca();
+
+               this.$root.search.cidade                     =   null;
+               this.$root.search.estado                     =   null;
+               this.$root.search.bairro                     =   null;
+               this.$root.search.cidades                    =   [];
+               this.$root.search.cidades                    =   [];
+               this.$root.search.bairros                    =   [];
+               this.$root.search.localEstado                =   "";
+               this.$root.search.opcoes.bairros             =   [];
+               this.$root.search.opcoes.cidades             =   [];
+
+               this.$root.search.imovelBusca.imovel.cod     = "";
+
+               this.tipoImovel    = "";
+               this.tipoOperacao  = "";
+               //this.estado        = "";
+               //this.cidade        = "";
+               //this.bairro        = "";
+               this.valorMinimo   = "";
+               this.valorMaximo   = "";
+               this.areaMinima    = "";
+               this.areaMaxima    = "";
+               this.quartos       = "";
+               this.vagas         = "";
+               this.banheiros     = "";
+               this.suites        = "";
+        
+               //c("clear")
+
+            }
+
+	    }				
+		
+}
+
+</script>
+
+
+<!--<script setup>
+const isCollapse = ref(true);
+const handleOpen = function(key, keyPath){
+  c(key, keyPath);
+}
+const handleClose = function(key, keyPath){
+  c(key, keyPath);
+}
+</script>-->
+
+<style scoped>
+
+
+#side-search{
+  transition: width 0.3s;
+  /*width: 320px;*/
+  /*max-width: 320px;*/
+  overflow-x:hidden;
+}
+ 
+
+
+</style>
+
+

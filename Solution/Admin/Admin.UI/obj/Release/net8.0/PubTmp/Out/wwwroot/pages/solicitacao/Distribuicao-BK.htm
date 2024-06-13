@@ -1,0 +1,204 @@
+<template>
+    <div>
+        <el-row v-if="loading">
+            <el-col :md="24">
+                <c-loading padding="0px" style="padding: 0px;margin-top: -17px;"></c-loading>
+            </el-col>
+        </el-row>
+        <div class="row" :style="(loading)? 'opacity:0':'opacity:1'">
+            <div class="col-12">
+                <div id="chart"></div>
+            </div>
+        </div>
+    </div>
+</template>
+
+
+
+
+<script>
+    module.exports = {
+
+        name: 'Solicitacao_Distribuicao',
+
+        components: {
+
+        },
+        data: function () {
+            return {
+                index: 0,
+                charts: [],
+                chart1: {},
+                chart2: {},
+                xaxisCat: [],
+                solicitacoesAguardando: [],
+                solicitacoesVerificando: [],
+                solicitacoesFinalizadas: [],
+                ontablequest: false,
+                admins: (this.$root.admins.filter(a => !a.god && !a.gestor)),
+                loading: true
+            }
+        }, computed: {
+
+        },
+
+        props: {
+            solicitacoes: { type: Array, required: true, default: [] },
+            //solicitacoesAguardando:  { type: Array, required: true, default: [] },
+            //solicitacoesVerificando: { type: Array, required: true, default: [] },
+            //solicitacoesFinalizadas: { type: Array, required: true, default: [] },
+            //          totalAguardando:         { type: Number,required: false, default:  0 },
+            //          totalVerificando:        { type: Number,required: false, default:  0 },
+            //          totalFinalizadas:        { type: Number,required: false, default:  0 },
+        },
+        watch: {
+
+        },
+        created: function () {
+
+        },
+        mounted() {
+            //c2("solicitacoesAguardando", this.solicitacoesAguardando)
+            //this.BuildChart();
+        },
+        methods: {
+
+
+            async AlterarDisponibilidade(scope) {
+
+                var request = await this.$api.Post("usuario/alterar/disponibilidade", scope.row);
+
+                if (request.status.success)
+                    this.$tools.MessageSuccess("disponibilidade alterada");
+                else {
+                    window.setTimeout(() => scope.row.disponivel = !scope.row.disponivel, 1000);
+                    this.$tools.Alert("Não foi possível alterar a disponibilidade.");
+                }
+
+            },
+
+            BuildChart(solicitacoesAguardando, solicitacoesVerificando, solicitacoesFinalizadas, adminSelecionado) {
+
+                this.loading = false;
+
+                var categories = [];
+                var data = [];
+                var dataAguardando = [];
+                var dataVerificando = [];
+                var dataFinalizadas = [];
+                var qtd = 0;
+
+                var solicitacoes = this.solicitacoes;
+
+                if (adminSelecionado.id > 0) {
+                    categories.push(adminSelecionado.nome);
+                    dataAguardando.push(solicitacoesAguardando.filter(s => s.ativo && s.idAdmin == adminSelecionado.id).length);
+                    dataVerificando.push(solicitacoesVerificando.filter(s => s.ativo && s.idAdmin == adminSelecionado.id).length);
+                } else {
+
+                    this.$root.admins.forEach(a => {
+                        if (!a.god && !a.gestor) {
+
+                            categories.push(a.nome);
+
+                            //data.push(this.solicitacoes.filter(s => s.ativo && s.idAdmin == a.id).length);
+                            dataAguardando.push(solicitacoesAguardando.filter(s => s.ativo && s.idAdmin == a.id).length);
+                            dataVerificando.push(solicitacoesVerificando.filter(s => s.ativo && s.idAdmin == a.id).length);
+                            //dataFinalizadas.push(solicitacoesFinalizadas.filter(s => s.ativo && s.idAdmin == a.id).length);
+
+                        }
+                    });
+
+                }
+
+
+                var options = {
+                    series: [
+                        // { name: "Total", data: data },
+                        { name: "Aguardando", data: dataAguardando, color: "#ff722c" },
+                        { name: "Verificando", data: dataVerificando, color: "#0072ff" }
+                    ],
+                    chart: {
+                        type: 'bar',
+                        height: 350
+                    },
+                    plotOptions: {
+                        bar: {
+                            borderRadius: 4,
+                            horizontal: true,
+                        }
+                    },
+                    fill: {
+                        colors: ['#ff722c', '#0072ff']
+                    },
+                    markers: {
+                        colors: ['#ff722c', '#0072ff']
+                    },
+                    dataLabels: {
+                        enabled: false
+                    },
+                    xaxis: {
+                        categories: categories
+                    }
+                };
+
+                // Destroy if exists in order to re-update the data
+                if (this.charts[0]) {
+                    this.charts[0].destroy();
+                    this.charts = [];
+                }
+
+                this.charts.push(new ApexCharts(document.querySelector("#chart"), options));
+                this.charts[0].render();
+
+            },
+
+
+
+            BuildChartDemo() {
+                var options = {
+                    series: [{
+                        data: [400, 430, 448, 470, 540, 580, 690, 1100, 1200, 1380]
+                    }],
+                    chart: {
+                        type: 'bar',
+                        height: 350
+                    },
+                    plotOptions: {
+                        bar: {
+                            borderRadius: 4,
+                            horizontal: true,
+                        }
+                    },
+                    dataLabels: {
+                        enabled: false
+                    },
+                    xaxis: {
+                        categories: ['South Korea', 'Canada', 'United Kingdom', 'Netherlands', 'Italy', 'France', 'Japan',
+                            'United States', 'China', 'Germany'
+                        ],
+                    }
+                };
+
+                var chart = new ApexCharts(document.querySelector("#chart"), options);
+                chart.render();
+
+            },
+
+
+
+
+
+
+        }
+
+    }
+
+
+</script>
+
+
+<style scoped>
+</style>
+
+

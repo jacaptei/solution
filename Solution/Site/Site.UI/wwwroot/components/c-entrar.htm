@@ -1,0 +1,108 @@
+<template>
+	<div>
+
+        <div v-if="liberado">
+            
+            <!--<q-btn v-if="!$root.isAuth" color="primary" icon="fa fa-user-circle" label="API" @click="ApiTest()" ></q-btn>-->
+            <q-btn v-if="!$root.isAuth" color="primary" icon="fa fa-user-circle" label="Entrar" @click="$root.Login()"></q-btn>
+
+            <div v-else class="user_drop">
+                <el-dropdown>
+                    <span class="el-dropdown-link">
+                        <span class="el-dropdown-label">
+                            <el-icon class="el-icon--left" size="20" style="color:var(--s-accent-color)">
+                                <i class="fa fa-user"></i>
+                            </el-icon>
+                            <span style="padding:0px;color:var(--s-alt-accent-color);font-size:9pt">
+                                {{$root.usuario.apelido}}
+                            </span>
+                        </span>
+                    </span>
+                    <template #dropdown>
+                        <el-dropdown-menu>
+                            <!--<el-dropdown-item><el-icon class="el-icon--left"><i class="fa fa-edit" /></el-icon> &nbsp;&nbsp;Ver perfil</el-dropdown-item>-->
+                            <el-dropdown-item @click="$root.RouteTo('Perfil')"><el-icon class="el-icon--left"><i class="fa fa-edit" /></el-icon> &nbsp;&nbsp;Perfil</el-dropdown-item>
+                            <el-dropdown-item @click="$root.Exit()"><el-icon class="el-icon--left"><i class="fa fa-sign-out" /></el-icon> &nbsp;&nbsp;Sair</el-dropdown-item>
+                        </el-dropdown-menu>
+                    </template>
+                </el-dropdown>
+            </div>
+
+
+            </div>
+
+
+
+        </div>
+</template>
+
+<script>
+module.exports = {
+    components: {
+
+	},	
+	
+	data: function () {
+		return {
+            liberado:true
+		}
+	},computed: {
+      
+	},
+	
+	props:{
+	},
+	watch:{
+	},
+	created: function () {
+	 },
+	mounted(){
+
+	},		  
+	methods: {
+        is(val) {
+            return (val && val != null && val !== null && val !== "null" && val != "null" && val != "" && typeof val != undefined && typeof val !== undefined && typeof val != 'undefined' && typeof val != 'UNDEFINED' && typeof val !== 'undefined' && typeof val !== 'UNDEFINED');
+        },
+
+	}				
+
+}
+
+</script>
+
+
+<style scoped>
+
+	.user_drop{
+		height:22px;
+		padding-top:15px
+	}
+
+    .box-login {
+        width: 100%;
+        width: 300px;
+        min-width: 210px;
+        max-width: 420px;
+        padding: 10px;
+        font-size: 18px;
+        font-weight: 300;
+        min-height: 260px;
+        height: 300px;
+        color: #FFF;
+		text-align:center;
+        background-color: var(--s-alt-accent-color);
+    }
+
+    .box-login-footer {
+        padding: 10px;
+        font-size: 18px;
+        font-weight: 300;
+        height: 60px;
+        color: #FFF;
+        background-color: #134d8f;
+        border-radius: 10px;
+    }
+
+</style>
+
+

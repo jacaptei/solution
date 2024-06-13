@@ -1,0 +1,68 @@
+﻿<template>
+
+    <div>
+        <article>
+        </article>
+    </div>
+
+
+</template>
+
+
+<script>
+    module.exports = {
+
+        name: 'HOME',
+
+        components: {
+
+        },
+
+        data: function () {
+            return {
+            }
+        }, computed: {
+
+        },
+
+        props: {
+
+        },
+        watch: {
+            //"pct":function(){ this.updateLabels(); }
+        },
+        created: function () {
+            this.$root.SetTitle("Home", "fa fa-home", null);
+        },
+        mounted() {
+            // window.setTimeout(() => {
+            //this.$root.RouteTo("/admin/user/home");
+            //}, 400);
+        },
+        methods: {
+
+
+        }
+
+    }
+
+
+
+
+
+
+
+
+</script>
+
+
+
+<style scoped>
+
+    .accent-name {
+        color: var(--s-color-accent);
+        font-weight: 600;
+    }
+</style>
+
+

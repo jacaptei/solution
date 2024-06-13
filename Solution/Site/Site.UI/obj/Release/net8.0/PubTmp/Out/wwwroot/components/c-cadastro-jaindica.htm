@@ -1,0 +1,599 @@
+<template>
+
+
+
+			<div>
+						<div style="margin-top:40px;text-align:center;width:100%">
+							<div class="form-area" id="form-area" style="background:var(--s-accent-color);">
+
+								<div style="text-align:center;width:100%;padding-top:50px">
+									<p class="title">
+										Indique um imóvel agora
+									</p>
+								</div>
+
+								<div class="form" id="form"  v-if="view == 'form_pt1' || view == 'form_pt2' ">
+									<div  v-if="view == 'form_pt1' ">
+											<el-col :md="24">
+														<el-row :gutter="20">
+
+																<el-col :md="24" style="padding-left:20px;font-weight:700;font-size:20px">
+																			Informe <b>seus dados</b>
+																</el-col>
+
+																<el-col :sm="12"  :md="6"  :lg="6" class="s-input" >
+																				<div>CPF<span></span></div>
+																				<el-input @keyup.enter="Next()" v-model="indicacao.cpf"  maxlength="22" v-maska data-maska="###.###.###-##" @blur="CheckDoc"></el-input>
+																</el-col>
+																<el-col :sm="12"  :md="6"  :lg="6" class="s-input" >
+																				<div>NOME COMPLETO<span></span></div>
+																				<el-input @keyup.enter="Next()" v-model="indicacao.nome" placeholder="" maxlength="80" input-style="text-transform:uppercase;"></el-input>
+																</el-col>
+																<el-col :sm="12"  :md="6"  :lg="6" class="s-input" >
+																		<div>SEXO <span></span></div>
+																		<el-select filterable v-model="indicacao.sexo" class="m-4" placeholder="Selecionar" size="large" style="width:100%">
+																				<el-option
+																					v-for="item in opcoes.sexos"
+																					:key="item.id"
+																					:label="item.label"
+																					:value="item.value"
+																				></el-option>
+																		</el-select>
+																</el-col>
+										
+																<el-col :sm="12"  :md="6"  :lg="68" class="s-input" >
+																				<div>E-MAIL <span></span></div>
+																				<el-input @keyup.enter="Next()" v-model="indicacao.email" placeholder="" maxlength="80" input-style="text-transform:lowercase;"></el-input>
+																</el-col>
+																<el-col :sm="12"  :md="6"  :lg="6" class="s-input" >
+																				<div>TELEFONE <span></span></div>
+																				<el-input @keyup.enter="Next()" v-model="indicacao.telefone" placeholder="(11) 11111-1111" maxlength="40" input-style="text-transform:lowercase;" v-maska data-maska="(##) #####-#### ********************"></el-input>
+																</el-col>
+																<el-col :md="24" style="margin-top:20px">
+																		<q-btn label="PROSSEGUIR" color="secondary"  @click="Next" style="width:100%;height:40px"></q-btn>
+																</el-col>
+														</el-row>
+
+
+												</el-col>
+										</div>
+										<div v-else-if="view == 'form_pt2' ">
+														<el-row :gutter="20" >
+
+
+																<el-col :md="24" style="padding-left:20px;font-weight:700;font-size:20px">
+																			Informe dados do <b>proprietário e do Imóvel indicado</b>
+																</el-col>
+
+																<el-col :sm="12"  :md="6"  :lg="8" class="s-input" >
+																			<div>VALOR <span> do Imóvel</span></div>
+													                        <el-input input-style="color:var(--s-accent-color)" v-model="indicacao.valor"  @keyup.enter="Send()" maxlength="40"  :formatter="(value) => `R$ ${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, '.')"    :parser="(value) => value.replace(/\R\$\s?|(\.*)/g, '').replace(/[a-zA-Z]/g, '')"></el-input>
+																</el-col>
+
+																<el-col :sm="12"  :md="6"  :lg="8" class="s-input" >
+																		<div>TIPO <span> de Imóvel</span></div>
+																		<el-select filterable v-model="indicacao.tipo" class="m-4" placeholder="Selecionar" size="large" style="width:100%">
+																				<el-option
+																					v-for="item in opcoes.tiposImoveis"
+																					:key="item.id"
+																					:label="item.label"
+																					:value="item.value"
+																				></el-option>
+																		</el-select>
+																</el-col>
+																									
+																<el-col :sm="12"  :md="6"  :lg="8" class="s-input" >
+																			<div>CEP<span> do Imóvel</span></div>
+								                                            <el-input v-model="cep.numero" placeholder="" ref="postalCode" v-maska data-maska="#####-###" @keyup="()=>{  if(cep.numero.length>=9){BuscarEndereco();} }">
+                                                                                <template #append>
+																						<c-loading size="20px" v-if="carregandoCEP" ></c-loading>
+                                                                                        <i class="fa fa-search" v-else-if="(cep.numero.length < 9)" style="color:var(--s-accent-color)" @click="$tools.Alert('Preencha todo o CEP para poder realizar a busca.')" ></i>
+                                                                                        <i class="fa fa-search" v-else style="color:var(--s-accent-color);cursor:pointer" @click="BuscarEndereco"></i>
+                                                                                </template>
+                                                                            </el-input>
+																</el-col>
+
+																<el-col :sm="12"  :md="6"  :lg="8" class="s-input" >
+																				<div>ESTADO<span> do Imóvel</span></div>
+																				<div style="height:40px" v-if="carregandoEstados">
+																					<c-loading size="30px" style="padding-left:5px"></c-loading>
+																				</div>
+																				<el-select v-else filterable v-model="indicacao.estado" class="m-4" placeholder="Selecionar" size="large" style="width:100%" @change="(item)=>{ObterCidades(item);enableFilterButton = true;}">
+																						<el-option
+																							v-for="item in opcoes.estados"
+																							:key="item.id"
+																							:label="item.label"
+																							:value="item.value"
+																						></el-option>
+																				</el-select>
+																</el-col>
+																<el-col :sm="12"  :md="6"  :lg="8" class="s-input">
+																				<div>CIDADE<span> do Imóvel</span></div>
+																				<div style="height:40px" v-if="carregandoCidades">
+																					<c-loading size="30px" style="padding-left:5px"></c-loading>
+																				</div>
+																				<el-select v-else v-model="indicacao.cidade" filterable class="m-4" placeholder="Selecionar" size="large" style="width:100%" @click="()=>{ if($validator.not(indicacao.estado)){ $tools.Alert('Selecione um <b>Estado</b> antes');} }" @change="(item)=>{ObterBairros(item);enableFilterButton = true;}">
+																						<el-option
+																							v-for="item in opcoes.cidades"
+																							:key="item.id"
+																							:label="item.label"
+																							:value="item.value"
+																						></el-option>
+																				</el-select>
+																</el-col>
+																<el-col :sm="12"  :md="6"  :lg="8" class="s-input">
+																		<div>BAIRRO <span> do Imóvel</span></div>
+																		<div style="height:40px" v-if="carregandoBairros">
+																			<c-loading size="30px" style="padding-left:5px"></c-loading>
+																		</div>
+																		<el-select v-else v-model="indicacao.bairro" filterable :clearable="true" class="m-4" placeholder="Selecionar" size="large" style="width:100%;" @click="()=>{ if($validator.not(indicacao.estado)){ $tools.Alert('Selecione <b>Estado</b> e <b>Cidade</b> antes');} }" @change="(item)=>{DefinirBairro(item);enableFilterButton = true;}">
+																				<el-option
+																					v-for="item in opcoes.bairros"
+																					:key="item.id"
+																					:label="item.label"
+																					:value="item.value"
+																				></el-option>
+																		</el-select>
+																</el-col>
+																<el-col :sm="12"  :md="6"  :lg="8" class="s-input" >
+																				<div>LOGRADOURO <span style="color:#808080">&nbsp; do Imóvel (rua, avenida, praça, etc)</span></div>
+																				<el-input @keyup.enter="Send()" v-model="indicacao.logradouro" placeholder="" maxlength="80" input-style="text-transform:uppercase;"></el-input>
+																</el-col>
+																<el-col :sm="12"  :md="6"  :lg="8" class="s-input" >
+																				<div>NÚMERO <span style="color:#808080">&nbsp; do Imóvel (informe <b>SN</b> se não houver)</span></div>
+																				<el-input @keyup.enter="Send()" v-model="indicacao.numero" placeholder="" maxlength="80" input-style="text-transform:uppercase;" ref="addressnumber"></el-input>
+																</el-col>
+																<el-col :sm="12"  :md="6"  :lg="8" class="s-input" >
+																				<div>NOME do Proprietário <span> do Imóvel</span></div>
+																				<el-input @keyup.enter="Send()" v-model="indicacao.proprietarioNome" placeholder="" maxlength="80" input-style="text-transform:uppercase;"></el-input>
+																</el-col>
+																<el-col :sm="12"  :md="6"  :lg="8" class="s-input" >
+																				<div>TELEFONE do Proprietário<span> do Imóvel</span></div>
+																				<el-input @keyup.enter="Send()" v-model="indicacao.proprietarioTelefone" placeholder="(11) 11111-1111" maxlength="40"  v-maska data-maska="(##) #####-#### ********************"></el-input>
+																</el-col>
+																<el-col :sm="12"  :md="6"  :lg="8" class="s-input" >
+																				<div>Observação <span></span></div>
+																				<el-input @keyup.enter="Send()" v-model="indicacao.obs" maxlength="200" ></el-input>
+																</el-col>
+
+														</el-row>
+
+														<el-row :gutter="20">
+																<el-col :md="24" style="margin:20px">
+																				<el-checkbox v-model="indicacao.aceitouPoliticaPrivacidade" >o proprietário está ciente do compartilhamento de seus dados</el-checkbox>
+																</el-col>
+														</el-row>
+
+														<el-row :gutter="20">
+																<el-col :md="6" style="margin-top:0px">
+																		<q-btn label="Voltar" color="grey" @click="ShowView('form_pt1')" style="width:100%;height:40px"></q-btn>
+																</el-col>
+																<el-col :md="18" style="margin-top:0px">
+																		<q-btn label="Enviar" color="secondary" @click="Send()" style="width:100%;height:40px"></q-btn>
+																</el-col>
+														</el-row>
+
+									</div>
+
+
+								</div>
+
+
+
+									<div v-if="view=='sending'" style="min-height:374px">
+												<br /><br />
+												<div class="title" style="color:#fff"><b>Enviando</b></div>
+												<br /><br />
+												<c-loading size="3em" color="#fff"></c-loading>
+									</div>
+
+									<div v-else-if="view=='alert'">
+												<br /><br />
+												<div class="title" style="color:var(--s-color-yellow)"><b><i class="fa-solid fa-triangle-exclamation"></i> Atenção</b></div>
+												<br /><br />
+												<br /><span v-html="messageAlert"></span>
+												<br /><br />
+												<q-btn color="white" text-color="indigo-10" label="VOLTAR" @click="ShowView(viewLast)" style="width:160px;"  id="btn_voltar_5"></q-btn>
+									</div>
+
+									<div v-else-if="view=='success'" style="min-height:374px">
+												<div >
+													<br />
+													<br />
+													<div class="title" style="color:#fff"><b><i class="fa fa-circle-check" style="color:#fff"></i> Sucesso</b></div>
+													<br />
+													<span style="font-size:17px;color:#fff"><b>Imóvel indicado!</b></span>
+													<br />
+													<br />
+													<div>
+														<br />
+														<br />
+														<q-btn  label="INDICAR OUTRO" color="secondary"		style="font-size:18px;width:50%;height:50px;border-radius:20px" @click="ShowView('form_pt1')"></q-btn>
+													</div>
+												</div>
+									</div>
+
+									<div v-else-if="view=='fail'">
+												<div class="title" style="color:var(--s-color-red)"><b><i class="fa fa-circle-xmark"></i> Falhou</b></div>
+												<br /><br />
+												<br /><span v-html="messageFail"></span>
+												<br /><br />
+												<q-btn color="white" text-color="indigo-10" label="VOLTAR" @click="ShowView(viewLast)" style="width:160px;"  id="btn_voltar_5"></q-btn>
+									</div>
+
+
+
+
+
+							</div>
+						</div>
+
+			</div>
+
+
+
+
+</template>
+
+<script>
+module.exports = {
+    components: {
+
+	},	
+	
+	data: function () {
+		return {
+			onRequest:false,
+            view:"form_pt1",
+			messageSuccess		: "Enviado!",
+			messageAlert		: "",
+			messageFail			: "Não foi possível enviar os dados, favor tentar novamente.",
+			content:"",
+			DiaNascimento:0, 
+			MesNascimento:0,
+			AnoNascimento:0,
+			senhaConfirma:"",
+			carregandoCEP:false,
+			carregandoEstados:false,
+			carregandoCidades:false,
+			carregandoBairros:false,
+			indicacao:{
+                nome: "",
+                cpf: "",
+                sexo: "NA",
+                email: "",
+                telefone: "",
+                cep: "",
+                logradouro: "",
+                numero: "",
+                complemento: "",
+                bairro: "",
+                cidade: "",
+				estado: "",
+				valor: null,
+				tipo:null,
+                proprietarioNome:"",
+                proprietarioTelefone:"",
+				obs:"",
+                aceitouPoliticaPrivacidade: false
+			},
+			cep:{
+				numero:"",
+				estado:"",
+				cidade:"",
+				logradouro:""
+			},
+			opcoes:{ 
+					estados:  this.$sdata.forms.states ,
+					cidades: [] ,
+					estadosCreci:  this.$sdata.forms.states ,
+					cidadesCreci: [] ,
+					bairros: [] ,
+					tiposImoveis:[{id:1,label:"APARTAMENTO PADRÃO", value:"APARTAMENTO PADRÃO"},{id:2,label:"ÁREA PRIVATIVA", value:"ÁREA PRIVATIVA"},{id:3,label:"COBERTURA", value:"COBERTURA"}],
+					sexos:[{id:1,label:"NÃO APLICÁVEL", value:"NA"},{id:2,label:"MASCULINO", value:"MASCULINO"},{id:3,label:"FEMININO", value:"FEMININO"}],
+				}
+		}
+	},computed: {
+      
+	},
+	
+	props:{
+	},
+	watch:{
+	},
+	created: function () {
+        //this.indicacao = this.$models.usuario();
+		//this.opcoes.estados = this.$sdata.forms.states;
+	 },
+	mounted(){
+		var count=0;
+		//c2("idTipo",this.indicacao.idTipo)
+		//c2("tipo",this.indicacao.tipo)
+	},		  
+	methods: {
+
+         async BuscarEndereco(){
+
+                if(this.cep.numero !== this.indicacao.cep){
+                            
+							this.carregandoCEP		= true;
+							this.carregandoEstados	= true;
+							this.carregandoCidades	= true;
+							this.carregandoBairros	= true;
+
+                            this.cep.cidade             = this.indicacao.cidade     = ""  ;
+                            this.cep.logradouro         = this.indicacao.logradouro = ""  ;
+                            this.cep.bairro				= this.indicacao.bairro		= ""  ;
+                            this.cep.estado             = this.indicacao.estado     = ""  ;
+
+                            this.indicacao.cep = this.cep.numero;
+                            let res = await this.$sdata.SearchAddress(this.cep.numero);
+                            if(this.$validator.is(res?.city)){
+                                this.cep.cidade             = this.indicacao.cidade     = res.city            ;
+                                this.cep.logradouro         = this.indicacao.logradouro = res.address         ;
+                                this.cep.bairro				= this.indicacao.bairro		= res.neighborhood    ;
+                                this.cep.estado             = this.indicacao.estado     = res.state           ;
+                                //addressReference = res.addressReference;
+                                this.$refs.addressnumber.focus();
+								//c2("cep",this.cep)
+                            }
+                            
+							this.carregandoCEP		= false;
+							this.carregandoEstados	= false;
+							this.carregandoCidades	= false;
+							this.carregandoBairros	= false;
+                }
+         },
+
+
+
+            ObterCidades(estado) {
+
+                this.carregandoCidades = true;
+                this.indicacao.cidade = "";
+                this.opcoes.bairros = [];
+                this.opcoes.cidades = [];
+                var cidades = [];
+
+                if (this.$validator.is(estado)) {
+
+                    var idEstado = this.opcoes.estados.filter((e) => e.value == estado)[0].id;
+                    var url = this.$api.BuildURL("suporte/cidades/obter") + "/" + idEstado;
+
+                    axios.get(url).then((request) => {
+                        if (request.data) {
+                                request.data.result.forEach((item, index) => {
+                                    cidades.push({ id: item.id, value: item.nome, label: item.label });
+                                });
+                                this.opcoes.cidades = cidades;
+                        }
+                    }).catch((error) => {
+                        ce(error);
+                        if (error.response)
+                            ce(error.response);
+                        ce("Não foi possível obter cidades.");
+                    }).finally(() => {
+                        this.carregandoCidades = false;
+                    });
+
+                } else
+                    this.carregandoCidades = false;
+            },
+
+
+            ObterBairros(cidade) {
+
+                var idCidade = this.opcoes.cidades.filter((c)=>c.value == cidade)[0].id;
+
+				//this.indicacao.cidade = this.indicacao.cidade.label;
+				//c2("this.indicacao.cidade",this.indicacao.cidade);
+
+				this.carregandoBairros = true;
+                this.opcoes.bairros = [];
+                var bairros = [];
+
+                if (this.$validator.is(idCidade)) {
+
+                    var url = this.$api.BuildURL("suporte/bairros/obter") + "/" + idCidade;
+
+                    axios.get(url).then((request) => {
+                        if (request.data) {
+                            request.data.result.forEach((item, index) => {
+                                bairros.push({ id: item.id, value: item.nome, label: item.label });
+                            });
+                            this.opcoes.bairros = bairros;
+                        }
+                    }).catch((error) => {
+                        ce(error);
+                        if (error.response)
+                            ce(error.response);
+                        ce("Não foi possível obter bairros.");
+                    }).finally(() => {
+                        this.carregandoBairros = false;
+                    });
+
+                } else
+                    this.carregandoBairros = false;
+            },
+
+
+		DefinirBairro(bairro){
+            c2("this.indicacao", this.indicacao)
+		},
+
+
+
+        CheckDoc(){
+            if(this.$validator.is(this.indicacao.cpf) && !this.$validator.IsCPF(this.indicacao.cpf))
+                this.$tools.Alert("CPF inválido");
+        },
+
+
+		ShowView(v){
+			this.view = v;
+		},
+
+
+		Next(){
+				var msg = "";
+
+				if (this.$validator.not(this.indicacao.cpf))
+					msg += "<b>CPF</b> não informado<br>";
+				else if (!this.$validator.IsCPF(this.indicacao.cpf))
+					msg += "<b>CPF</b> inválido<br>";
+
+				if (this.$validator.not(this.indicacao.nome))
+					msg += "<b>NOME</b> não informado<br>";
+
+				if (this.$validator.not(this.indicacao.email))
+					msg += "<b>E-MAIL</b> não informado<br>";
+				else if (!this.$validator.IsEmail(this.indicacao.email))
+					msg += "<b>E-MAIL</b> inválido<br>";
+
+				if (this.$validator.not(this.indicacao.telefone))
+					msg += "<b>TELEFONE</b> não informado<br>";
+				else if (this.indicacao.telefone.length < 14)
+					msg += "<b>TELEFONE</b> inválido<br>";
+
+				if (msg.length > 0) {
+					this.$tools.Alert(msg);
+				} else
+                    this.ShowView("form_pt2")
+
+				
+		},
+
+
+		Send(){
+
+				var msg = "";
+
+				if(this.$validator.not(this.indicacao.cpf))
+					msg += "<b>CPF</b> não informado<br>";
+				else if(!this.$validator.IsCPF(this.indicacao.cpf))
+                    msg += "<b>CPF</b> inválido<br>";
+
+				if(this.$validator.not(this.indicacao.nome))
+					msg += "<b>NOME</b> não informado<br>";
+
+				if(this.$validator.not(this.indicacao.email))
+					msg += "<b>E-MAIL</b> não informado<br>";
+				else if(!this.$validator.IsEmail(this.indicacao.email))
+					msg += "<b>E-MAIL</b> inválido<br>";
+
+				if(this.$validator.not(this.indicacao.telefone))
+					msg += "<b>TELEFONE</b> não informado<br>";
+				else if(this.indicacao.telefone.length < 14)
+					msg += "<b>TELEFONE</b> inválido<br>";
+
+
+				if(this.$validator.not(this.indicacao.valor))
+					msg += "<b>VALOR</b> não informado<br>";
+
+				if(this.$validator.not(this.indicacao.tipo))
+					msg += "<b>TIPO</b> não selecionado<br>";
+
+				if(this.$validator.not(this.indicacao.estado))
+					msg += "<b>ESTADO</b> não selecionado<br>";
+
+				if(this.$validator.not(this.indicacao.cidade))
+					msg += "<b>CIDADE</b> não selecionada<br>";
+
+				if(this.$validator.not(this.indicacao.bairro))
+					msg += "<b>BAIRRO</b> não selecionado<br>";
+
+				if(this.$validator.not(this.indicacao.logradouro))
+					msg += "<b>LOGRADOURO</b> não informado<br>";
+
+				if(this.$validator.not(this.indicacao.numero))
+					msg += "<b>NÚMERO</b> não informado (informe <b>SN</b> se não houver)<br>";
+
+
+
+				if(!this.indicacao.aceitouPoliticaPrivacidade)
+					msg += "<b>PROPRIETÁRIO</b> deve estar ciente do compartilhamento dos dados<br>";
+
+
+				if(msg.length > 0){
+					this.$tools.Alert(msg);
+				}else{
+
+						msg = "";
+
+						/*
+						var stringpost = "";
+
+						stringpost += "<br><b>Indicado por</b><br>";
+						stringpost += "<br>Nome: "     + this.indicacao.nome;
+						stringpost += "<br>CPF: "      + this.indicacao.cpf;
+						stringpost += "<br>E-mail: "   + this.indicacao.email;
+						stringpost += "<br>Telefone: " + this.indicacao.telefone;
+						
+						stringpost += "<br><br>";
+						stringpost += "<br><b>Proprietário</b><br>";
+						stringpost += "<br>Nome: "      + this.indicacao.proprietarioNome;
+						stringpost += "<br>Telefone: "  + this.indicacao.proprietarioTelefone;
+                		
+						stringpost += "<br><br>";
+						stringpost += "<br><b>Imóvel</b><br>";
+						stringpost += "<br>CEP: "      + this.indicacao.cep;
+						stringpost += "<br>Endereço: " + this.indicacao.logradouro + ", " + this.indicacao.numero;
+						stringpost += "<br>Cidade: "   + this.indicacao.cidade;
+						stringpost += "<br>Estado: "   + this.indicacao.estado;
+						
+						stringpost += "<br><br>";
+						stringpost += "<br><b>Observações</b><br>";
+						stringpost += this.indicacao.obs;
+						*/
+
+						this.ShowView('sending');
+
+						//window.setTimeout(()=>this.ShowView('success'),1000);
+						//c2("this.indicacao",this.indicacao)
+
+						axios.post(this.$api.BuildURL("imovel/indicar"), this.indicacao).then((request) => {
+								c(request)
+								if(request.data.success){
+									this.ShowView("success");
+								}else{
+                                    this.ShowView("form_pt1");
+									this.$tools.Alert(request.data.messages);
+								}
+							}).catch((error) => {
+								ce(error);
+								this.ShowView("form_pt1");
+								this.$tools.Alert("Não foi possível atender a requisição");
+							}).finally(() => {
+								
+							});
+
+				}
+			},
+
+
+
+
+
+
+
+
+
+
+
+	}				
+		
+}
+
+</script>
+
+
+<style scoped>
+.s-input{
+	margin:20px;
+	margin-bottom:0px;
+	height:70px;
+	width:100%;
+}
+</style>
+
+

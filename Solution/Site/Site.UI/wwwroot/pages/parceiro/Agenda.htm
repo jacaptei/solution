@@ -1,0 +1,455 @@
+<template>
+	<div>
+
+				<el-row :gutter="20">
+
+					<el-col :md="24" style="width:100%;text-align:center;padding:40px;padding-left:0px" v-if="onRequest">
+						<c-loading size="60px"></c-loading>
+					</el-col>
+
+
+					<el-col :md="24" v-else>
+
+						<el-row>
+							<el-col :md="24" style="width:100%;text-align:center;padding:40px;padding-left:0px" v-if="schedules?.length == 0">
+								<i class="fa fa-circle-exclamation" style="font-size:80px;color:var(--s-accent-color)"></i>  <br />
+								<div style="font-size:20px;font-weight:700;color:var(--s-accent-color);margin-top:20px">Sem agendamentos</div>
+							</el-col>
+						</el-row>
+
+
+						<el-row v-else :gutter="20" style="margin:0px">
+
+							<el-col :md="24" :lg="12" v-for="(item, index) in schedules" key="index" style="margin-top:15px;margin-bottom:15px;padding:0px">
+
+								<div style="display:inline-block;width:100%">
+
+
+									<div :class="(item.status == 'SOLICITADO')? 'card-waiting' : 'card-approved' ">
+										<div style="padding:10px;color:white;height:auto;min-height:132px;text-align:center;color:white;">
+											<div style="padding:0px;height:20px;text-align:center;font-size:14px;color:#fff;font-weight:100">
+												{{item.year}}
+											</div>
+											<div style="padding:10px;height:44px;text-align:center;font-size:34px;font-weight:800">
+												{{item.day}}
+											</div>
+											<div style="text-align:center;font-size:14px;font-weight:800">
+												{{item.month}}
+											</div>
+											<div style="text-align:center;font-size:14px;font-weight:500;color:#ffff00">
+												{{item.dayWeek}} <b>{{item.hour}}</b>
+											</div>
+										</div>
+									</div>
+
+
+									<div :class="(item.status == 'SOLICITADO')? 'card-content-waiting' : 'card-content-approved' ">
+										<!--<div style="padding:10px;display:inline-block;height:auto;min-height:132px;vertical-align:top;width:calc(100% - 160px);background:#333 ">-->
+										<div id="title" style="font-weight:800;cursor:pointer" @click="Open(item.subject,'_self')" @click.middle="Open(item.subject,'_blank')">
+											{{item.subject}}
+											<i class="fa fa-up-right-from-square" style="padding-left:10px;font-size:14px;color:var(--s-alt-accent-color)"></i>
+										</div>
+										<div style="font-weight:600;color:var(--s-alt-accent-color);margin-top:4px;">
+											<i class="icons fa fa-map-marker-alt"></i> {{item.location}}
+										</div>
+										<div v-if="$validator.is(item.description)" style="font-weight:400;color:#808080;margin-top:4px;">
+											obs: {{item.description}}
+										</div>
+									</div>
+
+									<div id="status" :class="(item.status == 'SOLICITADO')? 'status-waiting' : 'status-approved' ">
+										<span v-if="item.status == 'SOLICITADO' ">AGUARDANDO CONFIRMAÇÃO</span>
+										<span v-else>CONFIRMADO</span>
+									</div>
+
+
+
+								</div>
+
+
+							</el-col>
+
+						</el-row>
+
+
+
+
+
+
+
+
+
+
+
+
+					</el-col>
+				</el-row>
+
+
+
+
+
+
+
+
+
+
+			<!--
+
+							<el-tab-pane label="Favoritos" name="favs">
+
+									 <el-container>
+
+										 <div class="row" style="width:100%;margin-bottom:40px;display:block">
+											 <div class="col-12" style="width:100%;text-align:center;padding:40px;padding-left:0px" v-if="$root.search.onRequest">
+													<c-loading size="60px"></c-loading>
+											 </div>
+											 <div class="col-12" style="width:100%" v-else>
+												 <div class="col-12" style="width:100%;text-align:center;padding:40px;padding-left:0px" v-if="!$root.search.onRequest && builds?.length == 0">
+													 <i class="fa fa-circle-exclamation" style="font-size:80px;color:var(--s-accent-color)"></i>  <br />
+													 <div  style="font-size:20px;font-weight:700;color:var(--s-accent-color);margin-top:20px">Sem favoritos</div>
+												 </div>
+												 <div v-for="(item,index) in builds" v-else>
+													<c-building-card :id="$tools.GetRandomID()" :imovel="item"></c-building-card>
+												 </div>
+											 </div>
+
+										 </div>
+
+
+
+									<el-dialog v-model="showModalImages" :title="'Apartamento, 4 quartos, 2 suítes, 4 vagas, index = '+imageIndex" id="caroussel">
+
+										<q-carousel
+											v-model="imageIndex"
+											arrows
+											navigation
+											swipeable
+											animated
+											infinite
+										>
+											 <template v-slot:navigation-icon="{ active, btnProps, onClick }">
+												<q-btn v-if="active" size="5px"  color="orange" ></q-btn>
+												<q-btn v-else size="4px" color="white"  @click="onClick" ></q-btn>
+											  </template>
+
+											<q-carousel-slide  v-for="(item,index) in imovel.images" :name="index" :img-src="item" ></q-carousel-slide>
+											<q-carousel-slide :name="1" img-src="https://cdn.quasar.dev/img/mountains.jpg" />
+											<q-carousel-slide :name="2" img-src="https://cdn.quasar.dev/img/parallax1.jpg" />
+											<q-carousel-slide :name="3" img-src="https://cdn.quasar.dev/img/parallax2.jpg" />
+											<q-carousel-slide :name="4" img-src="https://cdn.quasar.dev/img/quasar.jpg" />
+										</q-carousel>
+
+									</el-dialog>
+
+
+									 </el-container>
+
+
+							</el-tab-pane>
+
+
+
+							-->
+
+
+
+
+
+
+
+
+		</el-tabs>
+
+
+
+
+	</div>
+
+</template>
+
+<script>
+	module.exports = {
+
+		name: 'JaCapteiParceiroAgenda653276476',
+
+		components: {
+
+		},
+
+		data: function () {
+			return {
+				onRequest: false,
+				tab: "schedules",
+				view: "home",
+				schedules: [],
+				builds: [],
+				imagesData: [],
+				images: [],
+			}
+		}, computed: {
+
+		},
+
+		props: {
+		},
+		watch: {
+		},
+		created: function () {
+		},
+		mounted() {
+			this.GetSchedules();
+			//this.SearchFavorites();
+		},
+		methods: {
+
+			Open(title, target = "_self") {
+				//cclear();
+				//c(this.imovel.cod);
+				//this.$sdata.Storage.Set(("imovel"+imovel.cod),this.imovel);
+				//this.$sdata.Storage.Set(this.imovel.key,this.imovel);
+				//this.$root.imovelClicado = this.imovel;
+				var _id = title.split("id: ")[1];
+				const routeData = this.$router.resolve({ name: 'building', query: { id: _id } });
+				window.open(routeData.href, target);
+			},
+
+			HandleTabClick() {
+				c(this.tab)
+			},
+
+			HandleEventTabClick(pane, event) {
+				//console.log(pane, event)
+			},
+
+
+			GetSchedules() {
+
+				if (this.$root.isAuth) {
+
+					this.onRequest = true;
+
+					axios.post(this.$api.BuildURL("imovel/agendas/obter"), this.$root.usuario).then((request) => {
+
+						//c2("request", request.data);
+
+						if (request.data.status.success) {
+
+							var res = JSON.parse(request.data.result);
+							var agendasCRMRes = res.result.records;
+							var schedule = {};
+
+							for (var i = 0; i < agendasCRMRes.length; i++) {
+
+								var item = agendasCRMRes[i];
+
+								schedule = {};
+
+								schedule.status = this.$tools.ToUpper(item.eventstatus);
+								//schedule.status				=	(i%2==0)? "SOLICITADO":"CONFIRMADO";
+								schedule.date_start = item.date_start;
+								schedule.time_start = item.time_start;
+								schedule.location = item.location;
+								schedule.subject = item.subject;
+								schedule.description = item.description;
+
+								var year = schedule.date_start.split("-")[0];
+								var month = parseInt(schedule.date_start.split("-")[1]) - 1;
+								var day = schedule.date_start.split("-")[2];
+
+								var hour = schedule.time_start.split(":")[0];
+								var min = schedule.time_start.split(":")[1];
+
+								var dt = new Date(year, month, day, hour, min, 0, 0);
+
+								schedule.day = day;
+								schedule.year = year;
+								schedule.month = this.$tools.GetFullMonthName(dt);
+								schedule.dayWeek = this.$tools.GetDayWeek(dt);
+								schedule.hour = schedule.time_start + "h";
+
+								this.schedules.push(schedule);
+							}
+
+
+						} else {
+						}
+
+
+
+					}).catch((error) => {
+						ce(error);
+						this.$tools.Alert("Não foi possível obter agendamentos");
+					}).finally(() => {
+						this.onRequest = false;
+					});
+				}
+
+
+
+			},
+
+
+
+
+			SearchFavorites() {
+
+				if (this.$root.isAuth) {
+
+					this.$root.search.onRequest = true;
+
+					this.results = [];
+
+					axios.post(this.$api.BuildURL("imovel/favoritos"), this.$root.usuario).then((request) => {
+
+						if (request.data.status.success) {
+
+							//c2("request.data.result",request.data.crmResult);
+							//this.OutputResults(request.data);
+
+							if (this.$validator.is(request.data.result.crmResult) && request.data.result.crmResult?.result?.records?.length > 0) {
+
+								var imoveisRes = request.data.result.crmResult.result.records;
+
+								for (var i = 0; i < imoveisRes.length; i++) {
+									var item = imoveisRes[i];
+									var imovel = this.$models.imovel();
+
+									imovel.images = this.imagesData.sort((a, b) => 0.5 - Math.random()).slice(0, 4);
+									imovel.favorito = this.$root.usuario.favoritos.filter(fav => fav.idImovelCRM == item.id).length > 0;
+									imovel = this.$imovelHandler.Parse(imovel, item, i);
+
+									this.builds.push(imovel);
+
+								}
+
+							}
+
+						} else {
+							this.$tools.Alert("Não foi possível efetuar a busca.");
+						}
+					}).catch((error) => {
+						ce(error);
+						if (error.response)
+							ce(error.response);
+						//this.api.status.success=false;
+						//this.validator.AlertResponseErrors(error);
+						//this.messageFail="Não foi possível efetuar a busca.";
+						ce("Não foi possível efetuar a busca.");
+					}).finally(() => {
+						this.$root.search.onRequest = false;
+						//this.SearchTitle(this.$root.search.imovelBusca.imovel);
+						//this.OutputResultMap(request.data.imovel);
+						//window.setTimeout(()=>{this.api.status.requesting = false;},400);
+					});
+
+				}
+
+			},
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+		}
+
+	}
+
+</script>
+
+
+<style scoped>
+	.c-tabs {
+	}
+
+	.card-waiting {
+		display: inline-block;
+		min-width: 100px;
+		background: var(--s-accent-color);
+	}
+
+	.card-approved {
+		display: inline-block;
+		min-width: 100px;
+		background: #00c300;
+	}
+
+	.card-declined {
+		display: inline-block;
+		min-width: 100px;
+	}
+
+	.card-content-waiting {
+		padding: 10px;
+		display: inline-block;
+		height: auto;
+		min-height: 132px;
+		vertical-align: top;
+		width: calc(100% - 130px);
+		background: linear-gradient(to right, #fff7d3 0%, #fffcf3 100%);
+	}
+
+		.card-content-waiting #title {
+			color: var(--s-accent-color);
+		}
+
+	.status-waiting {
+		width: 100%;
+		background: linear-gradient(to right, #ffd891 0%, #fff 100%);
+		color: var(--s-accent-color);
+		font-size: 11px;
+		font-weight: 700;
+		padding-left: 10px;
+	}
+
+	.card-content-approved {
+		padding: 10px;
+		display: inline-block;
+		height: auto;
+		min-height: 132px;
+		vertical-align: top;
+		width: calc(100% - 100px);
+		background: linear-gradient(to right, #dcffd3 0%, #f4fff3 100%);
+	}
+
+		.card-content-approved #title {
+			color: #008700;
+		}
+
+	.status-approved {
+		width: 100%;
+		background: linear-gradient(to right, #a7ff91 0%, #fff 100%);
+		color: #019801;
+		font-size: 11px;
+		font-weight: 700;
+		padding-left: 10px;
+	}
+
+
+	.card-content-declined {
+		padding: 10px;
+		display: inline-block;
+		height: auto;
+		min-height: 132px;
+		vertical-align: top;
+		width: calc(100% - 30px);
+		background: linear-gradient(to right, #fff7d3 0%, #fffcf3 100%);
+	}
+</style>
+
+

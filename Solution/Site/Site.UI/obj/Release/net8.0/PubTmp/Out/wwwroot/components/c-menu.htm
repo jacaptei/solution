@@ -1,0 +1,316 @@
+<template>
+
+    <div class="row">
+        <div class="col-10 xs-hide sm-hide">
+        <!--<div class="col-12">-->
+            <el-menu active-text-color="#fff"
+                     text-color="#a4a5ff"
+                     class="el-menu-horizontal"
+                     background-color="none"
+                     :default-active="$root.routing.menuIndex"
+                     mode="horizontal"
+             >
+                <div style="flex-grow: 0.8;"></div>
+                <el-menu-item index="01-00-00-00"   @click="$root.RouteTo('/home')"             class="el-menu-horizontal-space"><span>  Home             </span></el-menu-item>
+                <el-menu-item index="02-00-00-00"   @click="$root.RouteTo('/busca')"            class="el-menu-horizontal-space"><span>  Buscar Imóveis   </span></el-menu-item>
+                <el-menu-item index="03-00-00-00"   @click="$root.RouteTo('/proprietarios')"    class="el-menu-horizontal-space"><span>  Proprietários    </span></el-menu-item>
+                <el-menu-item index="04-00-00-00"   @click="$root.RouteTo('/parceiros')"        class="el-menu-horizontal-space"><span>  Parceiros        </span></el-menu-item>
+                <el-menu-item index="05-00-00-00"   @click="$root.RouteTo('/jaindiquei')"       class="el-menu-horizontal-space"><span> JáIndiquei        </span></el-menu-item>
+                <el-menu-item index="06-00-00-00"   @click="$root.RouteTo('/sobre')"            class="el-menu-horizontal-space"><span>  Sobre            </span></el-menu-item>
+                <el-menu-item index="07-00-00-00"   @click="$root.RouteTo('/ajuda')"            class="el-menu-horizontal-space"><span>  Ajuda            </span></el-menu-item>
+                <!--<el-menu-item index="04-00-00-00"   @click="$root.RouteTo('/partners')"     class="el-menu-horizontal-space"><i class="fa fa-vial"         />
+			            <span class="link-arrow" @click="$root.ZoomOut()"         ><i class="fa fa-minus"   /> </span>
+			            <span class="link-arrow" @click="$root.ZoomReset()"     style="font-size:12px;padding-right:20px;padding-left:20px;"   >-->
+                            <!--<i :class="($root.zoom !=1)? 'far fa-circle':'fa fa-circle'"   />-->
+                             <!--<q-tooltip class="bg-yellow-2 text-yellow-10 shadow-4">reset</q-tooltip>-->
+                            <!--{{Math.round($root.zoom * 100)+'%'}}
+                        </span>
+			            <span class="link-arrow" @click="$root.ZoomIn()"          ><i class="fa fa-plus"   /> </span>
+                
+                </el-menu-item>-->
+
+            </el-menu>
+        </div>
+        <div class="col-2 xs-hide sm-hide" style="padding-top:17px">
+            <c-entrar></c-entrar>
+        </div>
+
+
+        <div class="col-7  xs-hide md-hide lg-hide xl-hide" style="line-height:4px;padding:15px 0px 0px 40px">
+                <q-btn   @click="$root.RouteTo('/home')"           :flat="($root.routing.menuIndex != '01-00-00-00')"  :color="$root.routing.menuIndex == '01-00-00-00'? 'primary':'secondary'" ><span>  Home          </span></q-btn>
+                <q-btn   @click="$root.RouteTo('/busca')"          :flat="($root.routing.menuIndex != '02-00-00-00')"  :color="$root.routing.menuIndex == '02-00-00-00'? 'primary':'secondary'" ><span>  Buscar        </span></q-btn>
+                <q-btn   @click="$root.RouteTo('/proprietarios')"  :flat="($root.routing.menuIndex != '03-00-00-00')"  :color="$root.routing.menuIndex == '03-00-00-00'? 'primary':'secondary'" ><span>  Proprietários </span></q-btn>
+                <q-btn   @click="$root.RouteTo('/parceiros')"      :flat="($root.routing.menuIndex != '04-00-00-00')"  :color="$root.routing.menuIndex == '04-00-00-00'? 'primary':'secondary'" ><span>  Parceiros     </span></q-btn>
+                <q-btn   @click="$root.RouteTo('/jaindiquei')"     :flat="($root.routing.menuIndex != '05-00-00-00')"  :color="$root.routing.menuIndex == '05-00-00-00'? 'primary':'secondary'" ><span>  JáIndiquei    </span></q-btn>
+                <q-btn   @click="$root.RouteTo('/sobre')"          :flat="($root.routing.menuIndex != '06-00-00-00')"  :color="$root.routing.menuIndex == '06-00-00-00'? 'primary':'secondary'" ><span>  Sobre         </span></q-btn>
+                <q-btn   @click="$root.RouteTo('/ajuda')"          :flat="($root.routing.menuIndex != '07-00-00-00')"  :color="$root.routing.menuIndex == '07-00-00-00'? 'primary':'secondary'" ><span>  Ajuda         </span></q-btn>
+        </div>
+        <div class="xs-hide md-hide lg-hide xl-hide" style="float: right;    max-width: 240px;    text-align: center; margin-top:17px; padding-left:40px">
+            <c-entrar></c-entrar>
+        </div>
+
+
+        <div class="col-12  sm-hide md-hide lg-hide xl-hide" style="line-height:4px;padding-left:20px;padding-top:33px;min-width:220px">
+                <el-dropdown>
+                    <span class="el-dropdown-link" style="color:var(--s-alt-accent-color);font-weight:800;border:none">
+                        <el-icon class="el-icon--left" size="20">
+                                <i class="fa fa-bars" style="color:var(--s-accent-color)"></i>
+                        </el-icon>
+                        <span class="el-dropdown-label" style="margin-left:-10px">
+                            {{$root.routing.label}}
+                        </span>
+                        <!--<span style="padding-left:20px;color:var(--s-text-color)">
+                            {{$root.routing.label}}
+                        </span>-->
+                    </span>
+                    <template #dropdown>
+                        <el-dropdown-menu style="color:var(--s-alt-accent-color);font-weight:800">
+                            <el-dropdown-item  @click="$root.RouteTo('/home')"            >Home            </el-dropdown-item>
+                            <el-dropdown-item  @click="$root.RouteTo('/busca')"           >Buscar Imóveis  </el-dropdown-item>
+                            <el-dropdown-item  @click="$root.RouteTo('/proprietarios')"   >Proprietários   </el-dropdown-item>
+                            <el-dropdown-item  @click="$root.RouteTo('/parceiros')"       >Parceiros       </el-dropdown-item>
+                            <el-dropdown-item  @click="$root.RouteTo('/jaindiquei')"      >JáIndiquei      </el-dropdown-item>
+                            <el-dropdown-item  @click="$root.RouteTo('/sobre')"           >Sobre           </el-dropdown-item>
+                            <el-dropdown-item  @click="$root.RouteTo('/ajuda')"           >Ajuda           </el-dropdown-item>
+                        </el-dropdown-menu>
+                    </template>
+                </el-dropdown>
+
+        </div>
+        <div class="sm-hide md-hide lg-hide xl-hide" style="position: absolute;    float: right;    text-align: right; margin-top:-10px; margin-left:120px">
+            <c-entrar></c-entrar>
+        </div>
+        
+
+    </div>
+
+
+
+</template>
+
+<script>
+module.exports = {
+
+    components: {
+
+	},	
+	
+        data: function () {
+            return {
+                language:"PT-BR",
+                labels:[]
+            }
+        }, computed: {
+
+        },
+
+        props: {
+
+        },
+        watch: {
+        },
+        created: function () {
+
+	 },
+	mounted(){
+       // cclear();
+       //this.isCollapse = this.$root.isMenuCollapse;
+	},		  
+	methods: {
+        handleOpen(key, keyPath){
+            //c(key, keyPath);
+        },
+        handleClose(key, keyPath){
+            //c(key, keyPath);
+        },
+	}				
+		
+}
+
+</script>
+
+
+<!--<script setup>
+const isCollapse = ref(true);
+const handleOpen = function(key, keyPath){
+  c(key, keyPath);
+}
+const handleClose = function(key, keyPath){
+  c(key, keyPath);
+}
+</script>-->
+
+<style scoped>
+
+.flex-grow {
+  flex-grow: 0.8;
+}
+
+
+.el-menu-horizontal-bk {
+    border:none;
+    margin-top: 16px;
+}
+
+
+.el-menu-horizontal {
+    list-style: none;
+    position: relative;
+    /*background-color: var(--el-menu-bg-color);*/
+    box-sizing: border-box;
+    border:none;
+    overflow-x:hidden;
+    overflow-y:hidden;
+    /*border-right: solid 4px var(--el-menu-bg-color);*/
+    font-weight:600;
+    line-height: 38px;
+    height: 40px !important;
+    vertical-align:middle;
+    margin: 0;
+    margin-top: 24px;
+    width:100%;
+    display:inline-flex;
+    float:right;
+    background:none;
+    font-family:  "Marine-Bold", "Segoe UI","Trebuchet MS", Tahoma,  Verdana, Hind,Hind, Arial, sans-serif !important;
+    font-size:20px;
+}
+
+
+.el-menu-horizontal:not(.el-menu--collapse) {
+  color:#EF5924;
+  background-color:#FFF;
+}
+.el-menu-horizontal:not(.el-menu--expand) {
+  color:#EF5924;
+  background-color:#FFF;
+  /*width: 240px;*/
+  /*min-width: 400px;*/
+}
+.el-menu-horizontal-space{
+    margin: 0;
+    margin-right:5px;
+    margin-left:5px;
+}
+
+
+.el-menu-item {
+    opacity:1;
+    -webkit-transition: 0.5s;  
+    -moz-transition:    0.5s;  
+    -o-transition:      0.5s;  
+    transition:         0.5s;  
+    color:var(--s-alt-accent-color) !important;
+    font-weight: 700;
+    font-size: 16px;
+    border:none;
+}
+
+.el-menu-item:hover, .el-menu-item.is-active  {
+    color: #fff !important;
+    background-color: var(--s-accent-color) !important;
+    opacity:1;
+    border:none;
+}
+
+
+
+
+.link-collapser{
+    cursor:pointer;
+    padding-left:20px;
+    color:var(--s-alt-accent-color);
+    text-align:left;
+}
+.link-collapser:hover{
+    color:var(--s-accent-color);
+}
+
+
+svg{padding-right:10px;}
+
+i{padding-right:10px;}
+
+.q-btn {
+    display: inline-flex;
+    flex-direction: column;
+    align-items: stretch;
+    position: relative;
+    outline: 0;
+    border: 0;
+    vertical-align: middle;
+    font-size: 14px;
+    line-height: 12px;
+    text-decoration: none;
+    color: inherit;
+    background: transparent;
+    font-weight: 800;
+    text-transform: none;
+    text-align: center;
+    width: 100px;
+    height: auto;
+    cursor: pointer;
+    /* padding: 4px 16px 4px 16px; */
+    padding: 8px;
+    min-height: 20px;
+    opacity: 1 !important;
+    border-radius:0px;
+}
+
+</style>
+
+
+
+<!--<template>
+  <div>
+          <el-radio-group v-model="$root.isMenuCollapse" style="margin-bottom: 20px">
+            <el-radio-button :label="false">>></el-radio-button>
+            <el-radio-button :label="true"><<</el-radio-button>
+          </el-radio-group>
+          <el-menu
+            default-active="2"
+            class="el-menu-horizontal"
+            :collapse="$root.isMenuCollapse"
+            @open="handleOpen"
+            @close="handleClose"
+          >
+                <el-menu-item index="0-1"><router-link to="/home">Home  </router-link> </el-menu-item>
+                <el-menu-item index="0-2"><router-link to="/login">Login</router-link> </el-menu-item>
+                <el-menu-item index="0-3"><router-link to="/tests">Tests</router-link> </el-menu-item>
+            <el-sub-menu index="1">
+              <template #title>
+                <el-icon><location /></el-icon>
+                <span>Navigator One</span>
+              </template>
+              <el-menu-item-group>
+                <template #title><span>Group One</span></template>
+                <el-menu-item index="1-1">item one</el-menu-item>
+                <el-menu-item index="1-2">item two</el-menu-item>
+              </el-menu-item-group>
+              <el-menu-item-group title="Group Two">
+                <el-menu-item index="1-3">item three</el-menu-item>
+              </el-menu-item-group>
+              <el-sub-menu index="1-4">
+                <template #title><span>item four</span></template>
+                <el-menu-item index="1-4-1">item one</el-menu-item>
+              </el-sub-menu>
+            </el-sub-menu>
+            <el-menu-item index="2">
+              <el-icon><icon-menu /></el-icon>
+              <template #title>Navigator Two</template>
+            </el-menu-item>
+            <el-menu-item index="3" disabled>
+              <el-icon><document /></el-icon>
+              <template #title>Navigator Three</template>
+            </el-menu-item>
+            <el-menu-item index="4">
+              <el-icon><setting /></el-icon>
+              <template #title>Navigator Four</template>
+            </el-menu-item>
+          </el-menu>
+    </div>
+</template>-->
+
+
+
+

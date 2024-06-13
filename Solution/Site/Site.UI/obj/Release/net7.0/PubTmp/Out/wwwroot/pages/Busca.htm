@@ -1,0 +1,478 @@
+﻿<template>
+
+     <el-container>
+
+         <c-search-form :show="showForm" @showform="showForm = !showForm" @requestsearch="Search" v-if="$validator.is($root.search.imovelBusca.imovel)"></c-search-form>
+
+         <el-container>
+
+             <div class="row" style="width:100%;margin-bottom:40px;display:block">
+                 <div class="col-12 search-header"  :style="showForm? 'max-width:calc(100% - 54px);margin-top:0px':'margin-left:auto;max-width:calc(100% - 54px);margin-right:4px;margin-top:53px;'">
+                      <span v-html="buscaTitulo"></span>
+                      <!-- Apartamentos à venda em Cidade Nova, Belo Horizonte, MG. -->
+                 </div>
+
+                 <div class="col-12" style="width:100%;text-align:center;padding:40px;padding-left:0px" v-if="$root.search.onRequest">
+                        <c-loading size="60px"></c-loading>
+                 </div>
+                 <div class="col-12" style="width:100%" v-else>
+                     <div class="col-12" style="width:100%;text-align:center;padding:40px;padding-left:0px" v-if="!$root.search.onRequest && results?.length == 0">
+                         <i class="fa fa-circle-exclamation" style="font-size:80px;color:var(--s-accent-color)"></i>  <br />
+                         <div  style="font-size:20px;font-weight:700;color:var(--s-accent-color);margin-top:20px">Nada encontrado</div>
+                     </div>
+                     <div v-for="(item,index) in results" v-else>
+                        <c-building-card :id="$tools.GetRandomID()" :imovel="item"></c-building-card>
+                     </div>
+
+                 </div>
+
+                <div v-if="showNavigator" style="width:100%;text-align:center;padding:40px;padding-left:0px">
+
+                    <div class="q-pa-lg flex flex-center">
+                       <!--<el-pagination layout="prev, pager, next" :total="totalNav" :page-count="Math.ceil(totalNav/20)" v-model:current-page="page" @current-change="Nav"></el-pagination>-->
+                       <el-pagination layout="prev, pager, next" :total="totalNav" :page-size="20" v-model:current-page="page" @current-change="Nav"></el-pagination>
+                    </div>
+                 
+                    <!--
+                    <q-btn label="Anterior" color="primary" icon="fa fa-caret-left" @click="NavTemp(-1)" :disabled="$root.search.imovelBusca.page == 0"></q-btn> 
+                    &nbsp;&nbsp;<div style="display:inline-block;width:100px;text-align:center;font-size:24px;color:var(--s-accent-color)">{{page}}</div>&nbsp;&nbsp; 
+                    
+                        
+                        <q-btn label="Próximo" color="primary" icon-right="fa fa-caret-right" @click="NavTemp(1)"></q-btn>
+                    <br /><br />
+                    <el-pagination layout="prev, pager, next" :total="totalResults" @prev-click="Nav(-1)" @next-click="Nav(1)" v-model:current-page="page" @current-change="NavTo"></el-pagination>
+                    <br /><br />
+                    <div class="q-pa-lg flex flex-center">
+                        <q-pagination
+                          v-model="page"
+                          :max="totalResults"
+                          :max-pages="10"
+                          direction-links
+                          boundary-links
+                          icon-prevt="fa fa-caret-left"
+                          icon-next="fa fa-caret-right"
+                          icon-firs="fa fa-backward"
+                          icon-last="fa fa-forward"
+                        />
+                      </div>-->
+                    
+                </div>
+
+             </div>
+
+
+       
+
+         </el-container>
+     </el-container>
+
+</template>
+
+
+<script>
+    module.exports = {
+
+        name: 'HOME',
+
+        components: {
+
+        },
+
+        data: function () {
+            return {
+                showForm            :   window.screen.width > 1000,
+                onRequest           :   true,
+                showNavigator       :   false,
+                showModalImages     :   false,
+                imagesData:[
+                    "https://resizedimgs.vivareal.com/fit-in/870x653/named.images.sp/003d551c87ed21fd12bac72f40fa6ac3/foto-1-de-cobertura-com-3-quartos-a-venda-340m-em-cidade-dutra-sao-paulo.jpg",
+                    "https://resizedimgs.vivareal.com/fit-in/870x653/named.images.sp/aad2bdf597c316819ccca678b1c8422d/foto-3-de-cobertura-com-3-quartos-a-venda-340m-em-cidade-dutra-sao-paulo.jpg",
+                    "https://resizedimgs.vivareal.com/fit-in/870x653/named.images.sp/f796323969403b92ccd6b19b50d142d4/foto-2-de-cobertura-com-3-quartos-a-venda-340m-em-cidade-dutra-sao-paulo.jpg",
+                    "https://resizedimgs.vivareal.com/fit-in/870x653/named.images.sp/9392174b1b6cb1ef283e912c757a77e0/foto-15-de-cobertura-com-3-quartos-a-venda-340m-em-cidade-dutra-sao-paulo.jpg",
+                    "https://resizedimgs.vivareal.com/fit-in/870x653/named.images.sp/b2287799056dcddf11379cac4bde283d/foto-17-de-cobertura-com-3-quartos-a-venda-340m-em-cidade-dutra-sao-paulo.jpg",
+
+                    "https://resizedimgs.vivareal.com/fit-in/870x653/named.images.sp/a4e230d97bdf4124c2569a0c7e817dee/foto-12-de-apartamento-com-4-quartos-a-venda-243m-em-vila-andrade-sao-paulo.jpg",
+                    "https://resizedimgs.vivareal.com/fit-in/870x653/named.images.sp/96bf28321843acf1a9a02ca8a6a63f6e/foto-1-de-apartamento-com-4-quartos-a-venda-243m-em-vila-andrade-sao-paulo.jpg",
+                    "https://resizedimgs.vivareal.com/fit-in/870x653/named.images.sp/088df890982bb5a34f0771d65d8f2ebc/foto-3-de-apartamento-com-4-quartos-a-venda-243m-em-vila-andrade-sao-paulo.jpg",
+                    "https://resizedimgs.vivareal.com/fit-in/870x653/named.images.sp/96f5887bd37d8fe983356ff0aefeef1e/foto-5-de-apartamento-com-4-quartos-a-venda-243m-em-vila-andrade-sao-paulo.jpg",
+                    "https://resizedimgs.vivareal.com/fit-in/870x653/named.images.sp/8789c8462d7cb220ca45cea9dd46a851/foto-11-de-apartamento-com-4-quartos-a-venda-243m-em-vila-andrade-sao-paulo.jpg",
+
+                    "https://resizedimgs.vivareal.com/fit-in/870x653/named.images.sp/1334b4eefdbb812e1303eae6df226d3c/foto-1-de-apartamento-com-3-quartos-a-venda-306m-em-jardim-paulistano-sao-paulo.jpg",
+                    "https://resizedimgs.vivareal.com/fit-in/870x653/named.images.sp/90801bf9262e29de77e1abca04ae9233/foto-4-de-apartamento-com-3-quartos-a-venda-306m-em-jardim-paulistano-sao-paulo.jpg",
+                    "https://resizedimgs.vivareal.com/fit-in/870x653/named.images.sp/35565ccd784389e0056958b1d28027e9/foto-7-de-apartamento-com-3-quartos-a-venda-306m-em-jardim-paulistano-sao-paulo.jpg",
+                    "https://resizedimgs.vivareal.com/fit-in/870x653/named.images.sp/405a016b3280e9ac82d1d25dcf2aaf94/foto-13-de-apartamento-com-3-quartos-a-venda-306m-em-jardim-paulistano-sao-paulo.jpg",
+                    "https://resizedimgs.vivareal.com/fit-in/870x653/named.images.sp/7cf348f4c55888dda0e49f3042b3b6ca/foto-10-de-apartamento-com-3-quartos-a-venda-306m-em-jardim-paulistano-sao-paulo.jpg",
+
+                    "https://resizedimgs.vivareal.com/fit-in/870x653/named.images.sp/e874cedbeaad90ffd403dd95e5c815af/foto-3-de-cobertura-com-3-quartos-a-venda-210m-em-campo-belo-sao-paulo.jpg",
+                    "https://resizedimgs.vivareal.com/fit-in/870x653/named.images.sp/5bd81ae42596763ebd2988b7d07585e7/foto-6-de-cobertura-com-3-quartos-a-venda-210m-em-campo-belo-sao-paulo.jpg",
+                    "https://resizedimgs.vivareal.com/fit-in/870x653/named.images.sp/56cf011dad97ebe184c24da5716e7d7f/foto-8-de-cobertura-com-3-quartos-a-venda-210m-em-campo-belo-sao-paulo.jpg",
+
+                    "https://resizedimgs.vivareal.com/fit-in/870x653/named.images.sp/ab369d08951e3f956741d265fd2ab2f3/foto-3-de-apartamento-com-4-quartos-a-venda-200m-em-perdizes-sao-paulo.jpg",
+                    "https://resizedimgs.vivareal.com/fit-in/870x653/named.images.sp/9ad5af3b41a02290ebb71318dab619d8/foto-2-de-apartamento-com-4-quartos-a-venda-200m-em-perdizes-sao-paulo.jpg",
+                    "https://resizedimgs.vivareal.com/fit-in/870x653/named.images.sp/5d64f10fc76260e15bdb4aa3f2d529f2/foto-5-de-apartamento-com-4-quartos-a-venda-200m-em-perdizes-sao-paulo.jpg",
+                    "https://resizedimgs.vivareal.com/fit-in/870x653/named.images.sp/b8d2f30ec62a003e0bd6f5444ec80fbe/foto-4-de-apartamento-com-4-quartos-a-venda-200m-em-perdizes-sao-paulo.jpg",
+                    "https://resizedimgs.vivareal.com/fit-in/870x653/named.images.sp/dd160b90a7f836aa30c5ddd9d2beb425/foto-11-de-apartamento-com-4-quartos-a-venda-200m-em-perdizes-sao-paulo.jpg",
+                    "https://resizedimgs.vivareal.com/fit-in/870x653/named.images.sp/371c06d664bacf1df361b2491ae5d9c6/foto-16-de-apartamento-com-4-quartos-a-venda-200m-em-perdizes-sao-paulo.jpg",
+                    
+                    "https://resizedimgs.vivareal.com/fit-in/870x653/named.images.sp/341cc5fc2a0af5df10688981a17ebfbb/foto-1-de-apartamento-com-3-quartos-a-venda-240m-em-campo-belo-sao-paulo.jpg",
+                    "https://resizedimgs.vivareal.com/fit-in/870x653/named.images.sp/a2acc2f4f1fda2deab2b7af52239edef/foto-3-de-apartamento-com-3-quartos-a-venda-240m-em-campo-belo-sao-paulo.jpg",
+                    "https://resizedimgs.vivareal.com/fit-in/870x653/named.images.sp/e993c7a27a08efc8d4f29461b43f73f6/foto-4-de-apartamento-com-3-quartos-a-venda-240m-em-campo-belo-sao-paulo.jpg",
+                    "https://resizedimgs.vivareal.com/fit-in/870x653/named.images.sp/f77c13e6162187515631f380a39d9bed/foto-6-de-apartamento-com-3-quartos-a-venda-240m-em-campo-belo-sao-paulo.jpg",
+                    "https://resizedimgs.vivareal.com/fit-in/870x653/named.images.sp/82177d7ca40fbd6663ffb827b15dd1af/foto-11-de-apartamento-com-3-quartos-a-venda-240m-em-campo-belo-sao-paulo.jpg",
+                    "https://resizedimgs.vivareal.com/fit-in/870x653/named.images.sp/a0fe221df69a3a2263522ea8d0e95baf/foto-12-de-apartamento-com-3-quartos-a-venda-240m-em-campo-belo-sao-paulo.jpg",
+                    "https://resizedimgs.vivareal.com/fit-in/870x653/named.images.sp/80b56c254e939a760c20e834d59246f4/foto-14-de-apartamento-com-3-quartos-a-venda-240m-em-campo-belo-sao-paulo.jpg",
+                    "https://resizedimgs.vivareal.com/fit-in/870x653/named.images.sp/be5b235b15033f1090c3810e482f6a88/foto-41-de-apartamento-com-3-quartos-a-venda-240m-em-campo-belo-sao-paulo.jpg",
+                    "https://resizedimgs.vivareal.com/fit-in/870x653/named.images.sp/6cace6d21082c9b5f0ae00e5174e3986/foto-21-de-apartamento-com-3-quartos-a-venda-240m-em-campo-belo-sao-paulo.jpg",
+                    "https://resizedimgs.vivareal.com/fit-in/870x653/named.images.sp/19d8b5af0df6669e8ab74129fe9ffbcf/foto-26-de-apartamento-com-3-quartos-a-venda-240m-em-campo-belo-sao-paulo.jpg",
+                    "https://resizedimgs.vivareal.com/fit-in/870x653/named.images.sp/0d4b5883f8f20545f55ee1d1a8f64011/foto-31-de-apartamento-com-3-quartos-a-venda-240m-em-campo-belo-sao-paulo.jpg",
+
+                ],
+                images:[],
+                imageIndex: 0,
+                results:[],
+                totalResults:0,
+                totalNav:0,
+                page:1,
+                buscaTitulo:"buscando...",
+            }
+        }, computed: {
+
+        },
+
+        props: {
+
+        },
+        watch: {
+            //"pct":function(){ this.updateLabels(); }
+        },
+        created: function () {
+
+            //for(var i=0;i<8;i++)
+            //    this.results.push({name:"card"+i});
+        },
+        mounted() {
+            this.$root.search.onRequest = true;
+        },
+        methods: {
+
+
+//handleSizeChange(page){
+//  c(`${page} items per page`)
+//},
+//handleCurrentChange(page){
+//  c(`current page: ${page}`)
+//},
+
+            Nav(page){
+                 //c(`current page: ${page}`)
+                if(this.$root.search.imovelBusca.page != (page-1)){
+                    //this.page = page;
+                    if( (this.$root.search.imovelBusca.page + page) < 0){
+                        this.$root.search.imovelBusca.page = 0;
+                    }else{
+                        this.$root.search.imovelBusca.page = (page-1);
+                    }
+                    this.Search();
+                }
+            },
+   
+            NavTemp(count){
+                if(this.$root.search.imovelBusca.page != count){
+                    if( (this.$root.search.imovelBusca.page + count) < 0){
+                        this.$root.search.imovelBusca.page = 0;
+                        this.page = 1;
+                    }else{
+                        this.$root.search.imovelBusca.page += count;
+                        this.page = this.$root.search.imovelBusca.page + count;
+                    }
+                    this.Search();
+                }
+            },
+   
+
+            NavTo(pg){
+                    this.$root.search.imovelBusca.page = (pg-1);
+                    this.page = pg;
+                    this.Search();
+            },
+   
+
+
+            SearchTitle(imovel){
+
+                this.buscaTitulo = "";
+
+                this.buscaTitulo += this.$validator.is(imovel.tipo)? imovel.tipo+"s" : "Imóveis";
+                
+                if(this.$validator.is(imovel.finalidade))
+                    this.buscaTitulo += (imovel.finalidade=="Venda")? " à venda" : "para alugar";
+
+                this.buscaTitulo += (imovel.quartos > 0)? (", "+imovel.quartos + "+ quartos ") :"";
+
+                if(this.$validator.is(imovel.estado)){
+                    this.buscaTitulo += " em ";
+                    this.buscaTitulo += (this.$validator.is(imovel.bairros.length == 1))? (imovel.bairros[0]+", ") : (this.$validator.is(imovel.bairros.length > 1))? (imovel.bairros.length +" bairros de ") : "";
+                    this.buscaTitulo += this.$validator.is(imovel.cidade)? (imovel.cidade+", "+imovel.estado) : imovel.estado;
+                }
+
+
+            },
+
+            Search(){
+
+                        this.$tools.Top();
+                        this.showNavigator                  = false;
+                        this.$root.search.onRequest         = true;
+
+                        this.totalResults=0;
+                        this.results = [];
+
+						axios.post(this.$api.BuildURL("imovel/buscar"),this.$root.search.imovelBusca).then((request) => {
+
+                            c2("request.data", request.data);
+
+                                if(request.data.status.success){
+									//this.$root.search.imovelBusca
+									this.totalResults = request.data.result.result.totalResults;
+
+                                    if(this.totalResults != this.totalNav)
+                                        this.totalNav = this.totalResults;
+
+									//c2("request.data.result.images",request.data.result.images);
+                                    //this.OutputResults(request.data);
+
+                                    if (this.$validator.is(request.data.result.crmResult) && request.data.result.crmResult?.result?.records?.length > 0){
+
+                                                var imoveisRes = request.data.result.crmResult.result.records;
+                                                var imagensRes = JSON.parse(request.data.result.result.imagensJson);
+                                                //c2("imagensRes",imagensRes.result["14x4310"]);
+
+                                                for(var i=0;i<imoveisRes.length;i++){
+                                                    var item            =   imoveisRes[i];
+                                                    var imovel          =   this.$models.imovel();
+                                                     
+                                                    //imovel.imagens       =   this.imagesData.sort((a, b) => 0.5 - Math.random()).slice(0, 4);
+                                                    imovel.favorito     =   this.$root.usuario.favoritos.filter(fav => fav.idImovelCRM == item.id).length > 0;
+                                                    imovel              =   this.$imovelHandler.Parse(imovel,item,i);
+                                                    
+                                                    imovel.imagens = [];
+                                                    imovel.thumbs = [];
+
+                                                    if (this.$validator.is(imagensRes) && this.$validator.is(imagensRes?.result[imovel.idCRM])) {
+                                                        imagensRes.result[imovel.idCRM].forEach(
+                                                            img => {
+                                                                //img.url = "https://imagizer.imageshack.com/v2/100x75q70/924/knaP8O.jpg";
+                                                                imovel.imagens.push(img);
+                                                                imovel.thumbs.push(img);
+
+                                                            }
+                                                        );
+                                                    }
+                                                 
+                                                        //c2("imagensRes",imagensRes.result[imovel.idCRM])
+
+                                                    /*
+                                                    imovel.imagens       =   this.imagesData.sort((a, b) => 0.5 - Math.random()).slice(0, 4);
+                                                    imovel.id           =   item.id.split("x")[1];
+                                                    imovel.idModule     =   item.id.split("x")[0];
+                                                    imovel.cod          =   item.productcode;
+                                                    imovel.tipo         =   item.productcategory;
+                                                    imovel.index        =   i;
+                                                    imovel.nome         =   "build"+i;
+                                                    imovel.estado       =   item.cf_1021;
+                                                    imovel.cidade       =   item.cf_1019;
+                                                    imovel.bairro       =   item.cf_1011;
+                                                    imovel.endereco     =   item.cf_1001;
+                                                    imovel.numero       =   item.cf_1003;
+                                                    imovel.andar        =   item.cf_1033;
+
+                                                    imovel.quartos      =   item.cf_1041;
+                                                    imovel.vagas        =   item.cf_1097;
+                                                    imovel.banheiros    =   item.cf_1035;
+                                                    imovel.suites       =   item.cf_1045;
+                                                    imovel.areaInterna  =   item.cf_1203;
+                                                    imovel.areaExterna  =   item.cf_1205;
+                                                    imovel.areaTotal    =   parseFloat(imovel.areaInterna) + parseFloat(imovel.areaExterna);
+
+                                                    imovel.valor        =   parseFloat(item.unit_price);
+
+
+                                                    // booleans
+                                                    imovel.areaServico     = (item.cf_1053 == 1);
+                                                    imovel.closet          = (item.cf_1063 == 1);
+                                                    imovel.churrasqueira   = (item.cf_1147 == 1);
+                                                    imovel.salas           = (item.cf_1043 == 1);
+                                                    imovel.armarioBanheiro = (item.cf_1055 == 1);
+                                                    imovel.armarioQuarto   = (item.cf_1059 == 1);
+                                                    imovel.boxDespejo      = (item.cf_1121 == 1);
+                                                    imovel.lavabo          = (item.cf_1071 == 1);
+                                                    imovel.hidromassagem   = (item.cf_1149 == 1);
+                                                    imovel.piscina         = (item.cf_1153 == 1);
+                                                    imovel.quadraEsportiva = (item.cf_1157 == 1);
+                                                    imovel.salaoFestas     = (item.cf_1163 == 1);
+                                                    imovel.dce             = (item.cf_1065 == 1);
+                                                    imovel.cercaEletrica   = (item.cf_1123 == 1);
+                                                    imovel.jardim          = (item.cf_1131 == 1);
+                                                    imovel.interfone       = (item.cf_1129 == 1);
+                                                    imovel.armarioCozinha  = (item.cf_1057 == 1);
+                                                    imovel.portaoEletronico= (item.cf_1135 == 1);
+                                                    imovel.alarme          = (item.cf_1113 == 1);
+                                                    imovel.aguaIndividual  = (item.cf_1111 == 1);
+                                                    imovel.gasCanalizado   = (item.cf_1127 == 1);
+                                                    */
+
+
+                                                    this.results.push(imovel);
+
+                                                }
+
+
+                                                //imovelsRes.forEach((item, i) => {
+                                                //    var imovel            = this.$models.imovel();
+                                                //    imovel.estado     =   item.cf_1021;
+                                                //    imovel.imagens     =   this.imagesData.sort((a, b) => 0.5 - Math.random()).slice(0, 4);
+                                                //    imovel.index      =   i;
+                                                //    imovel.name       =   "build"+count;
+                                                //    c(imovel);
+                                                //    this.results.push(imovel);
+                                                //});
+
+                                    }
+
+								}else{
+									this.$tools.Alert("Não foi possível efetuar a busca.");
+								}
+							}).catch((error) => {
+								ce(error);
+								if(error.response)
+								    ce(error.response);
+								//this.api.status.success=false;
+								//this.validator.AlertResponseErrors(error);
+								//this.messageFail="Não foi possível efetuar a busca.";
+								ce("Não foi possível efetuar a busca.");
+							}).finally(() => {
+                                this.$root.search.onRequest = false;
+                                this.SearchTitle(this.$root.search.imovelBusca.imovel);
+                                //this.OutputResultMap(request.data.imovel);
+								window.setTimeout(()=>{this.showNavigator = true;},1000);
+							});
+
+
+
+            },
+
+
+
+            OutputResults(data){
+
+                var outs  = [];
+
+                  outs.push("\n----------- critérios ----------- ");
+
+                  outs.push("cod          =   productcode         = " + data.imovel.cod           );
+                  outs.push("tipo         =   productcategory     = " + data.imovel.tipo          );
+                  outs.push("estado       =   cf_1021             = " + data.imovel.estado        );
+                  outs.push("cidade       =   cf_1019             = " + data.imovel.cidade        );
+                  outs.push("bairro       =   cf_1011             = " + data.imovel.bairro        );
+                  outs.push("endereco     =   cf_1001             = " + data.imovel.endereco      );
+                  outs.push("numero       =   cf_1003             = " + data.imovel.numero        );
+                  outs.push("andar        =   cf_1033             = " + data.imovel.andar         );
+                  outs.push("quartos      =   cf_1041             = " + data.imovel.quartos       );
+                  outs.push("banheiros    =   cf_1035             = " + data.imovel.banheiros     );
+                  outs.push("suites       =   cf_1045             = " + data.imovel.suites        );
+                  outs.push("vagas        =   cf_1097             = " + data.imovel.vagas         );
+                  outs.push("areaInterna  =   cf_1203             = " + data.imovel.areaInterna   );
+                  outs.push("areaExterna  =   cf_1205             = " + data.imovel.areaExterna   );
+                  outs.push("valor        =   unit_price          = " + data.imovel.valor         );
+
+                  outs.push("\n----- caracteristicas");
+
+                  outs.push("areaServico      =  cf_1053  = "+ data.imovel.areaServico     );
+                  outs.push("closet           =  cf_1063  = "+ data.imovel.closet          );
+                  outs.push("churrasqueira    =  cf_1147  = "+ data.imovel.churrasqueira   );
+                  outs.push("salas            =  cf_1043  = "+ data.imovel.salas           );
+                  outs.push("armarioBanheiro  =  cf_1055  = "+ data.imovel.armarioBanheiro );
+                  outs.push("armarioQuarto    =  cf_1059  = "+ data.imovel.armarioQuarto   );
+                  outs.push("boxDespejo       =  cf_1121  = "+ data.imovel.boxDespejo      );
+                  outs.push("lavabo           =  cf_1071  = "+ data.imovel.lavabo          );
+                  outs.push("hidromassagem    =  cf_1149  = "+ data.imovel.hidromassagem   );
+                  outs.push("piscina          =  cf_1153  = "+ data.imovel.piscina         );
+                  outs.push("quadraEsportiva  =  cf_1157  = "+ data.imovel.quadraEsportiva );
+                  outs.push("salaoFestas      =  cf_1163  = "+ data.imovel.salaoFestas     );
+                  outs.push("dce              =  cf_1065  = "+ data.imovel.dce             );
+                  outs.push("cercaEletrica    =  cf_1123  = "+ data.imovel.cercaEletrica   );
+                  outs.push("jardim           =  cf_1131  = "+ data.imovel.jardim          );
+                  outs.push("interfone        =  cf_1129  = "+ data.imovel.interfone       );
+                  outs.push("armarioCozinha   =  cf_1057  = "+ data.imovel.armarioCozinha  );
+                  outs.push("portaoEletronico =  cf_1135  = "+ data.imovel.portaoEletronico);
+                  outs.push("alarme           =  cf_1113  = "+ data.imovel.alarme          );
+                  outs.push("aguaIndividual   =  cf_1111  = "+ data.imovel.aguaIndividual  );
+                  outs.push("gasCanalizado    =  cf_1127  = "+ data.imovel.gasCanalizado   );
+                
+
+                  //c(outs);
+                  //window.setTimeout(()=>{ console.clear(); c(sql); outs.forEach((i)=>console.log(i))},1000);
+                  window.setTimeout(()=>{ 
+                      cclear();
+                      carray(outs); 
+                      c(data.sql);
+                  },1000);
+
+            },
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+        }
+
+    }
+
+
+
+
+
+
+
+
+</script>
+
+
+
+<style scoped>
+
+
+
+.search-header{
+    min-height:24px;
+    line-height:22px;
+    vertical-align:middle;
+    border-radius:14px;
+    padding:10px;
+    padding-left:20px;
+    margin-left:20px;
+    margin-right:20px;
+    margin-bottom:auto;
+    font-weight:600;
+    color:var(--s-text-color);
+    /*border:solid 2px #efefef;*/
+    box-shadow: rgba(99, 99, 99, 0.1) 0px 2px 8px 0px;
+    box-shadow: rgba(0, 0, 0, 0.16) 0px 1px 4px;
+    background-color:#efefef;
+}
+
+
+
+</style>
+

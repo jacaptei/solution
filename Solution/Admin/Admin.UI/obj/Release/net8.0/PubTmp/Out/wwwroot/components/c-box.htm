@@ -1,0 +1,107 @@
+<template>
+	<div>
+
+                <el-row v-if="align=='right'" class="box">
+                            <el-col :xs="24" :sm="12" :md="10">
+                                    <q-img  :src="image" class="col-5 box-img" style="min-height:300px" />
+                            </el-col>
+                            <el-col :xs="24" :sm="12" :md="14" :class="'box-text box-' + color">
+                                    <p><span v-html="title" ></span></p>
+                                    <p>
+										<span v-html="content"   :style="{color: (color=='orange'? '#fff':'inherith') }"  ></span>
+										<br /><br />
+										<q-btn :label="btlabel" :color=" color=='orange'? 'secondary':'primary'" class="box-bt" @click="$emit(event)"></q-btn>
+									</p>
+                            </el-col>
+                </el-row>
+
+                <el-row v-else-if="!isXS" class="box">
+                            <el-col :xs="24" :sm="12" :md="14" :class="'box-text box-' + color">
+                                    <p><span v-html="title"    ></span></p>
+                                    <p>
+										<span v-html="content"   :style="{color: (color=='orange'? '#fff':'inherith') }"  ></span>
+										<br /><br />
+										<q-btn :label="btlabel" :color=" color=='orange'? 'secondary':'primary'" class="box-bt" @click="$emit(event)"></q-btn>
+									</p>
+                            </el-col>
+                            <el-col :xs="24" :sm="12" :md="10">
+                                    <q-img  :src="image" class="col-5 box-img"  />
+                            </el-col>
+                </el-row>
+
+
+                <el-row v-else class="box">
+                            <el-col :xs="24" :sm="12" :md="10">
+                                    <q-img  :src="image" class="col-5 box-img"  />
+                            </el-col>
+                            <el-col :xs="24" :sm="12" :md="14" :class="'box-text box-' + color">
+                                    <p><span v-html="title"    ></span></p>
+                                    <p>
+										<span v-html="content"  ></span>
+										<br /><br />
+										<q-btn :label="btlabel" :color=" color=='orange'? 'secondary':'primary'" class="box-bt" @click="$emit(event)"></q-btn>
+									</p>
+                            </el-col>
+                </el-row>
+
+
+
+
+	</div>
+</template>
+
+
+
+<script>
+
+module.exports = {
+    components: {
+
+	},	
+	
+	data: function () {
+		return {
+			isXS:false
+		}
+	},computed: {
+      
+	},
+	
+	props:{
+        title:			{ type: String, required: false, default: "" },
+        content:		{ type: String, required: false, default: "" },
+        align:			{ type: String, required: false, default: "left" },
+        image:			{ type: String, required: false, default: null },
+        btlabel:		{ type: Boolean, required: false, default: "" }, 
+        event:		    { type: String, required: false, default: "" }, 
+        color:			{ type: Boolean, required: false, default: "grey" }, // grey, navy, orange
+	},
+	watch:{
+	},
+	created: function () {
+		
+		
+	 },
+	mounted(){
+			this.isXS =	(window.screen.width < 576);
+	},		  
+	methods: {
+        Back() {
+            //this.$root.RouteTo($root.lastRoute);
+            //this.$root.router.back();
+        }
+	}				
+		
+}
+
+</script>
+
+
+<style scoped>
+
+
+
+
+</style>
+
+

@@ -1,0 +1,30 @@
+C:\jobs\JaCaptei\Projects\_main\Solution\Admin.Site\bin\Release\net8.0\appsettings.Development.json
+C:\jobs\JaCaptei\Projects\_main\Solution\Admin.Site\bin\Release\net8.0\appsettings.json
+C:\jobs\JaCaptei\Projects\_main\Solution\Admin.Site\bin\Release\net8.0\1.2 JaCaptei.Admin.Site.staticwebassets.runtime.json
+C:\jobs\JaCaptei\Projects\_main\Solution\Admin.Site\bin\Release\net8.0\1.2 JaCaptei.Admin.Site.exe
+C:\jobs\JaCaptei\Projects\_main\Solution\Admin.Site\bin\Release\net8.0\1.2 JaCaptei.Admin.Site.deps.json
+C:\jobs\JaCaptei\Projects\_main\Solution\Admin.Site\bin\Release\net8.0\1.2 JaCaptei.Admin.Site.runtimeconfig.json
+C:\jobs\JaCaptei\Projects\_main\Solution\Admin.Site\bin\Release\net8.0\1.2 JaCaptei.Admin.Site.dll
+C:\jobs\JaCaptei\Projects\_main\Solution\Admin.Site\bin\Release\net8.0\1.2 JaCaptei.Admin.Site.pdb
+C:\jobs\JaCaptei\Projects\_main\Solution\Admin.Site\obj\Release\net8.0\1.2 JaCaptei.Admin.Site.GeneratedMSBuildEditorConfig.editorconfig
+C:\jobs\JaCaptei\Projects\_main\Solution\Admin.Site\obj\Release\net8.0\1.2 JaCaptei.Admin.Site.AssemblyInfoInputs.cache
+C:\jobs\JaCaptei\Projects\_main\Solution\Admin.Site\obj\Release\net8.0\1.2 JaCaptei.Admin.Site.AssemblyInfo.cs
+C:\jobs\JaCaptei\Projects\_main\Solution\Admin.Site\obj\Release\net8.0\1.2 JaCaptei.Admin.Site.csproj.CoreCompileInputs.cache
+C:\jobs\JaCaptei\Projects\_main\Solution\Admin.Site\obj\Release\net8.0\1.2 JaCaptei.Admin.Site.MvcApplicationPartsAssemblyInfo.cache
+C:\jobs\JaCaptei\Projects\_main\Solution\Admin.Site\obj\Release\net8.0\1.2 JaCaptei.Admin.Site.RazorAssemblyInfo.cache
+C:\jobs\JaCaptei\Projects\_main\Solution\Admin.Site\obj\Release\net8.0\1.2 JaCaptei.Admin.Site.RazorAssemblyInfo.cs
+C:\jobs\JaCaptei\Projects\_main\Solution\Admin.Site\obj\Release\net8.0\staticwebassets.build.json
+C:\jobs\JaCaptei\Projects\_main\Solution\Admin.Site\obj\Release\net8.0\staticwebassets.development.json
+C:\jobs\JaCaptei\Projects\_main\Solution\Admin.Site\obj\Release\net8.0\staticwebassets\msbuild.1.2 JaCaptei.Admin.Site.Microsoft.AspNetCore.StaticWebAssets.props
+C:\jobs\JaCaptei\Projects\_main\Solution\Admin.Site\obj\Release\net8.0\staticwebassets\msbuild.build.1.2 JaCaptei.Admin.Site.props
+C:\jobs\JaCaptei\Projects\_main\Solution\Admin.Site\obj\Release\net8.0\staticwebassets\msbuild.buildMultiTargeting.1.2 JaCaptei.Admin.Site.props
+C:\jobs\JaCaptei\Projects\_main\Solution\Admin.Site\obj\Release\net8.0\staticwebassets\msbuild.buildTransitive.1.2 JaCaptei.Admin.Site.props
+C:\jobs\JaCaptei\Projects\_main\Solution\Admin.Site\obj\Release\net8.0\staticwebassets.pack.json
+C:\jobs\JaCaptei\Projects\_main\Solution\Admin.Site\obj\Release\net8.0\scopedcss\Views\Shared\_Layout.cshtml.rz.scp.css
+C:\jobs\JaCaptei\Projects\_main\Solution\Admin.Site\obj\Release\net8.0\scopedcss\bundle\1.2 JaCaptei.Admin.Site.styles.css
+C:\jobs\JaCaptei\Projects\_main\Solution\Admin.Site\obj\Release\net8.0\scopedcss\projectbundle\1.2 JaCaptei.Admin.Site.bundle.scp.css
+C:\jobs\JaCaptei\Projects\_main\Solution\Admin.Site\obj\Release\net8.0\1.2 JaCaptei.Admin.Site.dll
+C:\jobs\JaCaptei\Projects\_main\Solution\Admin.Site\obj\Release\net8.0\refint\1.2 JaCaptei.Admin.Site.dll
+C:\jobs\JaCaptei\Projects\_main\Solution\Admin.Site\obj\Release\net8.0\1.2 JaCaptei.Admin.Site.pdb
+C:\jobs\JaCaptei\Projects\_main\Solution\Admin.Site\obj\Release\net8.0\1.2 JaCaptei.Admin.Site.genruntimeconfig.cache
+C:\jobs\JaCaptei\Projects\_main\Solution\Admin.Site\obj\Release\net8.0\ref\1.2 JaCaptei.Admin.Site.dll

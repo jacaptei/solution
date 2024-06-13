@@ -1,0 +1,292 @@
+<template>
+
+    <div>
+        <!--<div class="content-height"  :style="($root.menu.isCollapse)? 'width:100%':'width:200px;'">-->
+        <div class="content-height">
+
+            <div style="font-size:12px;padding-top:6px;text-align:right;width:100%">
+                <div style="display:inline-block;float:left">
+                    <div class="link-collapser" style="text-align:left" v-if="$root.menu.isCollapse" @click="$root.menu.isCollapse=!$root.menu.isCollapse"><i class="fa fa-chevron-right" /> </div>
+                    <div class="link-collapser" style="text-align:left" v-else @click="$root.menu.isCollapse=!$root.menu.isCollapse"><i class="fa fa-chevron-left " /> </div>
+                </div>
+                <!--<div style="font-size:17px;display:inline-block;float:right">
+                    <div class="link-arrow" style="text-align:right" @click="$root.RouteBack()"><i class="fa fa-arrow-left" /> </div>
+                </div>-->
+            </div>
+            <el-menu active-text-color="#fff"
+                     text-color="#fff"
+                     background-color="none"
+                     class="el-menu-vertical"
+                     :default-active="$root.routing.menuIndex"
+                     :collapse=$root.menu.isCollapse>
+                <el-menu-item index="01-00-00-00" @click="$root.RouteTo('/home')"           class="el-menu-vertical-space"><div class="menu-mark">&nbsp;</div><i class="fa fa-house"       /><template #title><span>Home</span></template></el-menu-item>
+                <el-menu-item index="02-00-00-00" @click="$root.RouteTo('/parceiros')"      class="el-menu-vertical-space"><div class="menu-mark">&nbsp;</div><i class="fa fa-user-alt"   /><template #title><span></span><span>Parceiros</span></template></el-menu-item>
+                <el-menu-item index="03-00-00-00" @click="$root.RouteTo('/proprietarios')"  class="el-menu-vertical-space"><div class="menu-mark">&nbsp;</div><i class="fa fa-house-user"       /><template #title><span></span><span>Proprietários</span></template></el-menu-item>
+                <el-menu-item index="04-00-00-00" @click="$root.RouteTo('/imoveis')"        class="el-menu-vertical-space"><div class="menu-mark">&nbsp;</div><i class="fa fa-building"    /><template #title><span></span><span>Imóveis</span></template></el-menu-item>
+                <el-menu-item index="05-00-00-00" @click="$root.RouteTo('/solicitacoes')"   class="el-menu-vertical-space"><div class="menu-mark">&nbsp;</div><i class="fa fa-bell-concierge"    /><template #title><span></span><span>Solicitações</span></template></el-menu-item>
+                <el-menu-item index="----" @click="$root.SignOut()" class="el-menu-vertical-space"><i class="fa fa-sign-out" /><span>   Sair  </span></el-menu-item>
+
+                <!--<el-divider class="mainmenu-divider"></el-divider>
+
+                <el-divider class="mainmenu-divider"></el-divider>
+                <el-sub-menu index="100">
+                    <template #title style="color:#FFF !important;">
+                        <i class="fa fa-cog" />
+                        <span>SuperAdmin</span>
+                    </template>
+                    <el-menu-item-group>
+                        <el-menu-item index="100-1-0-0-0" @click="$root.RouteTo('/home')" class="el-menu-vertical-space"><i class="fa fa-user-gear" />  Usuarios   </el-menu-item>
+                    </el-menu-item-group>
+                </el-sub-menu>-->
+
+            </el-menu>
+        </div>
+    </div>
+
+</template>
+
+<script>
+    module.exports = {
+
+        components: {
+
+        },
+
+        data: function () {
+            return {
+                language: "PT-BR",
+                labels: []
+            }
+        }, computed: {
+
+        },
+
+        props: {
+
+        },
+        watch: {
+        },
+        created: function () {
+
+        },
+        mounted() {
+            // cclear();
+            //this.isCollapse = this.$root.isMenuCollapse;
+        },
+        methods: {
+            handleOpen(key, keyPath) {
+                //c(key, keyPath);
+            },
+            handleClose(key, keyPath) {
+                //c(key, keyPath);
+            },
+        }
+
+    }
+
+</script>
+
+
+<!--<script setup>
+const isCollapse = ref(true);
+const handleOpen = function(key, keyPath){
+  c(key, keyPath);
+}
+const handleClose = function(key, keyPath){
+  c(key, keyPath);
+}
+</script>-->
+
+<style scoped>
+
+    .menu-mark {
+        background: #fff;
+        width: 0px;
+        height: 50%;
+        margin-right: 0px
+    }
+
+
+    .el-menu-vertical {
+        list-style: none;
+        position: relative;
+        margin: 0;
+        padding-left: 0;
+        box-sizing: border-box;
+        border: none;
+        overflow-x: hidden;
+        font-size: 11pt;
+        font-family: "Marine", "Segoe UI","Trebuchet MS", Tahoma, Verdana, Hind,Hind, Arial, sans-serif !important;
+        
+    }
+
+
+            .el-menu-vertical:not(.el-menu--collapse) {
+                min-height: 400px;
+                color: #fff;
+                /*background-color:#000144;*/
+                width: 200px;
+            }
+
+            .el-menu-vertical:not(.el-menu--expand) {
+                /*width: 240px;*/
+                min-height: 400px;
+                color: #fff;
+                /*background-color:#000144;*/
+                text-align: center;
+            }
+
+        .el-menu-vertical-space {
+            margin-bottom: 1px;
+            margin-top: 1px;
+        }
+
+
+        .el-menu-item {
+            opacity:0.6;
+            -webkit-transition: 0.5s;
+            -moz-transition: 0.5s;
+            -o-transition: 0.5s;
+            transition: 0.5s;
+        }
+
+        .el-menu-item div {
+            opacity: 0.4;
+        }
+
+            .el-menu-item:hover {
+                color: #fff;
+                background-color: inherit;
+                opacity: 1;
+            }
+
+            .el-menu-item:hover div{
+                opacity: 1;
+            }
+
+
+            /*.el-sub-menu:hover {
+        background:none !important;
+    }*/
+
+            .el-menu-item.is-active {
+                opacity: 1;
+                color: #fff;
+            }
+            .el-menu-item.is-active div {
+                opacity: 1;
+            }
+
+                .el-menu-item.is-active:hover {
+                    color: #fff;
+                    background-color: inherit;
+                    opacity: 1;
+                }
+
+
+/*                .el-menu-item.is-active:hover {
+                    color: #07459f;
+                    font-weight:800;
+                    background-color: #fff !important;
+                    opacity: 1;
+                }
+*/
+
+
+        .link-collapser {
+            cursor: pointer;
+            padding-left: 20px;
+            color: #5d5ed1;
+            text-align: left;
+        }
+
+            .link-collapser:hover {
+                color: #ffffff;
+            }
+
+
+        svg {
+            padding-right: 10px;
+        }
+
+        i {
+            padding-right: 10px;
+        }
+
+        .mdi-file-cog::before {
+            font-size: 19px;
+        }
+
+
+        .mainmenu-divider {
+            border-top: 1px solid #102962 !important;
+            margin: 0px !important;
+            background-color: #102962;
+        }
+
+        /*
+    .el-menu--popup {
+        z-index: 100;
+        min-width: 200px;
+        border: none;
+        padding: 5px 0;
+        border-radius: var(--el-border-radius-small);
+        box-shadow: var(--el-box-shadow-light);
+        background: #030056;
+        background: linear-gradient(180deg, #000144 0%, #190062 35%, #2e0083 80%, #310078 85%, #000144 100%);
+    }
+    */
+
+</style>
+
+
+
+<!--<template>
+  <div>
+          <el-radio-group v-model="$root.isMenuCollapse" style="margin-bottom: 20px">
+            <el-radio-button :label="false">>></el-radio-button>
+            <el-radio-button :label="true"><<</el-radio-button>
+          </el-radio-group>
+          <el-menu
+            default-active="2"
+            class="el-menu-vertical"
+            :collapse="$root.isMenuCollapse"
+            @open="handleOpen"
+            @close="handleClose"
+          >
+                <el-menu-item index="0-1"><router-link to="/home">Home  </router-link> </el-menu-item>
+                <el-menu-item index="0-2"><router-link to="/login">Login</router-link> </el-menu-item>
+                <el-menu-item index="0-3"><router-link to="/tests">Tests</router-link> </el-menu-item>
+            <el-sub-menu index="1">
+              <template #title>
+                <el-icon><location /></el-icon>
+                <span>Navigator One</span>
+              </template>
+              <el-menu-item-group>
+                <template #title><span>Group One</span></template>
+                <el-menu-item index="1-1">item one</el-menu-item>
+                <el-menu-item index="1-2">item two</el-menu-item>
+              </el-menu-item-group>
+              <el-menu-item-group title="Group Two">
+                <el-menu-item index="1-3">item three</el-menu-item>
+              </el-menu-item-group>
+              <el-sub-menu index="1-4">
+                <template #title><span>item four</span></template>
+                <el-menu-item index="1-4-1">item one</el-menu-item>
+              </el-sub-menu>
+            </el-sub-menu>
+            <el-menu-item index="2">
+              <el-icon><icon-menu /></el-icon>
+              <template #title>Navigator Two</template>
+            </el-menu-item>
+            <el-menu-item index="3" disabled>
+              <el-icon><document /></el-icon>
+              <template #title>Navigator Three</template>
+            </el-menu-item>
+            <el-menu-item index="4">
+              <el-icon><setting /></el-icon>
+              <template #title>Navigator Four</template>
+            </el-menu-item>
+          </el-menu>
+    </div>
+</template>-->

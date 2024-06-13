@@ -1,0 +1,3177 @@
+[
+  {
+    "ContainingType": "JaCaptei.Administrativo.API.Controllers.HomeController",
+    "Method": "Info",
+    "RelativePath": "",
+    "HttpMethod": "",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "JaCaptei.Administrativo.API.Controllers.ApiControllerBase",
+    "Method": "ResultException",
+    "RelativePath": "admin",
+    "HttpMethod": "",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "JaCaptei.Administrativo.API.Controllers.ApiControllerBase",
+    "Method": "ResultUnauthorized",
+    "RelativePath": "admin",
+    "HttpMethod": "",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "JaCaptei.Administrativo.API.Controllers.ApiControllerBase",
+    "Method": "ResultNotFound",
+    "RelativePath": "admin",
+    "HttpMethod": "",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "JaCaptei.Administrativo.API.Controllers.ApiControllerBase",
+    "Method": "Result",
+    "RelativePath": "admin",
+    "HttpMethod": "",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "JaCaptei.Administrativo.API.Controllers.ApiControllerBase",
+    "Method": "Result",
+    "RelativePath": "admin",
+    "HttpMethod": "",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "appReturn",
+        "Type": "JaCaptei.Model.AppReturn",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "JaCaptei.Administrativo.API.Controllers.ApiControllerBase",
+    "Method": "Result",
+    "RelativePath": "admin",
+    "HttpMethod": "",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "dataResult",
+        "Type": "System.Object",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "JaCaptei.Administrativo.API.Controllers.ApiControllerBase",
+    "Method": "ObterUsuarioAutenticado",
+    "RelativePath": "admin",
+    "HttpMethod": "",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [],
+    "ReturnTypes": [
+      {
+        "Type": "JaCaptei.Model.Usuario",
+        "MediaTypes": [
+          "text/plain",
+          "application/json",
+          "text/json"
+        ],
+        "StatusCode": 200
+      }
+    ]
+  },
+  {
+    "ContainingType": "JaCaptei.Administrativo.API.Controllers.ApiControllerBase",
+    "Method": "ObterUsuarioAutenticado",
+    "RelativePath": "admin",
+    "HttpMethod": "",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "usuario",
+        "Type": "JaCaptei.Model.Usuario",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": [
+      {
+        "Type": "JaCaptei.Model.Usuario",
+        "MediaTypes": [
+          "text/plain",
+          "application/json",
+          "text/json"
+        ],
+        "StatusCode": 200
+      }
+    ]
+  },
+  {
+    "ContainingType": "JaCaptei.Administrativo.API.Controllers.ApiControllerBase",
+    "Method": "ObterAdminAutenticado",
+    "RelativePath": "admin",
+    "HttpMethod": "",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [],
+    "ReturnTypes": [
+      {
+        "Type": "JaCaptei.Model.Admin",
+        "MediaTypes": [
+          "text/plain",
+          "application/json",
+          "text/json"
+        ],
+        "StatusCode": 200
+      }
+    ]
+  },
+  {
+    "ContainingType": "JaCaptei.Administrativo.API.Controllers.ApiControllerBase",
+    "Method": "ObterAdminAutenticado",
+    "RelativePath": "admin",
+    "HttpMethod": "",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "usuario",
+        "Type": "JaCaptei.Model.Admin",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": [
+      {
+        "Type": "JaCaptei.Model.Admin",
+        "MediaTypes": [
+          "text/plain",
+          "application/json",
+          "text/json"
+        ],
+        "StatusCode": 200
+      }
+    ]
+  },
+  {
+    "ContainingType": "JaCaptei.Administrativo.API.Controllers.AdminController",
+    "Method": "ObterAdmins",
+    "RelativePath": "admin/obter/todos",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "JaCaptei.Administrativo.API.Controllers.ApiControllerBase",
+    "Method": "ResultException",
+    "RelativePath": "home",
+    "HttpMethod": "",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "JaCaptei.Administrativo.API.Controllers.ApiControllerBase",
+    "Method": "ResultUnauthorized",
+    "RelativePath": "home",
+    "HttpMethod": "",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "JaCaptei.Administrativo.API.Controllers.ApiControllerBase",
+    "Method": "ResultNotFound",
+    "RelativePath": "home",
+    "HttpMethod": "",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "JaCaptei.Administrativo.API.Controllers.ApiControllerBase",
+    "Method": "Result",
+    "RelativePath": "home",
+    "HttpMethod": "",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "JaCaptei.Administrativo.API.Controllers.ApiControllerBase",
+    "Method": "Result",
+    "RelativePath": "home",
+    "HttpMethod": "",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "appReturn",
+        "Type": "JaCaptei.Model.AppReturn",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "JaCaptei.Administrativo.API.Controllers.ApiControllerBase",
+    "Method": "Result",
+    "RelativePath": "home",
+    "HttpMethod": "",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "dataResult",
+        "Type": "System.Object",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "JaCaptei.Administrativo.API.Controllers.ApiControllerBase",
+    "Method": "ObterUsuarioAutenticado",
+    "RelativePath": "home",
+    "HttpMethod": "",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [],
+    "ReturnTypes": [
+      {
+        "Type": "JaCaptei.Model.Usuario",
+        "MediaTypes": [
+          "text/plain",
+          "application/json",
+          "text/json"
+        ],
+        "StatusCode": 200
+      }
+    ]
+  },
+  {
+    "ContainingType": "JaCaptei.Administrativo.API.Controllers.ApiControllerBase",
+    "Method": "ObterUsuarioAutenticado",
+    "RelativePath": "home",
+    "HttpMethod": "",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "usuario",
+        "Type": "JaCaptei.Model.Usuario",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": [
+      {
+        "Type": "JaCaptei.Model.Usuario",
+        "MediaTypes": [
+          "text/plain",
+          "application/json",
+          "text/json"
+        ],
+        "StatusCode": 200
+      }
+    ]
+  },
+  {
+    "ContainingType": "JaCaptei.Administrativo.API.Controllers.ApiControllerBase",
+    "Method": "ObterAdminAutenticado",
+    "RelativePath": "home",
+    "HttpMethod": "",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [],
+    "ReturnTypes": [
+      {
+        "Type": "JaCaptei.Model.Admin",
+        "MediaTypes": [
+          "text/plain",
+          "application/json",
+          "text/json"
+        ],
+        "StatusCode": 200
+      }
+    ]
+  },
+  {
+    "ContainingType": "JaCaptei.Administrativo.API.Controllers.ApiControllerBase",
+    "Method": "ObterAdminAutenticado",
+    "RelativePath": "home",
+    "HttpMethod": "",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "usuario",
+        "Type": "JaCaptei.Model.Admin",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": [
+      {
+        "Type": "JaCaptei.Model.Admin",
+        "MediaTypes": [
+          "text/plain",
+          "application/json",
+          "text/json"
+        ],
+        "StatusCode": 200
+      }
+    ]
+  },
+  {
+    "ContainingType": "JaCaptei.Administrativo.API.Controllers.ImovelController",
+    "Method": "SalvarImagem",
+    "RelativePath": "imovel",
+    "HttpMethod": "",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "imovel",
+        "Type": "JaCaptei.Model.Imovel",
+        "IsRequired": true
+      },
+      {
+        "Name": "file",
+        "Type": "Microsoft.AspNetCore.Http.IFormFile",
+        "IsRequired": false
+      }
+    ],
+    "ReturnTypes": [
+      {
+        "Type": "JaCaptei.Model.Imovel",
+        "MediaTypes": [
+          "text/plain",
+          "application/json",
+          "text/json"
+        ],
+        "StatusCode": 200
+      }
+    ]
+  },
+  {
+    "ContainingType": "JaCaptei.Administrativo.API.Controllers.ImovelController",
+    "Method": "SalvarImagens",
+    "RelativePath": "imovel",
+    "HttpMethod": "",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "imovel",
+        "Type": "JaCaptei.Model.Imovel",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": [
+      {
+        "Type": "JaCaptei.Model.Imovel",
+        "MediaTypes": [
+          "text/plain",
+          "application/json",
+          "text/json"
+        ],
+        "StatusCode": 200
+      }
+    ]
+  },
+  {
+    "ContainingType": "JaCaptei.Administrativo.API.Controllers.ImovelController",
+    "Method": "BuscarImoveisImagensCRM",
+    "RelativePath": "imovel",
+    "HttpMethod": "",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "sessaoCRMglobal",
+        "Type": "System.String",
+        "IsRequired": false
+      },
+      {
+        "Name": "ids",
+        "Type": "System.String",
+        "IsRequired": false
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "JaCaptei.Administrativo.API.Controllers.ApiControllerBase",
+    "Method": "ResultException",
+    "RelativePath": "imovel",
+    "HttpMethod": "",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "JaCaptei.Administrativo.API.Controllers.ApiControllerBase",
+    "Method": "ResultUnauthorized",
+    "RelativePath": "imovel",
+    "HttpMethod": "",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "JaCaptei.Administrativo.API.Controllers.ApiControllerBase",
+    "Method": "ResultNotFound",
+    "RelativePath": "imovel",
+    "HttpMethod": "",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "JaCaptei.Administrativo.API.Controllers.ApiControllerBase",
+    "Method": "Result",
+    "RelativePath": "imovel",
+    "HttpMethod": "",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "JaCaptei.Administrativo.API.Controllers.ApiControllerBase",
+    "Method": "Result",
+    "RelativePath": "imovel",
+    "HttpMethod": "",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "appReturn",
+        "Type": "JaCaptei.Model.AppReturn",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "JaCaptei.Administrativo.API.Controllers.ApiControllerBase",
+    "Method": "Result",
+    "RelativePath": "imovel",
+    "HttpMethod": "",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "dataResult",
+        "Type": "System.Object",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "JaCaptei.Administrativo.API.Controllers.ApiControllerBase",
+    "Method": "ObterUsuarioAutenticado",
+    "RelativePath": "imovel",
+    "HttpMethod": "",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [],
+    "ReturnTypes": [
+      {
+        "Type": "JaCaptei.Model.Usuario",
+        "MediaTypes": [
+          "text/plain",
+          "application/json",
+          "text/json"
+        ],
+        "StatusCode": 200
+      }
+    ]
+  },
+  {
+    "ContainingType": "JaCaptei.Administrativo.API.Controllers.ApiControllerBase",
+    "Method": "ObterUsuarioAutenticado",
+    "RelativePath": "imovel",
+    "HttpMethod": "",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "usuario",
+        "Type": "JaCaptei.Model.Usuario",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": [
+      {
+        "Type": "JaCaptei.Model.Usuario",
+        "MediaTypes": [
+          "text/plain",
+          "application/json",
+          "text/json"
+        ],
+        "StatusCode": 200
+      }
+    ]
+  },
+  {
+    "ContainingType": "JaCaptei.Administrativo.API.Controllers.ApiControllerBase",
+    "Method": "ObterAdminAutenticado",
+    "RelativePath": "imovel",
+    "HttpMethod": "",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [],
+    "ReturnTypes": [
+      {
+        "Type": "JaCaptei.Model.Admin",
+        "MediaTypes": [
+          "text/plain",
+          "application/json",
+          "text/json"
+        ],
+        "StatusCode": 200
+      }
+    ]
+  },
+  {
+    "ContainingType": "JaCaptei.Administrativo.API.Controllers.ApiControllerBase",
+    "Method": "ObterAdminAutenticado",
+    "RelativePath": "imovel",
+    "HttpMethod": "",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "usuario",
+        "Type": "JaCaptei.Model.Admin",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": [
+      {
+        "Type": "JaCaptei.Model.Admin",
+        "MediaTypes": [
+          "text/plain",
+          "application/json",
+          "text/json"
+        ],
+        "StatusCode": 200
+      }
+    ]
+  },
+  {
+    "ContainingType": "JaCaptei.Administrativo.API.Controllers.ImovelController",
+    "Method": "Adicionar",
+    "RelativePath": "imovel/adicionar",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "id",
+        "Type": "System.Int32",
+        "IsRequired": false
+      },
+      {
+        "Name": "idCRM",
+        "Type": "System.String",
+        "IsRequired": false
+      },
+      {
+        "Name": "cod",
+        "Type": "System.String",
+        "IsRequired": false
+      },
+      {
+        "Name": "codCRM",
+        "Type": "System.String",
+        "IsRequired": false
+      },
+      {
+        "Name": "index",
+        "Type": "System.Int32",
+        "IsRequired": false
+      },
+      {
+        "Name": "nome",
+        "Type": "System.String",
+        "IsRequired": false
+      },
+      {
+        "Name": "titulo",
+        "Type": "System.String",
+        "IsRequired": false
+      },
+      {
+        "Name": "descricao",
+        "Type": "System.String",
+        "IsRequired": false
+      },
+      {
+        "Name": "idTipo",
+        "Type": "System.Int16",
+        "IsRequired": false
+      },
+      {
+        "Name": "tipo",
+        "Type": "System.String",
+        "IsRequired": false
+      },
+      {
+        "Name": "idFinalidade",
+        "Type": "System.Int16",
+        "IsRequired": false
+      },
+      {
+        "Name": "finalidade",
+        "Type": "System.String",
+        "IsRequired": false
+      },
+      {
+        "Name": "valor",
+        "Type": "System.Double",
+        "IsRequired": false
+      },
+      {
+        "Name": "valorMinimo",
+        "Type": "System.Double",
+        "IsRequired": false
+      },
+      {
+        "Name": "valorMaximo",
+        "Type": "System.Double",
+        "IsRequired": false
+      },
+      {
+        "Name": "valorIPTU",
+        "Type": "System.Double",
+        "IsRequired": false
+      },
+      {
+        "Name": "valorCondominio",
+        "Type": "System.Double",
+        "IsRequired": false
+      },
+      {
+        "Name": "valorAnterior",
+        "Type": "System.Double",
+        "IsRequired": false
+      },
+      {
+        "Name": "valorConsulta",
+        "Type": "System.Double",
+        "IsRequired": false
+      },
+      {
+        "Name": "areaMinima",
+        "Type": "System.Double",
+        "IsRequired": false
+      },
+      {
+        "Name": "areaMaxima",
+        "Type": "System.Double",
+        "IsRequired": false
+      },
+      {
+        "Name": "areaInterna",
+        "Type": "System.Double",
+        "IsRequired": false
+      },
+      {
+        "Name": "areaExterna",
+        "Type": "System.Double",
+        "IsRequired": false
+      },
+      {
+        "Name": "areaTotal",
+        "Type": "System.Double",
+        "IsRequired": false
+      },
+      {
+        "Name": "quartos",
+        "Type": "System.Int16",
+        "IsRequired": false
+      },
+      {
+        "Name": "banheiros",
+        "Type": "System.Int16",
+        "IsRequired": false
+      },
+      {
+        "Name": "vagas",
+        "Type": "System.Int16",
+        "IsRequired": false
+      },
+      {
+        "Name": "suites",
+        "Type": "System.Int16",
+        "IsRequired": false
+      },
+      {
+        "Name": "elevafores",
+        "Type": "System.Int16",
+        "IsRequired": false
+      },
+      {
+        "Name": "aguaIndividual",
+        "Type": "System.Boolean",
+        "IsRequired": false
+      },
+      {
+        "Name": "areaServico",
+        "Type": "System.Boolean",
+        "IsRequired": false
+      },
+      {
+        "Name": "alarme",
+        "Type": "System.Boolean",
+        "IsRequired": false
+      },
+      {
+        "Name": "armarioCozinha",
+        "Type": "System.Boolean",
+        "IsRequired": false
+      },
+      {
+        "Name": "armarioBanheiro",
+        "Type": "System.Boolean",
+        "IsRequired": false
+      },
+      {
+        "Name": "armarioQuarto",
+        "Type": "System.Boolean",
+        "IsRequired": false
+      },
+      {
+        "Name": "boxDespejo",
+        "Type": "System.Boolean",
+        "IsRequired": false
+      },
+      {
+        "Name": "cercaEletrica",
+        "Type": "System.Boolean",
+        "IsRequired": false
+      },
+      {
+        "Name": "churrasqueira",
+        "Type": "System.Boolean",
+        "IsRequired": false
+      },
+      {
+        "Name": "closet",
+        "Type": "System.Boolean",
+        "IsRequired": false
+      },
+      {
+        "Name": "dce",
+        "Type": "System.Boolean",
+        "IsRequired": false
+      },
+      {
+        "Name": "gasCanalizado",
+        "Type": "System.Boolean",
+        "IsRequired": false
+      },
+      {
+        "Name": "hidromassagem",
+        "Type": "System.Boolean",
+        "IsRequired": false
+      },
+      {
+        "Name": "interfone",
+        "Type": "System.Boolean",
+        "IsRequired": false
+      },
+      {
+        "Name": "jardim",
+        "Type": "System.Boolean",
+        "IsRequired": false
+      },
+      {
+        "Name": "lavabo",
+        "Type": "System.Boolean",
+        "IsRequired": false
+      },
+      {
+        "Name": "piscina",
+        "Type": "System.Boolean",
+        "IsRequired": false
+      },
+      {
+        "Name": "portaoEletronico",
+        "Type": "System.Boolean",
+        "IsRequired": false
+      },
+      {
+        "Name": "salas",
+        "Type": "System.Boolean",
+        "IsRequired": false
+      },
+      {
+        "Name": "salaoFestas",
+        "Type": "System.Boolean",
+        "IsRequired": false
+      },
+      {
+        "Name": "quadraEsportiva",
+        "Type": "System.Boolean",
+        "IsRequired": false
+      },
+      {
+        "Name": "elevador",
+        "Type": "System.Boolean",
+        "IsRequired": false
+      },
+      {
+        "Name": "cep",
+        "Type": "System.String",
+        "IsRequired": false
+      },
+      {
+        "Name": "cepNorm",
+        "Type": "System.String",
+        "IsRequired": false
+      },
+      {
+        "Name": "logradouro",
+        "Type": "System.String",
+        "IsRequired": false
+      },
+      {
+        "Name": "logradouroNorm",
+        "Type": "System.String",
+        "IsRequired": false
+      },
+      {
+        "Name": "numero",
+        "Type": "System.String",
+        "IsRequired": false
+      },
+      {
+        "Name": "andar",
+        "Type": "System.String",
+        "IsRequired": false
+      },
+      {
+        "Name": "complemento",
+        "Type": "System.String",
+        "IsRequired": false
+      },
+      {
+        "Name": "referencia",
+        "Type": "System.String",
+        "IsRequired": false
+      },
+      {
+        "Name": "bairro",
+        "Type": "System.String",
+        "IsRequired": false
+      },
+      {
+        "Name": "bairroNorm",
+        "Type": "System.String",
+        "IsRequired": false
+      },
+      {
+        "Name": "cidade",
+        "Type": "System.String",
+        "IsRequired": false
+      },
+      {
+        "Name": "cidadeNorm",
+        "Type": "System.String",
+        "IsRequired": false
+      },
+      {
+        "Name": "estado",
+        "Type": "System.String",
+        "IsRequired": false
+      },
+      {
+        "Name": "estadoNorm",
+        "Type": "System.String",
+        "IsRequired": false
+      },
+      {
+        "Name": "pais",
+        "Type": "System.String",
+        "IsRequired": false
+      },
+      {
+        "Name": "paisNorm",
+        "Type": "System.String",
+        "IsRequired": false
+      },
+      {
+        "Name": "idEstado",
+        "Type": "System.Int16",
+        "IsRequired": false
+      },
+      {
+        "Name": "idCidade",
+        "Type": "System.Int16",
+        "IsRequired": false
+      },
+      {
+        "Name": "idBairro",
+        "Type": "System.Int16",
+        "IsRequired": false
+      },
+      {
+        "Name": "imagensStr",
+        "Type": "System.String",
+        "IsRequired": false
+      },
+      {
+        "Name": "imagens",
+        "Type": "System.Collections.Generic.List\u00601[[JaCaptei.Model.Imagem, JaCaptei.Model, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null]]",
+        "IsRequired": false
+      },
+      {
+        "Name": "imagem",
+        "Type": "System.Byte[]",
+        "IsRequired": false
+      },
+      {
+        "Name": "status",
+        "Type": "System.String",
+        "IsRequired": false
+      },
+      {
+        "Name": "ativo",
+        "Type": "System.Boolean",
+        "IsRequired": false
+      },
+      {
+        "Name": "ativoCRM",
+        "Type": "System.Boolean",
+        "IsRequired": false
+      },
+      {
+        "Name": "sucesso",
+        "Type": "System.Boolean",
+        "IsRequired": false
+      },
+      {
+        "Name": "token",
+        "Type": "System.String",
+        "IsRequired": false
+      },
+      {
+        "Name": "tokenNum",
+        "Type": "System.Int64",
+        "IsRequired": false
+      },
+      {
+        "Name": "tokenUID",
+        "Type": "System.String",
+        "IsRequired": false
+      },
+      {
+        "Name": "favorito",
+        "Type": "System.Boolean",
+        "IsRequired": false
+      },
+      {
+        "Name": "obs",
+        "Type": "System.String",
+        "IsRequired": false
+      },
+      {
+        "Name": "inseridoPorId",
+        "Type": "System.Int32",
+        "IsRequired": false
+      },
+      {
+        "Name": "inseridoPorNome",
+        "Type": "System.String",
+        "IsRequired": false
+      },
+      {
+        "Name": "atualizadoPorId",
+        "Type": "System.Int32",
+        "IsRequired": false
+      },
+      {
+        "Name": "atualizadoPorNome",
+        "Type": "System.String",
+        "IsRequired": false
+      },
+      {
+        "Name": "carga",
+        "Type": "System.Int32",
+        "IsRequired": false
+      },
+      {
+        "Name": "dataAtualizacao",
+        "Type": "System.DateTime",
+        "IsRequired": false
+      },
+      {
+        "Name": "data",
+        "Type": "System.DateTime",
+        "IsRequired": false
+      },
+      {
+        "Name": "file",
+        "Type": "Microsoft.AspNetCore.Http.IFormFile",
+        "IsRequired": false
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "JaCaptei.Administrativo.API.Controllers.ImovelController",
+    "Method": "AdicionarLote",
+    "RelativePath": "imovel/adicionar/lote",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "entities",
+        "Type": "System.Collections.Generic.List\u00601[[JaCaptei.Model.Imovel, JaCaptei.Model, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null]]",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "JaCaptei.Administrativo.API.Controllers.ImovelController",
+    "Method": "Importar",
+    "RelativePath": "imovel/importar",
+    "HttpMethod": "",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "busca",
+        "Type": "JaCaptei.Model.ImovelBusca",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "JaCaptei.Administrativo.API.Controllers.HomeController",
+    "Method": "Info",
+    "RelativePath": "info",
+    "HttpMethod": "",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "JaCaptei.Administrativo.API.Controllers.HomeController",
+    "Method": "KeepCRMsession",
+    "RelativePath": "keepcrmsession",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "JaCaptei.Administrativo.API.Controllers.HomeController",
+    "Method": "ObterModelos",
+    "RelativePath": "modelos",
+    "HttpMethod": "",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "JaCaptei.Administrativo.API.Controllers.HomeController",
+    "Method": "ObterModelos",
+    "RelativePath": "obtermodelos",
+    "HttpMethod": "",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "JaCaptei.Administrativo.API.Controllers.ApiControllerBase",
+    "Method": "ResultException",
+    "RelativePath": "parceiro",
+    "HttpMethod": "",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "JaCaptei.Administrativo.API.Controllers.ApiControllerBase",
+    "Method": "ResultUnauthorized",
+    "RelativePath": "parceiro",
+    "HttpMethod": "",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "JaCaptei.Administrativo.API.Controllers.ApiControllerBase",
+    "Method": "ResultNotFound",
+    "RelativePath": "parceiro",
+    "HttpMethod": "",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "JaCaptei.Administrativo.API.Controllers.ApiControllerBase",
+    "Method": "Result",
+    "RelativePath": "parceiro",
+    "HttpMethod": "",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "JaCaptei.Administrativo.API.Controllers.ApiControllerBase",
+    "Method": "Result",
+    "RelativePath": "parceiro",
+    "HttpMethod": "",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "appReturn",
+        "Type": "JaCaptei.Model.AppReturn",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "JaCaptei.Administrativo.API.Controllers.ApiControllerBase",
+    "Method": "Result",
+    "RelativePath": "parceiro",
+    "HttpMethod": "",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "dataResult",
+        "Type": "System.Object",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "JaCaptei.Administrativo.API.Controllers.ApiControllerBase",
+    "Method": "ObterUsuarioAutenticado",
+    "RelativePath": "parceiro",
+    "HttpMethod": "",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [],
+    "ReturnTypes": [
+      {
+        "Type": "JaCaptei.Model.Usuario",
+        "MediaTypes": [
+          "text/plain",
+          "application/json",
+          "text/json"
+        ],
+        "StatusCode": 200
+      }
+    ]
+  },
+  {
+    "ContainingType": "JaCaptei.Administrativo.API.Controllers.ApiControllerBase",
+    "Method": "ObterUsuarioAutenticado",
+    "RelativePath": "parceiro",
+    "HttpMethod": "",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "usuario",
+        "Type": "JaCaptei.Model.Usuario",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": [
+      {
+        "Type": "JaCaptei.Model.Usuario",
+        "MediaTypes": [
+          "text/plain",
+          "application/json",
+          "text/json"
+        ],
+        "StatusCode": 200
+      }
+    ]
+  },
+  {
+    "ContainingType": "JaCaptei.Administrativo.API.Controllers.ApiControllerBase",
+    "Method": "ObterAdminAutenticado",
+    "RelativePath": "parceiro",
+    "HttpMethod": "",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [],
+    "ReturnTypes": [
+      {
+        "Type": "JaCaptei.Model.Admin",
+        "MediaTypes": [
+          "text/plain",
+          "application/json",
+          "text/json"
+        ],
+        "StatusCode": 200
+      }
+    ]
+  },
+  {
+    "ContainingType": "JaCaptei.Administrativo.API.Controllers.ApiControllerBase",
+    "Method": "ObterAdminAutenticado",
+    "RelativePath": "parceiro",
+    "HttpMethod": "",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "usuario",
+        "Type": "JaCaptei.Model.Admin",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": [
+      {
+        "Type": "JaCaptei.Model.Admin",
+        "MediaTypes": [
+          "text/plain",
+          "application/json",
+          "text/json"
+        ],
+        "StatusCode": 200
+      }
+    ]
+  },
+  {
+    "ContainingType": "JaCaptei.Administrativo.API.Controllers.ParceiroController",
+    "Method": "Adicionar",
+    "RelativePath": "parceiro/adicionar",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "entity",
+        "Type": "JaCaptei.Model.Parceiro",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "JaCaptei.Administrativo.API.Controllers.ParceiroController",
+    "Method": "Alterar",
+    "RelativePath": "parceiro/alterar",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "entity",
+        "Type": "JaCaptei.Model.Parceiro",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "JaCaptei.Administrativo.API.Controllers.ParceiroController",
+    "Method": "Ativar",
+    "RelativePath": "parceiro/ativar",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "entity",
+        "Type": "JaCaptei.Model.Parceiro",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "JaCaptei.Administrativo.API.Controllers.ParceiroController",
+    "Method": "Buscar",
+    "RelativePath": "parceiro/buscar",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "busca",
+        "Type": "JaCaptei.Model.Search",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "JaCaptei.Administrativo.API.Controllers.ParceiroController",
+    "Method": "Confirmar",
+    "RelativePath": "parceiro/confirmar",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "entity",
+        "Type": "JaCaptei.Model.Parceiro",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "JaCaptei.Administrativo.API.Controllers.ParceiroController",
+    "Method": "Desativar",
+    "RelativePath": "parceiro/desativar",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "entity",
+        "Type": "JaCaptei.Model.Parceiro",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "JaCaptei.Administrativo.API.Controllers.ParceiroController",
+    "Method": "Excluir",
+    "RelativePath": "parceiro/excluir",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "entity",
+        "Type": "JaCaptei.Model.Parceiro",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "JaCaptei.Administrativo.API.Controllers.ParceiroController",
+    "Method": "Obter",
+    "RelativePath": "parceiro/obter/{id}",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "id",
+        "Type": "System.String",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "JaCaptei.Administrativo.API.Controllers.ParceiroController",
+    "Method": "ObterPendentesValidacao",
+    "RelativePath": "parceiro/pendentes",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "JaCaptei.Administrativo.API.Controllers.ParceiroController",
+    "Method": "Validar",
+    "RelativePath": "parceiro/validar",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "entity",
+        "Type": "JaCaptei.Model.Parceiro",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "JaCaptei.Administrativo.API.Controllers.ApiControllerBase",
+    "Method": "ResultException",
+    "RelativePath": "proprietario",
+    "HttpMethod": "",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "JaCaptei.Administrativo.API.Controllers.ApiControllerBase",
+    "Method": "ResultUnauthorized",
+    "RelativePath": "proprietario",
+    "HttpMethod": "",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "JaCaptei.Administrativo.API.Controllers.ApiControllerBase",
+    "Method": "ResultNotFound",
+    "RelativePath": "proprietario",
+    "HttpMethod": "",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "JaCaptei.Administrativo.API.Controllers.ApiControllerBase",
+    "Method": "Result",
+    "RelativePath": "proprietario",
+    "HttpMethod": "",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "JaCaptei.Administrativo.API.Controllers.ApiControllerBase",
+    "Method": "Result",
+    "RelativePath": "proprietario",
+    "HttpMethod": "",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "appReturn",
+        "Type": "JaCaptei.Model.AppReturn",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "JaCaptei.Administrativo.API.Controllers.ApiControllerBase",
+    "Method": "Result",
+    "RelativePath": "proprietario",
+    "HttpMethod": "",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "dataResult",
+        "Type": "System.Object",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "JaCaptei.Administrativo.API.Controllers.ApiControllerBase",
+    "Method": "ObterUsuarioAutenticado",
+    "RelativePath": "proprietario",
+    "HttpMethod": "",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [],
+    "ReturnTypes": [
+      {
+        "Type": "JaCaptei.Model.Usuario",
+        "MediaTypes": [
+          "text/plain",
+          "application/json",
+          "text/json"
+        ],
+        "StatusCode": 200
+      }
+    ]
+  },
+  {
+    "ContainingType": "JaCaptei.Administrativo.API.Controllers.ApiControllerBase",
+    "Method": "ObterUsuarioAutenticado",
+    "RelativePath": "proprietario",
+    "HttpMethod": "",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "usuario",
+        "Type": "JaCaptei.Model.Usuario",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": [
+      {
+        "Type": "JaCaptei.Model.Usuario",
+        "MediaTypes": [
+          "text/plain",
+          "application/json",
+          "text/json"
+        ],
+        "StatusCode": 200
+      }
+    ]
+  },
+  {
+    "ContainingType": "JaCaptei.Administrativo.API.Controllers.ApiControllerBase",
+    "Method": "ObterAdminAutenticado",
+    "RelativePath": "proprietario",
+    "HttpMethod": "",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [],
+    "ReturnTypes": [
+      {
+        "Type": "JaCaptei.Model.Admin",
+        "MediaTypes": [
+          "text/plain",
+          "application/json",
+          "text/json"
+        ],
+        "StatusCode": 200
+      }
+    ]
+  },
+  {
+    "ContainingType": "JaCaptei.Administrativo.API.Controllers.ApiControllerBase",
+    "Method": "ObterAdminAutenticado",
+    "RelativePath": "proprietario",
+    "HttpMethod": "",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "usuario",
+        "Type": "JaCaptei.Model.Admin",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": [
+      {
+        "Type": "JaCaptei.Model.Admin",
+        "MediaTypes": [
+          "text/plain",
+          "application/json",
+          "text/json"
+        ],
+        "StatusCode": 200
+      }
+    ]
+  },
+  {
+    "ContainingType": "JaCaptei.Administrativo.API.Controllers.ProprietarioController",
+    "Method": "Adicionar",
+    "RelativePath": "proprietario/adicionar",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "entity",
+        "Type": "JaCaptei.Model.Proprietario",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "JaCaptei.Administrativo.API.Controllers.ProprietarioController",
+    "Method": "Alterar",
+    "RelativePath": "proprietario/alterar",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "entity",
+        "Type": "JaCaptei.Model.Proprietario",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "JaCaptei.Administrativo.API.Controllers.ProprietarioController",
+    "Method": "Buscar",
+    "RelativePath": "proprietario/buscar",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "busca",
+        "Type": "JaCaptei.Model.Search",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "JaCaptei.Administrativo.API.Controllers.ProprietarioController",
+    "Method": "Excluir",
+    "RelativePath": "proprietario/excluir",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "entity",
+        "Type": "JaCaptei.Model.Proprietario",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "JaCaptei.Administrativo.API.Controllers.ProprietarioController",
+    "Method": "Obter",
+    "RelativePath": "proprietario/obter/{id}",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "id",
+        "Type": "System.String",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "JaCaptei.Administrativo.API.Controllers.RestTestController",
+    "Method": "Index",
+    "RelativePath": "resttest",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "JaCaptei.Administrativo.API.Controllers.ApiControllerBase",
+    "Method": "ResultException",
+    "RelativePath": "resttest",
+    "HttpMethod": "",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "JaCaptei.Administrativo.API.Controllers.ApiControllerBase",
+    "Method": "ResultUnauthorized",
+    "RelativePath": "resttest",
+    "HttpMethod": "",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "JaCaptei.Administrativo.API.Controllers.ApiControllerBase",
+    "Method": "ResultNotFound",
+    "RelativePath": "resttest",
+    "HttpMethod": "",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "JaCaptei.Administrativo.API.Controllers.ApiControllerBase",
+    "Method": "Result",
+    "RelativePath": "resttest",
+    "HttpMethod": "",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "JaCaptei.Administrativo.API.Controllers.ApiControllerBase",
+    "Method": "Result",
+    "RelativePath": "resttest",
+    "HttpMethod": "",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "appReturn",
+        "Type": "JaCaptei.Model.AppReturn",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "JaCaptei.Administrativo.API.Controllers.ApiControllerBase",
+    "Method": "Result",
+    "RelativePath": "resttest",
+    "HttpMethod": "",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "dataResult",
+        "Type": "System.Object",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "JaCaptei.Administrativo.API.Controllers.ApiControllerBase",
+    "Method": "ObterUsuarioAutenticado",
+    "RelativePath": "resttest",
+    "HttpMethod": "",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [],
+    "ReturnTypes": [
+      {
+        "Type": "JaCaptei.Model.Usuario",
+        "MediaTypes": [
+          "text/plain",
+          "application/json",
+          "text/json"
+        ],
+        "StatusCode": 200
+      }
+    ]
+  },
+  {
+    "ContainingType": "JaCaptei.Administrativo.API.Controllers.ApiControllerBase",
+    "Method": "ObterUsuarioAutenticado",
+    "RelativePath": "resttest",
+    "HttpMethod": "",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "usuario",
+        "Type": "JaCaptei.Model.Usuario",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": [
+      {
+        "Type": "JaCaptei.Model.Usuario",
+        "MediaTypes": [
+          "text/plain",
+          "application/json",
+          "text/json"
+        ],
+        "StatusCode": 200
+      }
+    ]
+  },
+  {
+    "ContainingType": "JaCaptei.Administrativo.API.Controllers.ApiControllerBase",
+    "Method": "ObterAdminAutenticado",
+    "RelativePath": "resttest",
+    "HttpMethod": "",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [],
+    "ReturnTypes": [
+      {
+        "Type": "JaCaptei.Model.Admin",
+        "MediaTypes": [
+          "text/plain",
+          "application/json",
+          "text/json"
+        ],
+        "StatusCode": 200
+      }
+    ]
+  },
+  {
+    "ContainingType": "JaCaptei.Administrativo.API.Controllers.ApiControllerBase",
+    "Method": "ObterAdminAutenticado",
+    "RelativePath": "resttest",
+    "HttpMethod": "",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "usuario",
+        "Type": "JaCaptei.Model.Admin",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": [
+      {
+        "Type": "JaCaptei.Model.Admin",
+        "MediaTypes": [
+          "text/plain",
+          "application/json",
+          "text/json"
+        ],
+        "StatusCode": 200
+      }
+    ]
+  },
+  {
+    "ContainingType": "JaCaptei.Administrativo.API.Controllers.RestTestController",
+    "Method": "Req1",
+    "RelativePath": "resttest/req1",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "JaCaptei.Administrativo.API.Controllers.RestTestController",
+    "Method": "Req2",
+    "RelativePath": "resttest/req2",
+    "HttpMethod": "",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "JaCaptei.Administrativo.API.Controllers.RestTestController",
+    "Method": "Req3",
+    "RelativePath": "resttest/req3",
+    "HttpMethod": "",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "JaCaptei.Administrativo.API.Controllers.RestTestController",
+    "Method": "Req4",
+    "RelativePath": "resttest/req4",
+    "HttpMethod": "",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "JaCaptei.Administrativo.API.Controllers.RestTestController",
+    "Method": "Req5",
+    "RelativePath": "resttest/req5",
+    "HttpMethod": "",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "JaCaptei.Administrativo.API.Controllers.RestTestController",
+    "Method": "Req6",
+    "RelativePath": "resttest/req6",
+    "HttpMethod": "",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "JaCaptei.Administrativo.API.Controllers.RolesTestController",
+    "Method": "Index",
+    "RelativePath": "rolestest",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "JaCaptei.Administrativo.API.Controllers.ApiControllerBase",
+    "Method": "ResultException",
+    "RelativePath": "rolestest",
+    "HttpMethod": "",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "JaCaptei.Administrativo.API.Controllers.ApiControllerBase",
+    "Method": "ResultUnauthorized",
+    "RelativePath": "rolestest",
+    "HttpMethod": "",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "JaCaptei.Administrativo.API.Controllers.ApiControllerBase",
+    "Method": "ResultNotFound",
+    "RelativePath": "rolestest",
+    "HttpMethod": "",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "JaCaptei.Administrativo.API.Controllers.ApiControllerBase",
+    "Method": "Result",
+    "RelativePath": "rolestest",
+    "HttpMethod": "",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "JaCaptei.Administrativo.API.Controllers.ApiControllerBase",
+    "Method": "Result",
+    "RelativePath": "rolestest",
+    "HttpMethod": "",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "appReturn",
+        "Type": "JaCaptei.Model.AppReturn",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "JaCaptei.Administrativo.API.Controllers.ApiControllerBase",
+    "Method": "Result",
+    "RelativePath": "rolestest",
+    "HttpMethod": "",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "dataResult",
+        "Type": "System.Object",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "JaCaptei.Administrativo.API.Controllers.ApiControllerBase",
+    "Method": "ObterUsuarioAutenticado",
+    "RelativePath": "rolestest",
+    "HttpMethod": "",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [],
+    "ReturnTypes": [
+      {
+        "Type": "JaCaptei.Model.Usuario",
+        "MediaTypes": [
+          "text/plain",
+          "application/json",
+          "text/json"
+        ],
+        "StatusCode": 200
+      }
+    ]
+  },
+  {
+    "ContainingType": "JaCaptei.Administrativo.API.Controllers.ApiControllerBase",
+    "Method": "ObterUsuarioAutenticado",
+    "RelativePath": "rolestest",
+    "HttpMethod": "",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "usuario",
+        "Type": "JaCaptei.Model.Usuario",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": [
+      {
+        "Type": "JaCaptei.Model.Usuario",
+        "MediaTypes": [
+          "text/plain",
+          "application/json",
+          "text/json"
+        ],
+        "StatusCode": 200
+      }
+    ]
+  },
+  {
+    "ContainingType": "JaCaptei.Administrativo.API.Controllers.ApiControllerBase",
+    "Method": "ObterAdminAutenticado",
+    "RelativePath": "rolestest",
+    "HttpMethod": "",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [],
+    "ReturnTypes": [
+      {
+        "Type": "JaCaptei.Model.Admin",
+        "MediaTypes": [
+          "text/plain",
+          "application/json",
+          "text/json"
+        ],
+        "StatusCode": 200
+      }
+    ]
+  },
+  {
+    "ContainingType": "JaCaptei.Administrativo.API.Controllers.ApiControllerBase",
+    "Method": "ObterAdminAutenticado",
+    "RelativePath": "rolestest",
+    "HttpMethod": "",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "usuario",
+        "Type": "JaCaptei.Model.Admin",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": [
+      {
+        "Type": "JaCaptei.Model.Admin",
+        "MediaTypes": [
+          "text/plain",
+          "application/json",
+          "text/json"
+        ],
+        "StatusCode": 200
+      }
+    ]
+  },
+  {
+    "ContainingType": "JaCaptei.Administrativo.API.Controllers.RolesTestController",
+    "Method": "Req1",
+    "RelativePath": "rolestest/req1",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "JaCaptei.Administrativo.API.Controllers.RolesTestController",
+    "Method": "Req2",
+    "RelativePath": "rolestest/req2",
+    "HttpMethod": "",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "JaCaptei.Administrativo.API.Controllers.RolesTestController",
+    "Method": "Req3",
+    "RelativePath": "rolestest/req3",
+    "HttpMethod": "",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "JaCaptei.Administrativo.API.Controllers.RolesTestController",
+    "Method": "Req4",
+    "RelativePath": "rolestest/req4",
+    "HttpMethod": "",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "JaCaptei.Administrativo.API.Controllers.RolesTestController",
+    "Method": "Req5",
+    "RelativePath": "rolestest/req5",
+    "HttpMethod": "",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "JaCaptei.Administrativo.API.Controllers.ApiControllerBase",
+    "Method": "ResultException",
+    "RelativePath": "solicitacao",
+    "HttpMethod": "",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "JaCaptei.Administrativo.API.Controllers.ApiControllerBase",
+    "Method": "ResultUnauthorized",
+    "RelativePath": "solicitacao",
+    "HttpMethod": "",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "JaCaptei.Administrativo.API.Controllers.ApiControllerBase",
+    "Method": "ResultNotFound",
+    "RelativePath": "solicitacao",
+    "HttpMethod": "",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "JaCaptei.Administrativo.API.Controllers.ApiControllerBase",
+    "Method": "Result",
+    "RelativePath": "solicitacao",
+    "HttpMethod": "",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "JaCaptei.Administrativo.API.Controllers.ApiControllerBase",
+    "Method": "Result",
+    "RelativePath": "solicitacao",
+    "HttpMethod": "",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "appReturn",
+        "Type": "JaCaptei.Model.AppReturn",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "JaCaptei.Administrativo.API.Controllers.ApiControllerBase",
+    "Method": "Result",
+    "RelativePath": "solicitacao",
+    "HttpMethod": "",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "dataResult",
+        "Type": "System.Object",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "JaCaptei.Administrativo.API.Controllers.ApiControllerBase",
+    "Method": "ObterUsuarioAutenticado",
+    "RelativePath": "solicitacao",
+    "HttpMethod": "",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [],
+    "ReturnTypes": [
+      {
+        "Type": "JaCaptei.Model.Usuario",
+        "MediaTypes": [
+          "text/plain",
+          "application/json",
+          "text/json"
+        ],
+        "StatusCode": 200
+      }
+    ]
+  },
+  {
+    "ContainingType": "JaCaptei.Administrativo.API.Controllers.ApiControllerBase",
+    "Method": "ObterUsuarioAutenticado",
+    "RelativePath": "solicitacao",
+    "HttpMethod": "",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "usuario",
+        "Type": "JaCaptei.Model.Usuario",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": [
+      {
+        "Type": "JaCaptei.Model.Usuario",
+        "MediaTypes": [
+          "text/plain",
+          "application/json",
+          "text/json"
+        ],
+        "StatusCode": 200
+      }
+    ]
+  },
+  {
+    "ContainingType": "JaCaptei.Administrativo.API.Controllers.ApiControllerBase",
+    "Method": "ObterAdminAutenticado",
+    "RelativePath": "solicitacao",
+    "HttpMethod": "",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [],
+    "ReturnTypes": [
+      {
+        "Type": "JaCaptei.Model.Admin",
+        "MediaTypes": [
+          "text/plain",
+          "application/json",
+          "text/json"
+        ],
+        "StatusCode": 200
+      }
+    ]
+  },
+  {
+    "ContainingType": "JaCaptei.Administrativo.API.Controllers.ApiControllerBase",
+    "Method": "ObterAdminAutenticado",
+    "RelativePath": "solicitacao",
+    "HttpMethod": "",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "usuario",
+        "Type": "JaCaptei.Model.Admin",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": [
+      {
+        "Type": "JaCaptei.Model.Admin",
+        "MediaTypes": [
+          "text/plain",
+          "application/json",
+          "text/json"
+        ],
+        "StatusCode": 200
+      }
+    ]
+  },
+  {
+    "ContainingType": "JaCaptei.Administrativo.API.Controllers.SolicitacaoController",
+    "Method": "Adicionar",
+    "RelativePath": "solicitacao/adicionar",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "entity",
+        "Type": "JaCaptei.Model.Solicitacao",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "JaCaptei.Administrativo.API.Controllers.SolicitacaoController",
+    "Method": "Alterar",
+    "RelativePath": "solicitacao/alterar",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "entity",
+        "Type": "JaCaptei.Model.Solicitacao",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "JaCaptei.Administrativo.API.Controllers.SolicitacaoController",
+    "Method": "AlterarDisponibilidade",
+    "RelativePath": "solicitacao/alterar/disponibilidade",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "entity",
+        "Type": "JaCaptei.Model.Admin",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "JaCaptei.Administrativo.API.Controllers.SolicitacaoController",
+    "Method": "Buscar",
+    "RelativePath": "solicitacao/buscar",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "entity",
+        "Type": "JaCaptei.Model.Solicitacao",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "JaCaptei.Administrativo.API.Controllers.SolicitacaoController",
+    "Method": "BuscarRange",
+    "RelativePath": "solicitacao/buscarrange",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "busca",
+        "Type": "JaCaptei.Model.Search",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "JaCaptei.Administrativo.API.Controllers.SolicitacaoController",
+    "Method": "Cancelar",
+    "RelativePath": "solicitacao/cancelar",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "entity",
+        "Type": "JaCaptei.Model.Solicitacao",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "JaCaptei.Administrativo.API.Controllers.SolicitacaoController",
+    "Method": "Captar",
+    "RelativePath": "solicitacao/captar",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "entity",
+        "Type": "JaCaptei.Model.Solicitacao",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "JaCaptei.Administrativo.API.Controllers.SolicitacaoController",
+    "Method": "Excluir",
+    "RelativePath": "solicitacao/excluir/{id}",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "id",
+        "Type": "System.Int32",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "JaCaptei.Administrativo.API.Controllers.SolicitacaoController",
+    "Method": "Finalizar",
+    "RelativePath": "solicitacao/finalizar",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "entity",
+        "Type": "JaCaptei.Model.Solicitacao",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "JaCaptei.Administrativo.API.Controllers.SolicitacaoController",
+    "Method": "ObterPeloId",
+    "RelativePath": "solicitacao/obter/{id}",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "id",
+        "Type": "System.String",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "JaCaptei.Administrativo.API.Controllers.SolicitacaoController",
+    "Method": "Captar",
+    "RelativePath": "solicitacao/obter/distribuicoes",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "JaCaptei.Administrativo.API.Controllers.SolicitacaoController",
+    "Method": "ObterTodosAdmin",
+    "RelativePath": "solicitacao/obter/todos/admin/{id}",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "id",
+        "Type": "System.Int32",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "JaCaptei.Administrativo.API.Controllers.SolicitacaoController",
+    "Method": "ObterTodosParceiro",
+    "RelativePath": "solicitacao/obter/todos/parceiro",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "JaCaptei.Administrativo.API.Controllers.SolicitacaoController",
+    "Method": "Realocar",
+    "RelativePath": "solicitacao/realocar",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "entity",
+        "Type": "JaCaptei.Model.Solicitacao",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "JaCaptei.Administrativo.API.Controllers.SolicitacaoController",
+    "Method": "RealocarParaAdmin",
+    "RelativePath": "solicitacao/realocar/admin",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "entity",
+        "Type": "JaCaptei.Model.Solicitacao",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "JaCaptei.Administrativo.API.Controllers.SolicitacaoController",
+    "Method": "RealocarNaFila",
+    "RelativePath": "solicitacao/realocar/fila",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "entity",
+        "Type": "JaCaptei.Model.Solicitacao",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "JaCaptei.Administrativo.API.Controllers.ApiControllerBase",
+    "Method": "ResultException",
+    "RelativePath": "suporte",
+    "HttpMethod": "",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "JaCaptei.Administrativo.API.Controllers.ApiControllerBase",
+    "Method": "ResultUnauthorized",
+    "RelativePath": "suporte",
+    "HttpMethod": "",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "JaCaptei.Administrativo.API.Controllers.ApiControllerBase",
+    "Method": "ResultNotFound",
+    "RelativePath": "suporte",
+    "HttpMethod": "",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "JaCaptei.Administrativo.API.Controllers.ApiControllerBase",
+    "Method": "Result",
+    "RelativePath": "suporte",
+    "HttpMethod": "",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "JaCaptei.Administrativo.API.Controllers.ApiControllerBase",
+    "Method": "Result",
+    "RelativePath": "suporte",
+    "HttpMethod": "",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "appReturn",
+        "Type": "JaCaptei.Model.AppReturn",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "JaCaptei.Administrativo.API.Controllers.ApiControllerBase",
+    "Method": "Result",
+    "RelativePath": "suporte",
+    "HttpMethod": "",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "dataResult",
+        "Type": "System.Object",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "JaCaptei.Administrativo.API.Controllers.ApiControllerBase",
+    "Method": "ObterUsuarioAutenticado",
+    "RelativePath": "suporte",
+    "HttpMethod": "",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [],
+    "ReturnTypes": [
+      {
+        "Type": "JaCaptei.Model.Usuario",
+        "MediaTypes": [
+          "text/plain",
+          "application/json",
+          "text/json"
+        ],
+        "StatusCode": 200
+      }
+    ]
+  },
+  {
+    "ContainingType": "JaCaptei.Administrativo.API.Controllers.ApiControllerBase",
+    "Method": "ObterUsuarioAutenticado",
+    "RelativePath": "suporte",
+    "HttpMethod": "",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "usuario",
+        "Type": "JaCaptei.Model.Usuario",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": [
+      {
+        "Type": "JaCaptei.Model.Usuario",
+        "MediaTypes": [
+          "text/plain",
+          "application/json",
+          "text/json"
+        ],
+        "StatusCode": 200
+      }
+    ]
+  },
+  {
+    "ContainingType": "JaCaptei.Administrativo.API.Controllers.ApiControllerBase",
+    "Method": "ObterAdminAutenticado",
+    "RelativePath": "suporte",
+    "HttpMethod": "",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [],
+    "ReturnTypes": [
+      {
+        "Type": "JaCaptei.Model.Admin",
+        "MediaTypes": [
+          "text/plain",
+          "application/json",
+          "text/json"
+        ],
+        "StatusCode": 200
+      }
+    ]
+  },
+  {
+    "ContainingType": "JaCaptei.Administrativo.API.Controllers.ApiControllerBase",
+    "Method": "ObterAdminAutenticado",
+    "RelativePath": "suporte",
+    "HttpMethod": "",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "usuario",
+        "Type": "JaCaptei.Model.Admin",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": [
+      {
+        "Type": "JaCaptei.Model.Admin",
+        "MediaTypes": [
+          "text/plain",
+          "application/json",
+          "text/json"
+        ],
+        "StatusCode": 200
+      }
+    ]
+  },
+  {
+    "ContainingType": "JaCaptei.Administrativo.API.Controllers.SuporteController",
+    "Method": "ObterIdBairro",
+    "RelativePath": "suporte/bairro/obter/id/{idCidade}/{nome}",
+    "HttpMethod": "",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "idCidade",
+        "Type": "System.Int32",
+        "IsRequired": true
+      },
+      {
+        "Name": "nome",
+        "Type": "System.String",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "JaCaptei.Administrativo.API.Controllers.SuporteController",
+    "Method": "ObterBairrosPorCidadeId",
+    "RelativePath": "suporte/bairros/obter/{id_cidade}",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "id_cidade",
+        "Type": "System.Int32",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "JaCaptei.Administrativo.API.Controllers.SuporteController",
+    "Method": "ObterBairrosPorCidadeNome",
+    "RelativePath": "suporte/bairros/obter/cidade/{nome}",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "nome",
+        "Type": "System.String",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "JaCaptei.Administrativo.API.Controllers.SuporteController",
+    "Method": "ObterIdCidade",
+    "RelativePath": "suporte/cidade/obter/id/{idEstado}/{nome}",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "idEstado",
+        "Type": "System.Int32",
+        "IsRequired": true
+      },
+      {
+        "Name": "nome",
+        "Type": "System.String",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "JaCaptei.Administrativo.API.Controllers.SuporteController",
+    "Method": "ObterCidadesPorEstadoId",
+    "RelativePath": "suporte/cidades/obter/{id_estado}",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "id_estado",
+        "Type": "System.Int32",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "JaCaptei.Administrativo.API.Controllers.SuporteController",
+    "Method": "ObterCidadesPorUF",
+    "RelativePath": "suporte/cidades/obter/uf/{uf}",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "uf",
+        "Type": "System.String",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "JaCaptei.Administrativo.API.Controllers.SuporteController",
+    "Method": "ObterIdEstado",
+    "RelativePath": "suporte/estado/obter/id/{nome}",
+    "HttpMethod": "",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "nome",
+        "Type": "System.String",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "JaCaptei.Administrativo.API.Controllers.SuporteController",
+    "Method": "ObterEstados",
+    "RelativePath": "suporte/estados/obter",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "JaCaptei.Administrativo.API.Controllers.SuporteController",
+    "Method": "RegistrarLog",
+    "RelativePath": "suporte/log/registrar",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "log",
+        "Type": "JaCaptei.Model.Log",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": [
+      {
+        "Type": "System.Void",
+        "MediaTypes": [],
+        "StatusCode": 200
+      }
+    ]
+  },
+  {
+    "ContainingType": "JaCaptei.Administrativo.API.Controllers.SuporteController",
+    "Method": "ObterModelos",
+    "RelativePath": "suporte/modelos/obter",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "JaCaptei.Administrativo.API.Controllers.ApiControllerBase",
+    "Method": "ResultException",
+    "RelativePath": "usuario",
+    "HttpMethod": "",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "JaCaptei.Administrativo.API.Controllers.ApiControllerBase",
+    "Method": "ResultUnauthorized",
+    "RelativePath": "usuario",
+    "HttpMethod": "",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "JaCaptei.Administrativo.API.Controllers.ApiControllerBase",
+    "Method": "ResultNotFound",
+    "RelativePath": "usuario",
+    "HttpMethod": "",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "JaCaptei.Administrativo.API.Controllers.ApiControllerBase",
+    "Method": "Result",
+    "RelativePath": "usuario",
+    "HttpMethod": "",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "JaCaptei.Administrativo.API.Controllers.ApiControllerBase",
+    "Method": "Result",
+    "RelativePath": "usuario",
+    "HttpMethod": "",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "appReturn",
+        "Type": "JaCaptei.Model.AppReturn",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "JaCaptei.Administrativo.API.Controllers.ApiControllerBase",
+    "Method": "Result",
+    "RelativePath": "usuario",
+    "HttpMethod": "",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "dataResult",
+        "Type": "System.Object",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "JaCaptei.Administrativo.API.Controllers.ApiControllerBase",
+    "Method": "ObterUsuarioAutenticado",
+    "RelativePath": "usuario",
+    "HttpMethod": "",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [],
+    "ReturnTypes": [
+      {
+        "Type": "JaCaptei.Model.Usuario",
+        "MediaTypes": [
+          "text/plain",
+          "application/json",
+          "text/json"
+        ],
+        "StatusCode": 200
+      }
+    ]
+  },
+  {
+    "ContainingType": "JaCaptei.Administrativo.API.Controllers.ApiControllerBase",
+    "Method": "ObterUsuarioAutenticado",
+    "RelativePath": "usuario",
+    "HttpMethod": "",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "usuario",
+        "Type": "JaCaptei.Model.Usuario",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": [
+      {
+        "Type": "JaCaptei.Model.Usuario",
+        "MediaTypes": [
+          "text/plain",
+          "application/json",
+          "text/json"
+        ],
+        "StatusCode": 200
+      }
+    ]
+  },
+  {
+    "ContainingType": "JaCaptei.Administrativo.API.Controllers.ApiControllerBase",
+    "Method": "ObterAdminAutenticado",
+    "RelativePath": "usuario",
+    "HttpMethod": "",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [],
+    "ReturnTypes": [
+      {
+        "Type": "JaCaptei.Model.Admin",
+        "MediaTypes": [
+          "text/plain",
+          "application/json",
+          "text/json"
+        ],
+        "StatusCode": 200
+      }
+    ]
+  },
+  {
+    "ContainingType": "JaCaptei.Administrativo.API.Controllers.ApiControllerBase",
+    "Method": "ObterAdminAutenticado",
+    "RelativePath": "usuario",
+    "HttpMethod": "",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "usuario",
+        "Type": "JaCaptei.Model.Admin",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": [
+      {
+        "Type": "JaCaptei.Model.Admin",
+        "MediaTypes": [
+          "text/plain",
+          "application/json",
+          "text/json"
+        ],
+        "StatusCode": 200
+      }
+    ]
+  },
+  {
+    "ContainingType": "JaCaptei.Administrativo.API.Controllers.UsuarioController",
+    "Method": "Alterar",
+    "RelativePath": "usuario/alterar",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "entity",
+        "Type": "JaCaptei.Model.Admin",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "JaCaptei.Administrativo.API.Controllers.UsuarioController",
+    "Method": "AlterarDisponibilidade",
+    "RelativePath": "usuario/alterar/disponibilidade",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "entity",
+        "Type": "JaCaptei.Model.Admin",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "JaCaptei.Administrativo.API.Controllers.UsuarioController",
+    "Method": "Autenticar",
+    "RelativePath": "usuario/autenticar",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "entity",
+        "Type": "JaCaptei.Model.Admin",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "JaCaptei.Administrativo.API.Controllers.UsuarioController",
+    "Method": "Inserir",
+    "RelativePath": "usuario/inserir",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "entity",
+        "Type": "JaCaptei.Model.Admin",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "JaCaptei.Administrativo.API.Controllers.UsuarioController",
+    "Method": "Obter",
+    "RelativePath": "usuario/obter/{id}",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "id",
+        "Type": "System.String",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "JaCaptei.Administrativo.API.Controllers.UsuarioController",
+    "Method": "AlterarSenha",
+    "RelativePath": "usuario/senha/alterar",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "entity",
+        "Type": "JaCaptei.Model.Admin",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "JaCaptei.Administrativo.API.Controllers.UsuarioController",
+    "Method": "SolicitarAlterarSenha",
+    "RelativePath": "usuario/senha/solicitar",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "entity",
+        "Type": "JaCaptei.Model.Admin",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "JaCaptei.Administrativo.API.Controllers.WeatherForecastController",
+    "Method": "Get",
+    "RelativePath": "weatherforecast",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [],
+    "ReturnTypes": [
+      {
+        "Type": "System.Collections.Generic.IEnumerable\u00601[[JaCaptei.Administrativo.API.WeatherForecast, JaCaptei.Admin.API, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null]]",
+        "MediaTypes": [
+          "text/plain",
+          "application/json",
+          "text/json"
+        ],
+        "StatusCode": 200
+      }
+    ]
+  }
+]

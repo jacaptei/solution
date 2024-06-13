@@ -1,0 +1,105 @@
+﻿<template>
+
+    <div>
+
+            <div>
+                <div class="banner" :style="'background-image:url('+$root.GetBanner(6)+')'">
+                    <div class="text">
+                        Precisa de ajuda?<br />
+                        Encontre respostas
+                        para suas dúvidas
+                        frequentes ou entre
+                        em contato com
+                        nosso suporte.
+                    </div>
+                </div>
+            </div>
+
+            <article>
+                <br />
+                <p>
+
+                    <c-box color="navy"
+                           image="resources/images/contato.png"
+                           align="right"
+                           title="Entre em contato"
+                           content=""
+                           btlabel="contato@jacaptei.com.br"
+                           @click="MailTo"></c-box>
+
+                </p>
+                <br />
+           </article>
+
+    </div>
+
+
+</template>
+
+
+<script>
+    module.exports = {
+
+        name: 'HOME',
+
+        components: {
+
+        },
+
+        data: function () {
+            return {
+            }
+        }, computed: {
+
+        },
+
+        props: {
+
+        },
+        watch: {
+            //"pct":function(){ this.updateLabels(); }
+        },
+        created: function () {
+            this.$root.SetTitle("Home","fa fa-home",null);
+        },
+        mounted() {
+           // window.setTimeout(() => {
+              //this.$root.RouteTo("/admin/user/home");
+            //}, 400);
+        },
+        methods: {
+            
+            MailTo(){
+
+
+                const windowRef = window.open(`mailto:contato@jacaptei.com.br`, '_blank');
+                windowRef.focus();
+                setTimeout(function () {
+                    if (!windowRef.document.hasFocus()) {
+                        windowRef.close();
+                    }
+                }, 500);
+
+
+            }
+        }
+
+    }
+
+
+
+
+
+
+
+
+</script>
+
+
+
+<style scoped>
+
+
+</style>
+
+

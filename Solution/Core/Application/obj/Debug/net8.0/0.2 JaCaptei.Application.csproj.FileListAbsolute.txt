@@ -1,0 +1,15 @@
+C:\jobs\JaCaptei\Projects\_main\Solution\Core\Application\bin\Debug\net8.0\0.2 JaCaptei.Application.deps.json
+C:\jobs\JaCaptei\Projects\_main\Solution\Core\Application\bin\Debug\net8.0\0.2 JaCaptei.Application.dll
+C:\jobs\JaCaptei\Projects\_main\Solution\Core\Application\bin\Debug\net8.0\0.2 JaCaptei.Application.pdb
+C:\jobs\JaCaptei\Projects\_main\Solution\Core\Application\bin\Debug\net8.0\0.1 JaCaptei.Model.dll
+C:\jobs\JaCaptei\Projects\_main\Solution\Core\Application\bin\Debug\net8.0\0.1 JaCaptei.Model.pdb
+C:\jobs\JaCaptei\Projects\_main\Solution\Core\Application\obj\Debug\net8.0\0.2 JaCaptei.Application.csproj.AssemblyReference.cache
+C:\jobs\JaCaptei\Projects\_main\Solution\Core\Application\obj\Debug\net8.0\0.2 JaCaptei.Application.GeneratedMSBuildEditorConfig.editorconfig
+C:\jobs\JaCaptei\Projects\_main\Solution\Core\Application\obj\Debug\net8.0\0.2 JaCaptei.Application.AssemblyInfoInputs.cache
+C:\jobs\JaCaptei\Projects\_main\Solution\Core\Application\obj\Debug\net8.0\0.2 JaCaptei.Application.AssemblyInfo.cs
+C:\jobs\JaCaptei\Projects\_main\Solution\Core\Application\obj\Debug\net8.0\0.2 JaCaptei.Application.csproj.CoreCompileInputs.cache
+C:\jobs\JaCaptei\Projects\_main\Solution\Core\Application\obj\Debug\net8.0\0.2 JaCaptei.Application.csproj.CopyComplete
+C:\jobs\JaCaptei\Projects\_main\Solution\Core\Application\obj\Debug\net8.0\0.2 JaCaptei.Application.dll
+C:\jobs\JaCaptei\Projects\_main\Solution\Core\Application\obj\Debug\net8.0\refint\0.2 JaCaptei.Application.dll
+C:\jobs\JaCaptei\Projects\_main\Solution\Core\Application\obj\Debug\net8.0\0.2 JaCaptei.Application.pdb
+C:\jobs\JaCaptei\Projects\_main\Solution\Core\Application\obj\Debug\net8.0\ref\0.2 JaCaptei.Application.dll

@@ -1,0 +1,315 @@
+<template>
+
+   <div class="row">
+
+    
+        <div class="col-12">
+
+                          <el-carousel :interval="2000" arrow="always" style="height:100px;border-radius:0px;overflow-y:hidden">
+                           <el-carousel-item v-for="(item,index) in images" :key="index">
+                                <el-image :src="item"  fit="cover"></el-image>
+                                <div>{{index+1}} / 4</div>
+                            </el-carousel-item>
+                        </el-carousel>
+       </div>
+
+
+
+        <div class="col-12">
+                       <el-row >
+                            <div id="title-mini">Apartamento, 4 quartos, 2 suítes, 4 vagas</div>
+                            <div id="subtitle-mini">Cidade Nova, Belo Horizonte, MG.</div>
+                            <el-col id="resources-mini">
+                                <el-row>
+                                    <el-col :md=8> <i class="icons mdi mdi-set-square " ></i>172</el-col>
+                                    <el-col :md=8> <i class="icons mdi mdi-bed-king"    ></i>3</el-col>
+                                    <el-col :md=8> <i class="icons fa fa-shower "       ></i>5</el-col>
+                                    <!--<el-col :md=6> <i class="icons fa fa-bath "         ></i>2 suítes</el-col>
+                                    <el-col :md=6> <i class="icons fa fa-building "     ></i>10º andar</el-col>
+                                    <el-col :md=6> <i class="icons fa fa-car "          ></i>4 vagas</el-col>-->
+                                </el-row>
+                           </el-col>
+
+                           <el-col>
+                               <span id="value-mini">R$ 2.150.000,00</span>
+                           </el-col>
+                    </el-row>
+       </div>
+       
+
+
+   </div>
+
+</template>
+
+<script>
+module.exports = {
+
+    components: {
+
+	},	
+	
+        data: function () {
+            return {
+                showModalImages       :false,
+                item:{
+                    title          :"",
+                    location       :"",
+                    address        :"",
+                    state          :"",
+                    city           :"",
+                    operationType  :"",
+                    buildingType   :"",
+                    value          : 0,
+                    area           : 0,
+                    bedrooms       : 0,
+                    bathrooms      : 0,
+                    parkings       : 0,
+                    suites         : 0,
+                    floor          : 0
+                },
+                imagesData:[
+                    "https://resizedimgs.vivareal.com/fit-in/870x653/named.images.sp/003d551c87ed21fd12bac72f40fa6ac3/foto-1-de-cobertura-com-3-quartos-a-venda-340m-em-cidade-dutra-sao-paulo.jpg",
+                    "https://resizedimgs.vivareal.com/fit-in/870x653/named.images.sp/aad2bdf597c316819ccca678b1c8422d/foto-3-de-cobertura-com-3-quartos-a-venda-340m-em-cidade-dutra-sao-paulo.jpg",
+                    "https://resizedimgs.vivareal.com/fit-in/870x653/named.images.sp/f796323969403b92ccd6b19b50d142d4/foto-2-de-cobertura-com-3-quartos-a-venda-340m-em-cidade-dutra-sao-paulo.jpg",
+                    "https://resizedimgs.vivareal.com/fit-in/870x653/named.images.sp/9392174b1b6cb1ef283e912c757a77e0/foto-15-de-cobertura-com-3-quartos-a-venda-340m-em-cidade-dutra-sao-paulo.jpg",
+                    "https://resizedimgs.vivareal.com/fit-in/870x653/named.images.sp/b2287799056dcddf11379cac4bde283d/foto-17-de-cobertura-com-3-quartos-a-venda-340m-em-cidade-dutra-sao-paulo.jpg",
+
+                    "https://resizedimgs.vivareal.com/fit-in/870x653/named.images.sp/a4e230d97bdf4124c2569a0c7e817dee/foto-12-de-apartamento-com-4-quartos-a-venda-243m-em-vila-andrade-sao-paulo.jpg",
+                    "https://resizedimgs.vivareal.com/fit-in/870x653/named.images.sp/96bf28321843acf1a9a02ca8a6a63f6e/foto-1-de-apartamento-com-4-quartos-a-venda-243m-em-vila-andrade-sao-paulo.jpg",
+                    "https://resizedimgs.vivareal.com/fit-in/870x653/named.images.sp/088df890982bb5a34f0771d65d8f2ebc/foto-3-de-apartamento-com-4-quartos-a-venda-243m-em-vila-andrade-sao-paulo.jpg",
+                    "https://resizedimgs.vivareal.com/fit-in/870x653/named.images.sp/96f5887bd37d8fe983356ff0aefeef1e/foto-5-de-apartamento-com-4-quartos-a-venda-243m-em-vila-andrade-sao-paulo.jpg",
+                    "https://resizedimgs.vivareal.com/fit-in/870x653/named.images.sp/8789c8462d7cb220ca45cea9dd46a851/foto-11-de-apartamento-com-4-quartos-a-venda-243m-em-vila-andrade-sao-paulo.jpg",
+
+                    "https://resizedimgs.vivareal.com/fit-in/870x653/named.images.sp/1334b4eefdbb812e1303eae6df226d3c/foto-1-de-apartamento-com-3-quartos-a-venda-306m-em-jardim-paulistano-sao-paulo.jpg",
+                    "https://resizedimgs.vivareal.com/fit-in/870x653/named.images.sp/90801bf9262e29de77e1abca04ae9233/foto-4-de-apartamento-com-3-quartos-a-venda-306m-em-jardim-paulistano-sao-paulo.jpg",
+                    "https://resizedimgs.vivareal.com/fit-in/870x653/named.images.sp/35565ccd784389e0056958b1d28027e9/foto-7-de-apartamento-com-3-quartos-a-venda-306m-em-jardim-paulistano-sao-paulo.jpg",
+                    "https://resizedimgs.vivareal.com/fit-in/870x653/named.images.sp/405a016b3280e9ac82d1d25dcf2aaf94/foto-13-de-apartamento-com-3-quartos-a-venda-306m-em-jardim-paulistano-sao-paulo.jpg",
+                    "https://resizedimgs.vivareal.com/fit-in/870x653/named.images.sp/7cf348f4c55888dda0e49f3042b3b6ca/foto-10-de-apartamento-com-3-quartos-a-venda-306m-em-jardim-paulistano-sao-paulo.jpg",
+
+                    "https://resizedimgs.vivareal.com/fit-in/870x653/named.images.sp/e874cedbeaad90ffd403dd95e5c815af/foto-3-de-cobertura-com-3-quartos-a-venda-210m-em-campo-belo-sao-paulo.jpg",
+                    "https://resizedimgs.vivareal.com/fit-in/870x653/named.images.sp/5bd81ae42596763ebd2988b7d07585e7/foto-6-de-cobertura-com-3-quartos-a-venda-210m-em-campo-belo-sao-paulo.jpg",
+                    "https://resizedimgs.vivareal.com/fit-in/870x653/named.images.sp/56cf011dad97ebe184c24da5716e7d7f/foto-8-de-cobertura-com-3-quartos-a-venda-210m-em-campo-belo-sao-paulo.jpg",
+
+                    "https://resizedimgs.vivareal.com/fit-in/870x653/named.images.sp/ab369d08951e3f956741d265fd2ab2f3/foto-3-de-apartamento-com-4-quartos-a-venda-200m-em-perdizes-sao-paulo.jpg",
+                    "https://resizedimgs.vivareal.com/fit-in/870x653/named.images.sp/9ad5af3b41a02290ebb71318dab619d8/foto-2-de-apartamento-com-4-quartos-a-venda-200m-em-perdizes-sao-paulo.jpg",
+                    "https://resizedimgs.vivareal.com/fit-in/870x653/named.images.sp/5d64f10fc76260e15bdb4aa3f2d529f2/foto-5-de-apartamento-com-4-quartos-a-venda-200m-em-perdizes-sao-paulo.jpg",
+                    "https://resizedimgs.vivareal.com/fit-in/870x653/named.images.sp/b8d2f30ec62a003e0bd6f5444ec80fbe/foto-4-de-apartamento-com-4-quartos-a-venda-200m-em-perdizes-sao-paulo.jpg",
+                    "https://resizedimgs.vivareal.com/fit-in/870x653/named.images.sp/dd160b90a7f836aa30c5ddd9d2beb425/foto-11-de-apartamento-com-4-quartos-a-venda-200m-em-perdizes-sao-paulo.jpg",
+                    "https://resizedimgs.vivareal.com/fit-in/870x653/named.images.sp/371c06d664bacf1df361b2491ae5d9c6/foto-16-de-apartamento-com-4-quartos-a-venda-200m-em-perdizes-sao-paulo.jpg",
+                    
+                    "https://resizedimgs.vivareal.com/fit-in/870x653/named.images.sp/341cc5fc2a0af5df10688981a17ebfbb/foto-1-de-apartamento-com-3-quartos-a-venda-240m-em-campo-belo-sao-paulo.jpg",
+                    "https://resizedimgs.vivareal.com/fit-in/870x653/named.images.sp/a2acc2f4f1fda2deab2b7af52239edef/foto-3-de-apartamento-com-3-quartos-a-venda-240m-em-campo-belo-sao-paulo.jpg",
+                    "https://resizedimgs.vivareal.com/fit-in/870x653/named.images.sp/e993c7a27a08efc8d4f29461b43f73f6/foto-4-de-apartamento-com-3-quartos-a-venda-240m-em-campo-belo-sao-paulo.jpg",
+                    "https://resizedimgs.vivareal.com/fit-in/870x653/named.images.sp/f77c13e6162187515631f380a39d9bed/foto-6-de-apartamento-com-3-quartos-a-venda-240m-em-campo-belo-sao-paulo.jpg",
+                    "https://resizedimgs.vivareal.com/fit-in/870x653/named.images.sp/82177d7ca40fbd6663ffb827b15dd1af/foto-11-de-apartamento-com-3-quartos-a-venda-240m-em-campo-belo-sao-paulo.jpg",
+                    "https://resizedimgs.vivareal.com/fit-in/870x653/named.images.sp/a0fe221df69a3a2263522ea8d0e95baf/foto-12-de-apartamento-com-3-quartos-a-venda-240m-em-campo-belo-sao-paulo.jpg",
+                    "https://resizedimgs.vivareal.com/fit-in/870x653/named.images.sp/80b56c254e939a760c20e834d59246f4/foto-14-de-apartamento-com-3-quartos-a-venda-240m-em-campo-belo-sao-paulo.jpg",
+                    "https://resizedimgs.vivareal.com/fit-in/870x653/named.images.sp/be5b235b15033f1090c3810e482f6a88/foto-41-de-apartamento-com-3-quartos-a-venda-240m-em-campo-belo-sao-paulo.jpg",
+                    "https://resizedimgs.vivareal.com/fit-in/870x653/named.images.sp/6cace6d21082c9b5f0ae00e5174e3986/foto-21-de-apartamento-com-3-quartos-a-venda-240m-em-campo-belo-sao-paulo.jpg",
+                    "https://resizedimgs.vivareal.com/fit-in/870x653/named.images.sp/19d8b5af0df6669e8ab74129fe9ffbcf/foto-26-de-apartamento-com-3-quartos-a-venda-240m-em-campo-belo-sao-paulo.jpg",
+                    "https://resizedimgs.vivareal.com/fit-in/870x653/named.images.sp/0d4b5883f8f20545f55ee1d1a8f64011/foto-31-de-apartamento-com-3-quartos-a-venda-240m-em-campo-belo-sao-paulo.jpg",
+
+                ],
+                images:[],
+                imageIndex: 0,
+
+            }
+        }, computed: {
+
+        },
+
+        props: {
+            id:			{ type: Number, required: false, default: 0 },
+            index:		{ type: Number, required: false, default: 0 },
+        },
+        watch: {
+        },
+        created: function () {
+               this.images = this.imagesData.sort((a, b) => 0.5 - Math.random()).slice(0, 4);
+	    },
+	    mounted(){
+	    },		  
+	    methods: {
+
+
+            OpenModalImages(index){
+                this.imageIndex=index;
+                //window.setTimeout(()=>this.showModalImages=true,2000)
+                this.showModalImages=true;
+                
+            },
+
+            Open(id){
+                const routeData = this.$router.resolve({name: 'building', query: {data: id}});
+                window.open(routeData.href, '_self');
+            }
+
+
+	    }				
+		
+}
+
+</script>
+
+
+<!--<script setup>
+const isCollapse = ref(true);
+const handleOpen = function(key, keyPath){
+  c(key, keyPath);
+}
+const handleClose = function(key, keyPath){
+  c(key, keyPath);
+}
+</script>-->
+
+<style scoped>
+
+img {
+    display:flex;
+    justify-content:center;
+    width:100%;
+    height:100%;
+}
+
+
+#build-card{
+    /*height:240px;*/
+    width:calc(100% - 65px);
+    border-radius:14px;
+    margin:20px;
+    margin-bottom:4px;
+    /*border:solid 2px #efefef;*/
+    box-shadow: rgba(99, 99, 99, 0.1) 0px 2px 8px 0px;
+    box-shadow: rgba(0, 0, 0, 0.16) 0px 1px 4px;
+}
+#build-card-xs{
+    height:auto;
+    width:calc(100% - 22px);
+    border-radius:14px;
+    margin:20px;
+    /*border:solid 2px #efefef;*/
+    box-shadow: rgba(99, 99, 99, 0.1) 0px 2px 8px 0px;
+    box-shadow: rgba(0, 0, 0, 0.16) 0px 1px 4px;
+}
+
+
+#carousel-thumbs{
+    /*height:240px;*/
+    display:inline-block;
+    padding:0px;
+    max-width:400px;
+    width:33%;
+    float:left;
+}
+
+
+
+#carousel-thumbs-xs{
+    display:block;
+    padding:0px;
+    width:100%;
+}
+
+#body{
+    display:inline-block;
+    float:right;
+    width:65%;
+}
+#body-xs{
+    display:block;
+    padding:10px;
+    width:calc(100% - 20px);
+}
+
+#title-mini{
+    font-size:13px;
+    line-height:14px;
+    font-weight:600;
+    color:var(--s-accent-color);
+    padding-top:15px;
+}
+
+#subtitle-mini{
+    font-size:11px;
+    line-height:14px;
+    font-weight:700;
+    color:var(--s-text-color);
+}
+
+
+.icons{
+        width:28px;
+        display:inline-block;
+        text-align:center;
+        line-height: 32px;
+        color:var(--s-accent-color);
+}
+
+
+#location{
+    font-size:15px;
+    line-height:28px;
+    font-weight:500;
+    color:#131A2E;
+    color:#6a728a;
+    padding:10px 0px 5px 0px;
+}
+
+    
+#resources{
+    font-size:15px;
+    line-height:20px;
+    font-weight:500;
+    color:#131A2E;
+    color:#6a728a;
+    padding:0px;
+}
+
+    
+#value-mini{
+    font-size:16px;
+    font-weight:700;
+    color:var(--s-accent-color);
+}
+
+
+
+
+
+
+.el-carousel__item {
+  background-color: #d3dce6;
+}
+
+.el-carousel__item div:nth-child(2){
+  z-index:100000;
+  color:#fff;
+  text-shadow: -1px -1px 0 #353535, 1px -1px 0 #353535, -1px 1px 0 #353535, 1px 1px 0 #353535;
+  margin-top:-26px;
+  text-align:left;
+  padding-left:10px;
+}
+
+.el-carousel__item div:nth-child(3){
+  z-index:100000;
+  color:#fff;
+  text-shadow: -1px -1px 0 #353535, 1px -1px 0 #353535, -1px 1px 0 #353535, 1px 1px 0 #353535;
+  margin-top:-26px;
+  text-align:right;
+  padding-right:10px;
+}
+
+
+
+.el-carousel__item span {
+  color: #475669;
+  opacity: 0.75;
+  margin: 0;
+  text-align: center;
+}
+
+
+</style>
+
+

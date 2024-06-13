@@ -1,0 +1,84 @@
+C:\jobs\JaCaptei\Projects\_main\Solution\Site\Site.API\bin\Release\net8.0\appsettings.Development.json
+C:\jobs\JaCaptei\Projects\_main\Solution\Site\Site.API\bin\Release\net8.0\appsettings.Homolog.json
+C:\jobs\JaCaptei\Projects\_main\Solution\Site\Site.API\bin\Release\net8.0\appsettings.json
+C:\jobs\JaCaptei\Projects\_main\Solution\Site\Site.API\bin\Release\net8.0\appsettings.Production.json
+C:\jobs\JaCaptei\Projects\_main\Solution\Site\Site.API\bin\Release\net8.0\2.1 JaCaptei.Site.API.exe
+C:\jobs\JaCaptei\Projects\_main\Solution\Site\Site.API\bin\Release\net8.0\2.1 JaCaptei.Site.API.deps.json
+C:\jobs\JaCaptei\Projects\_main\Solution\Site\Site.API\bin\Release\net8.0\2.1 JaCaptei.Site.API.runtimeconfig.json
+C:\jobs\JaCaptei\Projects\_main\Solution\Site\Site.API\bin\Release\net8.0\2.1 JaCaptei.Site.API.dll
+C:\jobs\JaCaptei\Projects\_main\Solution\Site\Site.API\bin\Release\net8.0\2.1 JaCaptei.Site.API.pdb
+C:\jobs\JaCaptei\Projects\_main\Solution\Site\Site.API\bin\Release\net8.0\Azure.Core.dll
+C:\jobs\JaCaptei\Projects\_main\Solution\Site\Site.API\bin\Release\net8.0\Azure.Identity.dll
+C:\jobs\JaCaptei\Projects\_main\Solution\Site\Site.API\bin\Release\net8.0\BouncyCastle.Cryptography.dll
+C:\jobs\JaCaptei\Projects\_main\Solution\Site\Site.API\bin\Release\net8.0\MailKit.dll
+C:\jobs\JaCaptei\Projects\_main\Solution\Site\Site.API\bin\Release\net8.0\Microsoft.AspNetCore.Authentication.JwtBearer.dll
+C:\jobs\JaCaptei\Projects\_main\Solution\Site\Site.API\bin\Release\net8.0\Microsoft.AspNetCore.OpenApi.dll
+C:\jobs\JaCaptei\Projects\_main\Solution\Site\Site.API\bin\Release\net8.0\Microsoft.Bcl.AsyncInterfaces.dll
+C:\jobs\JaCaptei\Projects\_main\Solution\Site\Site.API\bin\Release\net8.0\Microsoft.Data.SqlClient.dll
+C:\jobs\JaCaptei\Projects\_main\Solution\Site\Site.API\bin\Release\net8.0\Microsoft.Identity.Client.dll
+C:\jobs\JaCaptei\Projects\_main\Solution\Site\Site.API\bin\Release\net8.0\Microsoft.Identity.Client.Extensions.Msal.dll
+C:\jobs\JaCaptei\Projects\_main\Solution\Site\Site.API\bin\Release\net8.0\Microsoft.IdentityModel.Abstractions.dll
+C:\jobs\JaCaptei\Projects\_main\Solution\Site\Site.API\bin\Release\net8.0\Microsoft.IdentityModel.JsonWebTokens.dll
+C:\jobs\JaCaptei\Projects\_main\Solution\Site\Site.API\bin\Release\net8.0\Microsoft.IdentityModel.Logging.dll
+C:\jobs\JaCaptei\Projects\_main\Solution\Site\Site.API\bin\Release\net8.0\Microsoft.IdentityModel.Protocols.dll
+C:\jobs\JaCaptei\Projects\_main\Solution\Site\Site.API\bin\Release\net8.0\Microsoft.IdentityModel.Protocols.OpenIdConnect.dll
+C:\jobs\JaCaptei\Projects\_main\Solution\Site\Site.API\bin\Release\net8.0\Microsoft.IdentityModel.Tokens.dll
+C:\jobs\JaCaptei\Projects\_main\Solution\Site\Site.API\bin\Release\net8.0\Microsoft.OpenApi.dll
+C:\jobs\JaCaptei\Projects\_main\Solution\Site\Site.API\bin\Release\net8.0\Microsoft.SqlServer.Server.dll
+C:\jobs\JaCaptei\Projects\_main\Solution\Site\Site.API\bin\Release\net8.0\Microsoft.Win32.SystemEvents.dll
+C:\jobs\JaCaptei\Projects\_main\Solution\Site\Site.API\bin\Release\net8.0\MimeKit.dll
+C:\jobs\JaCaptei\Projects\_main\Solution\Site\Site.API\bin\Release\net8.0\NETCore.MailKit.dll
+C:\jobs\JaCaptei\Projects\_main\Solution\Site\Site.API\bin\Release\net8.0\Newtonsoft.Json.dll
+C:\jobs\JaCaptei\Projects\_main\Solution\Site\Site.API\bin\Release\net8.0\Npgsql.dll
+C:\jobs\JaCaptei\Projects\_main\Solution\Site\Site.API\bin\Release\net8.0\RepoDb.dll
+C:\jobs\JaCaptei\Projects\_main\Solution\Site\Site.API\bin\Release\net8.0\RepoDb.PostgreSql.dll
+C:\jobs\JaCaptei\Projects\_main\Solution\Site\Site.API\bin\Release\net8.0\RepoDb.PostgreSql.BulkOperations.dll
+C:\jobs\JaCaptei\Projects\_main\Solution\Site\Site.API\bin\Release\net8.0\RepoDb.SqlServer.dll
+C:\jobs\JaCaptei\Projects\_main\Solution\Site\Site.API\bin\Release\net8.0\RepoDb.SqlServer.BulkOperations.dll
+C:\jobs\JaCaptei\Projects\_main\Solution\Site\Site.API\bin\Release\net8.0\System.Configuration.ConfigurationManager.dll
+C:\jobs\JaCaptei\Projects\_main\Solution\Site\Site.API\bin\Release\net8.0\System.Drawing.Common.dll
+C:\jobs\JaCaptei\Projects\_main\Solution\Site\Site.API\bin\Release\net8.0\System.IdentityModel.Tokens.Jwt.dll
+C:\jobs\JaCaptei\Projects\_main\Solution\Site\Site.API\bin\Release\net8.0\System.Json.dll
+C:\jobs\JaCaptei\Projects\_main\Solution\Site\Site.API\bin\Release\net8.0\System.Linq.Async.dll
+C:\jobs\JaCaptei\Projects\_main\Solution\Site\Site.API\bin\Release\net8.0\System.Memory.Data.dll
+C:\jobs\JaCaptei\Projects\_main\Solution\Site\Site.API\bin\Release\net8.0\System.Runtime.Caching.dll
+C:\jobs\JaCaptei\Projects\_main\Solution\Site\Site.API\bin\Release\net8.0\System.Security.Cryptography.ProtectedData.dll
+C:\jobs\JaCaptei\Projects\_main\Solution\Site\Site.API\bin\Release\net8.0\System.Security.Permissions.dll
+C:\jobs\JaCaptei\Projects\_main\Solution\Site\Site.API\bin\Release\net8.0\System.Windows.Extensions.dll
+C:\jobs\JaCaptei\Projects\_main\Solution\Site\Site.API\bin\Release\net8.0\runtimes\unix\lib\net6.0\Microsoft.Data.SqlClient.dll
+C:\jobs\JaCaptei\Projects\_main\Solution\Site\Site.API\bin\Release\net8.0\runtimes\win\lib\net6.0\Microsoft.Data.SqlClient.dll
+C:\jobs\JaCaptei\Projects\_main\Solution\Site\Site.API\bin\Release\net8.0\runtimes\win-arm\native\Microsoft.Data.SqlClient.SNI.dll
+C:\jobs\JaCaptei\Projects\_main\Solution\Site\Site.API\bin\Release\net8.0\runtimes\win-arm64\native\Microsoft.Data.SqlClient.SNI.dll
+C:\jobs\JaCaptei\Projects\_main\Solution\Site\Site.API\bin\Release\net8.0\runtimes\win-x64\native\Microsoft.Data.SqlClient.SNI.dll
+C:\jobs\JaCaptei\Projects\_main\Solution\Site\Site.API\bin\Release\net8.0\runtimes\win-x86\native\Microsoft.Data.SqlClient.SNI.dll
+C:\jobs\JaCaptei\Projects\_main\Solution\Site\Site.API\bin\Release\net8.0\runtimes\win\lib\net6.0\Microsoft.Win32.SystemEvents.dll
+C:\jobs\JaCaptei\Projects\_main\Solution\Site\Site.API\bin\Release\net8.0\runtimes\unix\lib\net6.0\System.Drawing.Common.dll
+C:\jobs\JaCaptei\Projects\_main\Solution\Site\Site.API\bin\Release\net8.0\runtimes\win\lib\net6.0\System.Drawing.Common.dll
+C:\jobs\JaCaptei\Projects\_main\Solution\Site\Site.API\bin\Release\net8.0\runtimes\win\lib\net6.0\System.Runtime.Caching.dll
+C:\jobs\JaCaptei\Projects\_main\Solution\Site\Site.API\bin\Release\net8.0\runtimes\win\lib\net6.0\System.Security.Cryptography.ProtectedData.dll
+C:\jobs\JaCaptei\Projects\_main\Solution\Site\Site.API\bin\Release\net8.0\runtimes\win\lib\net6.0\System.Windows.Extensions.dll
+C:\jobs\JaCaptei\Projects\_main\Solution\Site\Site.API\bin\Release\net8.0\0.1 JaCaptei.Model.dll
+C:\jobs\JaCaptei\Projects\_main\Solution\Site\Site.API\bin\Release\net8.0\0.2 JaCaptei.Application.dll
+C:\jobs\JaCaptei\Projects\_main\Solution\Site\Site.API\bin\Release\net8.0\0.2 JaCaptei.Application.pdb
+C:\jobs\JaCaptei\Projects\_main\Solution\Site\Site.API\bin\Release\net8.0\0.1 JaCaptei.Model.pdb
+C:\jobs\JaCaptei\Projects\_main\Solution\Site\Site.API\obj\Release\net8.0\2.1 JaCaptei.Site.API.csproj.AssemblyReference.cache
+C:\jobs\JaCaptei\Projects\_main\Solution\Site\Site.API\obj\Release\net8.0\2.1 JaCaptei.Site.API.GeneratedMSBuildEditorConfig.editorconfig
+C:\jobs\JaCaptei\Projects\_main\Solution\Site\Site.API\obj\Release\net8.0\2.1 JaCaptei.Site.API.AssemblyInfoInputs.cache
+C:\jobs\JaCaptei\Projects\_main\Solution\Site\Site.API\obj\Release\net8.0\2.1 JaCaptei.Site.API.AssemblyInfo.cs
+C:\jobs\JaCaptei\Projects\_main\Solution\Site\Site.API\obj\Release\net8.0\2.1 JaCaptei.Site.API.csproj.CoreCompileInputs.cache
+C:\jobs\JaCaptei\Projects\_main\Solution\Site\Site.API\obj\Release\net8.0\2.1 JaCaptei.Site.API.MvcApplicationPartsAssemblyInfo.cs
+C:\jobs\JaCaptei\Projects\_main\Solution\Site\Site.API\obj\Release\net8.0\2.1 JaCaptei.Site.API.MvcApplicationPartsAssemblyInfo.cache
+C:\jobs\JaCaptei\Projects\_main\Solution\Site\Site.API\obj\Release\net8.0\staticwebassets.build.json
+C:\jobs\JaCaptei\Projects\_main\Solution\Site\Site.API\obj\Release\net8.0\staticwebassets.development.json
+C:\jobs\JaCaptei\Projects\_main\Solution\Site\Site.API\obj\Release\net8.0\staticwebassets\msbuild.2.1 JaCaptei.Site.API.Microsoft.AspNetCore.StaticWebAssets.props
+C:\jobs\JaCaptei\Projects\_main\Solution\Site\Site.API\obj\Release\net8.0\staticwebassets\msbuild.build.2.1 JaCaptei.Site.API.props
+C:\jobs\JaCaptei\Projects\_main\Solution\Site\Site.API\obj\Release\net8.0\staticwebassets\msbuild.buildMultiTargeting.2.1 JaCaptei.Site.API.props
+C:\jobs\JaCaptei\Projects\_main\Solution\Site\Site.API\obj\Release\net8.0\staticwebassets\msbuild.buildTransitive.2.1 JaCaptei.Site.API.props
+C:\jobs\JaCaptei\Projects\_main\Solution\Site\Site.API\obj\Release\net8.0\staticwebassets.pack.json
+C:\jobs\JaCaptei\Projects\_main\Solution\Site\Site.API\obj\Release\net8.0\scopedcss\bundle\2.1 JaCaptei.Site.API.styles.css
+C:\jobs\JaCaptei\Projects\_main\Solution\Site\Site.API\obj\Release\net8.0\2.1 JaCaptei.Site.API.csproj.CopyComplete
+C:\jobs\JaCaptei\Projects\_main\Solution\Site\Site.API\obj\Release\net8.0\2.1 JaCaptei.Site.API.dll
+C:\jobs\JaCaptei\Projects\_main\Solution\Site\Site.API\obj\Release\net8.0\refint\2.1 JaCaptei.Site.API.dll
+C:\jobs\JaCaptei\Projects\_main\Solution\Site\Site.API\obj\Release\net8.0\2.1 JaCaptei.Site.API.pdb
+C:\jobs\JaCaptei\Projects\_main\Solution\Site\Site.API\obj\Release\net8.0\2.1 JaCaptei.Site.API.genruntimeconfig.cache
+C:\jobs\JaCaptei\Projects\_main\Solution\Site\Site.API\obj\Release\net8.0\ref\2.1 JaCaptei.Site.API.dll

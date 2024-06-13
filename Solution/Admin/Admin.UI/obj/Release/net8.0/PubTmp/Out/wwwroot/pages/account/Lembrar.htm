@@ -1,0 +1,224 @@
+﻿<template>
+    <div>
+        <el-row justify="center" v-if="loading">
+            <el-col :md="24" style="max-width:360px;margin-top:60px">
+                <c-loading size="60px"></c-loading>
+            </el-col>
+        </el-row>
+        <el-row v-else-if="$validator.is(token)" justify="center" @keyup.enter="AlterarSenha()">
+            <el-col :md="24" style="max-width:360px;">
+                <div class="s-input-login" style="text-align:left;">
+                    <div style="color:orange !important">REDEFINIR SENHA  <span></span> </div>
+                </div>
+                <div class="s-input-login" style="text-align:left">
+                    <div>NOVA SENHA  <span></span> </div>
+                    <el-input @keyup.enter="AlterarSenha()" v-model="senha" type="password" placeholder="senha" ref="senha" maxlength="20" show-password></el-input>
+                </div>
+                <div class="s-input-login" style="text-align:left">
+                    <div>CONFIRMAR NOVA SENHA<span></span></div>
+                    <el-input @keyup.enter="AlterarSenha()" v-model="senhaConfirma" type="password" placeholder="repetir senha" maxlength="20" show-password></el-input>
+                </div>
+                <div class="s-input-login" style="margin-top:30px;text-align:center">
+                    <q-btn color="primary" @click="AlterarSenha()">ENVIAR</q-btn><br /><br />
+                    <a href="javascript:void(0)" style="color:#444" @click="CancelarAlterarSenha">cancelar</a>
+                </div>
+            </el-col>
+        </el-row>
+        <el-row v-else justify="center" @keyup.enter="Lembrar()">
+            <el-col :md="24" style="max-width:360px">
+                <div class="s-input-login" style="text-align:left">
+                    <div><i class="fa fa-user"></i> CPF, CNPJ ou E-MAIL  <span></span> </div>
+                    <el-input v-model="usuario.username" placeholder="" ref="username" maxlength="140"></el-input>
+                </div>
+                <div class="s-input-login" style="margin-top:30px;text-align:center">
+                    <q-btn color="primary" @click="Lembrar()">ENVIAR</q-btn>
+                </div>
+            </el-col>
+        </el-row>
+    </div>
+</template>
+
+
+
+
+<script>
+    module.exports = {
+
+        name: 'Lembrar',
+
+        components: {
+
+        },
+
+        data: function () {
+            return {
+                loading:false,
+                usuario: this.$models.usuario(),
+                senha:"",
+                senhaConfirma:""
+            }
+        }, computed: {
+
+        },
+
+        props: {
+            token: { type: String, required: false, default: null },
+        },
+        watch: {
+
+        },
+        created: function () {
+            //this.usuario.username = "28249525809";
+            //this.usuario.senha = "123456";
+            //this.usuario.senha = "18109654000113";
+            //c2("usuario",this.usuario)
+        },
+        mounted() {
+          if(this.$validator.is(this.token))
+                this.$refs.senha.focus();
+            else
+                this.$refs.username.focus();
+
+            //var msg = "Um link para recuperar a senha foi enviado para o email <b>paulont@live.com</b>.";
+            //this.$tools.AlertError(msg);
+
+
+        },
+        methods: {
+
+
+            AlterarSenha() {
+
+                var msg = "";
+
+                if (this.$validator.not(this.token)) {
+                    this.view = "fail";
+                    msg += "<b>Token expirado</b><br>este token não é mais válido (clique no link de confirmação novamente)";
+                } else {
+
+                    if (this.$validator.not(this.senha))
+                        msg += "<b>SENHA</b> não informada<br>";
+                    if (this.senha.length < 4)
+                        msg += "<b>SENHA</b> precisa ter pelo menos 4 caracteres<br>";
+                    if (this.$validator.not(this.senhaConfirma))
+                        msg += "<b>CONFIRMAR SENHA</b> não informada<br>";
+                    else if (this.senha != this.senhaConfirma)
+                        msg += "<b>SENHA e CONFIRMAR SENHA</b> não combinam<br>";
+
+                }
+
+                if (msg.length > 0) {
+                    this.$tools.Alert(msg);
+                } else {
+
+                    this.loading = true;
+
+                    this.usuario.token = this.token;
+                    this.usuario.senha = this.senha;
+
+                    axios.post(this.$api.BuildURL("usuario/senha/alterar"), this.usuario).then((request) => {
+
+                        if (request.data.status.success) {
+                            this.$tools.AlertSuccess("Senha alterada");
+                        } else {
+                            this.$tools.AlertWarning("Não foi possível alterar senha (prazo pode ter expirado, solicite lembrar novamente).");
+                        }
+
+                    }).catch((error) => {
+                        ce(error);
+                        if (error.response)
+                            ce(error.response);
+                        this.view = "fail";
+                        ce("Não foi possível alterar senha.");
+                        this.buscaTitulo = "";
+                    }).finally(() => {
+                        this.loading = false;
+                    });
+
+
+
+                }
+            },
+
+            CancelarAlterarSenha(){
+                this.$emit("cancelar-alterar-senha");
+            },
+
+
+            Lembrar() {
+
+                var msg = "";
+
+                if (!this.$validator.is(this.usuario.username))
+                    msg += "- Necessário preencher o <u>CPF ou CNPJ ou E-Mail</u>.<br>";
+
+                if (this.$validator.is(msg))
+                    this.$tools.Alert(msg);
+                else {
+
+                    this.loading = true;
+
+                    axios.post(this.$api.BuildURL("usuario/senha/solicitar"), this.usuario).then((request) => {
+                        //c2("request.data",request.data);
+                        if (request.data.status.success) {
+                            var userresult = request.data.result;
+                            var msg = "Um link para recuperar a senha foi enviado para o email <b>" + userresult.email + "</b>."
+                            this.$tools.AlertSuccess(msg);
+                        } else {
+                            this.$tools.AlertWarning("Usuário não econtrado.");
+                        }
+                    }).catch((error) => {
+                        this.loading = false;
+                        c2("error.response.data", error.response.data)
+                        if (error.response) {
+                            this.$tools.AlertNotes(error.response.data);
+                        } else
+                            this.$tools.AlertEror("Não foi possível atender a requisição");
+                    }).finally(() => {
+                        window.setTimeout(() => { this.loading = false; }, 400);
+                    });
+
+                }
+
+            }
+
+           
+
+
+        }
+
+    }
+
+
+</script>
+
+
+<style scoped>
+    .s-input-login {
+        /*max-width:240px !important;*/
+        letter-spacing: 0.02em;
+        color: var(--s-accent-color);
+        margin-top: 20px;
+    }
+
+        .s-input-login > div:first-child {
+            color: var(--s-accent-color);
+            font-size: 0.9em;
+            line-height: 24px;
+            font-weight: 600;
+            text-decoration: inherit;
+            padding-left: 2px;
+        }
+
+            .s-input-login > div:first-child > span {
+                color: var(--s-accent-color);
+                font-weight: 400;
+                font-size: 0.9em;
+            }
+
+            .s-input-login > div:first-child > i {
+                padding-right: 2px;
+            }
+</style>
+
+

@@ -1,0 +1,290 @@
+﻿<template>
+
+    <div>
+
+        <div v-if="$root.isAuth" class="content-schedules">
+            <c-schedules></c-schedules>
+        </div>
+        <div v-else>
+
+
+            <!--<div>
+            <div class="banner" :style="'background:url('+$root.GetBanner(4)+');background-size:cover;'">
+                <div class="text">
+                    Seja um parceiro e
+                    <br />aumente suas vendas
+                    <br />com benefícios
+                    <br />exclusivos.-->
+            <!--<br /><span style="font-size:14px">[Texto resumido sobre os benefícios para parceiros]</span>-->
+            <!--</div>
+            </div>
+        </div>-->
+            <div style="cursor:pointer" @click="ScrollTo('planos')">
+                <div class="banner" style="background:url('resources/images/pages/banners/banner_mensalidade.jpg';background-size:cover;"></div>
+            </div>
+
+
+            <article class="content-boxes">
+                <br />
+
+
+                <c-box color="grey"
+                       image="resources/images/pages/parceiros/qualidade.png"
+                       align="right"
+                       title="Imóveis de <br />Qualidade"
+                       content="Acesse imóveis exclusivos e de extrema<br />qualidade em nossa plataforma"
+                       btlabel="Seja um parceiro JáCpatei"
+                       event="contact"
+                       @contact="ScrollTo('planos')"></c-box>
+
+
+                <c-box color="orange"
+                       image="resources/images/pages/parceiros/tecnologia.png"
+                       align="left"
+                       title="Tecnologia<br />Avançada"
+                       content="Utilizamos tecnologia de ponta para facilitar a<br />identificação e captação de imóveis."
+                       btlabel="Seja um parceiro JáCpatei"
+                       event="contact"
+                       @contact="ScrollTo('planos')"></c-box>
+
+
+                <c-box color="navy"
+                       image="resources/images/pages/parceiros/estrutura.png"
+                       align="right"
+                       title="Estrutura<br />Completa"
+                       content="Oferecemos suporte completo para o fechamento do<br />negócio, incluindo assessoria jurídica e muito mais."
+                       btlabel="Seja um parceiro JáCpatei"
+                       event="contact"
+                       @contact="ScrollTo('planos')"></c-box>
+
+
+
+                <c-box color="grey"
+                       image="resources/images/pages/parceiros/comissao.png"
+                       align="left"
+                       title="100% da Comissão<br />para Você"
+                       content="Na JáCaptei você fica com <b>100% da comissão</b> assinando nossa plataforma por apenas <b>R$ 259,00 por mês</b>.<br /><span style='color:#888;font-size:16px'>consulte as condições com nossos consultores</span>"
+                       btlabel="Seja um parceiro JáCpatei"
+                       event="contact"
+                       @contact="ScrollTo('planos')"></c-box>
+
+
+
+                <c-box color="orange"
+                       image="resources/images/pages/parceiros/beneficios.png"
+                       align="right"
+                       title="Benefícios<br />Exclusivos"
+                       content="Além da comissão atraente, conte com descontos em<br />serviços e treinamento capacitado."
+                       btlabel="Seja um parceiro JáCpatei"
+                       event="contact"
+                       @contact="ScrollTo('planos')"></c-box>
+
+
+
+            </article>
+
+
+
+        <div v-if="$root.usuario.idConta < 2" class="q-pa-md row items-start q-gutter-md" id="planos" style="margin-top:40px;text-align:center;width:100%;display:block;cursor:pointer">
+            <img src="../resources/images/plano1.jpg" @click="SelecionarPlano(2)" />
+            <img src="../resources/images/plano2.jpg" @click="SelecionarPlano(3)" />
+            <img src="../resources/images/plano3.jpg" @click="SelecionarPlano(4)" />
+            <!--<img src="../resources/images/plano1.jpg" @click="ContratarAgora(1)" />
+            <img src="../resources/images/plano2.jpg" @click="ContratarAgora(2)" />
+            <img src="../resources/images/plano3.jpg" @click="ContratarAgora(3)" />-->
+        </div>
+
+
+
+
+
+            <div class="q-pa-md row items-start q-gutter-md" style="margin-top:0px;text-align:center;width:100%;display:block">
+                <c-register tipo="PARCEIRO" idtipo="1"></c-register>
+            </div>
+
+
+            <!--<article class="content-boxes">
+
+
+              <div  class="q-pa-md row items-start q-gutter-md" style="margin-top:40px;text-align:center;width:100%;display:block">
+                  <p class="title">
+                      O que nossos clientes dizem?
+                  </p>
+              </div>
+
+
+              <div  class="q-pa-md row items-start q-gutter-md">
+
+
+                   <q-card class="box-client">
+                        <img src="https://media.bizj.us/view/img/12548767/joe-richlen-3x4-5-300ppi*900xx900-900-0-107.jpg" />
+
+                        <q-card-section>
+                            <p>
+                              {{ lorem }}
+                            </p>
+                        </q-card-section>
+                      </q-card>
+
+                   <q-card class="box-client">
+                        <img src="https://media.bizj.us/view/img/12464013/grier-ann-3x4*900xx900-900-0-0.jpg" />
+
+                        <q-card-section>
+                            <p>
+                              {{ lorem }}
+                            </p>
+                        </q-card-section>
+                      </q-card>
+
+                   <q-card class="box-client">
+                        <img src="https://media.bizj.us/view/img/12348951/shaw-cheryl-print-3x4-hi-res*1500xx1540-1540-0-96.jpg" />
+
+                        <q-card-section>
+                            <p>
+                              {{ lorem }}
+                            </p>
+                        </q-card-section>
+                      </q-card>
+
+
+                   <q-card class="box-client">
+                        <img src="https://i.pinimg.com/736x/24/16/a5/2416a57ec634dfebcfcc3cf6fad1bc7d.jpg" />
+
+                        <q-card-section>
+                            <p>
+                              {{ lorem }}
+                            </p>
+                        </q-card-section>
+                      </q-card>
+
+
+                   <q-card class="box-client">
+                        <img src="https://wcyb.com/resources/media2/3x4/full/236p/center/80/333bb790-d79d-40a2-484b-07a4cc06414d-largeScale_DAVEDIERKS.png" />
+
+                        <q-card-section>
+                            <p>
+                              {{ lorem }}
+                            </p>
+                        </q-card-section>
+                      </q-card>
+
+
+              </div>
+
+
+
+         </article>-->
+
+
+
+
+        </div>
+
+
+    </div>
+
+
+</template>
+
+
+<script>
+    module.exports = {
+
+        name: 'HOME',
+
+        components: {
+
+        },
+
+        data: function () {
+            return {
+                lorem: 'Lorem ipsum dolor sit amet, consectetur elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Aliquam vulputate nulla idvelit maximus, eget imperdiet dui.'
+            }
+        }, computed: {
+
+        },
+
+        props: {
+
+        },
+        watch: {
+            //"pct":function(){ this.updateLabels(); }
+        },
+        created: function () {
+          
+        },
+        mounted() {
+           // window.setTimeout(() => {
+              //this.$root.RouteTo("/admin/user/home");
+            //}, 400);
+
+            
+        },
+        methods: {
+
+
+            SelecionarPlano(idPlano){
+                this.$root.usuario.idPlano = idPlano;
+                this.ScrollTo('form');
+            },
+
+
+            ContratarAgora(plano) {
+                var link = "";
+                var msg = "";
+
+                if (plano == 1)
+                    msg = "gostaria de contratar o plano CORRETOR AUTÔNOMO ESSENCIAL";
+                else if (plano == 2)
+                    msg = "gostaria de contratar o plano IMOBILIÁRIA 03 USUÁRIOS";
+                else
+                    msg = "gostaria de contratar o plano IMOBILIÁRIA 05 USUÁRIOS";
+
+                if (this.$root.usuario.id > 0)
+                    link = "https://api.whatsapp.com/send?phone=553140039998&text=Olá, meu nome é " + this.$tools.Capitalize(this.$root.usuario.nome) + " (" + this.$root.usuario.email + ") e ";
+                else
+                    link = "https://api.whatsapp.com/send?phone=553140039998&text=Olá, ";
+
+                link += msg;
+
+                //window.open(link, "_blank");
+
+                c2("link", link);
+
+            },
+
+
+            ScrollTo(id){
+                this.$tools.ScrollTo(id);
+            }
+
+
+
+
+
+        }
+
+    }
+
+
+
+
+
+
+
+
+</script>
+
+
+<style scoped>
+
+.content-schedules{
+    max-width: 1240px;
+    margin-left: auto;
+    margin-right: auto;
+    text-align: justify;
+}
+
+</style>
+
+

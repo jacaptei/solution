@@ -1,0 +1,15 @@
+C:\jobs\Servisys\Project\Solution\Servisys\Application\bin\Debug\net7.0\Servisys.Application.deps.json
+C:\jobs\Servisys\Project\Solution\Servisys\Application\bin\Debug\net7.0\Servisys.Application.dll
+C:\jobs\Servisys\Project\Solution\Servisys\Application\bin\Debug\net7.0\Servisys.Application.pdb
+C:\jobs\Servisys\Project\Solution\Servisys\Application\bin\Debug\net7.0\Servisys.Shared.dll
+C:\jobs\Servisys\Project\Solution\Servisys\Application\bin\Debug\net7.0\Servisys.Shared.pdb
+C:\jobs\Servisys\Project\Solution\Servisys\Application\obj\Debug\net7.0\Servisys.Application.csproj.AssemblyReference.cache
+C:\jobs\Servisys\Project\Solution\Servisys\Application\obj\Debug\net7.0\Servisys.Application.GeneratedMSBuildEditorConfig.editorconfig
+C:\jobs\Servisys\Project\Solution\Servisys\Application\obj\Debug\net7.0\Servisys.Application.AssemblyInfoInputs.cache
+C:\jobs\Servisys\Project\Solution\Servisys\Application\obj\Debug\net7.0\Servisys.Application.AssemblyInfo.cs
+C:\jobs\Servisys\Project\Solution\Servisys\Application\obj\Debug\net7.0\Servisys.Application.csproj.CoreCompileInputs.cache
+C:\jobs\Servisys\Project\Solution\Servisys\Application\obj\Debug\net7.0\Servisys.Application.csproj.CopyComplete
+C:\jobs\Servisys\Project\Solution\Servisys\Application\obj\Debug\net7.0\Servisys.Application.dll
+C:\jobs\Servisys\Project\Solution\Servisys\Application\obj\Debug\net7.0\refint\Servisys.Application.dll
+C:\jobs\Servisys\Project\Solution\Servisys\Application\obj\Debug\net7.0\Servisys.Application.pdb
+C:\jobs\Servisys\Project\Solution\Servisys\Application\obj\Debug\net7.0\ref\Servisys.Application.dll

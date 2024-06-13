@@ -1,0 +1,178 @@
+﻿<template>
+        <div class="row"  v-if="!$root.isAuth">
+			
+            <div class="col-12 header" style="text-align:center">
+					<div style="padding-top:4px">
+							<img src="/resources/images/logo_login.png" />
+					</div>
+			</div>
+            <div class="col-12 titler">
+					
+					<div style="display:inline-block;padding-right:10px" >
+							ACESSO
+					</div>
+					
+				</div>
+
+			</div>
+			<div class="row" style="margin-top:20px;width:100%;text-align:center">
+				<div class="col-12">
+					        <q-tabs
+					            v-model="view"
+					            dense
+					            no-caps
+					            align="center"
+					            narrow-indicator
+ 					            class="text-grey"
+					            active-color="primary"
+					            indicator-color="primary"
+					        >
+					            <q-tab name="remember"	icon="fa fa-unlock"				label="LEMBRAR SENHA"   style="width:115px"></q-tab>
+					            <q-tab name="login" 	icon="fa fa-right-to-bracket"	label="LOGIN"			style="width:115px"></q-tab>
+					            <q-tab name="register"	icon="fa fa-user-plus"			label="CADASTRE-SE"		style="width:115px"></q-tab>
+					        </q-tabs>
+					        <q-tab-panels v-model="view" animated >
+
+						        <q-tab-panel name="login" style="margin-top:-20px">
+							        <s_login />
+						        </q-tab-panel>
+
+						        <q-tab-panel name="register">
+							        <s_register />
+						        </q-tab-panel>
+
+						        <q-tab-panel name="remember" style="margin-top:-20px">
+							        <s_remember />
+						        </q-tab-panel>
+
+					        </q-tab-panels>
+				</div>
+			</div>
+</template>
+
+
+
+
+<script>
+	module.exports = {
+
+		name: 'Login',
+
+        components: {
+			s_login:	LoadComponent("./pages/account/Login.htm"),
+			s_register:	LoadComponent("./pages/account/Register.htm"),
+			s_remember:	LoadComponent("./pages/account/Remember.htm"),
+        },
+
+		data: function () {
+			return {
+                view:"login",
+				//tempSettings:this.$tools.Unbind(this.$root.user.account)
+				tempSettings:{
+						id							:0,
+						idUser						:0,
+						keepFullSearchOS			:false,
+						keepFullSearchClient		:false,
+						theme						:"LIGHT",
+						city						:"SÃO PAULO",
+						state						:"SP",
+						country						:"BRASIL",
+						countryCode					:"BRA",
+						countryDDI					:"55",
+						language					:"pt-BR",
+						currency					:"BRL",
+						currencySymbol				:"R$",
+						timezone					:"America/Sao_Paulo",
+						timezoneOffset				:-3,
+						dateFormat					:"DD/MM/YYYY"
+				}
+			}
+		}, computed: {
+
+		},
+
+		props: {
+
+		},
+		watch: {
+
+		},
+		created: function () {
+			this.$root.SetTitle("LOGIN","fa fa-key");
+			this.$root.SignOut();
+			this.GetDataLocation();
+		},
+		mounted() {
+
+		},
+		methods: {
+
+			GetDataLocation(){
+                    //axios.get("https://api.ipgeolocation.io/ipgeo?apiKey=575e35c72f294cf3a8d5459eaafb272b").then((request) => {
+                    axios.get("https://api.ipgeolocation.io/ipgeo?apiKey=575e35c72f294cf3a8d5459eaafb272b&ip=1.1.1.1").then((request) => {
+						
+						try{
+							this.$root.user.account.countryCode		= request.data.country_code3;
+							this.$root.user.account.countryDDI		= request.data.calling_code.replace("+","");
+							this.$root.user.account.currency		= request.data.currency.code;
+							this.$root.user.account.currencySymbol	= request.data.currency.symbol;
+							this.$root.user.account.timezone		= request.data.time_zone.name;
+							this.$root.user.account.timezoneOffset	= request.data.time_zone.offset;
+							this.$root.user.account.language		= request.data.languages.split(",")[0];
+
+							var country = request.data.country_name.toUpperCase();
+							var city	= request.data.city.toUpperCase();
+
+							if(country=="BRAZIL" || country=="BRASIL"){
+								country = "BRASIL";
+								city = city.replace("SAO ","SÃO ");
+							}
+
+							this.$root.user.country		= this.$root.user.account.country = country;
+							this.$root.user.state		= this.$root.user.account.state = request.data.state_code.replace((request.data.country_code2+"-"),"");
+							this.$root.user.city		= this.$root.user.account.city = city;
+							this.$tools.account			= this.$root.user.account;
+
+							//c(this.$root.user.account)
+							//ci("signin in auth/index/GetDataLocation()");
+							//this.$root.SignIn();
+
+						}catch(e){
+							ce(error);
+							this.$root.user.account = this.$tools.userSettings = this.tempSettings;
+						}
+                    }).catch((error) => { ce(error);}).finally(() => {});
+			},
+
+
+		}
+
+	}
+
+
+</script>
+
+
+<style scoped>
+    .titler {
+	    font-size: 17px;
+        font-family: "hind-regular", "Segoe UI", sans-serif;
+		font-weight:700;
+		letter-spacing:1px;
+        margin: 0;
+		color:#FFF;
+		background-color:#0080ff;
+		line-height:36px;
+		height:38px;
+		vertical-align:middle;
+		background: rgb(0,90,255);
+		-webkit-box-shadow: 0px 5px 15px 5px rgba(0,44,87,0.29); 
+		box-shadow: 0px 5px 10px 2px rgba(0,44,87,0.29);
+		z-index:1000;
+		/*background: linear-gradient(90deg, rgba(0,90,255,1) 0%, rgba(2,4,118,1) 85%, rgba(0,1,68,1) 100%);*/
+		/*background: linear-gradient(200deg,rgba(0,1,68,1) 0%, rgba(115,85,255,0.8) 0%, rgba(0,1,68,1) 100%);*/
+		background: linear-gradient(292deg,rgba(0,1,68,1) 0%, rgb(69 0 203 / 90%) 0%, rgba(0,1,68,1) 100%);
+    }
+</style>
+
+

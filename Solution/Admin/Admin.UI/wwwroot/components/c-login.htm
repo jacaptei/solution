@@ -1,0 +1,400 @@
+<template>
+
+
+
+            <q-dialog v-model="$root.showLoginModal" @hide="view='login'">
+
+						<div>
+							<div v-if="view=='login'">
+
+								<q-card class="box-login">
+
+									<q-card-section>
+										<div class="title" style="color:#fff"><b>Login</b></div>
+									</q-card-section>
+
+									<q-card-section class="q-pt-none">
+										<q-input filled dark color="white" stack-label label-color="white" label="CPF, CNPJ ou E-mail" v-model="$root.usuario.username" autofocus @keyup.enter="Login"></q-input>
+										<!--<q-input filled dark color="white" stack-label label-color="white" label="Senha" v-model="pwd" @keyup.enter="Go" style="margin-top:30px"></q-input>-->
+										<q-input filled label="Senha" dark color="white" stack-label label-color="white" v-model="$root.usuario.senha" :type="isPwd ? 'password' : 'text'" @keyup.enter="Login" style="margin-top:30px">
+											<!--<template v-slot:append>
+												<q-icon :name="isPwd ? 'visibility_off' : 'visibility'"
+														class="cursor-pointer"
+														@click="isPwd = !isPwd"></q-icon>
+											</template>-->
+										</q-input>
+										<!--<q-item-section dark style="margin-top:4px;margin-bottom:-10px">
+											<q-checkbox v-model="$root.rememberMe" dark label="Lembrar-me"></q-checkbox>
+										</q-item-section>-->
+									</q-card-section>
+
+									<q-card-actions>
+										<div style="width:50%;display:inline-block;text-align:center">
+											<q-btn color="primary" label="Cancelar" v-close-popup style="width:120px" id="btn_cancelar_1"></q-btn>
+										</div>
+										<div style="width:50%;display:inline-block;text-align:center">
+											<!--<q-btn color="green-6" label="Enviar" style="width:120px" @click="view='sending'" id="btn_enviar_1"></q-btn>-->
+											<q-btn color="green-6" label="Enviar" style="width:120px" @click="Login" id="btn_enviar_1"></q-btn>
+										</div>
+										<div style="font-size:13px;margin-top:14px;width:100%;text-align:center;font-weight:500">
+											esqueceu a senha?  <el-button type="primary" link @click="ShowView('lembrarSenha')">REDEFINIR</el-button>
+										</div>
+									</q-card-actions>
+
+
+								</q-card>
+
+							</div>
+
+
+							<div v-if="view=='lembrarSenha'">
+								<q-card class="box-login">
+									<q-card-section>
+										<div class="title" style="color:#fff"><b>Redefinir Senha</b></div>
+									</q-card-section>
+									<br />
+									<q-card-section class="q-pt-none">
+										<div style="color:#fff"><b>CPF, CNPJ ou E-mail cadastrado</b></div><br />
+										<q-input filled dark color="white" stack-label label-color="white" label="CPF, CNPJ ou E-mail" v-model="$root.usuario.username" autofocus @keyup.enter="LembrarSenha"></q-input>
+									</q-card-section>
+
+									<q-card-actions>
+										<div style="width:50%;display:inline-block;text-align:center">
+											<q-btn color="primary" label="Cancelar" @click="view='login'" style="width:120px" id="btn_cancelar_1"></q-btn>
+										</div>
+										<div style="width:50%;display:inline-block;text-align:center">
+											<!--<q-btn color="green-6" label="Enviar" style="width:120px" @click="view='sending'" id="btn_enviar_1"></q-btn>-->
+											<q-btn color="green-6" label="Enviar" style="width:120px" @click="LembrarSenha" id="btn_enviar_1"></q-btn>
+										</div>
+									</q-card-actions>
+
+									<!--<q-card-section style="font-size:14px">
+										<div style="width:50%;display:inline-block;text-align:center;line-height:14px">
+											sem login? crie uma conta gratuita agora<br />
+											<q-btn @click="ShowView('register')" color="yellow-2" text-color="indigo-10" label="Criar" id="btn_criar_1" size="md" style="width:100px;padding:6px;height:16px;margin-top:2px"></q-btn>
+										</div>
+										<div style="width:50%;display:inline-block;text-align:center;line-height:14px">
+											esqueceu a senha?<br />
+											<q-btn @click="ShowView('resetpwd')" color="yellow-2" text-color="indigo-10" label="Recuperar" id="btn_recuperar_1" size="md" style="width:100px;padding:6px;height:16px;margin-top:2px"></q-btn>
+										</div>
+									</q-card-section>-->
+
+								</q-card>
+
+							</div>
+
+
+
+							<div v-if="view=='sending'">
+								<q-card class="box-login">
+									<q-card-section>
+										<div class="title" style="color:#fff"><b>Enviando</b></div>
+									</q-card-section>
+									<q-card-section class="q-pt-none" style="line-height: 180px; text-align:center">
+										<c-loading size="3em"></c-loading>
+									</q-card-section>
+								</q-card>
+							</div>
+
+							<div v-if="view=='success'">
+								<q-card class="box-login">
+									<q-card-section>
+											<div class="title" style="color:var(--s-color-neon-green)"><b><i class="fa fa-circle-check"></i> Sucesso</b></div>
+									</q-card-section>
+									<q-card-section class="q-pt-none">
+										<br />
+										<span v-html="messageSuccess"></span>
+										<br /><br />
+										<q-btn color="green-6" label="OK" v-close-popup style="width:160px;margin-top: 15px;"  id="btn_ok_1"></q-btn>
+									</q-card-section>
+								</q-card>
+							</div>
+
+							<div v-if="view=='alert'">
+								<q-card class="box-login">
+									<q-card-section>
+										<div class="title" style="color:var(--s-color-yellow)"><b><i class="fa-solid fa-triangle-exclamation"></i> Atenção</b></div>
+									</q-card-section>
+									<q-card-section class="q-pt-none">
+										<br /><span v-html="messageAlert"></span>
+										<br /><br />
+										<q-btn color="white" text-color="indigo-10" label="VOLTAR" @click="ShowView(viewLast)" style="width:160px;"  id="btn_voltar_5"></q-btn>
+									</q-card-section>
+								</q-card>
+							</div>
+
+							<div v-if="view=='fail'">
+								<q-card class="box-login">
+									<q-card-section>
+										<div class="title" style="color:var(--s-color-red)"><b><i class="fa fa-circle-xmark"></i> Falhou</b></div>
+									</q-card-section>
+									<q-card-section class="q-pt-none">
+										<br /><span v-html="messageFail"></span>
+										<br /><br /><br />
+										<q-btn color="white" text-color="indigo-10" label="VOLTAR" @click="ShowView(viewLast)" style="width:160px;"  id="btn_voltar_5"></q-btn>
+									</q-card-section>
+								</q-card>
+							</div>
+
+						</div>            
+
+			</q-dialog>
+
+
+</template>
+
+<script>
+module.exports = {
+    components: {
+
+	},	
+	
+	data: function () {
+		return {
+                api                 : this.$api.New(),
+                validator           : this.$validator.New(),
+                status              : null,
+				showModal			: false,
+				isPwd				: true,
+				pwdConfirm			: "",
+				view				: "login",
+				viewLast			: "login",
+				messageSuccess		: "Autenticado!",
+				messageAlert		: "",
+				messageFail			: "Não foi possível autenticar, favor tentar novamente.",
+                selectStates		: [],
+		}
+	},computed: {
+      
+	},
+	
+	props:{
+	},
+	watch:{
+	},
+	created: function () {
+	 },
+	mounted(){
+			//this.ApiTest();
+			//this.$root.usuario.username="28249525809";
+			//this.$root.usuario.senha="1234";
+			//this.Login();
+	},		  
+	methods: {
+
+			Open(){
+				this.view						=	'login';
+				this.$root.showModalLogin		=	true;
+			},
+
+			ShowView(v) {
+
+				if (this.view != "sending")
+					this.viewLast = this.view + ""; // to unbind
+				
+				this.view = v;
+
+			},
+
+
+			Login() {
+
+				var valid = true;
+
+				var msg = "";
+
+                if (!this.$validator.is(this.$root.usuario.username))
+                    msg += "- Necessário preencher o <u>CPF ou E-Mail</u>.<br>";
+				
+				if (!this.$validator.is(this.$root.usuario.senha))
+					msg += "- Necessário preencher a <u>SENHA</u>.<br>";
+
+				if (this.$validator.is(msg)) {
+
+					this.Alert(msg);
+					/*
+					this.$root.$q.dialog({
+						title: '<b>ATENÇÃO</b>',
+						html: true,
+						close:true,
+						message: msg,
+						style: "color:#fff !important;border:6px solid var(--s-alt-accent-color) ;background-color:var(--s-accent-color) !important",
+						ok: {
+							style: "color:#fff !important;background-color:var(--s-alt-accent-color) !important"
+						},
+					}).onOk(() => {
+						// console.log('OK')
+					}).onCancel(() => {
+						// console.log('Cancel')
+					}).onDismiss(() => {
+						// console.log('I am triggered on both OK and Cancel')
+					});
+					*/
+
+				} else {
+
+					//axios.get(Utils.BuildURL("/home/login"))
+					//    .then(response => { console.log(response.data) })
+					//    .catch(error => console.log(error))
+					//const result = await axios.post(Utils.BuildURL("/home/login"), this.$root.usuario);
+
+						this.ShowView("sending");
+
+						axios.post(this.$api.BuildURL("parceiro/autenticar"),this.$root.usuario).then((request) => {
+								//c2("request.data",request.data);
+								if(request.data.status.success){
+										
+									this.$root.usuario = request.data.result;
+
+									if(this.$validator.not(this.$root.usuario.id))
+										cw("não logado no CRM");
+									
+									this.$root.usuario.autenticado		= true;
+									this.$root.isAuth					= true;
+
+									this.$root.search.imovelBusca.sessaoCRM = this.$root.usuario.sessaoCRMsystem;
+
+									//this.$root.usuario.favoritos = this.$validator.is(this.$sdata.Storage.Get("favoritos"))?  this.$sdata.Storage.Get("favoritos") : [];
+									
+									//this.api.status.success=true;
+
+									//c2("this.$root.usuario.idCRM",this.$root.usuario.idCRM)
+									this.ShowView("success");
+
+								}else{
+                                    this.Alert("Não foi possível autenticar.");
+								}
+							}).catch((error) => {
+								//ce(error);
+                                if (error.response) {
+                                    //ce(error);
+                                    if (error.response.data.status.code == 404)
+                                        this.messageFail = "Usuário não encontrado, verifique CPF ou CNPJ ou E-Mail e Senha";
+                                } else
+									this.messageFail="Não foi possível autenticar, favor tentar novamente.";
+								this.ShowView("fail");
+							}).finally(() => {
+								window.setTimeout(()=>{this.api.status.requesting = false;},400);
+							});
+
+
+				}
+
+			},
+
+
+			LembrarSenha() {
+
+				var valid = true;
+
+				var msg = "";
+
+                if (!this.$validator.is(this.$root.usuario.username))
+                    msg += "- Necessário preencher o <u>username</u>.<br>";
+
+				if (this.$validator.is(msg)) {
+
+					this.Alert(msg);
+
+				} else {
+
+						this.ShowView("sending");
+						axios.post(this.$api.BuildURL("parceiro/senha/solicitar"),this.$root.usuario).then((request) => {
+                            if (request.data.status.success){
+									this.messageSuccess="Um link para poder alterar senha foi enviado para seu e-mail";
+									this.ShowView("success");
+								}else{
+									this.messageFail="Usuário não foi encontrado com documento ou e-mail informado.";
+									this.ShowView("fail");
+								}
+							}).catch((error) => {
+								ce(error);
+                                if (error.response) {
+                                    this.$tools.AlertNotes(error.response.data);
+                                }// else
+                                 //   this.$tools.Alert("Não foi possível atender a requisição");
+                                this.messageFail = "Usuário não foi encontrado com documento ou e-mail informado.";
+								this.ShowView("fail");
+							}).finally(() => {
+								window.setTimeout(()=>{this.api.status.requesting = false;},400);
+							});
+
+				}
+
+			},
+
+
+			Alert(messages){
+
+				//this.messageAlert=messages;
+				//this.ShowView("alert");
+
+					this.ShowView("login");
+
+					this.$root.$q.dialog({
+						title: '<b>ATENÇÃO</b>',
+						html: true,
+						close:true,
+						message: messages,
+						style: "color:#fff !important;border:6px solid var(--s-alt-accent-color) ;background-color:var(--s-accent-color) !important",
+						ok: {
+							style: "color:#fff !important;background-color:var(--s-alt-accent-color) !important"
+						},
+					}).onOk(() => {
+						// console.log('OK')
+					}).onCancel(() => {
+						// console.log('Cancel')
+					}).onDismiss(() => {
+						// console.log('I am triggered on both OK and Cancel')
+					});
+
+
+
+
+					
+			},
+
+
+
+	}				
+		
+}
+
+</script>
+
+
+<style scoped>
+
+	.user_drop{
+		height:22px;
+		padding-top:15px
+	}
+
+    .box-login {
+        width: 100%;
+        width: 300px;
+        min-width: 210px;
+        max-width: 420px;
+        padding: 10px;
+        font-size: 18px;
+        font-weight: 300;
+        min-height: 260px;
+        height: 320px;
+        color: #FFF;
+		text-align:center;
+        background-color: var(--s-alt-accent-color);
+    }
+
+    .box-login-footer {
+        padding: 10px;
+        font-size: 18px;
+        font-weight: 300;
+        height: 60px;
+        color: #FFF;
+        background-color: #134d8f;
+        border-radius: 10px;
+    }
+
+</style>
+
+

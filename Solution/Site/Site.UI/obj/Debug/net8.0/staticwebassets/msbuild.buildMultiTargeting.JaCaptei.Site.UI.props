@@ -1,0 +1,3 @@
+﻿<Project>
+  <Import Project="..\build\JaCaptei.Site.UI.props" />
+</Project>

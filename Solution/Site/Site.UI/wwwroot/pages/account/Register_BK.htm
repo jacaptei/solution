@@ -1,0 +1,277 @@
+﻿<template>
+	<div>
+
+			<el-row justify="center" :gutter="10">
+				<el-col :xs="1" :sm="8" :md="8"  :lg="8" :xl="10"></el-col>
+				<el-col :xs="22" :sm="8"  :md="8" :lg="7" :xl="4" >
+
+
+
+					        <q-tab-panels v-model="registerActionTab" animated @transition="()=>{ if(registerActionTab == 'identifydata'){ $refs.name.focus();} }">
+
+						        <q-tab-panel name="logindata" @keyup.enter="Next()"   v-loading="api.status.requesting" element-loading-text="verificando disponibilidade">
+										<div class="title">
+											DADOS DE AUTENTICAÇÃO
+										</div>
+										<div class="s-input-register" style="text-align:left">
+												<div><i class="fa fa-envelope" ></i> E-MAIL <s-tip :show="validator.GetNote('email').show" :note="validator.GetNote('email')" /> <span class="s-orange">será usado como <b>LOGIN</b></span> </div>
+												<el-input v-model="$root.user.email" placeholder="" ref="email" maxlength="40" class="input-lower"></el-input>
+										</div>
+										<div class="s-input-register" style="text-align:left">
+												<div><i class="fa fa-key" ></i> SENHA <s-tip :show="validator.GetNote('password').show" :note="validator.GetNote('password')" /> </div>
+												<el-input v-model="$root.user.password" placeholder="" ref="password" maxlength="40"  class="input-no-text-transform" type="password" show-password></el-input>
+										</div>
+										<div class="s-input-register" style="text-align:left;">
+												<div><i class="fa fa-key" ></i> CONFIRMAR SENHA <s-tip :show="validator.GetNote('password').show" :note="validator.GetNote('password')" /> </div>
+												<el-input v-model="passwordConfirm" placeholder="" ref="passwordConfirm" maxlength="40"  class="input-no-text-transform" type="password" show-password></el-input>
+										</div>
+						        </q-tab-panel>
+
+						        <q-tab-panel name="identifydata" style="margin-top:0px">
+									<div class="title">
+										DADOS DE IDENTIFICAÇÃO
+									</div>
+									<div class="s-input-register" style="text-align:left;margin-bottom:20px">
+												<div><i :class="($root.user.legalPerson=='PF')? 'fa fa-user':'fa fa-building'" ></i> SOU <span></span><s-tip :show="validator.GetNote('name').show" :note="validator.GetNote('name')" /></div>
+								                <q-radio keep-color v-model="$root.user.legalPerson"     val="PF"	size="xs"	label="PF pessoa física"    @click="$refs.name.focus()"    style="margin-right:20px;font-size: 1.05em;" />
+							                    <q-radio keep-color v-model="$root.user.legalPerson"     val="PJ"	size="xs"	label="PJ pessoa jurídica"  @click="$refs.name.focus()"    style="font-size: 1.05em;" />
+    								</div>
+									<div class="s-input-register" style="text-align:left">
+								            <div><i :class="($root.user.legalPerson=='PF')? 'fa fa-user':'fa fa-building'" ></i> NOME <span></span><s-tip :show="validator.GetNote('name').show" :note="validator.GetNote('name')" /></div>
+											<el-input v-model="$root.user.name" placeholder="" ref="name" maxlength="40"></el-input>
+									</div>
+									<div class="s-input-register" style="text-align:left">
+								            <div>PAÍS <span></span></div>
+			        		                <el-select v-model="$root.user.country"  size="medium" filterable  style="width:100%" placeholder="SELECIONE">
+                                                <el-option    v-for="item in $sdata.forms.countries"      :key="item.value"       ref="country"    :value="item.value"  @click="()=>{$root.user.state=null;$root.user.city=null;SetStatesOptions(item.code);$root.SetCountrySettings(item);}">
+                                                    <span v-html="item.label" style="float: left"></span>
+                                                    <span style="float: right;color:#c4c4c4"><span v-html="'+'+item.ddi"></span></span>
+                                                </el-option>
+                                            </el-select>
+									</div>
+									<div class="s-input-register" style="text-align:left">
+								                <div>ESTADO<span> </span></div>
+			        		                    <el-select v-model="$root.user.state"  size="medium"   filterable style="width:100%" placeholder="SELECIONE" >
+                                                    <el-option    v-for="item in statesOptions"      :key="item.value"      :label="item.label"      :value="item.value"  @click="$refs.city.focus()"   ></el-option>
+                                                </el-select>
+								                <!--<el-input  v-model="$root.user.state"    placeholder="" ref="state"   maxlength="35"></el-input>-->
+									</div>
+									<!--<div class="s-input-register" style="text-align:left">
+								                <div>{{($tools.ToUpper($root.user.country)=='BRASIL')? 'ESTADO':'PROVÍNCIA'}} <span> </span></div>
+			        		                    <el-select v-model="$root.user.state"  size="medium"  v-if="($tools.ToUpper($root.user.country))=='BRASIL'" filterable style="width:100%" placeholder="SELECIONE" >
+                                                    <el-option    v-for="item in $sdata.forms.states"      :key="item.value"      :label="item.label"      :value="item.value"  @click="$refs.city.focus()"   ></el-option>
+                                                </el-select>
+								                <el-input  v-model="$root.user.state"    v-else placeholder="" ref="state"   maxlength="35"></el-input>
+									</div>-->
+									<div class="s-input-register" style="text-align:left">
+								                <div>CIDADE <span></span></div>
+								                <el-input v-model="$root.user.city" placeholder="" ref="city"  maxlength="35"></el-input>
+									</div>
+
+						        </q-tab-panel>
+
+
+					        </q-tab-panels>
+
+
+                </el-col>
+				<el-col :xs="1" :sm="8" :md="8" :lg="8"  :xl="10"></el-col>
+
+				<el-col :slot="24" style="margin-top:20px">
+                            <el-button type="gray"    @click="registerActionTab='logindata'"		 v-if="registerActionTab != 'logindata'"	><el-icon class="fa fa-chevron-left" ></el-icon> VOLTAR</el-button>
+                            <el-button type="primary" @click="Next()" v-else-if="registerActionTab != 'identifydata'" :disabled="api.status.requesting"	>PROSSEGUIR <el-icon class="el-icon--right fa fa-chevron-right"><ArrowRight /></el-icon></el-button>
+                            <el-button type="primary" @click="Register()" v-if="registerActionTab != 'logindata'">CONCLUIR</el-button>
+				</el-col>
+
+
+				<!--
+                    <el-col :span="12">
+						<div style="float:right">
+							<div class="s-input-login" style="text-align:left;max-width:320px">
+										<div><i class="fa fa-envelope" ></i> NOME <s-tip :show="validator.GetNote('name').show" :note="validator.GetNote('name')" />  </div>
+										<el-input v-model="$root.user.name" placeholder="" ref="name" maxlength="40" class="input-lower"></el-input>
+							</div>
+							<div class="s-input-login" style="text-align:left;max-width:320px">
+										<div><i class="fa fa-key" ></i> SENHA <s-tip :show="validator.GetNote('password').show" :note="validator.GetNote('password')" /> </div>
+										<el-input v-model="$root.user.password" placeholder="" ref="password" maxlength="40"  class="input-no-text-transform" type="password" show-password></el-input>
+							</div>
+						</div>
+                    </el-col>
+                    <el-col :span="12" justify="center">
+						<div style="float:left">
+							<div class="s-input-login" style="text-align:left;max-width:320px">
+										<div><i class="fa fa-envelope" ></i> E-MAIL <s-tip :show="validator.GetNote('email').show" :note="validator.GetNote('email')" /> <span>será usado no <b>LOGIN</b></span> </div>
+										<el-input v-model="$root.user.email" placeholder="" ref="email" maxlength="40" class="input-lower"></el-input>
+							</div>
+							<div class="s-input-login" style="text-align:left;max-width:320px">
+										<div><i class="fa fa-key" ></i> CONFIRMAR SENHA <s-tip :show="validator.GetNote('password').show" :note="validator.GetNote('password')" /> </div>
+										<el-input v-model="passwordConfirm" placeholder="" ref="passwordConfirm" maxlength="40"  class="input-no-text-transform" type="password" show-password></el-input>
+							</div>
+						</div>
+                    </el-col>
+-->
+
+            </el-row>
+		</div>
+</template>
+
+
+
+
+<script>
+	module.exports = {
+
+		name: '',
+
+		components: {
+
+		},
+
+		data: function () {
+			return {
+                api					: this.$api.New(),
+                validator			: this.$validator.New(),
+				registerActionTab	: "logindata",
+				passwordConfirm		: "",
+				countryCode			: this.$root.user.account.countryCode,
+                statesOptions       : [],
+			}
+		}, computed: {
+
+		},
+
+		props: {
+
+		},
+		watch: {
+
+		},
+		created: function () {
+			 this.$root.SetTitle("LOGIN","fa fa-rigth-to-bracket");
+             this.validator.InitNoteKey("name"     );
+             this.validator.InitNoteKey("email"     );
+             this.validator.InitNoteKey("password"  );
+			 this.SetStatesOptions(this.countryCode);
+		},
+		mounted() {
+			this.$root.user.name="TESTE";
+			this.$root.user.email="teste@mail.com";
+			this.$root.user.password="123456";
+			this.passwordConfirm="123456";
+
+			this.$refs.email.focus();
+		},
+		methods: {
+
+            SetStatesOptions(_countryCode){
+                this.statesOptions = this.$sdata.GetCountryStatesOptions(_countryCode);
+            },
+
+			async Next(){
+
+				this.validator.StartValidations();
+
+				if(this.validator.not(this.$root.user.email))      
+						this.validator.SetNote("email"      ,"Necessário informar o <b>E-MAIL</b>"                  );
+				else if(!this.validator.IsEmail(this.$root.user.email))      
+						this.validator.SetNote("email"      ,"<b>E-MAIL</b> inválido"								);
+				if(this.validator.not(this.$root.user.password))      
+						this.validator.SetNote("password"      ,"Necessário informar a <b>SENHA</b>"                );
+				else if(this.$root.user.password.length < 6)      
+						this.validator.SetNote("password"      ,"<b>SENHA</b> inválida (necessário mínimo de 6 caracteres)"	);
+				else if(this.validator.not(this.passwordConfirm))      
+						this.validator.SetNote("password"      ,"Necessário <b>CONFIRMAR SENHA</b>"	);
+				else if(this.$root.user.password !== this.passwordConfirm)      
+						this.validator.SetNote("password"      ,"<b>SENHA</b> e <b>CONFIRMAR SENHA</b> não estão iguais"	);
+                
+				if(this.validator.hasNotes)
+                    this.validator.Alert();
+				else{
+                          var url = this.api.URL("/account/exists")+"/"+this.$root.user.email;
+						  this.api.status.requesting = true;
+                          await axios.get(url).then((request) => {
+								this.registerActionTab="identifydata";
+						  }).catch((error) => {
+							    //ce(error)
+								//if(this.validator.is(error.request?.response)){
+								//	this.api.response = error.request.response;
+								//	this.validator.AddNotes(this.api.GetNotes());
+								//}
+								this.validator.AlertError(error);
+                           }).finally(() => { 
+                               this.api.status.requesting = false; 
+                           });
+				}
+			},
+
+
+			Register(){
+				
+                this.validator.StartValidations();
+
+				if(this.validator.not(this.$root.user.email))      
+						this.validator.SetNote("email"      ,"Necessário informar o <b>E-MAIL</b>"	);
+				else if(!this.validator.IsEmail(this.$root.user.email))      
+						this.validator.SetNote("email"      ,"<b>E-MAIL</b> inválido"	);
+				if(this.validator.not(this.$root.user.password))      
+						this.validator.SetNote("password"      ,"Necessário informar a <b>SENHA</b>"	);
+				else if(this.$root.user.password.length < 6)      
+						this.validator.SetNote("password"      ,"<b>SENHA</b> inválida (necessário mínimo de 6 caracteres)"	);
+                
+				if(this.validator.hasNotes)
+                    this.$alert(this.validator.NotesToHTML(),"ATENÇÃO",{dangerouslyUseHTMLString:true});
+				else{
+
+                    var url = this.api.URL("/account/register");
+					this.api.status.requesting = true;
+                    axios.post(url,this.$root.user).then((request) => {
+						this.$tools.Alert("Sucesso, cadastro feito");
+					}).catch((error) => {
+						//ce(error)
+						//if(this.validator.is(error.request?.response)){
+						//	this.api.response = error.request.response;
+						//	this.validator.AddNotes(this.api.GetNotes());
+						//}
+						ce(error);
+						this.validator.AlertResponseErrors(error);
+                    }).finally(() => { 
+                        this.api.status.requesting = false; 
+                    });
+					//this.$root.SignIn();
+				}
+			}
+		}
+
+	}
+
+
+</script>
+
+
+<style scoped>
+
+.s-input-register{
+    /*max-width:240px !important;*/
+    letter-spacing: 0.02em;
+    color: #4c9afb;
+    margin-top:16px;
+}
+.s-input-register > div:first-child{
+    color: #4c9afb;
+    font-size: 0.9em;
+    line-height: 24px;
+    font-weight: 600;
+    text-decoration: inherit;
+    padding-left:2px;
+}
+.s-input-register > div:first-child > span{
+    color:#a0a0a0;
+    font-weight: 400;
+    font-size:0.9em;
+}
+.s-input-register > div:first-child > i{
+    padding-right:2px;
+}
+</style>
+
+

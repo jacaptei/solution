@@ -1,0 +1,54 @@
+[
+  {
+    "ContainingType": "UI.Controllers.ApiLocationController",
+    "Method": "Index",
+    "RelativePath": "apilocation",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "UI.Controllers.ApiLocationController",
+    "Method": "ObterBairros",
+    "RelativePath": "apilocation/obterbairros/{idCity}",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "idCity",
+        "Type": "System.String",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "UI.Controllers.ApiLocationController",
+    "Method": "ObterCidades",
+    "RelativePath": "apilocation/obtercidades/{uf}",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "uf",
+        "Type": "System.String",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "UI.Controllers.ApiLocationController",
+    "Method": "ObterEstados",
+    "RelativePath": "apilocation/obterestados",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [],
+    "ReturnTypes": []
+  }
+]

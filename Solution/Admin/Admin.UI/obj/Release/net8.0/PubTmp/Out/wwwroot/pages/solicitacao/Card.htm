@@ -1,0 +1,227 @@
+<template>
+
+
+                                <c-card v-if="item.ativo" :idStatus="item.idStatus" :title2="item.idStatus == 3? 'AGUARDANDO CAPTADOR' : item.idStatus == 5? 'EM VERIFICAÇÃO' : 'FINALIZADO' " :title="'<b style=\'margin-right:10px;\'>#ID '+item.id+'</b>'+$tools.FormatDateHourToBR(item.data)+', '+$tools.GetFullDayWeek(item.data)">
+                                    <div style="display:flow-root">
+                                        <div style="font-weight:700;display:inline-block;float:left;line-height:28px">
+                                            <span style="color:#000;font-weight:normal">
+                                                <i class="icons fa fa-user" style="margin-right:3px;"></i>{{item.parceiro.nome}}
+                                                <br />
+                                                <span style="margin-right:10px">#id {{item.parceiro.id}}</span>
+                                                <a :href="$tools.BuildWhatsappLink(item.parceiro.telefone,'Olá '+item.apelido)" target="_blank" style="margin-left:00px;color:var(--s-color-green);text-decoration:none"><i class="fab fa-whatsapp" style="padding-right:3px;"></i> {{item.parceiro.telefone}}</a>
+                                                <a v-if="$validator.IsCPF(item.parceiro.cpf)" href="javascript:void(0)" @click="$tools.Copy(item.parceiro.cpf)" style="margin-left:20px;text-decoration:none;color:var(--s-color-tex-alt)"><i class="fa fa-copy" style="padding-right:3px;text-decoration:none"></i>CPF: {{item.parceiro.cpf}}  </a>
+                                                <a v-else-if="$validator.IsCNPJ(item.parceiro.cnpj)" href="javascript:void(0)" @click="$tools.Copy(item.parceiro.cnpj)" style="margin-left:20px;text-decoration:none;color:var(--s-color-tex-alt)"><i class="fa fa-copy" style="padding-right:3px;text-decoration:none"></i>CNPJ: {{item.parceiro.cnpj}}  </a>
+                                                <a :href="'mailto:'+item.parceiro.email" target="_blank" style="margin-left:20px;color:var(--el-color-primary);text-decoration:none"><i class="fa fa-envelope"></i>&nbsp; {{item.parceiro.email}}</a>
+                                            </span>
+
+                                            <br />
+                                            <span style="cursor:pointer;font-weight:normal" @click="$tools.OpenMap(item)">
+                                                <i class="icons fa fa-map-marker-alt" style="margin-right:10px"></i>
+                                                {{$tools.BuildAddress(item)}}
+                                                <i class="fa fa-up-right-from-square" style="padding-left:20px;font-size:14px;color:#000"></i>
+                                            </span>
+                                        </div>
+                                    </div>
+                                    <div style="margin-top:10px;font-weight:500;display:inline-blocktext-align:right;cursor:pointer;color:#000">
+                                        <el-input placeholder="" :value="$tools.BuildAddress(item)">
+                                            <template #prepend>
+                                                <div style="text-transform:uppercase;font-weight:700" @click="$tools.OpenLink(item.url)">
+                                                    <i class="fa fa-map-marker-alt"></i>
+                                                </div>
+                                            </template>
+                                            <template #append>
+                                                <q-btn icon="fa fa-copy" flat @click="$tools.Copy($tools.BuildAddress(item))" style="width:50px"></q-btn>
+                                                <q-btn icon="fa fa-up-right-from-square" flat style="margin-left:5px;width:50px" @click="$tools.OpenMap(item)"></q-btn>
+                                            </template>
+                                        </el-input>
+                                    </div>
+                                    <div style="margin-top:10px;font-weight:500;display:inline-blocktext-align:right;cursor:pointer;color:#000">
+                                        <el-input v-model="item.url" placeholder="" input-style="text-transform:lowercase;">
+                                            <template #prepend>
+                                                <div style="text-transform:uppercase;font-weight:700" @click="$tools.OpenLink(item.url)">
+                                                    <i class="fa fa-link"></i>
+                                                </div>
+                                            </template>
+                                            <template #append>
+                                                <q-btn icon="fa fa-copy" flat @click="$tools.CopyLink(item.url)" style="width:50px" :title="item.url"></q-btn>
+                                                <q-btn icon="fa fa-up-right-from-square" flat style="margin-left:5px;width:50px" @click="$tools.OpenLink(item.url)"></q-btn>
+                                            </template>
+                                        </el-input>
+                                    </div>
+                                    <div style="margin-top:10px;font-weight:500;display:inline-blocktext-align:right;cursor:pointer;color:#000">
+                                        <el-input placeholder="" :value="ObterDataVisita(item)">
+                                            <template #prepend>
+                                                <div style="text-transform:uppercase;font-weight:700" @click="$tools.OpenLink(item.url)">
+                                                    <i class="fa fa-calendar"></i>
+                                                </div>
+                                            </template>
+                                            <template #append>
+                                                <q-btn icon="fa fa-copy" flat @click="$tools.Copy($tools.BuildAddress(item))" style="width:50px"></q-btn>
+                                                <q-btn icon="fa fa-up-right-from-square" flat style="margin-left:5px;width:50px" @click="$tools.OpenMap(item)"></q-btn>
+                                            </template>
+                                        </el-input>
+                                    </div>
+                                    <div style="margin-top:10px">
+                                        <el-input v-model="item.descricao" placeholder="" type="textarea" :disable="true" :autosize="{ minRows: 2, maxRows: 4 }" style="font-size:12pt"></el-input>
+                                    </div>
+                                    <div v-if="item.idStatus > 3" style="margin-top:10px">
+                                        <el-input v-model="item.avaliacao" placeholder="" type="textarea" :autosize="{ minRows: 3, maxRows: 5 }" :ref="'avaliacao'+item.id" style="font-size:12pt"></el-input>
+                                    </div>
+                                    <div v-if="item.idStatus == 3" style="margin-top:10px;width:100%;text-align:center">
+                                        <q-btn label="CAPTAR" color="red" text-color="white" @click="Captar(item)" :loading="item.acao==1" style="max-width:200px;"></q-btn>
+                                    </div>
+                                    <div v-else-if="item.idStatus == 5"  style="margin-top:10px;width:100%;text-align:center">
+                                        <q-btn label="CANCELAR"          color="red"        text-color="white" @click="Cancelar(item)" style="max-width:160px;margin-left:00px"></q-btn>
+                                        <q-btn label="SALVAR"            color="primary"    text-color="white" @click="Alterar(item)" style="max-width:160px;margin-left:20px"></q-btn>
+                                        <q-btn label="FINALIZAR"         color="green"      text-color="white" @click="Finalizar(item)" style="max-width:160px;margin-left:20px"></q-btn>
+                                    </div>
+
+                                </c-card>
+
+
+
+
+</template>
+
+
+
+<script>
+    module.exports = {
+        components: {
+
+        },
+
+        data: function () {
+            return {
+            }
+        }, computed: {
+
+        },
+
+        props: {
+            item: { type: Object, required: false, default: null },
+        },
+        watch: {
+        },
+        created: function () {
+        },
+        mounted() {
+            this.Enviar();
+        },
+        methods: {
+
+
+
+            ShowView(v) {
+                this.view = v;
+            },
+
+            ObterDataVisita(item) {
+                if (this.$validator.is(item.dataVisita)) {
+                    var data = new Date(item.dataVisita);
+                    return (data.getFullYear() > 1900) ? data.format("dd/mm/yyyy, HH:MM'h'") : ""; 
+                 }
+                return "";
+            },
+
+            async Enviar() {
+
+                this.view = "request";
+
+                var request = await this.$api.Get("solicitacao/obter/todos");
+
+                if (request?.status?.success) {
+                    this.view = "success";
+                    this.results = request.result;
+
+                    //this.results.forEach(i =>i.acao=0);
+
+                    this.resultsAguardando  = this.results.filter(r => r.idStatus == 3);
+                    this.resultsVerificando = this.results.filter(r => r.idStatus == 5);
+                    this.resultsFinalizadas = this.results.filter(r => r.idStatus == 9);
+                    //c(this.results[0]);
+
+                }//else
+                 //  this.view = "fail";
+
+            },
+    
+
+            async Captar(item) {
+                item.acao = 1;
+                var request = await this.$api.Post("solicitacao/captar", item);
+                if (request?.status?.success) {
+                    item.acao = 0;
+                    //this.$tools.AlertSuccess("Solicitação ID# " + item.id + " captada em verificação!");
+                    this.$tools.MessageSuccess("Solicitação ID# " + item.id + " captada em verificação!");
+                    this.resultsVerificando.unshift(request.result);
+                    item.ativo = false;
+                    this.tab = "verificando";
+                    this.$tools.Top();
+                    window.setTimeout(() => this.$refs["avaliacao"+item.id].focus(), 500);
+                    //c(this.results);
+                }//else
+                 //  this.view = "fail";
+            },
+
+            async Cancelar(item) {
+                item.acao = 1;
+                var request = await this.$api.Post("solicitacao/cancelar", item);
+                if (request?.status?.success) {
+                    item.acao = request.result.acao = 0;
+                    this.$tools.AlertSuccess("Solicitação ID# " + item.id +" voltou para o status de aguardada.");
+                    this.resultsAguardando.unshift(request.result);
+                    //this.resultsVerificando = this.results.filter(r => r.id != item.id && r.idStatus == 5);
+                    //this.resultsFinalizadas = this.results.filter(r => r.id != item.id && r.idStatus == 9);
+                    item.ativo = false;
+                    //c(this.results);
+                }//else
+                 //  this.view = "fail";
+            },
+
+            async Alterar(item) {
+                item.acao = 1;
+                var request = await this.$api.Post("solicitacao/alterar", item);
+                if (request?.status?.success) {
+                    item = request.result;
+                    item.acao = 0;
+                    this.$tools.AlertSuccess("Solicitação ID# " + item.id +" salva!");
+                    //c(this.results);
+                }//else
+                 //  this.view = "fail";
+            },
+
+            
+            async Finalizar(item) {
+                item.acao = 1;
+                var request = await this.$api.Post("solicitacao/finalizar", item);
+                if (request?.status?.success) {
+                    item.acao = 0;
+                    this.$tools.AlertSuccess("Solicitação ID# "+item.id+" finalizada!");
+                    this.resultsVerificando = this.results.filter(r => r.id != item.id && r.idStatus == 5);
+                    this.resultsFinalizadas.unshift(request.result);
+                    item.ativo = false;
+                    //c(this.results);
+                }//else
+                 //  this.view = "fail";
+            },
+
+
+
+
+
+
+        }
+
+    }
+
+</script>
+
+
+<style scoped>
+    .s-input {
+        margin-bottom: 20px;
+    }
+</style>
+
+

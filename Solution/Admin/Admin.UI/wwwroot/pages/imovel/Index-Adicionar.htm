@@ -1,0 +1,533 @@
+﻿<template>
+
+
+
+    <div>
+
+        <el-row v-if="view == 'sending' ">
+            <el-col :md="24" style="max-width:360px">
+                <c-loading></c-loading>
+            </el-col>
+        </el-row>
+
+
+
+        <div v-if="view=='imagens'">
+            <div style="width:100%">
+                       
+                    <!--<el-upload
+                            v-model:file-list="imagens"
+                            action="https://run.mocky.io/v3/9d059bf9-4660-45f2-925d-ce80ad6c4d15"
+                            list-type="picture-card"
+                            :on-preview="handlePictureCardPreview"
+                            :on-remove="handleRemove"
+                    >-->
+                    <!--<el-upload
+                            v-model:file-list="imagens"
+                            list-type="picture-card"
+                            :on-preview="handlePictureCardPreview"
+                            :on-remove="handleRemove"
+                    >
+                    <el-icon><Plus /></el-icon>
+                    </el-upload>
+
+                    <el-dialog v-model="dialogVisible">
+                        <img w-full :src="dialogImageUrl" alt="Preview Image" />
+                    </el-dialog>-->
+
+
+
+                  <!--<el-upload
+                    v-model:file-list="imagens"
+                    list-type="picture-card"
+                    :on-preview="handlePictureCardPreview"
+                    :on-remove="handleRemove"
+                    class="upload-demo"
+                    drag
+                    multiple
+                  >-->
+                  <el-upload
+                    accept="image/png,image/jpeg"
+                    :auto-upload="false"
+                    ref="uploadImagesComponent"
+                    v-model:file-list="imagens"
+                    list-type="picture-card"
+                    :on-preview="HandlePreviewImagem"
+                    :on-remove="HandleRemoverImagem"
+                    :on-change="HandleChangeImagem"
+                    class="upload-demo"
+                    drag
+                    multiple
+                    style="width:100%;display:block"
+                  >
+                    <el-icon class="el-icon--upload"><upload-filled /></el-icon>
+                    <div class="el-upload__text">
+                      Arraste as imagens aqui ou <em>clique para buscar</em>
+                    </div>
+                    <template #tip>
+                      <div class="el-upload__tip">
+                        <!--jpg/png files with a size less than 500kb-->
+                      </div>
+                    </template>
+                  </el-upload>
+
+                <div style="margin-top:0px">
+                    <q-btn label="limpar" outline color="orange" @click="imagens = []" icon="fa fa-trash"></q-btn>
+                    <q-btn label="SALVAR" color="primary" @click="Enviar()" :loading="onrequest" style="margin-left:20px" icon="fa fa-save"></q-btn>
+                </div>
+            </div>
+
+            <div>
+                  <el-dialog v-model="previewImagemModal" :title="previewImagem?.name" width="100%">
+                      <div>
+                            <img :src="previewImagem?.url" />
+                      </div>
+                  </el-dialog>
+            </div>
+
+
+            <div>
+                    <input type="file" id="fileInput" />
+            </div>
+        </div>
+
+
+
+
+        <div v-else>
+
+                <div v-if="view == 'form' ">
+                    <div>
+                        <el-col :md="24">
+
+                            <el-row :gutter="20">
+
+                                <el-col :xs="24" :sm="12" :md="8" :lg="6" class="s-input-optional">
+                                    <div><p>CEP</p><span></span></div>
+                                    <el-input v-model="cep.numero" placeholder="" ref="postalCode" v-maska data-maska="#####-###" @keyup="()=>{  if(cep.numero.length>=9){BuscarEndereco();} }">
+                                        <template #append>
+                                            <c-loading size="20px" v-if="carregandoCEP"></c-loading>
+                                            <i class="fa fa-search" v-else-if="(cep.numero.length < 9)" style="color:var(--s-accent-color)" @click="$tools.Alert('Preencha todo o CEP para poder realizar a busca.')"></i>
+                                            <i class="fa fa-search" v-else style="color:var(--s-accent-color);cursor:pointer" @click="BuscarEndereco"></i>
+                                        </template>
+                                    </el-input>
+                                </el-col>
+
+                                <el-col :xs="24" :sm="12" :md="8" :lg="6" class="s-input">
+                                    <div><p>ESTADO</p><span></span></div>
+                                    <div style="height:40px" v-if="carregandoEstados">
+                                        <c-loading size="30px" style="padding-left:5px"></c-loading>
+                                    </div>
+                                    <el-select v-else filterable v-model="imovel.estado" class="m-4" placeholder="Selecionar" size="large" style="width:100%" @change="(item)=>{ObterCidades(item);enableFilterButton = true;}">
+                                        <el-option v-for="item in opcoes.estados"
+                                                   :key="item.id"
+                                                   :label="item.label"
+                                                   :value="item.value"></el-option>
+                                    </el-select>
+                                </el-col>
+                                <el-col :xs="24" :sm="12" :md="8" :lg="6" class="s-input">
+                                    <div><p>CIDADE</p><span></span></div>
+                                    <div style="height:40px" v-if="carregandoCidades">
+                                        <c-loading size="30px" style="padding-left:5px"></c-loading>
+                                    </div>
+                                    <el-select v-else v-model="imovel.cidade" filterable class="m-4" placeholder="Selecionar" size="large" style="width:100%" @click="()=>{ if($validator.not(imovel.estado)){ $tools.Alert('Selecione um <b>Estado</b> antes');} }" @change="(item)=>{ObterBairros(item);enableFilterButton = true;}">
+                                        <el-option v-for="item in opcoes.cidades"
+                                                   :key="item.id"
+                                                   :label="item.label"
+                                                   :value="item.value"></el-option>
+                                    </el-select>
+                                </el-col>
+                                <el-col :xs="24" :sm="12" :md="8" :lg="6" class="s-input">
+                                    <div><p>BAIRRO</p><span></span></div>
+                                    <div style="height:40px" v-if="carregandoBairros">
+                                        <c-loading size="30px" style="padding-left:5px"></c-loading>
+                                    </div>
+                                    <el-select v-else v-model="imovel.bairro" filterable :clearable="true" class="m-4" placeholder="Selecionar" size="large" style="width:100%;" @click="()=>{ if($validator.not(imovel.estado)){ $tools.Alert('Selecione <b>Estado</b> e <b>Cidade</b> antes');} }" @change="(item)=>{DefinirBairro(item);enableFilterButton = true;}">
+                                        <el-option v-for="item in opcoes.bairros"
+                                                   :key="item.id"
+                                                   :label="item.label"
+                                                   :value="item.value"></el-option>
+                                    </el-select>
+                                </el-col>
+
+
+                                <el-col :xs="24" :sm="12" :md="8" :lg="6" class="s-input">
+                                    <div>LOGRADOURO <span>&nbsp;rua, avenida, praça, etc</span></div>
+                                    <el-input @keyup.enter="Enviar()" v-model="imovel.logradouro" placeholder="" maxlength="80" input-style="text-transform:uppercase;"></el-input>
+                                </el-col>
+                                <el-col :xs="24" :sm="12" :md="8" :lg="6" class="s-input">
+                                    <div>NÚMERO <span>&nbsp;&nbsp;informe <b>SN</b> se não houver</span></div>
+                                    <el-input @keyup.enter="Enviar()" v-model="imovel.numero" placeholder="" maxlength="80" input-style="text-transform:uppercase;" ref="addressnumber"></el-input>
+                                </el-col>
+
+                                <el-col :xs="24" :sm="12" :md="8" :lg="6" class="s-input-optional">
+                                    <div>COMPLEMENTO <span></span></div>
+                                    <el-input @keyup.enter="Enviar()" v-model="imovel.complemento" placeholder="" maxlength="80" input-style="text-transform:uppercase;"></el-input>
+                                </el-col>
+
+                                <el-col :xs="24" :sm="12" :md="8" :lg="6" class="s-input-optional">
+                                    <div>OBSERVAÇÕES <span></span></div>
+                                    <el-input @keyup.enter="Enviar()" v-model="imovel.obs" placeholder="" maxlength="200" input-style="text-transform:lowercase;"></el-input>
+                                </el-col>
+
+                            </el-row>
+
+                            <el-row :gutter="20" style="margin-top:10px">
+                                <el-col :md="12" class="s-input-optional">
+                                    <q-btn label="Adicionar" color="primary" @click="Enviar()" :loading="onrequest"></q-btn><br /><br />
+                                    <q-btn label="VOLTAR" outline color="primary" @click="$emit('voltar')"></q-btn>
+                                </el-col>
+                                <el-col :md="12" class="s-input">
+                                    <div><i class="fa fa-square"></i> campos necessários</div>
+                                </el-col>
+                            </el-row>
+
+
+
+                        </el-col>
+
+                    </div>
+
+
+                </div>
+
+
+
+
+
+
+                <div v-if="view=='success'">
+                    <div style="max-width:360px;text-align:center">
+                        <c-info type="success" title="Sucesso" subtitle="Cadastro efetuado"></c-info>
+                        <q-btn label="Cadastrar outro" color="primary" style="width:240px;" @click="NovoCadastro"></q-btn>
+                    </div>
+                </div>
+
+                <div v-if="view=='fail'">
+                    <div class="title" style="color:var(--s-color-red)"><b><i class="fa fa-circle-xmark"></i> Falhou</b></div>
+                    <br /><br />
+                    <br /><span v-html="messageFail"></span>
+                    <br /><br />
+                    <q-btn color="white" text-color="indigo-10" label="VOLTAR" @click="ShowView(viewLast)" style="width:160px;" id="btn_voltar_5"></q-btn>
+                </div>
+
+
+
+
+
+            </div>
+
+    </div>
+
+
+
+
+</template>
+
+<script>
+    module.exports = {
+        components: {
+
+        },
+
+        data: function () {
+            return {
+                onrequest: false,
+                view: "imagens",
+                imagens: [],
+                imagensFiles: [],
+                previewImagemModal:false,
+                previewImagem:null,
+                carregandoCEP: false,
+                carregandoEstados: false,
+                carregandoCidades: false,
+                carregandoBairros: false,
+                cep: {
+                    numero: "",
+                    estado: "",
+                    cidade: "",
+                    logradouro: ""
+                },
+                opcoes: {
+                    estados: [],
+                    cidades: [],
+                    bairros: [],
+                    sexos: [],
+                },
+                imovel: this.$models.imovel()
+            }
+        }, computed: {
+
+        },
+
+        props: {},
+        watch: {
+        },
+        created: function () {
+            this.$sdata.ObterEstados().then(res => { this.opcoes.estados = res; });
+        },
+        mounted() {
+           // window.setTimeout(() => this.$refs.nome.focus(), 500);
+        },
+        methods: {
+
+            HandleChangeImagem(uploadFile, uploadFiles){
+              c("change")
+              //console.log(uploadFile, uploadFiles)
+              this.imagensFiles =  Object.assign({}, uploadFile).raw;
+              console.log(this.imagensFiles)
+            },
+
+            HandleRemoverImagem(uploadFile, uploadFiles){
+              c("remove")
+              //console.log(uploadFile, uploadFiles)
+              this.imagensFiles =  Object.assign({}, uploadFile).raw;
+              console.log(this.imagensFiles)
+              //console.log(uploadFile)
+            },
+
+            HandlePreviewImagem(file){
+                console.log(file)
+                this.previewImagem=file;
+                this.previewImagemModal=true;
+            },
+
+
+           async EnviarParte1() {
+
+                if (this.$validator.not(this.imovel.estado))
+                    msg += "<b>ESTADO</b> não selecionado<br>";
+
+                if (this.$validator.not(this.imovel.cidade))
+                    msg += "<b>CIDADE</b> não selecionada<br>";
+
+                if (this.$validator.not(this.imovel.bairro))
+                    msg += "<b>BAIRRO</b> não selecionado<br>";
+
+                if (this.$validator.not(this.imovel.logradouro))
+                    msg += "<b>LOGRADOURO</b> não informado<br>";
+
+                if (this.$validator.not(this.imovel.numero))
+                    msg += "<b>NÚMERO</b> não informado (informe <b>SN</b> se não houver)<br>";
+
+
+                if (msg.length > 0)
+                    this.$tools.Alert(msg);
+                else{
+                    if (this.$validator.not(this.imovel.cep))
+                        this.cep.numero = this.imovel.cep = await this.BuscarCep();
+                    this.view = "imagens";
+                }
+            },
+
+            ArrayBufferToBase64( buffer, callback ) {
+                var blob = new Blob([buffer],{type:'application/octet-binary'});
+                var reader = new FileReader();
+                reader.onload = function(evt){
+                    var dataurl = evt.target.result;
+                    callback(dataurl.substr(dataurl.indexOf(',')+1));
+                };
+                reader.readAsDataURL(blob);
+            },
+
+            async Blob2base64(blob, mimeType){
+
+                var reader = new FileReader();    
+                 reader.readAsDataURL(blob);
+                 reader.onloadend = function () {
+                       var base64data = reader.result;
+                       c(base64data)
+                       return base64data;
+                 };
+            },
+
+
+
+           async Enviar() {
+
+            var fileInput = document.getElementById("fileInput");
+            var fileINPUT = fileInput.files[0];
+
+             console.log(fileINPUT);
+             var file = Object.assign({}, this.imagensFiles[0]).raw;
+             c("files");
+             console.log(file);
+
+
+                const formData = new FormData();
+                formData.append('object', this.imovel);
+                formData.append('file', this.imagensFiles[0], 'logo.jpg');
+                //formData.append('file', fileINPUT , 'logo.jpg');
+
+                 //ar url = this.$api.BuildURL("imovel/adicionar");
+                 //ar result = axios.post(url,formData,{headers:{"Content-Type": "multipart/form-data"} }).then((request) => {
+                 //      c(request.data);
+                 //);  
+
+                //var request = await this.$api.Post("imovel/adicionar", this.imovel);
+                
+                
+                
+                //axios.post(url, formData)
+                //    .then(function (response) {
+                //        document.getElementById("response").innerText = "Image uploaded successfully.";
+                //    })
+                //    .catch(function (error) {
+                //        document.getElementById("response").innerText = "Error: " + error.response.statusText;
+                //    });
+
+
+                    /*
+                    var reader = new FileReader();    
+                    reader.readAsDataURL(blob);
+                    reader.onloadend =()=>{
+                        var base64data = reader.result;
+                        var img = {base64:base64data,blob:this.imagens[0].url};
+                        c2("base64data",base64data);
+                        this.imovel.imagens.push(img);
+                        this.imovel.imagem = this.imagens[0];
+                        //var request = this.$api.Post("imovel/adicionar", this.imovel);
+
+
+                        var url = this.$api.BuildURL("imovel/adicionar");
+                        var result = axios.post(url, this.imovel,{headers:{"Content-Type": "multipart/form-data"} }).then((request) => {
+                                c(request.data);
+                        });  
+                    };
+                    */
+
+                    //this.Blob2base64(blob, mimeType).then(base64data => {
+                    //  c2("base64data",base64data);
+                    //});
+
+
+                    //var reader = new FileReader();
+                    //reader.readAsDataURL(this.imovel.imagens[0].url); 
+                    //reader.onloadend = function() {
+                    //  var base64data = reader.result;            
+                    //  c2("base64data",base64data);
+                    //}
+
+                    //var base64String = btoa(String.fromCharCode.apply(null, new Uint8Array(arrayBuffer)));
+
+                    
+               /*
+                    
+                    this.onrequest = true;
+                    var img = {bin:this.imagens[0].url.replace("blob:","")};
+                    this.imovel.imagens.push(img);
+
+                    var request = await this.$api.Post("imovel/adicionar", this.imovel);
+
+                    this.onrequest = false;
+                    if (this.$validator.is(request?.status?.success)){
+                        this.$tools.AlertSuccess("Cadastro efetuado");
+                        this.imovel = this.$models.imovel();
+                    }
+                    else
+                        this.$tools.AlertSuccess("Não foi possível realizar o cadastro.");
+                    */
+
+            },
+
+
+
+            async BuscarEndereco() {
+
+                if (this.cep.numero !== this.imovel.cep) {
+
+                    this.carregandoCEP      = true;
+                    this.carregandoEstados  = true;
+                    this.carregandoCidades  = true;
+                    this.carregandoBairros  = true;
+
+                    this.cep.cidade         = this.imovel.cidade     = "";
+                    this.cep.logradouro     = this.imovel.logradouro = "";
+                    this.cep.bairro         = this.imovel.bairro     = "";
+                    this.cep.estado         = this.imovel.estado     = "";
+
+                    this.imovel.cep  = this.cep.numero;
+                    let res                = await this.$sdata.BuscarEndereco(this.cep.numero);
+
+                    if (this.$validator.is(res?.city)) {
+                        this.cep.cidade         = this.imovel.cidade     = res.city;
+                        this.cep.logradouro     = this.imovel.logradouro = res.address;
+                        this.cep.bairro         = this.imovel.bairro     = res.neighborhood;
+                        this.cep.estado         = this.imovel.estado     = res.state;
+
+                        this.$refs.addressnumber.focus();
+
+                    }
+
+                    this.carregandoCEP      = false;
+                    this.carregandoEstados  = false;
+                    this.carregandoCidades  = false;
+                    this.carregandoBairros  = false;
+                }
+            },
+
+            async BuscarCep() {
+                var endereco = this.imovel.estado + "/" + this.imovel.cidade.replaceAll(" ", "%20") + "/" + this.imovel.logradouro.replaceAll(" ", "%20")
+                let res = await this.$sdata.BuscarCep(endereco);
+                return res.cep;
+            },
+
+            
+
+            ObterCidades(estado) {
+
+                this.imovel.cidade   =   this.imovel.bairro   = "";
+                this.imovel.idCidade =   this.imovel.idBairro = 0;
+
+                this.carregandoCidades = true;
+                this.opcoes.bairros = [];
+                this.opcoes.cidades = [];
+                var cidades = [];
+
+                if (this.$validator.is(estado)) {
+                    this.imovel.idEstado = this.opcoes.estados.filter((e) => e.value == estado)[0].id;
+                    this.$sdata.ObterCidades(this.imovel.idEstado).then(res => { this.opcoes.cidades = res; this.carregandoCidades = false; });
+                }
+
+            },
+
+
+            ObterBairros(cidade) {
+
+                this.imovel.bairro   = "";
+                this.imovel.idBairro = 0;
+                
+                this.carregandoBairros = true;
+                this.opcoes.bairros = [];
+                var bairros = [];
+
+                if (this.$validator.is(cidade)) {
+                    this.imovel.idCidade = this.opcoes.cidades.filter((c) => c.value == cidade)[0].id;
+                    this.$sdata.ObterBairros(this.imovel.idCidade).then(res => { this.opcoes.bairros = res; this.carregandoBairros = false; });
+                } 
+
+            },
+
+            DefinirBairro(bairro) {
+                this.imovel.idBairro = this.opcoes.bairros.filter((c) => c.value == bairro)[0].id;
+                //this.imovel.bairro = bairro.label;
+                //c2("this.imovel", this.imovel)
+            },
+
+
+
+
+
+
+
+        }
+
+    }
+
+</script>
+
+
+<style scoped>
+</style>
+
+

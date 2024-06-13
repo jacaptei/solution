@@ -1,0 +1,257 @@
+<template>
+
+    <div class="row">
+        <div class="col-12">
+
+
+
+            <q-tabs v-model="tab"
+                    dense
+                    no-caps
+                    align="left"
+                    narrow-indicator
+                    class="text-grey"
+                    active-color="primary"
+                    indicator-color="primary">
+                <q-tab name="aguardando"  icon="fa fa-list"   label="AGUARDANDO"></q-tab>
+                <q-tab name="verificando" icon="fa fa-gear"   label="EM VERIFICAÇÃO"></q-tab>
+                <q-tab name="finalizadas" icon="fa fa-check"  label="FINALIZADAS"></q-tab>
+            </q-tabs>
+
+            <el-row :gutter="20" v-if="view == 'request' ">
+                <el-col :md="24">
+                    <c-loading></c-loading>
+                </el-col>
+            </el-row>
+            <el-row :gutter="20" v-else-if="view == 'fail' ">
+                <el-col :md="24" style="width:100%;text-align:center;padding:40px;padding-left:0px">
+                    <div class="title" style="color:var(--s-color-red)"><b><i class="fa fa-circle-xmark"></i> Falhou</b></div>
+                    <br />Não foi possível obter solicitações,<br />favor tentar novamente.
+                    <br /><br />
+                    <q-btn color="white" text-color="orange-10" label="VOLTAR" @click="ShowView('form')" style="width:200px;"></q-btn>
+                </el-col>
+            </el-row>
+            
+            <q-tab-panels v-model="tab" animated v-else>
+
+
+
+
+
+
+
+                <q-tab-panel name="aguardando">
+                    <div>
+                        <el-row :gutter="20">
+
+                            <el-col :md="24" style="width:100%;text-align:center;padding:40px;padding-left:0px" v-if="resultsAguardando?.length == 0">
+                                <i class="fa fa-circle-exclamation" style="font-size:80px;color:var(--s-accent-color)"></i>  <br />
+                                <div style="font-size:20px;font-weight:700;color:var(--s-accent-color);margin-top:20px">Sem solicitações aguardando.</div>
+                            </el-col>
+                            <el-col :md="24" v-for="(item,index) in resultsAguardando" v-else style="padding:10px">
+                                <card :item="item"></card>
+                            </el-col>
+                    </div>
+                </q-tab-panel>
+
+
+
+                <q-tab-panel name="verificando">
+                    <div>
+
+                        <el-row :gutter="20">
+
+                            <el-col :md="24" style="width:100%;text-align:center;padding:40px;padding-left:0px" v-if="resultsVerificando?.length == 0">
+                                <i class="fa fa-circle-exclamation" style="font-size:80px;color:var(--s-accent-color)"></i>  <br />
+                                <div style="font-size:20px;font-weight:700;color:var(--s-accent-color);margin-top:20px">Sem solicitações em verificação.</div>
+                            </el-col>
+                            <el-col :md="24" v-for="(item,index) in resultsVerificando" v-else style="padding:10px">
+                                <card :item="item"></card>
+                            </el-col>
+
+
+                    </div>
+                </q-tab-panel>
+
+
+
+
+
+                <q-tab-panel name="finalizadas">
+                    finalizados
+                </q-tab-panel>
+
+            </q-tab-panels>
+        </div>
+    </div>
+</template>
+
+
+
+<script>
+    module.exports = {
+        components: {
+            card: LoadComponent("./pages/solicitacao/Card.htm")
+        },
+
+        data: function () {
+            return {
+                tab: "aguardando",
+                view: "request",
+                messageSuccess: "",
+                messageAlert: "",
+                content: "",
+                /*
+                carregandoCEP: false,
+                carregandoEstados: false,
+                carregandoCidades: false,
+                carregandoBairros: false,
+                cep: {
+                    numero: "",
+                    estado: "",
+                    cidade: "",
+                    logradouro: ""
+                },
+                opcoes: {
+                    estados: this.$root.localidade.estados,
+                    cidades: [],
+                    bairros: [],
+                    sexos: [],
+                },
+                */
+                solicitacao: this.$models.solicitacao(),
+                results: [],
+                resultsAguardando: [],
+                resultsVerificando: [],
+                resultsFinalizadas: [],
+                cards:[]
+            }
+        }, computed: {
+
+        },
+
+        props: {},
+        watch: {
+        },
+        created: function () {
+        },
+        mounted() {
+            this.Enviar();
+        },
+        methods: {
+
+
+
+            ShowView(v) {
+                this.view = v;
+            },
+
+            ObterDataVisita(item) {
+                if (this.$validator.is(item.dataVisita)) {
+                    var data = new Date(item.dataVisita);
+                    return (data.getFullYear() > 1900) ? data.format("dd/mm/yyyy, HH:MM'h'") : ""; 
+                 }
+                return "";
+            },
+
+            async Enviar() {
+
+                this.view = "request";
+
+                var request = await this.$api.Get("solicitacao/obter/todos");
+
+                if (request?.status?.success) {
+                    this.view = "success";
+                    this.results = request.result;
+
+                    //this.results.forEach(i =>i.acao=0);
+
+                    this.resultsAguardando  = this.results.filter(r => r.idStatus == 3);
+                    this.resultsVerificando = this.results.filter(r => r.idStatus == 5);
+                    this.resultsFinalizadas = this.results.filter(r => r.idStatus == 9);
+                    //c(this.results[0]);
+
+                }//else
+                 //  this.view = "fail";
+
+            },
+    
+
+            async Captar(item) {
+                item.acao = 1;
+                var request = await this.$api.Post("solicitacao/captar", item);
+                if (request?.status?.success) {
+                    item.acao = 0;
+                    //this.$tools.AlertSuccess("Solicitação ID# " + item.id + " captada em verificação!");
+                    this.$tools.MessageSuccess("Solicitação ID# " + item.id + " captada em verificação!");
+                    this.resultsVerificando.unshift(request.result);
+                    item.ativo = false;
+                    this.tab = "verificando";
+                    this.$tools.Top();
+                    window.setTimeout(() => this.$refs["avaliacao"+item.id].focus(), 500);
+                    //c(this.results);
+                }//else
+                 //  this.view = "fail";
+            },
+
+            async Cancelar(item) {
+                item.acao = 1;
+                var request = await this.$api.Post("solicitacao/cancelar", item);
+                if (request?.status?.success) {
+                    item.acao = request.result.acao = 0;
+                    this.$tools.AlertSuccess("Solicitação ID# " + item.id +" voltou para o status de aguardada.");
+                    this.resultsAguardando.unshift(request.result);
+                    //this.resultsVerificando = this.results.filter(r => r.id != item.id && r.idStatus == 5);
+                    //this.resultsFinalizadas = this.results.filter(r => r.id != item.id && r.idStatus == 9);
+                    item.ativo = false;
+                    //c(this.results);
+                }//else
+                 //  this.view = "fail";
+            },
+
+            async Alterar(item) {
+                item.acao = 1;
+                var request = await this.$api.Post("solicitacao/alterar", item);
+                if (request?.status?.success) {
+                    item = request.result;
+                    item.acao = 0;
+                    this.$tools.AlertSuccess("Solicitação ID# " + item.id +" salva!");
+                    //c(this.results);
+                }//else
+                 //  this.view = "fail";
+            },
+
+            
+            async Finalizar(item) {
+                item.acao = 1;
+                var request = await this.$api.Post("solicitacao/finalizar", item);
+                if (request?.status?.success) {
+                    item.acao = 0;
+                    this.$tools.AlertSuccess("Solicitação ID# "+item.id+" finalizada!");
+                    this.resultsVerificando = this.results.filter(r => r.id != item.id && r.idStatus == 5);
+                    this.resultsFinalizadas.unshift(request.result);
+                    item.ativo = false;
+                    //c(this.results);
+                }//else
+                 //  this.view = "fail";
+            },
+
+
+
+
+
+
+        }
+
+    }
+
+</script>
+
+
+<style scoped>
+    .s-input {
+        margin-bottom: 20px;
+    }
+</style>
+
+

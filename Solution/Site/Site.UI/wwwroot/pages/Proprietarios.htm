@@ -1,0 +1,307 @@
+﻿<template>
+
+    <div>
+
+            <div>
+                <div class="banner" :style="'background-image:url('+$root.GetBanner(3)+')'">
+                    <div class="text">
+                        Venda seu imóvel com
+                        <br />facilidade e benefícios
+                        <br />exclusivos na JáCaptei.
+                        <br />
+                        <div style="font-size:14px;line-height:22px;margin-top:20px">
+                            Na JáCaptei, entendemos que você,
+                            proprietário, é o protagonista na hora de
+                            vender seu imóvel. Por isso, oferecemos
+                            um atendimento personalizado e uma
+                            ampla gama de benefícios para tornar o
+                            processo mais fácil e vantajoso.
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <article class="content-boxes">
+                <br />
+
+
+
+                <c-box 
+                       color="grey" 
+                       image="resources/images/pages/proprietarios/gestao.png" 
+                       align="right" 
+                       title="Gestão<br />Completa" 
+                       content="Cuidamos de todo o processo de venda do seu imóvel,<br />desde a captação de fotos profissionais até a divulgação<br />para nossos parceiros cadastrados."
+                       btlabel="Vender meu imóvel agora"
+                       event="contact"
+                       @contact="ToForm"
+                ></c-box>
+
+                
+                <c-box 
+                       color="orange" 
+                       image="resources/images/pages/proprietarios/seguro.png" 
+                       align="left" 
+                       title="Seguro <br />Residencial" 
+                       content="Oferecemos uma apólice de seguro residencial gratuita<br />para você, que inclui proteção contra roubo, incêndio e<br />serviços essenciais."
+                       btlabel="Vender meu imóvel agora"
+                       event="contact"
+                       @contact="ToForm"
+                ></c-box>
+
+
+
+
+
+                <!--<c-box 
+                       color="navy" 
+                       image="resources/images/pages/proprietarios/auxilio.png" 
+                       align="right" 
+                       title="Auxílio<br />Mudança" 
+                       content="Conte com nosso auxílio financeiro para cobrir os custos<br />da mudança e até 2 diárias em hotel"
+                       btlabel="Vender meu imóvel agora"
+                       event="contact"
+                       @contact="ToForm"
+                ></c-box>-->
+
+
+                <c-box 
+                       color="grey" 
+                       image="resources/images/pages/proprietarios/concierge.png" 
+                       align="right" 
+                       title="Concierge <br />Exclusivo" 
+                       content="Um concierge estará disponível para ajudá-lo no<br />dia-a-dia e acompanhar as visitas ao imóvel."
+                       btlabel="Vender meu imóvel agora"
+                       event="contact"
+                       @contact="ToForm"
+                ></c-box>
+
+                
+                <c-box 
+                       color="orange" 
+                       image="resources/images/pages/proprietarios/assessoria.png" 
+                       align="left" 
+                       title="Assessoria<br />Jurídica" 
+                       content="Nosso time jurídico cuida de toda a documentação e<br />contrato, garantindo total segurança na negociação."
+                       btlabel="Vender meu imóvel agora"
+                       event="contact"
+                       @contact="ToForm"
+                ></c-box>
+                
+                <c-box 
+                       color="grey" 
+                       image="resources/images/pages/proprietarios/avaliacao.png" 
+                       align="right" 
+                       title="Avaliação<br />Mercadológica" 
+                       content="Receba uma avaliação real do seu imóvel feita por<br />profissionais credenciados."
+                       btlabel="Vender meu imóvel agora"
+                       event="contact"
+                       @contact="ToForm"
+                ></c-box>
+
+                <c-box 
+                       color="navy" 
+                       image="resources/images/pages/proprietarios/visita.png" 
+                       align="left" 
+                       title="Gestão Completa <br />de Visita" 
+                       content="Nós cuidamos da gestão das visitas, simplificando o<br />processo para você."
+                       btlabel="Vender meu imóvel agora"
+                       event="contact"
+                       @contact="ToForm"
+                ></c-box>
+
+
+                <c-box 
+                       color="grey" 
+                       image="resources/images/pages/proprietarios/relatorio.png" 
+                       align="right" 
+                       title="Relatório de<br />Desempenho" 
+                       content="Fornecemos relatórios periódicos sobre o desempenho<br />da venda do seu imóvel."
+                       btlabel="Vender meu imóvel agora"
+                       event="contact"
+                       @contact="ToForm"
+                ></c-box>
+
+                
+
+
+
+
+
+
+
+           </article>
+
+
+            <!--<div  class="q-pa-md row items-start q-gutter-md" style="margin-top:40px;text-align:center;width:100%;display:block">
+                    <c-register tipo="PROPRIETARIO" idtipo="2"></c-register>
+            </div>-->
+
+
+
+          <!--<article class="content-boxes">
+        
+
+                <div  class="q-pa-md row items-start q-gutter-md" style="margin-top:40px;text-align:center;width:100%;display:block">
+                    <p class="title">
+                        O que nossos clientes dizem?
+                    </p>
+                </div>
+
+
+
+
+                <div  class="q-pa-md row items-start q-gutter-md" style="text-align:center;width:100%">
+
+
+                     <q-card class="box-client">
+                          <img src="https://media.bizj.us/view/img/12548767/joe-richlen-3x4-5-300ppi*900xx900-900-0-107.jpg" />
+
+                          <q-card-section>
+                              <p>
+                                {{ lorem }}
+                              </p>
+                          </q-card-section>
+                        </q-card>
+
+                     <q-card class="box-client">
+                          <img src="https://media.bizj.us/view/img/12464013/grier-ann-3x4*900xx900-900-0-0.jpg" />
+
+                          <q-card-section>
+                              <p>
+                                {{ lorem }}
+                              </p>
+                          </q-card-section>
+                        </q-card>
+
+                     <q-card class="box-client">
+                          <img src="https://media.bizj.us/view/img/12348951/shaw-cheryl-print-3x4-hi-res*1500xx1540-1540-0-96.jpg" />
+
+                          <q-card-section>
+                              <p>
+                                {{ lorem }}
+                              </p>
+                          </q-card-section>
+                        </q-card>
+
+
+                     <q-card class="box-client">
+                          <img src="https://i.pinimg.com/736x/24/16/a5/2416a57ec634dfebcfcc3cf6fad1bc7d.jpg" />
+
+                          <q-card-section>
+                              <p>
+                                {{ lorem }}
+                              </p>
+                          </q-card-section>
+                        </q-card>
+
+
+                     <q-card class="box-client">
+                          <img src="https://wcyb.com/resources/media2/3x4/full/236p/center/80/333bb790-d79d-40a2-484b-07a4cc06414d-largeScale_DAVEDIERKS.png" />
+
+                          <q-card-section>
+                              <p>
+                                {{ lorem }}
+                              </p>
+                          </q-card-section>
+                        </q-card>
+
+
+                </div>
+
+
+
+           </article>-->        
+
+
+
+
+
+
+
+
+
+    </div>
+
+
+</template>
+
+
+<script>
+    module.exports = {
+
+        name: 'HOME',
+
+        components: {
+
+        },
+
+        data: function () {
+            return {
+                api                 : this.$api.New(),
+                validator           : this.$validator.New(),
+                banner              :"",
+                lorem: 'Lorem ipsum dolor sit amet, consectetur elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Aliquam vulputate nulla idvelit maximus, eget imperdiet dui.'
+            }
+        }, computed: {
+
+        },
+
+        props: {
+
+        },
+        watch: {
+            //"pct":function(){ this.updateLabels(); }
+        },
+        created: function () {
+            this.banner = this.$root.headBannerImagesShuffled[1];
+        },
+        mounted() {
+           // window.setTimeout(() => {
+              //this.$root.RouteTo("/admin/user/home");
+            //}, 400);
+        },
+        methods: {
+
+
+		    VenderAgora(){
+                var link = "";
+                if(this.$root.usuario.id > 0)
+			        link = "https://api.whatsapp.com/send?phone=553140039998&text=Olá, meu nome é " + this.$tools.Capitalize(this.$root.usuario.nome) + " (" + this.$root.usuario.email + ") e gostaria de vender meu imóvel." ;
+			    else
+			        link = "https://api.whatsapp.com/send?phone=553140039998&text=Olá, estava navegando pelo site e gostaria de vender meu imóvel." ;
+                    
+                //this.$tools.Alert(link);
+			    window.open(link, "_blank");
+		    },
+
+            ToForm(){
+                this.VenderAgora();
+               // this.$tools.ScrollTo("form-area")
+            },
+
+            Send(){
+                c("send");
+            }
+
+        }
+
+    }
+
+
+
+
+
+
+
+
+</script>
+
+
+<style scoped>
+
+
+
+</style>
+
+

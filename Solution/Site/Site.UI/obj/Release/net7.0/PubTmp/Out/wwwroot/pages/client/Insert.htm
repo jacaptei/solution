@@ -1,0 +1,880 @@
+﻿<template>
+
+    <div class="stepper-header">
+
+                <q-stepper
+                      v-model="step"
+                      ref="stepper"
+                      color="primary"
+                      done-color="green-6"
+                      animated
+                      style="max-width:920px"
+                      @transition="()=>{if(step==1){$refs.document.focus();}}"
+                    >
+                      <q-step
+                        :name="1"
+                        title="Dados de identificação"
+                        caption="campos necessários em laranja"
+                        icon="settings"
+                        color="orange"
+                        class="stepper"
+                        :done="step > 1"
+                      >
+                        <div>
+                            <el-space wrap   v-loading="api.status.requesting">
+                                <el-row :gutter="30" :fill="true">
+
+                                    <el-col :md="12">
+                                        <el-row :gutter="20" :fill="true">
+
+                                             <el-col :md="24" class="s-input-required" >
+								                            <div>TIPO DE CLIENTE <span></span></div>
+								                            <q-radio keep-color color="orange" v-model="client.legalPerson"     val="PF"	size="xs"	label="PF pessoa física"   @click="HandleLegalPerson"   style="margin-right:20px;font-size: 1.05em;" />
+							                                <q-radio keep-color color="orange" v-model="client.legalPerson"     val="PJ"	size="xs"	label="PJ pessoa jurídica" @click="HandleLegalPerson"   style="font-size: 1.05em;" />
+                                           </el-col>
+
+                                            <el-col :md="24" class="s-input-required">
+								                            <div>DOCUMENTO <span style="color:#0080ff">campo chave para evitar duplicidades</span></div>
+								                            <q-radio keep-color color="orange" v-model="client.documentType"     val="CPF"	    size="xs"	label="CPF"   style="margin-right:20px" @click="()=>{docTypeChange=true;client.document='';$refs.document.focus();}" />
+								                            <q-radio keep-color color="orange" v-model="client.documentType"     val="CNPJ"	    size="xs"	label="CNPJ"  style="margin-right:20px" @click="()=>{docTypeChange=true;client.document='';$refs.document.focus();}" />
+								                            <q-radio keep-color color="orange" v-model="client.documentType"     val="OTHER"	size="xs"	label="OUTRO" @click="()=>{docTypeChange=true;client.document='';$refs.document.focus();}" />
+                                                            <s-tip :show="validator.GetNote('document').show" :note="validator.GetNote('document')" />
+                                                            <el-input @keyup.enter="Next()" v-model="client.document"  :placeholder="(client.documentType=='CPF')? 'CPF NÚMERO': (client.documentType=='CNPJ')? 'CNPJ NÚMERO' : 'OUTRO NÚMERO'" ref="document" maxlength="22" v-maska :data-maska="(client.documentType=='CPF')? '###.###.###-##': (client.documentType=='CNPJ')? '##.###.###/####-##' : '###############'" @blur="CheckDoc"></el-input>
+                                            </el-col>
+
+                                           <el-col :md="24" class="s-input-required" style="margin-top:2px">
+								                            <div><i :class="(client.legalPerson=='PF')? 'fa fa-user':'fa fa-building'" ></i> NOME <span></span><s-tip :show="validator.GetNote('name').show" :note="validator.GetNote('name')" /></div>
+								                            <el-input @keyup.enter="Next()" v-model="client.name" placeholder="" ref="name" maxlength="35"></el-input>
+                                                            
+                                            </el-col>
+                                            <el-col :md="24" class="s-input" style="margin-top:2px">
+								                            <div><i :class="(client.legalPerson=='PF')? 'fa fa-user':'fa fa-building'" ></i>  {{(client.legalPerson=='PF')? 'NOME FORMAL':'RAZÃO SOCIAL'}}  <span></span></div>
+								                            <el-input @keyup.enter="Next()" v-model="client.nameSocial" placeholder="" ref="nameSocial" maxlength="35"></el-input>
+                                            </el-col>
+
+                                            <!--<el-col :md="24" class="s-input-required" style="padding-left:20px;margin:-10px" >
+								                            <div><i :class="(client.documentType=='CPF')? 'fa fa-id-card':'fa fa-file-lines'" ></i>  {{(client.documentType=='CPF')? 'CPF':'CNPJ'}}  <span>número</span></div>
+								                            <el-input v-model="client.document" placeholder="" ref="document" ></el-input>
+                                            </el-col>-->
+
+    
+                                      </el-row>
+                                </el-col>
+
+
+                                    <el-col :md="12" style="max-width:450px">
+                                        <el-row :gutter="20" :fill="true">
+
+                                            <el-col :md="24" class="s-input" style="margin-top:7px">
+								                            <div><i :class="(client.sex=='NA')? 'fa fa-ban' : (client.sex=='FEMININO')? 'fa fa-venus' : 'fa fa-mars'" /> SEXO <span></span></div>
+								                            <q-radio color="primary" v-model="client.sex"     val="FEMININO"	    size="xs"	label="FEMININO"   style="padding-left:10px"  />
+								                            <q-radio color="primary" v-model="client.sex"     val="MASCULINO"	    size="xs"	label="MASCULINO"  style="padding-left:10px"  />
+                                                            <el-tooltip content="Não Aplicável" placement="top">
+								                                <q-radio color="primary" v-model="client.sex"     val="NA"	        size="xs"	label="NA"  style="padding-left:10px"  />
+                                                            </el-tooltip>
+                                            </el-col>
+                                            <el-col :md="24" class="s-input" style="margin-top:13px" >
+								                    <div><i class="far fa-calendar"></i> NASCIMENTO <s-tip :show="validator.GetNote('birth').show" :note="validator.GetNote('birth')" /><span>não informar o ANO para ocultar a idade</span></div>
+					                                <div style="margin-top:4px">
+                                                        <div style="display:inline-block;width:90px ;padding-right:10px"><el-select v-model="client.birthDay"   filterable placeholder="DIA"  size="medium"  @change="()=>{ if(!IsValidBirthDate()){ $tools.MessageError('<b>DATA DE NASCIMENTO</b> inválida'); } }" ><el-option      v-for="item in $sdata.forms.days"      :key="item.value"      :label="item.label"      :value="item.value" ></el-option></el-select></div>
+					                                    <div style="display:inline-block;width:140px;padding-right:10px"><el-select v-model="client.birthMonth" filterable placeholder="MÊS"  size="medium"  @change="()=>{ if(!IsValidBirthDate()){ $tools.MessageError('<b>DATA DE NASCIMENTO</b> inválida'); } }" ><el-option      v-for="item in $sdata.forms.months"    :key="item.value"      :label="item.label"      :value="item.value" ></el-option></el-select></div>
+					                                    <div style="display:inline-block;width:80px;"                   ><el-select v-model="client.birthYear"  filterable placeholder="ANO"  size="medium"  @change="()=>{ if(!IsValidBirthDate()){ $tools.MessageError('<b>DATA DE NASCIMENTO</b> inválida'); } }"><el-option      v-for="item in $sdata.forms.years"     :key="item.value"      :label="item.label"      :value="item.value"  ></el-option></el-select></div>
+                                                    </div>
+                                                <br />
+                                            </el-col>
+                                            <el-col :md="24" class="s-input" style="margin-top:5px" >
+								                            <div><i :class="(client.isPartner)? 'fa fa-handshake-simple':'far fa-handshake'" style="font-size:16px" /> PARCEIRO COMERCIAL<span></span></div>
+                                                            <q-radio v-model="client.isPartner" :val="true"  label="SIM" size="xs"	color="s-green" label-color="pink-6"  keep-color  style="padding-left:10px;" />
+                                                            <q-radio v-model="client.isPartner" :val="false" label="NÃO" size="xs"	color="s-red"   label-color="teal-6"  keep-color  style="padding-left:10px;" />
+                                            </el-col>
+                                           <el-col :md="24" class="s-input" style="margin-top:10px">
+								                            <div><i class="fa fa-globe" ></i> CÓDIGO <span>interno / utilizado em outro sistema</span></div>
+								                            <el-input @keyup.enter="Next()" v-model="client.cod" placeholder="" ref="cod" maxlength="40" class="input-no-text-transform"></el-input>
+                                            </el-col>
+
+                                            <!--<el-col :md="24" style="margin-top:20px" >
+                                                <el-alert
+                                                    title="Nº do documento é um campo chave!"
+                                                    type="warning"
+                                                    description="através do CPF ou CNPJ será garantido que não haverá duplicidade do cliente cadastrado"
+                                                    show-icon
+                                                    :closable="false"
+                                                  ></el-alert>                                                
+                                            </el-col>-->
+
+                                        </el-row>
+                                    </el-col>
+
+
+
+
+                            </el-space>
+                        </div>
+                      </q-step>
+
+
+
+
+
+                      <q-step
+                        :name="2"
+                        title="Dados cadastrais"
+                        caption="opcionais"
+                        icon="fa fa-folder"
+                        class="stepper"
+                        :done="step > 2"
+                      >
+
+					                <q-tabs
+					                    v-model="viewOptionalData"
+					                    dense
+					                    no-caps
+					                    align="left"
+					                    narrow-indicator
+ 					                    class="text-grey"
+					                    active-color="primary"
+					                    indicator-color="primary"
+                                        @click="stepOptional=viewOptionalData.replace('section','')"
+					                >
+					                    <q-tab label="FORMAS DE CONTATO" 	    icon="fa fa-comments"           name="section1"    />
+					                    <q-tab label="ENDEREÇO"	                icon="fa fa-location-dot"       name="section2"    />
+					                    <q-tab label="CONTATOS"	                icon="fa fa-address-book"       name="section3"    />
+					                    <q-tab label="QUALIFICAÇÃO"             icon="fa fa-star"               name="section4"    />
+					                </q-tabs>
+					                <q-tab-panels v-model="viewOptionalData" animated>
+				
+                                        <q-tab-panel name="section1"> 
+                                            <el-space wrap >
+                                                <el-row :gutter="30">
+
+
+                                                           <el-col :md="8" style="margin-top:2px;max-width:280px">
+								                                       <el-row :gutter="30">
+                                                                               <el-col :md="24" class="s-input" style="margin-top:2px">
+								                                                                <div><i class="fa fa-mobile-screen" ></i> TELEFONE CELULAR <span></span></div>
+								                                                                <el-input @keyup.enter="NextOptional()"
+                                                                                                          v-model="client.cellPhone" 
+                                                                                                          placeholder="+55 (11) 11111-1111" 
+                                                                                                          ref="cellPhone" 
+                                                                                                          maxlength="40" 
+                                                                                                          style="max-width:220px" 
+                                                                                                          class="input-lower"
+                                                                                                          v-maska :data-maska="($root.user.account.countryDDI.length <=3)? '+## (##) #####-#### ********************':'+### ****************************' "
+                                                                                                ></el-input>
+                                                                                </el-col>
+                                                                               <el-col :md="24" class="s-input" style="margin-top:2px">
+								                                                                <div><i class="fa fa-phone" ></i> TELEFONE FIXO <span></span></div>
+								                                                                <el-input @keyup.enter="NextOptional()" 
+                                                                                                          v-model="client.phone" 
+                                                                                                          placeholder="" 
+                                                                                                          ref="phone" 
+                                                                                                          maxlength="40" 
+                                                                                                          style="max-width:220px"
+                                                                                                          class="input-lower"
+                                                                                                          v-maska :data-maska="($root.user.account.countryDDI.length <=3)? '+## (##) ####-#### ********************':'+### ****************************' "
+                                                                                                ></el-input>
+                                                                                </el-col>
+                                                                                <el-col :md="24" class="s-input" style="margin-top:7px" >
+								                                                        <div><i class="fa fa-headset"></i> FORMA DE CONTATO PREFERIDA<span></span></div>
+					                                                                    <el-select v-model="client.preferredContact"  size="medium">
+                                                                                            <el-option      v-for="item in $sdata.forms.contactWays"      :key="item.value"      :label="item.label"      :value="item.value"    ></el-option>
+                                                                                        </el-select>
+                                                                                </el-col>
+                                                                       </el-row>
+                                                            </el-col>
+
+                                                           <el-col :md="16" style="margin-top:2px">
+								                                       <el-row :gutter="30">
+                                                                               <el-col :md="24" class="s-input" style="margin-top:2px">
+								                                                                <div><i class="fa fa-envelope" ></i> E-MAIL <span></span> <s-tip :show="validator.GetNote('email').show" :note="validator.GetNote('email')" /></div>
+								                                                                <el-input @keyup.enter="NextOptional()" v-model="client.email" placeholder="" ref="email" maxlength="80" class="input-lower"></el-input>
+                                                                                </el-col>
+                                                                               <el-col :md="24" class="s-input" style="margin-top:2px">
+								                                                                <div><i class="fa fa-circle-nodes" ></i> NETWORK <span>site pessoal, perfil de rede social, etc</span></div>
+								                                                                <el-input @keyup.enter="NextOptional()" v-model="client.network" placeholder="" ref="network"  maxlength="300" class="input-lower"></el-input>
+                                                                                </el-col>
+                                                                                <el-col :md="24" class="s-input" style="margin-top:10px">
+								                                                                <div><i class="fab fa-whatsapp s-green" style="font-size:16px" /> PERMITE CHAT <span>WhatsApp, Telegram, Direct, Messenger, etc</span></div>
+                                                                                                <q-radio v-model="client.allowContact" :val="true"  label="SIM" size="xs"	color="s-green" label-color="s-green"   keep-color  style="padding-left:10px;" />
+                                                                                                <q-radio v-model="client.allowContact" :val="false" label="NÃO" size="xs"	color="s-red"   label-color="s-red"     keep-color  style="padding-left:10px;" />
+                                                                                </el-col>
+                                                                       </el-row>
+                                                            </el-col>
+
+
+
+                                                    </el-row>
+
+                                            </el-space>
+						                </q-tab-panel>
+
+
+
+
+
+
+						                <q-tab-panel name="section2">
+                                            <el-space wrap  v-loading="api.status.requesting" element-loading-text="buscando endereço...">
+                                                <el-row :gutter="20">
+
+
+                                                           <el-col :md="8" class="s-input-address">
+								                                            <div>PAÍS <span></span></div>
+								                                            <!--<el-input v-model="client.country" placeholder="" ref="country"  maxlength="35" ></el-input>-->
+			        		                                                <el-select v-model="client.country"  size="medium" filterable style="width:290px"   placeholder="SELECIONE">
+                                                                                <el-option    v-for="item in $sdata.forms.countries"      :key="item.value"       ref="country"  :value="item.value"   @click="()=>{client.state=null;client.city=null;countryCode=item.code;SetStatesOptions(item.code);$refs.postalCode.focus()}">
+                                                                                    <span v-html="item.label" style="float: left"></span>
+                                                                                    <span style="float: right;color:#c4c4c4"><span v-html="'+'+item.ddi"></span></span>
+                                                                                </el-option>
+                                                                            </el-select>
+                                                            </el-col>
+                                                           <el-col :md="8" class="s-input-address">
+								                                            <div>{{($tools.ToUpper(client.country)=='BRASIL')? 'CEP':'CÓDIGO POSTAL'}} <span></span></div>
+								                                            <el-input v-if="$tools.ToUpper(client.country)=='BRASIL'" v-model="client.postalCode" placeholder="" ref="postalCode" v-maska data-maska="#####-###" @keyup="()=>{  if(client.postalCode.length>=9){SearchAddress();} }">
+                                                                                <template #append>
+                                                                                        <i class="fa fa-search" v-if="(client.postalCode.length < 9)" style="color:#b6b6b6" @click="$message({message: 'Preencha todo o CEP para poder realizar a busca.',type: 'warning', offset:320})" ></i>
+                                                                                        <i class="fa fa-search" v-else style="color:#0080ff;cursor:pointer" @click="SearchAddress"></i>
+                                                                                </template>
+                                                                            </el-input>
+                                                                            <el-input @keyup.enter="NextOptional()" v-model="client.postalCode" placeholder="" ref="postalCode" v-else ></el-input>
+                                                            </el-col>
+                                                           <el-col :md="8" class="s-input-address" style="max-width:249px">
+
+								                                            <div>{{($tools.ToUpper(client.country)=='BRASIL')? 'ESTADO':'PROVÍNCIA'}} <span> </span></div>
+			        		                                                <el-select v-model="client.state"  size="medium"  filterable placeholder="SELECIONE">
+                                                                                <el-option    v-for="item in statesOptions"      :key="item.value"      :label="item.label"      :value="item.value"    ></el-option>
+                                                                            </el-select>
+								                                            <!--<div>{{($tools.ToUpper(client.country)=='BRASIL')? 'ESTADO':'PROVÍNCIA'}} <span> </span></div>
+			        		                                                <el-select v-model="client.state"  size="medium"  v-if="($tools.ToUpper(client.country))=='BRASIL'" filterable placeholder="SELECIONE">
+                                                                                <el-option    v-for="item in $sdata.forms.states"      :key="item.value"      :label="item.label"      :value="item.value"    ></el-option>
+                                                                            </el-select>
+								                                            <el-input  v-model="client.state"    v-else placeholder="" ref="state"   maxlength="35"></el-input>-->
+                                                               
+                                                            </el-col>
+
+                                                           <el-col :md="15" class="s-input-address" style="max-width:498px">
+								                                            <div>CIDADE <span></span></div>
+								                                            <el-input @keyup.enter="NextOptional()" v-model="client.city" placeholder="" ref="city"  maxlength="35"></el-input>
+                                                            </el-col>
+
+                                                           <el-col :md="9" class="s-input-address">
+								                                            <div>BAIRRO <span></span></div>
+								                                            <el-input @keyup.enter="NextOptional()" v-model="client.neighborhood" placeholder="" ref="neighborhood" maxlength="40"></el-input>
+                                                            </el-col>
+
+                                                           <el-col :md="15" class="s-input-address" style="max-width:498px">
+								                                            <div>LOGRADOURO <span>rua, avenida, pça, etc...</span></div>
+								                                            <el-input @keyup.enter="NextOptional()" v-model="client.address" placeholder="" ref="address" maxlength="95" ></el-input>
+                                                            </el-col>
+
+
+                                                           <el-col :md="9" class="s-input-address">
+								                                            <div>NÚMERO <span>colocar <b>SN</b> se não houver</span></div>
+								                                            <el-input @keyup.enter="NextOptional()" v-model="client.addressNumber" :placeholder="placeholderNumber" ref="addressnumber" maxlength="20" style="text-transform:none"></el-input>
+                                                            </el-col>
+
+                                                           <el-col :md="7" class="s-input-address">
+								                                            <div>COMPLEMENTO <span></span></div>
+								                                            <el-input @keyup.enter="NextOptional()" v-model="client.addressComplement" placeholder="" ref="addressComplement" maxlength="40" style="text-transform:none" ></el-input>
+                                                            </el-col>
+
+                                                           <el-col :md="16" class="s-input-address" style="max-width:780px">
+								                                            <div>REFERÊNCIA <span></span></div>
+								                                            <el-input @keyup.enter="NextOptional()" v-model="client.addressReference" placeholder="" ref="addressReference" maxlength="200"  show-word-limit style="text-transform:none"></el-input>
+                                                            </el-col>
+
+                                                    </el-row>
+                                            </el-space>
+						                </q-tab-panel>
+
+
+
+
+
+
+						                <q-tab-panel name="section3">
+							                
+                                             <el-space wrap style="margin-top:-30px">
+                                                <el-row :gutter="20">
+                                                       <el-col :md="12" class="s-input" style="margin-bottom:-10px">
+								                                        <div>PROPRIETÁRIO <span></span><s-tip :show="validator.GetNote('proprietary').show" :note="validator.GetNote('proprietary')" /></div>
+								                                        <el-input @keyup.enter="NextOptional()" v-model="client.proprietaryName"  placeholder="NOME"      ref="proprietaryName"    maxlength="35" ><template #prepend><i class="fa fa-user"></i></template></el-input>
+								                                        <el-input @keyup.enter="NextOptional()" v-model="client.proprietaryPhone" placeholder="TELEFONE"  ref="proprietaryPhone"   maxlength="40" v-maska :data-maska="($root.user.account.countryDDI.length <=3)? '+## (##) #####-#### ********************':'+### ****************************' "><template #prepend><i class="fa fa-phone"></i></template></el-input>
+								                                        <el-input @keyup.enter="NextOptional()" v-model="client.proprietaryEmail" placeholder="E-MAIL"    ref="proprietaryEmail"   maxlength="80" class="input-lower" ><template #prepend><i class="fa fa-envelope"></i></template></el-input>
+                                                                        <div class="s-prepend"><i :class="(client.proprietarySex=='' || client.proprietarySex=='NA')? 'fa fa-venus-mars' : (client.proprietarySex=='FEMININO')? 'fa fa-venus' : 'fa fa-mars'" ></i></div>
+                                                                        <div  style="width:calc(100% - 53px);display:inline-block">
+                                                                            <el-select v-model="client.proprietarySex" placeholder="SEXO"  size="medium" style="width:100%">
+                                                                                    <el-option      v-for="item in $sdata.forms.sexs"    :key="item.value"      :label="item.label"      :value="item.value"    ></el-option>
+                                                                            </el-select>
+                                                                        </div>
+                                                        </el-col>
+							                
+                                                        <el-col :md="12" class="s-input" style="margin-bottom:-10px">
+								                                        <div>GERENTE <span></span><s-tip :show="validator.GetNote('manager').show" :note="validator.GetNote('manager')" /></div>
+								                                        <el-input @keyup.enter="NextOptional()" v-model="client.managerName"  placeholder="NOME"      ref="managerName"  maxlength="35" ><template #prepend><i class="fa fa-user"></i></template></el-input>
+								                                        <el-input @keyup.enter="NextOptional()" v-model="client.managerPhone" placeholder="TELEFONE"  ref="managerPhone" maxlength="40" v-maska :data-maska="($root.user.account.countryDDI.length <=3)? '+## (##) #####-#### ********************':'+### ****************************' "><template #prepend><i class="fa fa-phone"></i></template></el-input>
+								                                        <el-input @keyup.enter="NextOptional()" v-model="client.managerEmail" placeholder="E-MAIL"    ref="managerEmail" maxlength="80" class="input-lower" ><template #prepend><i class="fa fa-envelope"></i></template></el-input>
+                                                                        <div class="s-prepend"><i :class="(client.managerSex=='' || client.managerSex=='NA')? 'fa fa-venus-mars' : (client.managerSex=='FEMININO')? 'fa fa-venus' : 'fa fa-mars'"></i></div>
+                                                                        <div  style="width:calc(100% - 53px);display:inline-block">
+                                                                            <el-select v-model="client.managerSex" placeholder="SEXO"  size="medium" style="width:100%">
+                                                                                    <el-option      v-for="item in $sdata.forms.sexs"    :key="item.value"      :label="item.label"      :value="item.value"    ></el-option>
+                                                                            </el-select>
+                                                                        </div>
+                                                        </el-col>
+
+                                                        <el-col :md="12" class="s-input">
+								                                        <div>ATENDIMENTO <span></span><s-tip :show="validator.GetNote('attendant').show" :note="validator.GetNote('attendant')" /></div>
+								                                        <el-input @keyup.enter="NextOptional()" v-model="client.attendantName"  placeholder="NOME"      ref="attendantName"  maxlength="35" ><template #prepend><i class="fa fa-user"></i></template></el-input>
+								                                        <el-input @keyup.enter="NextOptional()" v-model="client.attendantPhone" placeholder="TELEFONE"  ref="attendantPhone" maxlength="40" v-maska :data-maska="($root.user.account.countryDDI.length <=3)? '+## (##) #####-#### ********************':'+### ****************************' "><template #prepend><i class="fa fa-phone"></i></template></el-input>
+								                                        <el-input @keyup.enter="NextOptional()" v-model="client.attendantEmail" placeholder="E-MAIL"    ref="attendantEmail" maxlength="80" class="input-lower" ><template #prepend><i class="fa fa-envelope"></i></template></el-input>
+                                                                        <div class="s-prepend"><i :class="(client.attendantSex=='' || client.attendantSex=='NA')? 'fa fa-venus-mars' : (client.attendantSex=='FEMININO')? 'fa fa-venus' : 'fa fa-mars'"></i></div>
+                                                                        <div  style="width:calc(100% - 53px);display:inline-block">
+                                                                            <el-select v-model="client.attendantSex" placeholder="SEXO"  size="medium" style="width:100%">
+                                                                                    <el-option      v-for="item in $sdata.forms.sexs"    :key="item.value"      :label="item.label"      :value="item.value"    ></el-option>
+                                                                            </el-select>
+                                                                        </div>
+                                                        </el-col>
+
+                                                        <el-col :md="12" class="s-input">
+								                                        <div>PORTADOR <s-tip :show="validator.GetNote('carrier').show" :note="validator.GetNote('carrier')" /><span>motorista, chofer, entregador, etc</span></div>
+								                                        <el-input @keyup.enter="NextOptional()" v-model="client.carrierName"  placeholder="NOME"      ref="carrierName"  maxlength="35" ><template #prepend><i class="fa fa-user"></i></template></el-input>
+								                                        <el-input @keyup.enter="NextOptional()" v-model="client.carrierPhone" placeholder="TELEFONE"  ref="carrierPhone" maxlength="40" v-maska :data-maska="($root.user.account.countryDDI.length <=3)? '+## (##) #####-#### ********************':'+### ****************************' "><template #prepend><i class="fa fa-phone"></i></template></el-input>
+								                                        <el-input @keyup.enter="NextOptional()" v-model="client.carrierEmail" placeholder="E-MAIL"    ref="carrierEmail" maxlength="80" class="input-lower" ><template #prepend><i class="fa fa-envelope"></i></template></el-input>
+                                                                        <div class="s-prepend"><i :class="(client.carrierSex=='' || client.carrierSex=='NA')? 'fa fa-venus-mars' : (client.carrierSex=='FEMININO')? 'fa fa-venus' : 'fa fa-mars'"></i></div>
+                                                                        <div  style="width:calc(100% - 53px);display:inline-block">
+                                                                            <el-select v-model="client.carrierSex" placeholder="SEXO"  size="medium" style="width:100%">
+                                                                                    <el-option      v-for="item in $sdata.forms.sexs"    :key="item.value"      :label="item.label"      :value="item.value"    ></el-option>
+                                                                            </el-select>
+                                                                        </div>
+                                                        </el-col>
+							                
+                                                    </el-row>
+
+
+
+                                            </el-space>
+
+
+						                </q-tab-panel>
+
+
+
+
+                                        <q-tab-panel name="section4"> 
+                                            <el-space wrap>
+                                                <el-row :gutter="30">
+
+                                                           <el-col :md="12" class="s-input">
+								                                            <div><i class="fa fa-clock-rotate-left" ></i> CLIENTE DESDE <span></span></div>
+								                                            <el-select v-model="client.sinceYear"  filterable placeholder="ANO"  size="medium"><el-option      v-for="item in $sdata.GetYearsOptions(true)"     :key="item.value"      :label="item.label"      :value="item.value"    ></el-option></el-select>
+                                                            </el-col>
+                                                           <el-col :md="12" class="s-input">
+								                                            <div><i class="fa fa-star" ></i> CLASSIFICAÇÃO <span></span></div>
+                                                                            <q-rating
+                                                                                  v-model="client.rating"
+                                                                                  size="2em"
+                                                                                  :max="5"
+                                                                                  color="primary"
+                                                                                >
+                                                                                <template v-slot:tip-1>
+                                                                                    <q-tooltip>1 - Péssimo</q-tooltip>
+                                                                                </template>
+                                                                                <template v-slot:tip-2>
+                                                                                    <q-tooltip>2 - Ruim</q-tooltip>
+                                                                                </template>
+                                                                                <template v-slot:tip-3>
+                                                                                    <q-tooltip>3 - Regular</q-tooltip>
+                                                                                </template>
+                                                                                <template v-slot:tip-4>
+                                                                                    <q-tooltip>4 - Bom</q-tooltip>
+                                                                                </template>
+                                                                                <template v-slot:tip-5>
+                                                                                    <q-tooltip>5 - Ótimo</q-tooltip>
+                                                                                </template>
+                                                                            </q-rating>
+                                                            </el-col>
+                                                           <el-col :md="24" class="s-input" style="margin-top:20px;max-width:494px;height:200px;">
+								                                            <div><i class="fa fa-file-lines" ></i> OBSERVAÇÕES <span></span></div>
+                                                                            <el-input
+                                                                                v-model="client.obs"
+                                                                                :rows="4"
+                                                                                type="textarea"
+                                                                                maxlength="1000"
+                                                                                show-word-limit
+                                                                                :autosize="{ minRows: 3, maxRows: 6 }"
+                                                                              ></el-input>							                                            
+                                                            </el-col>
+                                                    </el-row>
+
+                                            </el-space>
+						                </q-tab-panel>
+
+
+
+					                </q-tab-panels>
+
+                                    <div style="margin:-10px;margin-bottom:-20px;margin-left:0px;">
+                                                <el-row>
+                                                    <el-col :md="24">
+                                                                <q-btn flat style="width:110px;font-size:12px" @click="PreviousOptional()" v-if="stepOptional > 1"><el-icon class="fa fa-chevron-left" ></el-icon>anterior </q-btn>
+                                                                <q-btn flat style="width:110px;font-size:12px" @click="NextOptional()"     >  próximo<el-icon class="el-icon--right fa fa-chevron-right"><ArrowRight /></el-icon> </q-btn>
+                                                    </el-col>
+                                                </el-row>
+                                    </div>
+
+
+
+                      </q-step>
+
+
+
+
+
+
+
+                   
+                      <q-step
+                        :name="3"
+                        title="Concluir"
+                        icon="fa fa-user-check"
+                        class="stepper"
+                        :done="step >= 3"
+                      >
+
+                        <div>
+                            <el-space wrap >
+                                <el-row :gutter="30" :fill="true">
+                                    <el-col :md="24">
+                                        <div v-if="api.status.requesting">
+                                             <s-info title="inserindo" status="loading"></s-info>
+                                        </div>
+                                        <div v-else>
+                                            <div v-if="api.status.success">
+                                                <s-info type="success" subtitle="cliente inserido"></s-info>
+                                                <div>
+                                                    <el-button type="primary" @click="Reset()"     style="width:180px"><el-icon class="fa fa-user-plus"  ></el-icon> INSERIR OUTRO</el-button>
+                                                    <el-button type="primary" @click="Previous()"  style="width:180px">NOVA OS <el-icon class="el-icon--right fa fa-folder-plus" style="padding-left:10px"></el-icon></el-button>
+                                                </div>
+                                            </div>
+                                            <div v-else style="text-align:center">
+                                                    <s-info type="warning" :apiNotes="api.GetNotes()" subtitle="não foi possível inserir o cliente"></s-info>
+                                                    <!--<s-notes :apiNotes="$api.GetNotes()"></s-notes>-->
+                                                    <!--<el-button type="primary" @click="$refs.stepper.goTo(1);"  style="width:180px">VOLTAR E AJUSTAR</el-button>-->
+                                                    <el-button type="primary" @click="(api.GetNotes().filter((n)=>(n.key=='document' || n.key=='name' || n.key=='birth')).length>0)? $refs.stepper.goTo(1) : $refs.stepper.goTo(2);">VOLTAR</el-button>
+                                            </div>
+                                        </div>
+                                    </el-col>
+                                </el-row>
+                            </el-space>
+                        </div>
+                      </q-step>
+
+
+                      <template v-slot:navigation>
+                        <q-stepper-navigation v-if="step < 3">
+                            <el-button type="secondary" @click="Previous()" v-if="step > 1"><el-icon class="fa fa-chevron-left" ></el-icon> VOLTAR</el-button>
+                            <el-button type="primary"   @click="Next()" v-if="step == 1"  :disabled="api.status.requesting">PROSSEGUIR <el-icon class="el-icon--right fa fa-chevron-right"><ArrowRight /></el-icon></el-button>
+                            <el-button type="primary"   @click="InsertCheckout()" v-else>CONCLUIR</el-button>
+                        </q-stepper-navigation>
+                      </template>
+
+
+
+                    </q-stepper>
+
+
+   </div>
+
+
+</template>
+
+
+<script>
+    module.exports = {
+
+        name: 'HOME',
+
+        components: {
+
+        },
+
+        data: function () {
+            return {
+                api                 : this.$api.New(),
+                validator           : this.$validator.New(),
+                status              : null,
+                viewOptionalData         : "section1",
+                stepOptional        : 1 ,
+                step                : 1,
+                client              : this.$models.client(),
+                docTypeChange       : false,
+                days                : [],
+                months              : [],
+                years               : [],
+                yearsReverse        : [],
+                day                 : 0,
+                month               : 0,
+                year                : 0,
+                cepSearch           : "",
+                placeholderNumber   : "",
+                fields              : new Map(),
+				countryCode			: this.$root.user.account.countryCode,
+                statesOptions       : [],
+            }
+        }, computed: {
+
+        },
+        props: {
+            
+        },
+        watch: {
+        },
+        created: function () {
+            this.$root.SetTitle("CLIENTE,INSERIR","fa fa-user");
+            //c("client",this.client)
+             //this.$tools.GetDaysOptions().forEach(          item =>  this.days.push(item)   );
+             //this.$tools.GetMonthsOptions().forEach(        item =>  this.months.push(item) );
+             //this.$tools.GetYearsOptionsReverse().forEach(  item =>  this.years.push(item)  );
+
+             //this.client.name="CLI 1";
+
+             this.validator.InitNoteKey("name"         );
+             this.validator.InitNoteKey("birth"        );
+             this.validator.InitNoteKey("document"     );
+             this.validator.InitNoteKey("email"        );
+             this.validator.InitNoteKey("proprietary"  );
+             this.validator.InitNoteKey("manager"      );
+             this.validator.InitNoteKey("attendant"    );
+             this.validator.InitNoteKey("carrier"      );
+
+            //this.yearsReverse = this.years.reverse();
+
+            this.client.phone     = this.$root.user.account.countryDDI +" ";
+            this.client.cellPhone = this.$root.user.account.countryDDI +" ";
+            this.client.country   =	this.$root.user.account.country;
+            this.client.state     =	this.$root.user.account.state;
+            this.client.city      =	this.$root.user.account.city;
+            this.countryCode      = this.$root.user.account.countryCode;
+
+            this.client.proprietaryPhone = this.$root.user.account.countryDDI +" ";
+            this.client.managerPhone     = this.$root.user.account.countryDDI +" ";
+            this.client.attendantPhone   = this.$root.user.account.countryDDI +" ";
+            this.client.carrierPhone     = this.$root.user.account.countryDDI +" ";
+            //c2("this.$root.user.account.country",this.$root.user.account.country)
+            //c2("this.$root.user.account.countryCode",this.$root.user.account.countryCode)
+
+            this.SetStatesOptions(this.countryCode);
+
+        },
+        mounted() {
+            this.$refs.document.focus();
+            //this.SearchAddress();
+        },
+        methods: {
+
+            Reset(){
+                this.client         = this.$models.client();
+                this.viewOptionalData    ="section1";
+                this.stepOptional   = 1;
+                this.step           = 1;
+                this.validator.ResetNotes();
+            },
+
+            SetStatesOptions(_countryCode){
+                    this.statesOptions = this.$sdata.GetCountryStatesOptions(_countryCode);
+            },
+
+            CheckDoc(){
+                if(this.$validator.is(this.client.document)){
+                    if(this.client.documentType=='CPF'){
+                        if(!this.$validator.IsCPF(this.client.document))
+                            this.$message({message: 'CPF inválido',type: 'error', offset:25})
+                    }else if(this.client.documentType=='CNPJ' && !this.$validator.IsCNPJ(this.client.document))
+                            this.$message({message: 'CNPJ inválido',type: 'error', offset:105});
+                //    else{
+                //           var url = this.api.URL("/client/check/doc")+"/"+this.client.document;
+                //           axios.get(url).then((request) => {}).catch((error) => {
+                //                this.api.response = error.request.response;
+                //                c(this.api.GetNotes());
+                //                this.validator.SetNotes(this.api.GetNotes());
+                //                this.$alert(this.validator.NotesToHTML(),"ATENÇÃO",{dangerouslyUseHTMLString:true});
+                //            }).finally(() => {});
+                //    }
+                }
+            },
+
+            InsertCheckout(){
+
+                    this.validator.StartValidations();
+
+                    if(this.validator.is(this.client.email)             && !this.validator.IsEmail(this.client.email            ))      this.validator.SetNote("email"      ,"<b>E-MAIL</b> inválido"                   );
+                    if(this.validator.is(this.client.proprietaryEmail)  && !this.validator.IsEmail(this.client.proprietaryEmail ))      this.validator.SetNote("proprietary","<b>E-MAIL</b> do proprietário inválido"   );
+                    if(this.validator.is(this.client.managerEmail)      && !this.validator.IsEmail(this.client.managerEmail     ))      this.validator.SetNote("manager"    ,"<b>E-MAIL</b> do gerente inválido"        );
+                    if(this.validator.is(this.client.attendantEmail)    && !this.validator.IsEmail(this.client.attendantEmail   ))      this.validator.SetNote("attendant"  ,"<b>E-MAIL</b> do atendimento inválido"    );
+                    if(this.validator.is(this.client.carrierEmail)      && !this.validator.IsEmail(this.client.carrierEmail     ))      this.validator.SetNote("carrier"    ,"<b>E-MAIL</b> do portador inválido"       );
+
+				    if(this.validator.hasNotes)
+                        this.validator.Alert();
+                    else if( (this.$validator.not(this.client.phone) || this.client.phone?.length < 6) && (this.$validator.not(this.client.cellPhone) || this.client.cellPhone?.length < 6 ) && this.$validator.not(this.client.email) && this.$validator.not(this.client.network) ){
+                        	this.$confirm(
+					                        'Nenhuma forma de contado com o cliente foi informada, deseja cadastrar mesmo assim?',
+					                        "Atenção",
+					                        {
+					                            title:"ATENÇÃO", //sobrescreve "Confirmation" que pode ser ocultado - idem para 'message'
+					                            confirmButtonText: "SIM",
+					                            cancelButtonText: "NÃO",
+					                            cancelButtonType: "success",
+					                            showCancelButton: true
+					                        }
+				                            ).then(() => {this.Insert(); 
+                                                //this.$message({ //  type: 'success',//  message: 'OK',//})
+								            })
+								            .catch(() => {
+                                                //this.$message({//  type: 'info',//  message: 'Cancel',//})
+								            });
+                    }else
+                        this.Insert();
+                    
+                },
+
+
+
+
+            HandleLegalPerson(){
+                //c("this.docTypeChange = "+this.docTypeChange)
+                    if(!this.docTypeChange && this.$validator.not(this.client.document))
+                        this.client.documentType = (this.client.legalPerson=="PF")? "CPF":"CNPJ";
+                    this.$refs.document.focus();
+            },
+
+            //Insert(){
+            //    this.$root.status.requesting = true;
+            //    this.$refs.stepper.next();
+            //    window.setTimeout(()=>{this.status="success";this.$root.status.requesting=false;},2000);
+            //},
+
+            Insert(){
+                this.api.status.requesting = true;
+                this.$refs.stepper.next();
+                           this.api.status.requesting = true;
+                           var url = this.api.URL("/client/insert");
+                           axios.post(url,this.client).then((request) => {
+                                c2("client",request.data.result);
+                                this.api.status.success=true;
+                            }).catch((error) => {
+                                ce(error);
+                                //if(error.response)
+                                //    cw(error.response);
+                                this.api.status.success=false;
+								this.validator.AlertResponseErrors(error);
+                            }).finally(() => {
+                                window.setTimeout(()=>this.api.status.requesting = false,400);
+                            });
+             },
+
+
+            FormatPhone(val){
+                //return val.replace(/\B(?=(\d{3})+(?!\d))/g, ',')
+                return val.replace(/(\d{2})(\d{2})(\d{1})(\d{4})(\d{4})/g, '+$1 ($2) $3 $4-$5');
+            },
+
+            IsValidBirthDate(){
+                     if(this.client.birthDay > 0 && this.client.birthMonth > 0){
+                             let dt = this.$tools.FormatDateArgs( ((this.client.birthYear == 0)? "1899" : this.client.birthYear),this.client.birthMonth,this.client.birthDay);
+                             return this.validator.IsDate(dt);
+                     }else
+                        return true;
+            },
+
+            async Next(){
+                //this.$refs.stepper.next();
+                this.validator.StartValidations();
+                if(this.step==1){
+
+                    if(this.validator.not(this.client.name)){
+                        this.validator.SetNote("name","Necessário informar o <b>NOME</b>");
+                        //c(this.validator.GetNotes())
+                        this.$refs.name.focus();
+                    }
+
+                    if(this.validator.not(this.client.document)){
+                        this.validator.SetNote("document","Necessário informar o <b>DOCUMENTO</b>");
+                        this.$refs.document.focus();
+                    }else if(this.client.documentType=="CPF"  && !this.validator.IsCPF(this.client.document))  this.validator.SetNote("document","<b>CPF</b> inválido");
+                     else if(this.client.documentType=="CNPJ" && !this.validator.IsCNPJ(this.client.document)) this.validator.SetNote("document","<b>CNPJ</b> inválido");
+
+                     //if(this.client.birthDay > 0 && this.client.birthMonth > 0){
+                     //        let dt = this.$tools.FormatDateArgs( ((this.client.birthYear == 0)? "1899" : this.client.birthYear),this.client.birthMonth,this.client.birthDay);
+                     //        if(!this.validator.IsDate(dt))
+                     //           this.validator.SetNote("birth","<b>DATA DE NASCIMENTO</b> inválida");
+                     //}
+
+                     if(!this.IsValidBirthDate())
+                        this.validator.SetNote("birth","<b>DATA DE NASCIMENTO</b> inválida");
+
+                    if(this.validator.hasNotes)
+                        this.validator.Alert();
+                     else{
+                          this.api.status.requesting = true;
+                          var url = this.api.URL("/client/check/doc")+"/"+this.$tools.HigienizeInteger(this.client.document);
+                          await axios.get(url).then((request) => {
+                                this.$refs.stepper.next();
+                          }).catch((error) => {
+								this.validator.AlertResponseErrors(error);
+                                //c(this.api.GetNotes());
+                                //Notes.push(...this.api.GetNotes());
+                                //this.$alert(this.validator.NotesToHTML(),"ATENÇÃO",{dangerouslyUseHTMLString:true});
+                           }).finally(() => { 
+                               this.api.status.requesting = false; 
+                           });
+                    }      
+                }
+
+            },
+
+            Previous(){
+                this.$refs.stepper.previous();
+            },
+
+
+
+
+            NextOptional(){
+                //this.stepOptional += (this.stepOptional<4)? 1 : 0;
+                this.stepOptional = parseInt(this.stepOptional);
+                if((this.stepOptional)<4)
+                    this.stepOptional+=1;
+                else
+                    this.stepOptional=1;
+                this.viewOptionalData = "section"+this.stepOptional;
+                c(this.viewOptionalData)
+            },
+
+            PreviousOptional(){
+                //this.stepOptional -= (this.stepOptional>1)? 1 : 0;
+                this.stepOptional = parseInt(this.stepOptional);
+                if((this.stepOptional-1)>1)
+                    this.stepOptional-=1;
+                else
+                    this.stepOptional=1;
+                this.viewOptionalData = "section"+this.stepOptional;
+            },
+
+
+            SelectFilter(val, update) {
+                if (val === '') {
+                    update(() => { options.value = stringOptions })
+                    return
+                }
+                update(() => {
+                    const needle = val.toLowerCase()
+                    options.value = stringOptions.filter(v => v.toLowerCase().indexOf(needle) > -1)
+                });
+            },
+
+           async SearchAddress(){
+
+                if(this.cepSearch !== this.client.postalCode){
+                            this.cepSearch = this.client.postalCode;
+                            this.api.status.requesting = true;
+                            let res = await this.$sdata.SearchAddress(this.cepSearch);
+                            if(this.$validator.not(res?.city)){
+                                this.client.city            = 
+                                this.client.address         = 
+                                this.client.neighborhood    = 
+                                this.client.state           = "";
+                                this.client.addressReference= "";
+                                this.placeholderNumber      = "";
+                                this.$message({message: 'Endereço não encontrado neste CEP.',type: 'warning', offset:320});
+                            }else{
+                                this.client.city             = res.city            ;
+                                this.client.address          = res.address         ;
+                                this.client.neighborhood     = res.neighborhood    ;
+                                this.client.state            = res.state           ;
+                                this.client.addressReference = res.addressReference;
+                                this.$refs.addressnumber.focus();
+                            }
+                            this.api.status.requesting = false;
+                }
+         },
+
+            
+            SearchAddress_BK(){
+
+                if(this.cepSearch !== this.client.postalCode){
+                            this.cepSearch = this.client.postalCode;
+                            this.api.status.requesting = true;
+                            var url = "https://viacep.com.br/ws/"+this.client.postalCode+"/json/";
+
+                            axios.get(url).then((request) => {
+                                //$('.modal-backdrop').remove();
+                                //c(request.data);
+                                if(this.$validator.not(request.data.localidade)){
+                                    this.$message({message: 'Endereço não encontrado neste CEP.',type: 'warning', offset:320})
+                                    this.client.city            = 
+                                    this.client.address         = 
+                                    this.client.neighborhood    = 
+                                    this.client.state           = "";
+                                    this.client.addressReference= "";
+                                    this.placeholderNumber      = "";
+                                }else{
+                                    this.client.city            = this.$validator.is(request.data.localidade  )?    request.data.localidade.toUpperCase()   : "";
+                                    this.client.address         = this.$validator.is(request.data.logradouro  )?    request.data.logradouro.toUpperCase()   : "";
+                                    this.client.neighborhood    = this.$validator.is(request.data.bairro      )?    request.data.bairro.toUpperCase()       : "";
+                                    this.client.state           = this.$validator.is(request.data.uf          )?    request.data.uf.toUpperCase()           : "";
+                                    this.client.addressReference= this.$validator.is(request.data.complemento )?    request.data.complemento  : "";
+                                    //this.placeholderNumber      = request.data.complemento;
+                                    this.$refs.addressnumber.focus();
+                                }
+                            }).catch((error) => {
+                                //this.ShowMessageBox1(message);
+                            }).finally(() => {
+                                this.api.status.requesting = false;
+                            });
+                }
+
+            },
+
+
+
+
+
+
+        }
+
+    }
+
+
+
+
+
+
+
+
+</script>
+
+<style scoped>
+
+
+.el-message-box__title{
+  color: #ff6a00;
+}
+
+.stepper{
+    margin-top:0px;
+    margin-bottom:0px;
+    height:auto;   
+}
+.q-btn__content{
+    font-size:12px;
+}
+.stepper-header > .q-stepper__header {
+    border-top-left-radius: inherit;
+    border-top-right-radius: inherit;
+    width: 640px !important;
+}
+.q-stepper__tab{
+    width: 80px !important;
+}
+</style>
+
