@@ -1,0 +1,32 @@
+[
+  {
+    "Name": "ADMIN",
+    "Projects": [
+      {
+        "Name": "Admin\\Admin.API\\JaCaptei.Admin.API.csproj",
+        "Action": "Start",
+        "DebugTarget": "https"
+      },
+      {
+        "Name": "Admin\\Admin.UI\\JaCaptei.Admin.UI.csproj",
+        "Action": "Start",
+        "DebugTarget": "https"
+      }
+    ]
+  },
+  {
+    "Name": "SITE",
+    "Projects": [
+      {
+        "Name": "Site\\Site.API\\JaCaptei.Site.API.csproj",
+        "Action": "Start",
+        "DebugTarget": "https"
+      },
+      {
+        "Name": "Site\\Site.UI\\JaCaptei.Site.UI.csproj",
+        "Action": "Start",
+        "DebugTarget": "https"
+      }
+    ]
+  }
+]
