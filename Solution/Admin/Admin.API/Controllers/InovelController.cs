@@ -33,185 +33,135 @@ namespace JaCaptei.Administrativo.API.Controllers {
 
         [HttpPost]
         [Route("[action]")]
-        public async Task<IActionResult> Adicionar([FromForm] Imovel imovel, IFormFile file) {
+        public async Task<IActionResult> Adicionar([FromForm] Imovel imovel,List<IFormFile> imgFiles) {
         //public async Task<IActionResult> Adicionar([FromForm] IFormFile file) {
 
            Usuario logado          = ObterUsuarioAutenticado();
-            // imovel.inseridoPorId    = imovel.atualizadoPorId = logado.id;
-            // imovel.inseridoPorNome  = imovel.atualizadoPorNome = logado.nome;
-            //
-            await SalvarImagem(imovel,file);
-           // appReturn.result = await SalvarImagem(imovel);
-            //appReturn = service.Adicionar(entity);
+            imovel.inseridoPorId    = imovel.atualizadoPorId    = logado.id;
+            imovel.inseridoPorNome  = imovel.atualizadoPorNome  = logado.nome;
+
+            appReturn = await ImageShackUploadImagens(imovel,imgFiles);
+            appReturn.result = imovel;
+            await ImageShackDownload_ImoviewUpload("https://imagizer.imageshack.com/img924/9249/XXPIrP.jpg");
             return Result(appReturn);
         }
 
-  
 
-        public async Task<Imovel> SalvarImagem(Imovel imovel,IFormFile file ) {
 
-            int     ordem        = 1;
-            string  pathToSave   = "";
-            string  path         = "";
-            //byte[]  fileBytes;
 
-                        // Form data
-                        var formData = new MultipartFormDataContent();
-                        formData.Add(new StringContent("key"),"37AGIJQUbe8fab869df40b8dd3dbecfce6e15c22");
-                        formData.Add(new StringContent("tags"),"logo");
-                        formData.Add(new StringContent("format"),"json");
-                       
-                    // File content
-                    //byte[] fileBytes = File.ReadAllBytes(imovel.imagem);
-                    //fileContent.Headers.ContentType = new MediaTypeHeaderValue("application/octet-stream");
-                    //ByteArrayContent fileContent = new ByteArrayContent(imagem);
-                    //fileContent.Headers.ContentType = new MediaTypeHeaderValue("application/json");
-                    //formData.Add(fileContent,"logo.jpg");
+        public async Task<AppReturn> ImageShackUploadImagens(Imovel imovel,List<IFormFile> imgFiles) {
 
+            int     ordem           = 1;
+            string  pathToSave      = "";
+            string  path            = "";
+            byte[]  fileBytes;
+
+            if(imgFiles?.Count > 0) {
+                foreach(IFormFile imgFile in imgFiles) {
                     using(var memoryStream = new MemoryStream()) {
-                    
-                        await file.CopyToAsync(memoryStream);
-                        var fileBytes = memoryStream.ToArray();
-                    
 
-                        //var fileContent = new StreamContent(file.OpenReadStream());
-                        //fileContent.Headers.ContentType = MediaTypeHeaderValue.Parse(file.ContentType);
-                        
+                        await imgFile.CopyToAsync(memoryStream);
+                        fileBytes = memoryStream.ToArray();
+
                         var fileContent = new ByteArrayContent(fileBytes);
-                        fileContent.Headers.ContentType = MediaTypeHeaderValue.Parse(file.ContentType);
-
+                        fileContent.Headers.ContentType = MediaTypeHeaderValue.Parse(imgFile.ContentType);
 
                         var requestContent = new MultipartFormDataContent();
                         requestContent.Add(new StringContent("37AGIJQUbe8fab869df40b8dd3dbecfce6e15c22"),"key");
-                        requestContent.Add(new StringContent("logo"),"tags");
+                        requestContent.Add(new StringContent("Test"),"tags");
                         requestContent.Add(new StringContent("json"),"format");
-                        //requestContent.Add(new ByteArrayContent(fileBytes),"fileupload",file.FileName);
-                        requestContent.Add(fileContent,"fileupload", file.FileName);
-                        //requestContent.Add(new ByteArrayContent(fileBytes),"fileupload","logo.jpg");
+                        requestContent.Add(fileContent,"fileupload",imgFile.FileName);
 
-                        //requestContent.Headers.ContentType = new System.Net.Http.Headers.MediaTypeHeaderValue(file.ContentType);
-                        //requestContent.Headers.ContentType = new MediaTypeHeaderValue("application/json");
-                        //requestContent.Headers.ContentType = new MediaTypeHeaderValue("application/x-www-form-urlencoded");
-                        //requestContent.Headers.ContentType   = new MediaTypeHeaderValue("multipart/form-data");
-                        //requestContent.Headers.ContentLength = file.Length;
-                        //var len = requestContent.Headers.ContentLength;
-                          
-                           
-                        using(HttpClient client = new HttpClient()) {
+                        using(HttpClient httpClient = new HttpClient()) {
                             try {
-                                //HttpResponseMessage response = await client.PostAsJsonAsync("https://post.imageshack.us/upload_api.php", requestContent);
-                                HttpResponseMessage response = await client.PostAsync("https://post.imageshack.us/upload_api.php", requestContent);
-                                if(response.IsSuccessStatusCode) {
-                                    string responseBody = await response.Content.ReadAsStringAsync();
-                                    imovel.obs = responseBody;
-                                } else {
-                                    imovel.obs = $"Error: {response.StatusCode} - {response.ReasonPhrase}";
+                                if(appReturn.status.success) {
+                                    //HttpResponseMessage response = await client.PostAsJsonAsync("https://post.imageshack.us/upload_api.php", requestContent);
+                                    HttpResponseMessage response = await httpClient.PostAsync("https://post.imageshack.us/upload_api.php", requestContent);
+                                    if(response.IsSuccessStatusCode) {
+                                        string responseBody = await response.Content.ReadAsStringAsync();
+                                        imovel.imagens.Add(new Imagem { cod = "1234" });
+                                        imovel.obs = responseBody;
+                                    } else {
+                                        appReturn.AddException($"Error: {response.StatusCode} - {response.ReasonPhrase}","Não foi possível cadastrar imagens");
+                                    }
                                 }
                             } catch(HttpRequestException e) {
-                               imovel.obs = $"HTTP Request Error: {e.Message}";
+                                appReturn.AddException($"HTTP Request Error: {e.Message}","Não foi possível cadastrar imagens");
                             }
                         }
 
 
-             }
-
-
-
-                return imovel;
-
-        }
-        
-
-
-
-        public async Task<Imovel> SalvarImagens(Imovel imovel) {
-
-            int     ordem        = 1;
-            string  pathToSave   = "";
-            string  path         = "";
-            byte[]  imgByte;
-
-                if(imovel.imagens?.Count > 0) {
-                    foreach(Imagem img in imovel.imagens) {
-                       // img.data             = imovel.data;
-                       // img.ordem            = ordem++;
-                       // img.nome             = "img_" + imovel.id + "_" + img.ordem.ToString() + "_" + Utils.Key.CreateDaykey().ToString()+ ".jpg";
-                       // img.path             = $"/wwwroot/Global/app/os/items/images/{img.nome}";
-                       // imgByte             = Convert.FromBase64String(img.base64.Replace("data:image/jpeg;base64,","").Replace("data:image/png;base64,","").Replace("data:image/jpg;base64,",""));
-                       // pathToSave          = Path.Combine($"{hosting.ContentRootPath}{img.path}");
-
-                        string imageshackApiUrl = "https://post.imageshack.us/upload_api.php";
-
-                        var formdata = new Dictionary<string, string>();
-                        formdata.Add("key"          ,"37AGIJQUbe8fab869df40b8dd3dbecfce6e15c22");
-                        //data.Add("fileupload" , img.blob);
-                        formdata.Add("url"          , img.url);
-                        formdata.Add("tags"         , "logo");
-                        formdata.Add("format"       , "json");
-
-                        using(HttpClient client = new HttpClient()) {
-                            try {
-
-                            var data                = Newtonsoft.Json.JsonConvert.SerializeObject(formdata);
-                            var content             = new StringContent(data, System.Text.Encoding.UTF8, "application/json");
-                            //var content             = new StringContent(img.base64, System.Text.Encoding.UTF8, "application/json");
-                            //HttpResponseMessage res = await client.PostAsync(imageshackApiUrl, content);
-                            //HttpResponseMessage res = await client.PostAsync(imageshackApiUrl, new FormUrlEncodedContent(data));
-                            //HttpResponseMessage res = await client.PostAsync(imageshackApiUrl, new FormUrlEncodedContent(data));
-
-
-                            //MultipartFormDataContent content = new MultipartFormDataContent();
-                            //byteArray Image
-                            //ByteArrayContent data = new ByteArrayContent(img.url);
-
-                            //content.Add(img.url,"File","logo_.jpg");
-                           
-                            HttpResponseMessage res = await client.PostAsync(imageshackApiUrl, content);
-                               if(res.IsSuccessStatusCode) {
-                                    string responseBody = await res.Content.ReadAsStringAsync();
-                                    imovel.sucesso = true;
-                                } else {
-                                    imovel.sucesso = false;
-                                    imovel.obs = $"IMAGESHACK request error: {res.StatusCode} - {res.ReasonPhrase}";
-                                }
-                            } catch(HttpRequestException e) {
-                                Console.WriteLine($"HTTP request error: {e.Message}");
-                            }
-                        }
-
-                        //System.IO.File.WriteAllBytes(pathToSave,imgByte);
-
-                        //using(FileStream fs = new FileStream(pathToSave,FileMode.Create)) {
-                        //    using(BinaryWriter bw = new BinaryWriter(fs)) {
-                        //        //byte[] data = Convert.FromBase64String(image);
-                        //        bw.Write(imgByte);
-                        //        bw.Close();
-                        //    }
-                        //}
-
-                        /*
-                        using(MemoryStream ms = new MemoryStream(imgByte)) {
-                            using(Bitmap newImg = new Bitmap(new Bitmap(ms), new Size(1024, 768))) {
-                                newImg.SetResolution(76, 76);
-                                newImg.Save(path, System.Drawing.Imaging.ImageFormat.Jpeg);
-                                //newImg.Save(ms, System.Drawing.Imaging.ImageFormat.Png);
-                                //usuario.imagem = ms.ToArray();
-                            }
-                        }
-                        */
-
+                    }
 
                 }
+                if(appReturn.status.success)
+                    appReturn.result = imovel;
             }
 
-            return imovel;
+            return appReturn;
 
         }
 
 
+        public async Task<AppReturn> ImageShackDownload_ImoviewUpload(string URLimagem) {
+
+            Imovel imovel = new Imovel();
+            byte[]  file;
+
+            // ------------------------------------------
+            // PREPARA IMAGEM BAIXADA PARA UPLOAD
+            // ------------------------------------------
+
+            var httpClient = new HttpClient();
+            var httpResponse = await httpClient.GetAsync(URLimagem);
+            var imagemBaixada = httpResponse.Content;
+
+            // ------------------------------------------
+            // PREPARA IMAGEM BAIXADA E FAZ UPLOAD
+            // ------------------------------------------
+
+            using(var memoryStream = new MemoryStream()) {
+
+                // ------------------------------------------
+                // PREPARA
+                // ------------------------------------------
+
+                imagemBaixada.CopyToAsync(memoryStream);
+                file = memoryStream.ToArray();
+
+                var fileContent = new ByteArrayContent(file);
+                fileContent.Headers.ContentType = MediaTypeHeaderValue.Parse("image/jpeg");
+                //fileContent.Headers.ContentType = MediaTypeHeaderValue.Parse(imagemBaixada.ContentType);
 
 
+                // ------------------------------------------
+                //  ENVIA
+                // ------------------------------------------
 
+                var requestContent = new MultipartFormDataContent();
+                requestContent.Add(new StringContent("37AGIJQUbe8fab869df40b8dd3dbecfce6e15c22"),"key");
+                requestContent.Add(new StringContent("Test"),"tags");
+                requestContent.Add(new StringContent("json"),"format");
+                requestContent.Add(fileContent,"fileupload","img_nome");
+
+                HttpResponseMessage response = await httpClient.PostAsync("https://post.imageshack.us/upload_api.php", requestContent);
+                if(response.IsSuccessStatusCode) {
+                    string responseBody = await response.Content.ReadAsStringAsync();
+                    imovel.imagens.Add(new Imagem { cod = "1234" });
+                    imovel.obs = responseBody;
+                } else {
+                    appReturn.AddException($"Error: {response.StatusCode} - {response.ReasonPhrase}","Não foi possível cadastrar imagens");
+                }
+
+            }
+
+
+            if(appReturn.status.success)
+                appReturn.result = imovel;
+
+            return appReturn;
+
+        }
 
 
 
@@ -420,31 +370,27 @@ namespace JaCaptei.Administrativo.API.Controllers {
                     if(busca.imovel.areaMaxima > 0)
                         filter += " AND cf_1203  <=  " + busca.imovel.areaMaxima.ToString();
 
-
-
-
-
-                    if(busca.imovel.areaServico) { filter += " AND cf_1053 = 1 "; }
-                    if(busca.imovel.closet) { filter += " AND cf_1063 = 1 "; }
-                    if(busca.imovel.churrasqueira) { filter += " AND cf_1147 = 1 "; }
-                    if(busca.imovel.salas) { filter += " AND cf_1043 = 1 "; }
-                    if(busca.imovel.armarioBanheiro) { filter += " AND cf_1055 = 1 "; }
-                    if(busca.imovel.armarioQuarto) { filter += " AND cf_1059 = 1 "; }
-                    if(busca.imovel.boxDespejo) { filter += " AND cf_1121 = 1 "; }
-                    if(busca.imovel.lavabo) { filter += " AND cf_1071 = 1 "; }
-                    if(busca.imovel.hidromassagem) { filter += " AND cf_1149 = 1 "; }
-                    if(busca.imovel.piscina) { filter += " AND cf_1153 = 1 "; }
-                    if(busca.imovel.quadraEsportiva) { filter += " AND cf_1157 = 1 "; }
-                    if(busca.imovel.salaoFestas) { filter += " AND cf_1163 = 1 "; }
-                    if(busca.imovel.dce) { filter += " AND cf_1065 = 1 "; }
-                    if(busca.imovel.cercaEletrica) { filter += " AND cf_1123 = 1 "; }
-                    if(busca.imovel.jardim) { filter += " AND cf_1131 = 1 "; }
-                    if(busca.imovel.interfone) { filter += " AND cf_1129 = 1 "; }
-                    if(busca.imovel.armarioCozinha) { filter += " AND cf_1057 = 1 "; }
-                    if(busca.imovel.portaoEletronico) { filter += " AND cf_1135 = 1 "; }
-                    if(busca.imovel.alarme) { filter += " AND cf_1113 = 1 "; }
-                    if(busca.imovel.aguaIndividual) { filter += " AND cf_1111 = 1 "; }
-                    if(busca.imovel.gasCanalizado) { filter += " AND cf_1127 = 1 "; }
+                    if(busca.imovel.areaServico)        { filter += " AND cf_1053 = 1 "; }
+                    if(busca.imovel.closet)             { filter += " AND cf_1063 = 1 "; }
+                    if(busca.imovel.churrasqueira)      { filter += " AND cf_1147 = 1 "; }
+                    if(busca.imovel.salas)              { filter += " AND cf_1043 = 1 "; }
+                    if(busca.imovel.armarioBanheiro)    { filter += " AND cf_1055 = 1 "; }
+                    if(busca.imovel.armarioQuarto)      { filter += " AND cf_1059 = 1 "; }
+                    if(busca.imovel.boxDespejo)         { filter += " AND cf_1121 = 1 "; }
+                    if(busca.imovel.lavabo)             { filter += " AND cf_1071 = 1 "; }
+                    if(busca.imovel.hidromassagem)      { filter += " AND cf_1149 = 1 "; }
+                    if(busca.imovel.piscina)            { filter += " AND cf_1153 = 1 "; }
+                    if(busca.imovel.quadraEsportiva)    { filter += " AND cf_1157 = 1 "; }
+                    if(busca.imovel.salaoFestas)        { filter += " AND cf_1163 = 1 "; }
+                    if(busca.imovel.dce)                { filter += " AND cf_1065 = 1 "; }
+                    if(busca.imovel.cercaEletrica)      { filter += " AND cf_1123 = 1 "; }
+                    if(busca.imovel.jardim)             { filter += " AND cf_1131 = 1 "; }
+                    if(busca.imovel.interfone)          { filter += " AND cf_1129 = 1 "; }
+                    if(busca.imovel.armarioCozinha)     { filter += " AND cf_1057 = 1 "; }
+                    if(busca.imovel.portaoEletronico)   { filter += " AND cf_1135 = 1 "; }
+                    if(busca.imovel.alarme)             { filter += " AND cf_1113 = 1 "; }
+                    if(busca.imovel.aguaIndividual)     { filter += " AND cf_1111 = 1 "; }
+                    if(busca.imovel.gasCanalizado)      { filter += " AND cf_1127 = 1 "; }
                 }
 
 

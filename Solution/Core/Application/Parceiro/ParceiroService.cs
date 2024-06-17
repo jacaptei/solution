@@ -103,7 +103,7 @@ namespace JaCaptei.Application{
 
             if(entityDB is not null && entityDB?.id > 0) {
                 if(!entityDB.confirmado)
-                    appReturn.AddException("Confirme o cadastro através do link enviado pelo e-mail para ter o acesso liberado.");
+                    appReturn.AddException("Já existe um Parceiro cadastrado com este CPF, CNPJ ou E-mail. Se já fez o cadastro, não esqueça de o confirmar através do link enviado pelo e-mail para ter o acesso liberado.");
                 else if(!entityDB.validado)
                     appReturn.AddException("Aguarde a liberação de seu acesso (será notificado via e-mail.");
                 else if(entityDB.excluido)

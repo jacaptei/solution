@@ -23,9 +23,11 @@ namespace JaCaptei.Application{
             using(var conn = new DBcontext().GetConn()) {
                 using(var trans = conn.EnsureOpen().BeginTransaction()) {
                     try{
-                        entity.id               = conn.Insert<Admin,int>(entity);
-                        entity.settings.idAdmin = entity.id;
-                        entity.settings.id      = conn.Insert<AdminSettings,int>(entity.settings);
+                        entity.id                                       = conn.Insert<Admin,int>(entity);
+                        entity.settings.idAdmin                         = entity.id;
+                        entity.settings.receberSolicitacaoAgendada      = false;
+                        entity.settings.receberSolicitacaoNaoAgendada   = false;
+                        entity.settings.id                              = conn.Insert<AdminSettings,int>(entity.settings);
                         trans.Commit();
                     } catch(Exception ex) {
                         appReturn.SetAsException("Falha ao criar admin",ex);

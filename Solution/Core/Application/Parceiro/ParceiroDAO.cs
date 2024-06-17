@@ -197,9 +197,10 @@ namespace JaCaptei.Application{
 
                     //user.idCRM              = entity.idCRM;
                     if(entityDB is not null && entityDB?.id > 0) {
-                        entityDB.ativo              = entity.ativo      = true;
                         entityDB.confirmado         = entity.confirmado = true;
-                        entityDB.ativoCRM           = entity.ativoCRM   = (Utils.Validator.Not(entity.usernameCRM) || Utils.Validator.Not(entity.senhaCRM)); 
+                        entityDB.validado           = entity.validado   = true; 
+                        entityDB.ativo              = entity.ativo      = true;
+                        entityDB.ativoCRM           = entity.ativoCRM   = (Utils.Validator.Not(entity.usernameCRM) || Utils.Validator.Not(entity.senhaCRM));
                         entityDB.status             = "ATIVO";
                         entityDB.dataAtualizacao    = Utils.Date.GetLocalDateTime();
 

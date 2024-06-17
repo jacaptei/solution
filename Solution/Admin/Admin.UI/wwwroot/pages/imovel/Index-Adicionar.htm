@@ -15,42 +15,11 @@
         <div v-if="view=='imagens'">
             <div style="width:100%">
                        
-                    <!--<el-upload
-                            v-model:file-list="imagens"
-                            action="https://run.mocky.io/v3/9d059bf9-4660-45f2-925d-ce80ad6c4d15"
-                            list-type="picture-card"
-                            :on-preview="handlePictureCardPreview"
-                            :on-remove="handleRemove"
-                    >-->
-                    <!--<el-upload
-                            v-model:file-list="imagens"
-                            list-type="picture-card"
-                            :on-preview="handlePictureCardPreview"
-                            :on-remove="handleRemove"
-                    >
-                    <el-icon><Plus /></el-icon>
-                    </el-upload>
-
-                    <el-dialog v-model="dialogVisible">
-                        <img w-full :src="dialogImageUrl" alt="Preview Image" />
-                    </el-dialog>-->
-
-
-
-                  <!--<el-upload
-                    v-model:file-list="imagens"
-                    list-type="picture-card"
-                    :on-preview="handlePictureCardPreview"
-                    :on-remove="handleRemove"
-                    class="upload-demo"
-                    drag
-                    multiple
-                  >-->
                   <el-upload
                     accept="image/png,image/jpeg"
                     :auto-upload="false"
                     ref="uploadImagesComponent"
-                    v-model:file-list="imagens"
+                    v-model:file-list="imagensInputs"
                     list-type="picture-card"
                     :on-preview="HandlePreviewImagem"
                     :on-remove="HandleRemoverImagem"
@@ -72,7 +41,7 @@
                   </el-upload>
 
                 <div style="margin-top:0px">
-                    <q-btn label="limpar" outline color="orange" @click="imagens = []" icon="fa fa-trash"></q-btn>
+                    <q-btn label="limpar" outline color="orange" @click="imagensInputs = []" icon="fa fa-trash"></q-btn>
                     <q-btn label="SALVAR" color="primary" @click="Enviar()" :loading="onrequest" style="margin-left:20px" icon="fa fa-save"></q-btn>
                 </div>
             </div>
@@ -90,7 +59,6 @@
                     <input type="file" id="fileInput" />
             </div>
         </div>
-
 
 
 
@@ -234,8 +202,8 @@
             return {
                 onrequest: false,
                 view: "imagens",
-                imagens: [],
                 imagensFiles: [],
+                imagensInputs: [],
                 previewImagemModal:false,
                 previewImagem:null,
                 carregandoCEP: false,
@@ -272,28 +240,22 @@
         methods: {
 
             HandleChangeImagem(uploadFile, uploadFiles){
-              c("change")
-              //console.log(uploadFile, uploadFiles)
-              this.imagensFiles =  Object.assign({}, uploadFile).raw;
-              console.log(this.imagensFiles)
+              //c("change")
             },
 
             HandleRemoverImagem(uploadFile, uploadFiles){
-              c("remove")
-              //console.log(uploadFile, uploadFiles)
-              this.imagensFiles =  Object.assign({}, uploadFile).raw;
-              console.log(this.imagensFiles)
-              //console.log(uploadFile)
+              //c("remove")
             },
 
             HandlePreviewImagem(file){
-                console.log(file)
+                //console.log(file)
                 this.previewImagem=file;
                 this.previewImagemModal=true;
             },
 
 
-           async EnviarParte1() {
+
+            async EnviarParte1() {
 
                 if (this.$validator.not(this.imovel.estado))
                     msg += "<b>ESTADO</b> não selecionado<br>";
@@ -320,113 +282,25 @@
                 }
             },
 
-            ArrayBufferToBase64( buffer, callback ) {
-                var blob = new Blob([buffer],{type:'application/octet-binary'});
-                var reader = new FileReader();
-                reader.onload = function(evt){
-                    var dataurl = evt.target.result;
-                    callback(dataurl.substr(dataurl.indexOf(',')+1));
-                };
-                reader.readAsDataURL(blob);
-            },
-
-            async Blob2base64(blob, mimeType){
-
-                var reader = new FileReader();    
-                 reader.readAsDataURL(blob);
-                 reader.onloadend = function () {
-                       var base64data = reader.result;
-                       c(base64data)
-                       return base64data;
-                 };
-            },
 
 
+            async Enviar() {
 
-           async Enviar() {
-
-            var fileInput = document.getElementById("fileInput");
-            var fileINPUT = fileInput.files[0];
-
-             console.log(fileINPUT);
-             var file = Object.assign({}, this.imagensFiles[0]).raw;
-             c("files");
-             console.log(file);
-
+            this.imagensFiles = [];
 
                 const formData = new FormData();
                 formData.append('object', this.imovel);
-                formData.append('file', this.imagensFiles[0], 'logo.jpg');
-                //formData.append('file', fileINPUT , 'logo.jpg');
 
-                 //ar url = this.$api.BuildURL("imovel/adicionar");
-                 //ar result = axios.post(url,formData,{headers:{"Content-Type": "multipart/form-data"} }).then((request) => {
-                 //      c(request.data);
-                 //);  
+                this.imagensInputs.forEach((img)=>{
+                    var imgFile = Object.assign({}, img).raw;
+                    formData.append('imgFiles',imgFile, imgFile.name);
+                    //this.imagensFiles.push(imgFile); 
+                });
 
-                //var request = await this.$api.Post("imovel/adicionar", this.imovel);
-                
-                
-                
-                //axios.post(url, formData)
-                //    .then(function (response) {
-                //        document.getElementById("response").innerText = "Image uploaded successfully.";
-                //    })
-                //    .catch(function (error) {
-                //        document.getElementById("response").innerText = "Error: " + error.response.statusText;
-                //    });
-
-
-                    /*
-                    var reader = new FileReader();    
-                    reader.readAsDataURL(blob);
-                    reader.onloadend =()=>{
-                        var base64data = reader.result;
-                        var img = {base64:base64data,blob:this.imagens[0].url};
-                        c2("base64data",base64data);
-                        this.imovel.imagens.push(img);
-                        this.imovel.imagem = this.imagens[0];
-                        //var request = this.$api.Post("imovel/adicionar", this.imovel);
-
-
-                        var url = this.$api.BuildURL("imovel/adicionar");
-                        var result = axios.post(url, this.imovel,{headers:{"Content-Type": "multipart/form-data"} }).then((request) => {
-                                c(request.data);
-                        });  
-                    };
-                    */
-
-                    //this.Blob2base64(blob, mimeType).then(base64data => {
-                    //  c2("base64data",base64data);
-                    //});
-
-
-                    //var reader = new FileReader();
-                    //reader.readAsDataURL(this.imovel.imagens[0].url); 
-                    //reader.onloadend = function() {
-                    //  var base64data = reader.result;            
-                    //  c2("base64data",base64data);
-                    //}
-
-                    //var base64String = btoa(String.fromCharCode.apply(null, new Uint8Array(arrayBuffer)));
-
-                    
-               /*
-                    
-                    this.onrequest = true;
-                    var img = {bin:this.imagens[0].url.replace("blob:","")};
-                    this.imovel.imagens.push(img);
-
-                    var request = await this.$api.Post("imovel/adicionar", this.imovel);
-
-                    this.onrequest = false;
-                    if (this.$validator.is(request?.status?.success)){
-                        this.$tools.AlertSuccess("Cadastro efetuado");
-                        this.imovel = this.$models.imovel();
-                    }
-                    else
-                        this.$tools.AlertSuccess("Não foi possível realizar o cadastro.");
-                    */
+                 var url = this.$api.BuildURL("imovel/adicionar");
+                 var result = axios.post(url,formData,{headers:{"Content-Type": "multipart/form-data"} }).then((request) => {
+                       c(request.data);
+                 });  
 
             },
 

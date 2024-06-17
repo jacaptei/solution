@@ -349,7 +349,7 @@
   },
   {
     "ContainingType": "JaCaptei.Administrativo.API.Controllers.ImovelController",
-    "Method": "SalvarImagem",
+    "Method": "ImageShackUploadImagens",
     "RelativePath": "imovel",
     "HttpMethod": "",
     "IsController": true,
@@ -361,14 +361,14 @@
         "IsRequired": true
       },
       {
-        "Name": "file",
-        "Type": "Microsoft.AspNetCore.Http.IFormFile",
+        "Name": "imgFiles",
+        "Type": "System.Collections.Generic.List\u00601[[Microsoft.AspNetCore.Http.IFormFile, Microsoft.AspNetCore.Http.Features, Version=8.0.0.0, Culture=neutral, PublicKeyToken=adb9793829ddae60]]",
         "IsRequired": false
       }
     ],
     "ReturnTypes": [
       {
-        "Type": "JaCaptei.Model.Imovel",
+        "Type": "JaCaptei.Model.AppReturn",
         "MediaTypes": [
           "text/plain",
           "application/json",
@@ -380,21 +380,21 @@
   },
   {
     "ContainingType": "JaCaptei.Administrativo.API.Controllers.ImovelController",
-    "Method": "SalvarImagens",
+    "Method": "ImageShackDownload_ImoviewUpload",
     "RelativePath": "imovel",
     "HttpMethod": "",
     "IsController": true,
     "Order": 0,
     "Parameters": [
       {
-        "Name": "imovel",
-        "Type": "JaCaptei.Model.Imovel",
-        "IsRequired": true
+        "Name": "URLimagem",
+        "Type": "System.String",
+        "IsRequired": false
       }
     ],
     "ReturnTypes": [
       {
-        "Type": "JaCaptei.Model.Imovel",
+        "Type": "JaCaptei.Model.AppReturn",
         "MediaTypes": [
           "text/plain",
           "application/json",
@@ -958,8 +958,8 @@
         "IsRequired": false
       },
       {
-        "Name": "imagem",
-        "Type": "System.Byte[]",
+        "Name": "imgFiles",
+        "Type": "System.Collections.Generic.List\u00601[[System.Object, System.Private.CoreLib, Version=8.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e]]",
         "IsRequired": false
       },
       {
@@ -1043,8 +1043,8 @@
         "IsRequired": false
       },
       {
-        "Name": "file",
-        "Type": "Microsoft.AspNetCore.Http.IFormFile",
+        "Name": "imgFiles",
+        "Type": "System.Collections.Generic.List\u00601[[Microsoft.AspNetCore.Http.IFormFile, Microsoft.AspNetCore.Http.Features, Version=8.0.0.0, Culture=neutral, PublicKeyToken=adb9793829ddae60]]",
         "IsRequired": false
       }
     ],

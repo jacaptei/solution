@@ -94,7 +94,7 @@ namespace JaCaptei.Model {
 
             public string       imagensStr              {get;set;}  = "";
             public List<Imagem> imagens                 {get;set;}  =   new List<Imagem>();
-            public byte[]       imagem                  {get;set;}
+            public List<dynamic>imgFiles                {get;set;}  =   new List<dynamic>();
             
             public string       status                  {get;set;}  =   "ATIVO";
             public bool         ativo                   {get;set;}  =   false;
