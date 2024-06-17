@@ -14,7 +14,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("JaCaptei.Model")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+244ab13ef8ff9b9d2e4c279817dfc155685bdd6b")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+b0d69e51e64e67fcff9e8f302dc44ca95de6a084")]
 [assembly: System.Reflection.AssemblyProductAttribute("JaCaptei.Model")]
 [assembly: System.Reflection.AssemblyTitleAttribute("JaCaptei.Model")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

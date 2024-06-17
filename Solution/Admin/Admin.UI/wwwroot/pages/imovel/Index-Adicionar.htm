@@ -19,7 +19,7 @@
                     accept="image/png,image/jpeg"
                     :auto-upload="false"
                     ref="uploadImagesComponent"
-                    v-model:file-list="imagensInputs"
+                    v-model:file-list="imagesInputs"
                     list-type="picture-card"
                     :on-preview="HandlePreviewImagem"
                     :on-remove="HandleRemoverImagem"
@@ -41,7 +41,7 @@
                   </el-upload>
 
                 <div style="margin-top:0px">
-                    <q-btn label="limpar" outline color="orange" @click="imagensInputs = []" icon="fa fa-trash"></q-btn>
+                    <q-btn label="limpar" outline color="orange" @click="imagesInputs = []" icon="fa fa-trash"></q-btn>
                     <q-btn label="SALVAR" color="primary" @click="Enviar()" :loading="onrequest" style="margin-left:20px" icon="fa fa-save"></q-btn>
                 </div>
             </div>
@@ -203,7 +203,7 @@
                 onrequest: false,
                 view: "imagens",
                 imagensFiles: [],
-                imagensInputs: [],
+                imagesInputs: [],
                 previewImagemModal:false,
                 previewImagem:null,
                 carregandoCEP: false,
@@ -291,10 +291,10 @@
                 const formData = new FormData();
                 formData.append('object', this.imovel);
 
-                this.imagensInputs.forEach((img)=>{
-                    var imgFile = Object.assign({}, img).raw;
-                    formData.append('imgFiles',imgFile, imgFile.name);
-                    //this.imagensFiles.push(imgFile); 
+                this.imagesInputs.forEach((img)=>{
+                    var imageFile = Object.assign({}, img).raw;
+                    formData.append('imageFiles',imageFile, imageFile.name);
+                    //this.imagensFiles.push(imageFile); 
                 });
 
                  var url = this.$api.BuildURL("imovel/adicionar");

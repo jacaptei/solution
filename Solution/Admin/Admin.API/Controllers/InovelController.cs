@@ -33,14 +33,14 @@ namespace JaCaptei.Administrativo.API.Controllers {
 
         [HttpPost]
         [Route("[action]")]
-        public async Task<IActionResult> Adicionar([FromForm] Imovel imovel,List<IFormFile> imgFiles) {
+        public async Task<IActionResult> Adicionar([FromForm] Imovel imovel,List<IFormFile> imageFiles) {
         //public async Task<IActionResult> Adicionar([FromForm] IFormFile file) {
 
            Usuario logado          = ObterUsuarioAutenticado();
             imovel.inseridoPorId    = imovel.atualizadoPorId    = logado.id;
             imovel.inseridoPorNome  = imovel.atualizadoPorNome  = logado.nome;
 
-            appReturn = await ImageShackUploadImagens(imovel,imgFiles);
+            appReturn = await ImageShackUploadImagens(imovel,imageFiles);
             appReturn.result = imovel;
             await ImageShackDownload_ImoviewUpload("https://imagizer.imageshack.com/img924/9249/XXPIrP.jpg");
             return Result(appReturn);
@@ -49,28 +49,28 @@ namespace JaCaptei.Administrativo.API.Controllers {
 
 
 
-        public async Task<AppReturn> ImageShackUploadImagens(Imovel imovel,List<IFormFile> imgFiles) {
+        public async Task<AppReturn> ImageShackUploadImagens(Imovel imovel,List<IFormFile> imageFiles) {
 
             int     ordem           = 1;
             string  pathToSave      = "";
             string  path            = "";
             byte[]  fileBytes;
 
-            if(imgFiles?.Count > 0) {
-                foreach(IFormFile imgFile in imgFiles) {
+            if(imageFiles?.Count > 0) {
+                foreach(IFormFile imageFile in imageFiles) {
                     using(var memoryStream = new MemoryStream()) {
 
-                        await imgFile.CopyToAsync(memoryStream);
+                        await imageFile.CopyToAsync(memoryStream);
                         fileBytes = memoryStream.ToArray();
 
                         var fileContent = new ByteArrayContent(fileBytes);
-                        fileContent.Headers.ContentType = MediaTypeHeaderValue.Parse(imgFile.ContentType);
+                        fileContent.Headers.ContentType = MediaTypeHeaderValue.Parse(imageFile.ContentType);
 
                         var requestContent = new MultipartFormDataContent();
                         requestContent.Add(new StringContent("37AGIJQUbe8fab869df40b8dd3dbecfce6e15c22"),"key");
                         requestContent.Add(new StringContent("Test"),"tags");
                         requestContent.Add(new StringContent("json"),"format");
-                        requestContent.Add(fileContent,"fileupload",imgFile.FileName);
+                        requestContent.Add(fileContent,"fileupload",imageFile.FileName);
 
                         using(HttpClient httpClient = new HttpClient()) {
                             try {

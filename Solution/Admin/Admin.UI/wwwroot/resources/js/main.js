@@ -281,8 +281,8 @@ $(document).ready(function () {
                     this.admins = (await this.$api.Get("admin/obter/todos")).result;
                     //c2("GetAdmin", this.GetAdmin(this.admins[0].id));
 
-					this.RouteTo("/imoveis");
-                    //this.RouteTo("/home");
+					//this.RouteTo("/imoveis");
+                    this.RouteTo("/home");
 
                 },
 
