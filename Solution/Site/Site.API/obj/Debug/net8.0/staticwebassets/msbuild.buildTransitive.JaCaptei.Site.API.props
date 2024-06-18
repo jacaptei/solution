@@ -1,3 +1,0 @@
-﻿<Project>
-  <Import Project="..\buildMultiTargeting\JaCaptei.Site.API.props" />
-</Project>

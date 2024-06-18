@@ -1,7 +1,0 @@
-C:\jobs\JaCaptei\Projects\_main\Solution\Admin\Admin.UI\obj\Release\net8.0\PubTmp\Out\JaCaptei.Admin.UI.exe
-C:\jobs\JaCaptei\Projects\_main\Solution\Admin\Admin.UI\obj\Release\net8.0\PubTmp\Out\appsettings.Development.json
-C:\jobs\JaCaptei\Projects\_main\Solution\Admin\Admin.UI\obj\Release\net8.0\PubTmp\Out\appsettings.json
-C:\jobs\JaCaptei\Projects\_main\Solution\Admin\Admin.UI\obj\Release\net8.0\PubTmp\Out\JaCaptei.Admin.UI.dll
-C:\jobs\JaCaptei\Projects\_main\Solution\Admin\Admin.UI\obj\Release\net8.0\PubTmp\Out\JaCaptei.Admin.UI.deps.json
-C:\jobs\JaCaptei\Projects\_main\Solution\Admin\Admin.UI\obj\Release\net8.0\PubTmp\Out\JaCaptei.Admin.UI.runtimeconfig.json
-C:\jobs\JaCaptei\Projects\_main\Solution\Admin\Admin.UI\obj\Release\net8.0\PubTmp\Out\JaCaptei.Admin.UI.pdb
