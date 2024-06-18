@@ -1,15 +1,12 @@
-﻿using Microsoft.AspNetCore.Mvc;
-using JaCaptei.Services;
-using System.Numerics;
-using JaCaptei.Application;
+﻿using JaCaptei.Application;
 using JaCaptei.Model;
-using System.Text.Json;
-using Microsoft.AspNetCore.Authorization;
-using Newtonsoft.Json;
-using JaCaptei.Application.Suporte;
-using System.Security.Claims;
 
-namespace JaCaptei.API.Controllers {
+using Microsoft.AspNetCore.Mvc;
+
+using Newtonsoft.Json;
+
+namespace JaCaptei.API.Controllers
+{
 
     [ApiController]
     [Route("[controller]")]

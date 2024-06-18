@@ -1,15 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using Microsoft.Data.SqlClient;
-using System.Threading.Tasks;
-using RepoDb;
+﻿using JaCaptei.Application.Services;
 using JaCaptei.Model;
-using JaCaptei.Application.Services;
-using JaCaptei.Model.Model;
-using JaCaptei.Application.Suporte;
-using JaCaptei.Application.DAL;
 
-namespace JaCaptei.Application{
+namespace JaCaptei.Application
+{
 
 
     public class LocalidadeService : ServiceBase{
