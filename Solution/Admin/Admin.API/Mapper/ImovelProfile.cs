@@ -16,7 +16,7 @@ public class ImovelDTOProfile : Profile
             .ForMember(dest => dest.Cod,                     opt => opt.MapFrom(src => src.productcode))
             .ForMember(dest => dest.Key,                     opt => opt.MapFrom(src => "imovel_cod_" + src.productcode + "_id_" + src.id))
             .ForMember(dest => dest.Tipo,                    opt => opt.MapFrom(src => MapTipo(src)))
-            .ForMember(dest => dest.Data,                    opt => opt.MapFrom(src => DateTime.Parse(src.createdtime)))
+            .ForMember(dest => dest.Data,                    opt => opt.MapFrom(src => StrToDateTime(src.createdtime)))
             .ForMember(dest => dest.Titulo,                  opt => opt.MapFrom(src => MapTitulo(src)))
             .ForMember(dest => dest.Destinacao,              opt => opt.MapFrom(src => src.cf_953))
             .ForMember(dest => dest.LocalChaves,             opt => opt.MapFrom(src => src.cf_959))
@@ -65,9 +65,23 @@ public class ImovelDTOProfile : Profile
             .ForMember(dest => dest.rlvideo,                opt => opt.MapFrom(src => src.UrlVideo))
             .ForMember(dest => dest.urlpublica,             opt => opt.MapFrom(src => src.UrlPublica))
 
-            .ForMember(dest => dest.descricao,              opt => opt.MapFrom(src => src.Descricao));
-          
+            .ForMember(dest => dest.finalidade, opt => opt.MapFrom(src => 2)) // Hardcoded venda
+            .ForMember(dest => dest.destinacao, opt => opt.MapFrom(src => GetFromDictionary(src.Destinacao, ImoviewCampos.Destinacoes, 3)))
+            .ForMember(dest => dest.codigotipo, opt => opt.MapFrom(src => GetFromDictionary(src.Tipo, ImoviewCampos.Tipos, 1)))
+            .ForMember(dest => dest.localchave, opt => opt.MapFrom(src => GetFromDictionary(src.LocalChaves, ImoviewCampos.LocaisChave, 1)))
+
+            .ForMember(dest => dest.descricao,              opt => opt.MapFrom(src => src.Descricao));       
     }
+
+    private int GetFromDictionary(string chave, IReadOnlyDictionary<string, int> valuePairs, int defaultValue = 1)
+    {
+        if(valuePairs.ContainsKey(chave))
+            return valuePairs[chave];
+        return defaultValue;
+    }
+
+    private static DateTime StrToDateTime(string strVal) =>
+        DateTime.TryParse(strVal, out DateTime dt) ? dt : DateTime.MinValue;
 
     private static bool StrToBool(string strVal) => 
         !string.IsNullOrWhiteSpace(strVal) 

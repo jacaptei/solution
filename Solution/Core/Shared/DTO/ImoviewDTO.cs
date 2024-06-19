@@ -1,4 +1,6 @@
-﻿namespace JaCaptei.Model.DTO;
+﻿using System.Collections.Immutable;
+
+namespace JaCaptei.Model.DTO;
 
 public class Areas
 {
@@ -105,10 +107,10 @@ public class ImoviewAddImovelRequest
 {
     public int codigousuario { get; set; } // preenchido pelo usuario?
     public int codigounidade { get; set; } // busca no imoview e secionado pelo usuario
-    public int finalidade { get; set; } // busca no imoview - selecionar 2 = Venda ou usuario seleciona?
-    public int destinacao { get; set; } // busca no imoview - mapear pelo campo Destinacao
-    public int codigotipo { get; set; } // busca no imoview - mapear pelo campo Tipo
-    public int localchave { get; set; } // busca no imoview - mapear pelo campo LocalChaves
+    public int finalidade { get; set; } // busca no imoview - selecionar 2 = Venda ou usuario seleciona? - mapeado
+    public int destinacao { get; set; } // busca no imoview - mapear pelo campo Destinacao - OK
+    public int codigotipo { get; set; } // busca no imoview - mapear pelo campo Tipo - OK
+    public int localchave { get; set; } // busca no imoview - mapear pelo campo LocalChaves - OK
     public Valores valores { get; set; }
     public Areas areas { get; set; }
     public Endereco endereco { get; set; }
@@ -156,4 +158,58 @@ public class ImagemDTO
     public string Url { get; set; }
     public string Tipo { get; set; }
     public byte[] Arquivo { get; set; }
+}
+
+
+public static class ImoviewCampos
+{
+    public readonly static IReadOnlyDictionary<string, int> Finalidades = ImmutableDictionary.CreateRange(new Dictionary<string, int>
+    {
+        { "Aluguel", 1 },
+        { "Venda"  , 2 }
+    });
+
+    public readonly static IReadOnlyDictionary<string, int> Destinacoes = ImmutableDictionary.CreateRange(new Dictionary<string, int>
+    {
+        { "Residencial"          , 1 },
+        { "Comercial"            , 2 },
+        { "Residencial/Comercial", 3 },
+        { "Industrial"           , 4 },
+        { "Rural"                , 5 },
+        { "Temporada"            , 6 },
+        { "Corporativa"          , 7 },
+        { "Comercial/Industrial" , 8 }
+    });
+
+    public readonly static IReadOnlyDictionary<string, int> Tipos = ImmutableDictionary.CreateRange(new Dictionary<string, int>
+    {
+        {"Andar corrido"                 , 9},
+        {"Apartamento"                   , 2},
+        {"Apartamento com área privativa", 21},
+        {"Apartamento Duplex"            , 36},
+        {"Área privativa"                , 17},
+        {"Casa"                          , 1},
+        {"Casa em condomínio"            , 20},
+        {"Casa geminada"                 , 24},
+        {"Casa geminada coletiva"        , 23},
+        {"Cobertura"                     , 18},
+        {"Cobertura Duplex"              , 19},
+        {"Galpão"                        , 11},
+        {"Loft"                          , 34},
+        {"Lote"                          , 3},
+        {"Lote em condomínio"            , 4},
+        {"Prédio Comercial"              , 33},
+        {"Studio"                        , 42},
+        {"Terreno / Área"                , 32}
+    });
+
+    public readonly static IReadOnlyDictionary<string, int> LocaisChave = ImmutableDictionary.CreateRange(new Dictionary<string, int>
+    {
+        {"Imobiliária" , 1},
+        {"Locatário"   , 5},
+        {"No Local"    , 4},
+        {"Portaria"    , 3},
+        {"Proprietário", 2}
+    });
+
 }
