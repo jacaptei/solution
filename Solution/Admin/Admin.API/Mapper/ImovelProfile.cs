@@ -9,63 +9,103 @@ public class ImovelDTOProfile : Profile
     public ImovelDTOProfile()
     {
         CreateMap<ImovelCRMDTO, ImovelDTO>()
-            .ForMember(dest => dest.Id, opt => opt.MapFrom(src => src.id))
-            .ForMember(dest => dest.IdCRM, opt => opt.MapFrom(src => src.id))
-            .ForMember(dest => dest.IdSKU, opt => opt.MapFrom(src => MapSku(src)))
-            .ForMember(dest => dest.IdModule, opt => opt.MapFrom(src => MapModule(src)))
-            .ForMember(dest => dest.Cod, opt => opt.MapFrom(src => src.productcode))
-            .ForMember(dest => dest.Key, opt => opt.MapFrom(src => "imovel_cod_" + src.productcode + "_id_" + src.id))
-            .ForMember(dest => dest.Tipo, opt => opt.MapFrom(src => MapTipo(src)))
-            .ForMember(dest => dest.Data, opt => opt.MapFrom(src => DateTime.Parse(src.createdtime)))
-            .ForMember(dest => dest.Titulo, opt => opt.MapFrom(src => MapTitulo(src)))
-            .ForMember(dest => dest.Destinacao, opt => opt.MapFrom(src => src.cf_953))
-            .ForMember(dest => dest.LocalChaves, opt => opt.MapFrom(src => src.cf_959))
+            .ForMember(dest => dest.Id,                      opt => opt.MapFrom(src => src.id))
+            .ForMember(dest => dest.IdCRM,                   opt => opt.MapFrom(src => src.id))
+            .ForMember(dest => dest.IdSKU,                   opt => opt.MapFrom(src => MapSku(src)))
+            .ForMember(dest => dest.IdModule,                opt => opt.MapFrom(src => MapModule(src)))
+            .ForMember(dest => dest.Cod,                     opt => opt.MapFrom(src => src.productcode))
+            .ForMember(dest => dest.Key,                     opt => opt.MapFrom(src => "imovel_cod_" + src.productcode + "_id_" + src.id))
+            .ForMember(dest => dest.Tipo,                    opt => opt.MapFrom(src => MapTipo(src)))
+            .ForMember(dest => dest.Data,                    opt => opt.MapFrom(src => DateTime.Parse(src.createdtime)))
+            .ForMember(dest => dest.Titulo,                  opt => opt.MapFrom(src => MapTitulo(src)))
+            .ForMember(dest => dest.Destinacao,              opt => opt.MapFrom(src => src.cf_953))
+            .ForMember(dest => dest.LocalChaves,             opt => opt.MapFrom(src => src.cf_959))
 
-            .ForMember(dest => dest.Valores, opt => opt.MapFrom(src => MapValores(src)))
-            .ForMember(dest => dest.Endereco, opt => opt.MapFrom(src => MapEndereco(src)))
-            .ForMember(dest => dest.Areas, opt => opt.MapFrom(src => MapAreas(src)))
+            .ForMember(dest => dest.Edificio,                opt => opt.MapFrom(src => src.cf_973))
+            .ForMember(dest => dest.Construtora,             opt => opt.MapFrom(src => src.cf_967))
+            .ForMember(dest => dest.IdChave,                 opt => opt.MapFrom(src => src.cf_961))
+            .ForMember(dest => dest.Exclusivo,               opt => opt.MapFrom(src => StrToBool(src.cf_967)))
+            .ForMember(dest => dest.Ocupado,                 opt => opt.MapFrom(src => StrToBool(src.cf_981)))
+            .ForMember(dest => dest.Alugado,                 opt => opt.MapFrom(src => StrToBool(src.cf_983)))
+            .ForMember(dest => dest.AceitaFinanciamento,     opt => opt.MapFrom(src => StrToBool(src.cf_985)))
+            .ForMember(dest => dest.AceitaPermuta,           opt => opt.MapFrom(src => StrToBool(src.cf_987)))
+            .ForMember(dest => dest.NaPlanta,                opt => opt.MapFrom(src => StrToBool(src.cf_989)))
+            .ForMember(dest => dest.Placa,                   opt => opt.MapFrom(src => StrToInt(src.cf_977)))
+            .ForMember(dest => dest.Anotacoes,               opt => opt.MapFrom(src => src.cf_1290))
+            .ForMember(dest => dest.UrlVideo,                opt => opt.MapFrom(src => src.cf_997))
+            .ForMember(dest => dest.UrlPublica,              opt => opt.MapFrom(src => src.cf_1250))
+
+            .ForMember(dest => dest.Valores,                 opt => opt.MapFrom(src => MapValores(src)))
+            .ForMember(dest => dest.Endereco,                opt => opt.MapFrom(src => MapEndereco(src)))
+            .ForMember(dest => dest.Areas,                   opt => opt.MapFrom(src => MapAreas(src)))
             .ForMember(dest => dest.CaracteristicasInternas, opt => opt.MapFrom(src => MapCaracteristicasInternas(src)))
             .ForMember(dest => dest.CaracteristicasInternas, opt => opt.MapFrom(src => MapCaracteristicasInternas(src)))
-            .ForMember(dest => dest.Lazer, opt => opt.MapFrom(src => MapLazer(src)))
-            .ForMember(dest => dest.Descricao, opt => opt.MapFrom(src => src.description));
+            .ForMember(dest => dest.Lazer,                   opt => opt.MapFrom(src => MapLazer(src)))
+            .ForMember(dest => dest.Descricao,               opt => opt.MapFrom(src => src.description));
 
         CreateMap<ImovelDTO, ImoviewAddImovelRequest>()
-            .ForMember(dest => dest.valores, opt => opt.MapFrom(src => GetValores(src)))
-            .ForMember(dest => dest.endereco, opt => opt.MapFrom(src => GetEndereco(src)))
+            .ForMember(dest => dest.valores,                opt => opt.MapFrom(src => GetValores(src)))
+            .ForMember(dest => dest.endereco,               opt => opt.MapFrom(src => GetEndereco(src)))
             .ForMember(dest => dest.caracteristicasinterna, opt => opt.MapFrom(src => GetCaracteristicasInterna(src)))
             .ForMember(dest => dest.caracteristicasexterna, opt => opt.MapFrom(src => GetCaracteristicasExterna(src)))
-            .ForMember(dest => dest.lazer, opt => opt.MapFrom(src => GetLazer(src)))
-            .ForMember(dest => dest.proprietarios, opt => opt.MapFrom(src => GetProprietarios(src)))
-            .ForMember(dest => dest.descricao, opt => opt.MapFrom(src => src.Descricao));
+            .ForMember(dest => dest.lazer,                  opt => opt.MapFrom(src => GetLazer(src)))
+            .ForMember(dest => dest.proprietarios,          opt => opt.MapFrom(src => GetProprietarios(src)))
+
+            .ForMember(dest => dest.edificio,               opt => opt.MapFrom(src => src.Edificio))
+            .ForMember(dest => dest.construtora ,           opt => opt.MapFrom(src => src.Construtora))
+            .ForMember(dest => dest.identificadorchave,     opt => opt.MapFrom(src => src.IdChave))
+            .ForMember(dest => dest.exclusivo,              opt => opt.MapFrom(src => src.Exclusivo))
+            .ForMember(dest => dest.ocupado,                opt => opt.MapFrom(src => src.Ocupado))
+            .ForMember(dest => dest.alugado,                opt => opt.MapFrom(src => src.Alugado))
+            .ForMember(dest => dest.aceitafinanciamento,    opt => opt.MapFrom(src => src.AceitaFinanciamento))
+            .ForMember(dest => dest.aceitapermuta,          opt => opt.MapFrom(src => src.AceitaPermuta))
+            .ForMember(dest => dest.naplanta,               opt => opt.MapFrom(src => src.NaPlanta))
+            .ForMember(dest => dest.placa,                  opt => opt.MapFrom(src => src.Placa))
+            .ForMember(dest => dest.anotacoes,              opt => opt.MapFrom(src => src.Anotacoes))
+            .ForMember(dest => dest.rlvideo,                opt => opt.MapFrom(src => src.UrlVideo))
+            .ForMember(dest => dest.urlpublica,             opt => opt.MapFrom(src => src.UrlPublica))
+
+            .ForMember(dest => dest.descricao,              opt => opt.MapFrom(src => src.Descricao));
+          
     }
+
+    private static bool StrToBool(string strVal) => 
+        !string.IsNullOrWhiteSpace(strVal) 
+        && strVal != "0" && !strVal.Equals("false", StringComparison.CurrentCultureIgnoreCase);
+
+    private static int StrToInt(string strVal) =>
+        int.TryParse(strVal, out int val) ? val : 0;
+
+    private static decimal StrToDecimal(string strVal) =>
+        decimal.TryParse(strVal, out decimal val) ? val : 0m;
 
     private static CaracteristicasInternasDTO MapCaracteristicasInternas(ImovelCRMDTO src)
     {
         return new CaracteristicasInternasDTO()
         {
-            Quartos         = int.TryParse(src.cf_1041, out int quartos) ? quartos : 0,
-            Salas           = int.TryParse(src.cf_1043, out int salas) ? salas : 0,
-            Banheiros       = int.TryParse(src.cf_1035, out int banheiros) ? banheiros : 0,
-            Suites          = int.TryParse(src.cf_1045, out int suites) ? suites : 0,
-            Andar           = int.TryParse(src.cf_1033, out int andar) ? andar : 0,
-            Varandas        = int.TryParse(src.cf_1047, out int varandas) ? varandas : 0,
-            Lavabo          = !string.IsNullOrWhiteSpace(src.cf_1071) && (src.cf_1071 != "0"),
-            Dce             = !string.IsNullOrWhiteSpace(src.cf_1065) && (src.cf_1065 != "0"),
-            Closet          = !string.IsNullOrWhiteSpace(src.cf_1063) && (src.cf_1063 != "0"),
-            AreaServico     = !string.IsNullOrWhiteSpace(src.cf_1053) && (src.cf_1053 != "0"),
-            ArmarioCozinha  = !string.IsNullOrWhiteSpace(src.cf_1057) && (src.cf_1057 != "0"),
-            ArmarioBanheiro = !string.IsNullOrWhiteSpace(src.cf_1055) && (src.cf_1055 != "0"),
-            ArmarioQuarto   = !string.IsNullOrWhiteSpace(src.cf_1059) && (src.cf_1059 != "0"),
-            ArCondicionado  = !string.IsNullOrWhiteSpace(src.cf_1049) && (src.cf_1049 != "0"),
-            AreaPrivativa   = !string.IsNullOrWhiteSpace(src.cf_1051) && (src.cf_1051 != "0"),
-            Box             = !string.IsNullOrWhiteSpace(src.cf_1061) && (src.cf_1061 != "0"),
-            Despensa        = !string.IsNullOrWhiteSpace(src.cf_1067) && (src.cf_1067 != "0"),
-            Escritorio      = !string.IsNullOrWhiteSpace(src.cf_1069) && (src.cf_1069 != "0"),
-            Mobiliado       = !string.IsNullOrWhiteSpace(src.cf_1073) && (src.cf_1073 != "0"),
-            Rouparia        = !string.IsNullOrWhiteSpace(src.cf_1075) && (src.cf_1075 != "0"),
-            SolDaManha      = !string.IsNullOrWhiteSpace(src.cf_1077) && (src.cf_1077 != "0"),
-            VarandaGourmet  = !string.IsNullOrWhiteSpace(src.cf_1081) && (src.cf_1081 != "0"),
-            VistaMar        = !string.IsNullOrWhiteSpace(src.cf_1079) && (src.cf_1079 != "0")
+            Quartos         = StrToInt(src.cf_1041),
+            Salas           = StrToInt(src.cf_1043),
+            Banheiros       = StrToInt(src.cf_1035),
+            Suites          = StrToInt(src.cf_1045),
+            Andar           = StrToInt(src.cf_1033),
+            Varandas        = StrToInt(src.cf_1047),
+            Lavabo          = StrToBool(src.cf_1071),
+            Dce             = StrToBool(src.cf_1065),
+            Closet          = StrToBool(src.cf_1063),
+            AreaServico     = StrToBool(src.cf_1053),
+            ArmarioCozinha  = StrToBool(src.cf_1057),
+            ArmarioBanheiro = StrToBool(src.cf_1055),
+            ArmarioQuarto   = StrToBool(src.cf_1059),
+            ArCondicionado  = StrToBool(src.cf_1049),
+            AreaPrivativa   = StrToBool(src.cf_1051),
+            Box             = StrToBool(src.cf_1061),
+            Despensa        = StrToBool(src.cf_1067),
+            Escritorio      = StrToBool(src.cf_1069),
+            Mobiliado       = StrToBool(src.cf_1073),
+            Rouparia        = StrToBool(src.cf_1075),
+            SolDaManha      = StrToBool(src.cf_1077),
+            VarandaGourmet  = StrToBool(src.cf_1081),
+            VistaMar        = StrToBool(src.cf_1079)
         };
     }
 
@@ -74,25 +114,25 @@ public class ImovelDTOProfile : Profile
         return new CaracteristicasExternasDTO()
         {
             TipoVagas         = src.cf_1099,
-            Vagas             = int.TryParse(src.cf_1097, out int vagas) ? vagas : 0,
-            Elevadores        = int.TryParse(src.cf_1101, out int elevadores) ? elevadores : 0,
-            Andares           = int.TryParse(src.cf_1105, out int andares) ? andares : 0,
-            UnidadePorAndar   = int.TryParse(src.cf_1107, out int unidsPorAndar) ? unidsPorAndar : 0,
-            AguaIndividual    = !string.IsNullOrWhiteSpace(src.cf_1111) && (src.cf_1111 != "0"),
-            Alarme            = !string.IsNullOrWhiteSpace(src.cf_1113) && (src.cf_1113 != "0"),
-            BoxDespejo        = !string.IsNullOrWhiteSpace(src.cf_1121) && (src.cf_1121 != "0"),
-            CercaEletrica     = !string.IsNullOrWhiteSpace(src.cf_1123) && (src.cf_1123 != "0"),
-            GasCanalizado     = !string.IsNullOrWhiteSpace(src.cf_1127) && (src.cf_1127 != "0"),
-            Interfone         = !string.IsNullOrWhiteSpace(src.cf_1129) && (src.cf_1129 != "0"),
-            Jardim            = !string.IsNullOrWhiteSpace(src.cf_1131) && (src.cf_1131 != "0"),
-            PortaoEletronico  = !string.IsNullOrWhiteSpace(src.cf_1135) && (src.cf_1135 != "0"),
-            Elevador          = !string.IsNullOrWhiteSpace(src.cf_1101) && (src.cf_1101 != "0"),
-            AquecedorGas      = !string.IsNullOrWhiteSpace(src.cf_1117) && (src.cf_1117 != "0"),
-            AquecedorEletrico = !string.IsNullOrWhiteSpace(src.cf_1115) && (src.cf_1115 != "0"),
-            AquecedorSolar    = !string.IsNullOrWhiteSpace(src.cf_1119) && (src.cf_1119 != "0"),
-            CircuitoTV        = !string.IsNullOrWhiteSpace(src.cf_1125) && (src.cf_1125 != "0"),
-            Lavanderia        = !string.IsNullOrWhiteSpace(src.cf_1133) && (src.cf_1133 != "0"),
-            Portaria24Horas   = !string.IsNullOrWhiteSpace(src.cf_1137) && (src.cf_1137 != "0"),
+            Vagas             = StrToInt(src.cf_1097),
+            Elevadores        = StrToInt(src.cf_1101),
+            Andares           = StrToInt(src.cf_1105),
+            UnidadePorAndar   = StrToInt(src.cf_1107),
+            AguaIndividual    = StrToBool(src.cf_1111),
+            Alarme            = StrToBool(src.cf_1113),
+            BoxDespejo        = StrToBool(src.cf_1121),
+            CercaEletrica     = StrToBool(src.cf_1123),
+            GasCanalizado     = StrToBool(src.cf_1127),
+            Interfone         = StrToBool(src.cf_1129),
+            Jardim            = StrToBool(src.cf_1131),
+            PortaoEletronico  = StrToBool(src.cf_1135),
+            Elevador          = StrToBool(src.cf_1101),
+            AquecedorGas      = StrToBool(src.cf_1117),
+            AquecedorEletrico = StrToBool(src.cf_1115),
+            AquecedorSolar    = StrToBool(src.cf_1119),
+            CircuitoTV        = StrToBool(src.cf_1125),
+            Lavanderia        = StrToBool(src.cf_1133),
+            Portaria24Horas   = StrToBool(src.cf_1137),
         };
     }
 
@@ -100,27 +140,29 @@ public class ImovelDTOProfile : Profile
     {
         return new LazerDTO()
         {
-            Churrasqueira   = !string.IsNullOrWhiteSpace(src.cf_1147) && (src.cf_1147 != "0"),
-            QuadraEsportiva = !string.IsNullOrWhiteSpace(src.cf_1157) && (src.cf_1157 != "0"),
-            SalaoFestas     = !string.IsNullOrWhiteSpace(src.cf_1163) && (src.cf_1163 != "0"),
-            Piscina         = !string.IsNullOrWhiteSpace(src.cf_1153) && (src.cf_1153 != "0"),
-            Hidromassagem   = !string.IsNullOrWhiteSpace(src.cf_1149) && (src.cf_1149 != "0"),
-            Academia        = !string.IsNullOrWhiteSpace(src.cf_1145) && (src.cf_1145 != "0"),
-            HomeCinema      = !string.IsNullOrWhiteSpace(src.cf_1151) && (src.cf_1151 != "0"),
-            Playground      = !string.IsNullOrWhiteSpace(src.cf_1155) && (src.cf_1155 != "0"),
-            SalaMassagem    = !string.IsNullOrWhiteSpace(src.cf_1161) && (src.cf_1161 != "0"),
-            SalaJogos       = !string.IsNullOrWhiteSpace(src.cf_1165) && (src.cf_1165 != "0"),
-            Sauna           = !string.IsNullOrWhiteSpace(src.cf_1167) && (src.cf_1167 != "0"),
+            Churrasqueira   = StrToBool(src.cf_1147),
+            QuadraEsportiva = StrToBool(src.cf_1157),
+            SalaoFestas     = StrToBool(src.cf_1163),
+            Piscina         = StrToBool(src.cf_1153),
+            Hidromassagem   = StrToBool(src.cf_1149),
+            Academia        = StrToBool(src.cf_1145),
+            HomeCinema      = StrToBool(src.cf_1151),
+            Playground      = StrToBool(src.cf_1155),
+            SalaMassagem    = StrToBool(src.cf_1161),
+            SalaJogos       = StrToBool(src.cf_1165),
+            Sauna           = StrToBool(src.cf_1167),
         };
     }
 
     private static AreasDTO MapAreas(ImovelCRMDTO src)
     {
+        var areaInterna = StrToDecimal(src.cf_1203);
+        var areaExterna = StrToDecimal(src.cf_1205);
         return new AreasDTO()
         {
-            AreaInterna = decimal.TryParse(src.cf_1203, out decimal areaInterna) ? areaInterna : 0,
-            AreaExterna = decimal.TryParse(src.cf_1205, out decimal areaExterna) ? areaExterna : 0,
-            AreaTotal = areaInterna + areaExterna
+            AreaInterna = areaInterna,
+            AreaExterna = areaExterna,
+            AreaTotal   = areaInterna + areaExterna
         };
     }
 
@@ -128,9 +170,10 @@ public class ImovelDTOProfile : Profile
     {
         return new ValoresDTO()
         {
-            Valor = MapValor(src),
-            ValorCondominio = decimal.TryParse(src.cf_1191, out decimal valorCondominio) ? valorCondominio : 0,
-            ValorIPTU = decimal.TryParse(src.cf_1193, out decimal valorIptu) ? valorIptu : 0
+            Valor           = MapValor(src),
+            ValorCondominio = StrToDecimal(src.cf_1191),
+            ValorIPTU       = StrToDecimal(src.cf_1193),
+            Comissao        = StrToDecimal(src.cf_1199)
         };
     }
 
@@ -138,13 +181,17 @@ public class ImovelDTOProfile : Profile
     {
         var endereco = new EnderecoDTO
         {
-            Cep = src.cf_999,
-            Estado = src.cf_1021,
-            Cidade = src.cf_1019,
-            Bairro = src.cf_1011,
-            Logradouro = src.cf_1001,
-            Numero = src.cf_1003,
-            Andar = src.cf_1033
+            Cep             = src.cf_999,
+            Estado          = src.cf_1021,
+            Cidade          = src.cf_1019,
+            Bairro          = src.cf_1011,
+            Logradouro      = src.cf_1001,
+            Numero          = src.cf_1003,
+            Andar           = src.cf_1033,
+            Complemento     = src.cf_1007,
+            Bloco           = src.cf_1288,
+            PontoReferencia = src.cf_1023,
+            MelhorAcesso    = src.cf_1025
         };
 
         return endereco;
@@ -154,9 +201,10 @@ public class ImovelDTOProfile : Profile
     {
         return new Valores()
         {
-            valor = src.Valores.Valor,
+            valor           = src.Valores.Valor,
             valorcondominio = src.Valores.ValorCondominio,
-            valoriptu = src.Valores.ValorIPTU
+            valoriptu       = src.Valores.ValorIPTU,
+            comissao        = src.Valores.Comissao
         };
     }
 
@@ -164,11 +212,15 @@ public class ImovelDTOProfile : Profile
     {
         return new Endereco()
         {
-            rua    = src.Endereco.Logradouro,
-            bairro = src.Endereco.Bairro,
-            cidade = src.Endereco.Cidade,
-            estado = src.Endereco.Estado,
-            numero = int.TryParse(src.Endereco.Numero, out int nro) ? nro : 0,
+            rua             = src.Endereco.Logradouro,
+            bairro          = src.Endereco.Bairro,
+            cidade          = src.Endereco.Cidade,
+            estado          = src.Endereco.Estado,
+            numero          = int.TryParse(src.Endereco.Numero, out int nro) ? nro : 0,
+            complemento     = src.Endereco.Complemento,
+            bloco           = src.Endereco.Bloco,
+            pontoreferencia = src.Endereco.PontoReferencia,
+            melhoracesso    = src.Endereco.MelhorAcesso
         };
     }
 
@@ -180,7 +232,7 @@ public class ImovelDTOProfile : Profile
             numerosalas     = src.CaracteristicasInternas.Salas,
             numerobanhos    = src.CaracteristicasInternas.Banheiros,
             numerosuites    = src.CaracteristicasInternas.Suites,
-            numeroandar     = int.TryParse(src.Endereco.Andar, out int andar) ? andar : 0,
+            numeroandar     = StrToInt(src.Endereco.Andar),
             areaservico     = src.CaracteristicasInternas.AreaServico,
             lavabo          = src.CaracteristicasInternas.Lavabo,
             closet          = src.CaracteristicasInternas.Closet,

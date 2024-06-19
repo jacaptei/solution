@@ -65,9 +65,6 @@ public class Endereco
     public string bairro { get; set; }
     public string cidade { get; set; }
     public string estado { get; set; }
-    public string bairro2 { get; set; }
-    public string cidade2 { get; set; }
-    public string estado2 { get; set; }
     public string bloco { get; set; }
     public string pontoreferencia { get; set; }
     public string melhoracesso { get; set; }
@@ -102,6 +99,7 @@ public class Valores
     public decimal valor { get; set; }
     public decimal valorcondominio { get; set; }
     public decimal valoriptu { get; set; }
+    public decimal comissao { get; set; }
 }
 public class ImoviewAddImovelRequest
 {
@@ -119,6 +117,19 @@ public class ImoviewAddImovelRequest
     public Lazer lazer { get; set; }
     public string descricao { get; set; }
     public List<Proprietario> proprietarios { get; set; }
+    public string edificio { get; set; }
+    public string construtora { get; set; }
+    public string identificadorchave { get; set; }
+    public bool exclusivo { get; set; }
+    public bool ocupado { get; set; }
+    public bool alugado { get; set; }
+    public int placa { get; set; }
+    public bool aceitafinanciamento { get; set; }
+    public bool aceitapermuta { get; set; }
+    public bool naplanta { get; set; }
+    public string anotacoes { get; set; }
+    public string rlvideo { get; set; }
+    public string urlpublica { get; set; }
 }
 
 public class CampoImoview

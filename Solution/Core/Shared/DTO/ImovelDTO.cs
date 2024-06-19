@@ -261,6 +261,20 @@ public class ImovelDTO
     public LazerDTO Lazer { get; set; }
     public string Titulo { get; set; }
     public string Descricao { get; set; }
+
+    public string Edificio { get; set; }
+    public string Construtora { get; set; }
+    public string IdChave { get; set; }
+    public bool Exclusivo { get; set; }
+    public bool Ocupado { get; set; }
+    public bool Alugado { get; set; }
+    public int Placa { get; set; }
+    public bool AceitaFinanciamento { get; set; }
+    public bool AceitaPermuta { get; set; }
+    public bool NaPlanta { get; set; }
+    public string Anotacoes { get; set; }
+    public string UrlVideo { get; set; }
+    public string UrlPublica { get; set; }
 }
 
 public class CaracteristicasInternasDTO
@@ -344,6 +358,7 @@ public class ValoresDTO
     public decimal Valor { get; set; }
     public decimal ValorCondominio { get; set; }
     public decimal ValorIPTU { get; set; }
+    public decimal Comissao { get; set; }
 }
 
 public class EnderecoDTO
@@ -355,6 +370,10 @@ public class EnderecoDTO
     public string Logradouro { get; set; }
     public string Numero { get; set; }
     public string Andar { get; set; }
+    public string Complemento { get; set; }
+    public string Bloco { get; set; }
+    public string PontoReferencia { get; set; }
+    public string MelhorAcesso { get; set; }
 }
 
 
