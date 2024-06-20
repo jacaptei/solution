@@ -1,70 +1,76 @@
 ﻿<template>
+    <div>
+        <div v-if="$root.isAuth">
 
-     <el-container :style="$root.search.onRequest? 'cursor:wait' : 'cursor:default'">
+            <el-container :style="$root.search.onRequest? 'cursor:wait' : 'cursor:default'">
 
-         <c-search-form :show="showForm" @showform="showForm = !showForm" @requestsearch="Search" v-if="$validator.is($root.search.imovelBusca.imovel)" :style="$root.search.onRequest? 'pointer-events: none;opacity:0.4;cursor:wait' : ''"></c-search-form>
+                <c-search-form :show="showForm" @showform="showForm = !showForm" @requestsearch="Search" v-if="$validator.is($root.search.imovelBusca.imovel)" :style="$root.search.onRequest? 'pointer-events: none;opacity:0.4;cursor:wait' : ''"></c-search-form>
 
-         <el-container style="cursor:default">
+                <el-container style="cursor:default">
 
-             <div class="row" style="width:100%;margin-bottom:40px;display:block">
-                 <div class="col-12 search-header"  :style="showForm? 'max-width:calc(100% - 54px);margin-top:0px':'margin-left:auto;max-width:calc(100% - 54px);margin-right:4px;margin-top:53px;'">
-                      <span v-html="buscaTitulo"></span>
-                      <!-- Apartamentos à venda em Cidade Nova, Belo Horizonte, MG. -->
-                 </div>
+                    <div class="row" style="width:100%;margin-bottom:40px;display:block">
+                        <div class="col-12 search-header" :style="showForm? 'max-width:calc(100% - 54px);margin-top:0px':'margin-left:auto;max-width:calc(100% - 54px);margin-right:4px;margin-top:53px;'">
+                            <span v-html="buscaTitulo"></span>
+                            <!-- Apartamentos à venda em Cidade Nova, Belo Horizonte, MG. -->
+                        </div>
 
-                 <div class="col-12" style="width:100%;text-align:center;padding:40px;padding-left:0px" v-if="$root.search.onRequest">
-                        <c-loading size="60px"></c-loading>
-                 </div>
-                 <div class="col-12" style="width:100%" v-else>
-                     <div class="col-12" style="width:100%;text-align:center;padding:40px;padding-left:0px" v-if="!$root.search.onRequest && results?.length == 0">
-                         <i class="fa fa-circle-exclamation" style="font-size:80px;color:var(--s-accent-color)"></i>  <br />
-                         <div  style="font-size:20px;font-weight:700;color:var(--s-accent-color);margin-top:20px">Nada encontrado</div>
-                     </div>
-                     <div v-for="(item,index) in results" v-else>
-                        <c-building-card :id="$tools.GetRandomID()" :imovel="item"></c-building-card>
-                     </div>
-                 </div>
+                        <div class="col-12" style="width:100%;text-align:center;padding:40px;padding-left:0px" v-if="$root.search.onRequest">
+                            <c-loading size="60px"></c-loading>
+                        </div>
+                        <div class="col-12" style="width:100%" v-else>
+                            <div class="col-12" style="width:100%;text-align:center;padding:40px;padding-left:0px" v-if="!$root.search.onRequest && results?.length == 0">
+                                <i class="fa fa-circle-exclamation" style="font-size:80px;color:var(--s-accent-color)"></i>  <br />
+                                <div style="font-size:20px;font-weight:700;color:var(--s-accent-color);margin-top:20px">Nada encontrado</div>
+                            </div>
+                            <div v-for="(item,index) in results" v-else>
+                                <c-building-card :id="$tools.GetRandomID()" :imovel="item"></c-building-card>
+                            </div>
+                        </div>
 
-                <div v-if="showNavigator" style="width:100%;text-align:center;padding:40px;padding-left:0px">
+                        <div v-if="showNavigator" style="width:100%;text-align:center;padding:40px;padding-left:0px">
 
-                    <div class="q-pa-lg flex flex-center">
-                       <!--<el-pagination layout="prev, pager, next" :total="totalNav" :page-count="Math.ceil(totalNav/20)" v-model:current-page="page" @current-change="Nav"></el-pagination>-->
-                       <el-pagination layout="prev, pager, next" :total="totalNav" :page-size="20" v-model:current-page="page" @current-change="Nav"></el-pagination>
+                            <div class="q-pa-lg flex flex-center">
+                                <!--<el-pagination layout="prev, pager, next" :total="totalNav" :page-count="Math.ceil(totalNav/20)" v-model:current-page="page" @current-change="Nav"></el-pagination>-->
+                                <el-pagination layout="prev, pager, next" :total="totalNav" :page-size="20" v-model:current-page="page" @current-change="Nav"></el-pagination>
+                            </div>
+
+                            <!--
+                        <q-btn label="Anterior" color="primary" icon="fa fa-caret-left" @click="NavTemp(-1)" :disabled="$root.search.imovelBusca.page == 0"></q-btn>
+                        &nbsp;&nbsp;<div style="display:inline-block;width:100px;text-align:center;font-size:24px;color:var(--s-accent-color)">{{page}}</div>&nbsp;&nbsp;
+
+
+                            <q-btn label="Próximo" color="primary" icon-right="fa fa-caret-right" @click="NavTemp(1)"></q-btn>
+                        <br /><br />
+                        <el-pagination layout="prev, pager, next" :total="totalResults" @prev-click="Nav(-1)" @next-click="Nav(1)" v-model:current-page="page" @current-change="NavTo"></el-pagination>
+                        <br /><br />
+                        <div class="q-pa-lg flex flex-center">
+                            <q-pagination
+                              v-model="page"
+                              :max="totalResults"
+                              :max-pages="10"
+                              direction-links
+                              boundary-links
+                              icon-prevt="fa fa-caret-left"
+                              icon-next="fa fa-caret-right"
+                              icon-firs="fa fa-backward"
+                              icon-last="fa fa-forward"
+                            />
+                          </div>-->
+
+                        </div>
+
                     </div>
-                 
-                    <!--
-                    <q-btn label="Anterior" color="primary" icon="fa fa-caret-left" @click="NavTemp(-1)" :disabled="$root.search.imovelBusca.page == 0"></q-btn> 
-                    &nbsp;&nbsp;<div style="display:inline-block;width:100px;text-align:center;font-size:24px;color:var(--s-accent-color)">{{page}}</div>&nbsp;&nbsp; 
-                    
-                        
-                        <q-btn label="Próximo" color="primary" icon-right="fa fa-caret-right" @click="NavTemp(1)"></q-btn>
-                    <br /><br />
-                    <el-pagination layout="prev, pager, next" :total="totalResults" @prev-click="Nav(-1)" @next-click="Nav(1)" v-model:current-page="page" @current-change="NavTo"></el-pagination>
-                    <br /><br />
-                    <div class="q-pa-lg flex flex-center">
-                        <q-pagination
-                          v-model="page"
-                          :max="totalResults"
-                          :max-pages="10"
-                          direction-links
-                          boundary-links
-                          icon-prevt="fa fa-caret-left"
-                          icon-next="fa fa-caret-right"
-                          icon-firs="fa fa-backward"
-                          icon-last="fa fa-forward"
-                        />
-                      </div>-->
-                    
-                </div>
-
-             </div>
 
 
-       
 
-         </el-container>
-     </el-container>
 
+                </el-container>
+            </el-container>
+        </div>
+        <div v-else>
+            {{$root.RequestLogin()}}
+        </div>
+    </div>
 </template>
 
 
