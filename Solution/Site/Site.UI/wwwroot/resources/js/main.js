@@ -276,9 +276,11 @@ $(document).ready(function () {
                      });
                 },
 
-                RequestLogin(){
-                    this.$tools.MessageAlert("necessário login para favoritar",100);
-                    window.setTimeout(()=>this.OpenLoginModal(),600);
+                RequestLogin(mensagem = "É necessário estar logado para acessar esta área") {
+                    if (this.$route.name != '/home') {
+                        this.$tools.MessageAlert(mensagem, 100);
+                        window.setTimeout(() => this.OpenLoginModal(), 300);
+                    }
                 },
 
                 Login(){
@@ -422,6 +424,7 @@ $(document).ready(function () {
                     this.$sdata.Storage.Set("usuario", null);
                     this.isAuth = false;
                     this.RouteTo("home");
+                    this.$route.name = '/home';
                 },
 
 
