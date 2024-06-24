@@ -12,7 +12,8 @@
 					indicator-color="primary">
 				<q-tab name="agenda"		icon="fa fa-calendar"		label="AGENDAMENTOS"></q-tab>
 				<q-tab name="solicitacao"	icon="fa fa-bell-concierge" label="SOLICITAÇÕES"></q-tab>
-				<!--<q-tab name="register"	icon="fa fa-user-plus"			label="CADASTRE-SE"		style="width:115px"></q-tab>-->
+				<q-tab name="usuarios"		icon="fa fa-users-gear"		label="USUÁRIOS"></q-tab>
+				<!--<q-tab name="register"	icon="fa fa-user-plus"		label="CADASTRE-SE"		style="width:115px"></q-tab>-->
 			</q-tabs>
 			<q-tab-panels v-model="view" animated>
 				
@@ -22,6 +23,10 @@
 
 				<q-tab-panel name="solicitacao">
 					<page_solicitacao />
+				</q-tab-panel>
+				
+				<q-tab-panel name="usuarios">
+					<page_adminstracao_usuarios />
 				</q-tab-panel>
 
 			</q-tab-panels>
@@ -39,9 +44,10 @@
 
 		components: {
 			page_agenda:		LoadComponent("./pages/parceiro/Agenda.htm"),
-            page_solicitacao:	LoadComponent("./pages/parceiro/Solicitacao.htm")
+            page_solicitacao:	LoadComponent("./pages/parceiro/Solicitacao.htm"),
+            page_adminstracao_usuarios:	LoadComponent("./pages/parceiro/Usuarios.htm")
 		},
-
+		
 		data: function () {
 			return {
                 view: "solicitacao"

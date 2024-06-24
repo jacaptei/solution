@@ -1,0 +1,455 @@
+﻿<template>
+    <div>
+        <div style="margin-top:40px;text-align:justify;width:100%">
+
+            <div class="form" id="form" v-if="view == 'form' ">
+                <!-- Coluna 1 -->
+            </div>
+        </div>
+    </div>
+</template>
+
+<script>
+    module.exports = {
+        components: {
+
+        },
+
+        data: function () {
+            return {
+                onRequest: false,
+                view: "form",
+                viewLast: "form",
+                messageSuccess: "Cadastrado!",
+                messageAlert: "",
+                contaNova: true,
+                messageFail: "Não foi possível autenticar, favor tentar novamente.",
+                content: "",
+                DiaNascimento: 0,
+                MesNascimento: 0,
+                AnoNascimento: 0,
+                senhaConfirma: "",
+                carregandoCEP: false,
+                carregandoEstados: false,
+                carregandoCidades: false,
+                carregandoBairros: false,
+                carregandoEstadosCreci: false,
+                carregandoCidadesCreci: false,
+                estadoSelecionado: {},
+                cidadeSelecionada: {},
+                bairroSelecionado: {},
+                cep: {
+                    numero: "",
+                    estado: "",
+                    cidade: "",
+                    logradouro: ""
+                },
+                opcoes: {
+                    cidades: [],
+                    estados: this.$sdata.forms.states,
+                    estadosCreci: this.$sdata.forms.states,
+                    //estados:        this.$root.localidade.estados,
+                    //estadosCreci:   this.$root.localidade.estados,
+                    cidadesCreci: [],
+                    bairros: [],
+                    sexos: [{ id: 1, label: "NÃO APLICÁVEL", value: "NA" }, { id: 2, label: "MASCULINO", value: "MASCULINO" }, { id: 3, label: "FEMININO", value: "FEMININO" }],
+                }
+            }
+        }, computed: {
+
+        },
+
+        props: {},
+        watch: {
+        },
+        created: function () {
+            //this.opcoes.estados = this.$sdata.forms.states;
+        },
+        mounted() {
+            var count = 0;
+            this.$root.usuario.idTipo = parseInt(this.idtipo);
+            this.$root.usuario.tipo = this.tipo;
+            //c2("idTipo",this.$root.usuario.idTipo)
+            //c2("tipo",this.$root.usuario.tipo)
+            window.setTimeout(() => this.$refs.documento.focus(), 2000);
+        },
+        methods: {
+
+
+            MudarTipoPessoa() {
+
+                if (this.$root.usuario.tipoPessoa == "PF")
+                    this.$root.usuario.cnpj = "";
+                else
+                    this.$root.usuario.cpf = "";
+
+                window.setTimeout(() => this.$refs.documento.focus(), 300);
+
+            },
+
+
+            MudarConta() {
+                this.$root.usuario.tokenConta = "";
+                if (!this.contaNova)
+                    window.setTimeout(() => this.$refs.token.focus(), 300);
+            },
+
+
+
+
+
+            CheckDoc() {
+
+                //if (this.$root.usuario.tipoPessoa == "PF") {
+                //    if (this.$validator.not(this.$root.usuario.cpf))
+                //        this.$tools.Alert("CPF não informado");
+                //    else if (!this.$validator.IsCPF(this.$root.usuario.cpf))
+                //        this.$tools.Alert("CPF inválido");
+                //}
+                //else {
+                //    if (this.$validator.not(this.$root.usuario.cnpj))
+                //        this.$tools.Alert("CNPJ não informado");
+                //    else if (!this.$validator.IsCNPJ(this.$root.usuario.cnpj))
+                //        this.$tools.Alert("CNPJ inválido");
+                //}
+
+                window.setTimeout(() => {
+
+                    if (this.$root.usuario.tipoPessoa == "PF") {
+                        if (this.$validator.is(this.$root.usuario.cpf) && !this.$validator.IsCPF(this.$root.usuario.cpf))
+                            this.$tools.Alert("CPF inválido");
+                    }
+                    else {
+                        if (this.$validator.is(this.$root.usuario.cnpj) && !this.$validator.IsCNPJ(this.$root.usuario.cnpj))
+                            this.$tools.Alert("CNPJ inválido");
+                    }
+                }, 500);
+
+
+            },
+            async BuscarEndereco() {
+
+                if (this.cep.numero !== this.$root.usuario.cep) {
+
+                    this.carregandoCEP = true;
+                    this.carregandoEstados = true;
+                    this.carregandoCidades = true;
+                    this.carregandoBairros = true;
+
+                    this.cep.cidade = this.$root.usuario.cidade = "";
+                    this.cep.logradouro = this.$root.usuario.logradouro = "";
+                    this.cep.bairro = this.$root.usuario.bairro = "";
+                    this.cep.estado = this.$root.usuario.estado = "";
+
+                    this.$root.usuario.cep = this.cep.numero;
+                    let res = await this.$sdata.SearchAddress(this.cep.numero);
+
+                    if (this.$validator.is(res?.city)) {
+                        this.cep.cidade = this.$root.usuario.cidade = res.city;
+                        this.cep.logradouro = this.$root.usuario.logradouro = res.address;
+                        this.cep.bairro = this.$root.usuario.bairro = res.neighborhood;
+                        this.cep.estado = this.$root.usuario.estado = res.state;
+
+                        //this.estadoSelecionado  = this.opcoes.estados.filter((e)=> e.value == res.state)[0];
+                        //this.cidadeSelecionada  = this.opcoes.estados.filter((e)=> e.value == res.state)[0];
+                        //c2("this.opcoes.estados ", this.opcoes.estados)
+                        //c2("this.estadoSelecionado ", this.estadoSelecionado)
+                        //addressReference = res.addressReference;
+                        this.$refs.addressnumber.focus();
+                        //c2("cep",this.cep)
+                    }
+
+                    this.carregandoCEP = false;
+                    this.carregandoEstados = false;
+                    this.carregandoCidades = false;
+                    this.carregandoBairros = false;
+                }
+            },
+
+
+
+
+            ObterCidades(estado) {
+
+                this.$root.usuario.cidade = this.$root.usuario.bairro = "";
+                this.cidadeSelecionada = this.bairroSelecionado = {};
+
+                this.carregandoCidades = true;
+                this.opcoes.bairros = [];
+                this.opcoes.cidades = [];
+                var cidades = [];
+
+                if (this.$validator.is(estado)) {
+
+                    var idEstado = this.opcoes.estados.filter((e) => e.value == estado)[0].id;
+                    var url = this.$api.BuildURL("suporte/cidades/obter") + "/" + idEstado;
+
+                    axios.get(url).then((request) => {
+                        if (request.data) {
+                            request.data.result.forEach((item, index) => {
+                                cidades.push({ id: item.id, value: item.nome, label: item.label });
+                            });
+                            this.opcoes.cidades = cidades;
+                        }
+                    }).catch((error) => {
+                        ce(error);
+                        if (error.response)
+                            ce(error.response);
+                        ce("Não foi possível obter cidades.");
+                    }).finally(() => {
+                        this.carregandoCidades = false;
+                    });
+
+                } else
+                    this.carregandoCidades = false;
+            },
+
+
+            ObterBairros(cidade) {
+
+                var idCidade = this.opcoes.cidades.filter((c) => c.value == cidade)[0].id;
+
+                this.$root.usuario.bairro = "";
+                this.bairroSelecionado = {};
+
+                //this.$root.usuario.cidade = cidade.label;
+
+                this.carregandoBairros = true;
+                this.opcoes.bairros = [];
+                var bairros = [];
+
+                if (this.$validator.is(idCidade)) {
+
+                    var url = this.$api.BuildURL("suporte/bairros/obter") + "/" + idCidade;
+
+                    axios.get(url).then((request) => {
+                        if (request.data) {
+                            request.data.result.forEach((item, index) => {
+                                bairros.push({ id: item.id, value: item.nome, label: item.label });
+                            });
+                            this.opcoes.bairros = bairros;
+                        }
+                    }).catch((error) => {
+                        ce(error);
+                        if (error.response)
+                            ce(error.response);
+                        ce("Não foi possível obter bairros.");
+                    }).finally(() => {
+                        this.carregandoBairros = false;
+                    });
+
+                } else
+                    this.carregandoBairros = false;
+            },
+
+            DefinirBairro(bairro) {
+                //this.$root.usuario.bairro = bairro.label;
+                //c2("this.$root.usuario", this.$root.usuario)
+            },
+
+
+
+            ChecarDataNascimento() {
+                var res = false;
+                if (this.DiaNascimento > 0 && this.MesNascimento > 0) {
+                    let dt = this.$tools.FormatDateArgs(((this.AnoNascimento == 0) ? "1900" : this.AnoNascimento), this.MesNascimento, this.DiaNascimento);
+                    //let dt = this.$tools.FormatDateArgs(this.AnoNascimento,this.MesNascimento,this.DiaNascimento);
+                    res = this.$validator.IsDate(dt);
+                } else
+                    res = true;
+                return res;
+            },
+
+
+
+
+            ShowView(v) {
+                this.view = v;
+            },
+
+
+            Send() {
+
+                this.$root.usuario.idTipo = 5;
+
+                var msg = "";
+
+                //if (this.$validator.not(this.$root.usuario.tipo) || this.$root.usuario.idTipo == 0)
+                //    msg += "<b>TIPO</b> de usuário não identificado<br>";
+
+                if (this.$root.usuario.tipoPessoa == "PF") {
+                    if (this.$validator.not(this.$root.usuario.cpf))
+                        msg += "<b>CPF</b> não informado<br>";
+                    else if (!this.$validator.IsCPF(this.$root.usuario.cpf))
+                        msg += "<b>CPF</b> inválido<br>";
+                    if (this.$validator.not(this.$root.usuario.nome))
+                        msg += "<b>NOME</b> não informado<br>";
+                }
+                else {
+                    if (this.$validator.not(this.$root.usuario.cnpj))
+                        msg += "<b>CNPJ</b> não informado<br>";
+                    else if (!this.$validator.IsCNPJ(this.$root.usuario.cnpj))
+                        msg += "<b>CNPJ</b> inválido<br>";
+                    if (this.$validator.not(this.$root.usuario.razao))
+                        msg += "<b>RAZÃO SOCIAL</b> não informada<br>";
+                    if (this.$validator.not(this.$root.usuario.nome))
+                        msg += "<b>NOME FANTASIA</b> não informado<br>";
+                    if (this.$validator.not(this.$root.usuario.responsavel))
+                        msg += "<b>NOME DO RESPONSÁVEL</b> não informado<br>";
+                }
+
+
+
+                if (this.$validator.not(this.$root.usuario.email))
+                    msg += "<b>E-MAIL</b> não informado<br>";
+                else if (!this.$validator.IsEmail(this.$root.usuario.email))
+                    msg += "<b>E-MAIL</b> inválido<br>";
+
+                if (this.$validator.not(this.$root.usuario.telefone))
+                    msg += "<b>TELEFONE</b> não informado<br>";
+                else if (this.$root.usuario.telefone.length < 14)
+                    msg += "<b>TELEFONE</b> inválido<br>";
+
+                if (this.$root.usuario.tipoPessoa == "PF") {
+                    if (this.AnoNascimento == 0 && this.MesNascimento == 0 && this.DiaNascimento == 0)
+                        msg += "<b>DATA DE NASCIMENTO</b> não informada<br>";
+                    else if (this.AnoNascimento == 0 || this.MesNascimento == 0 || this.DiaNascimento == 0)
+                        msg += "<b>DATA DE NASCIMENTO</b> incompleta<br>";
+                    else if (!this.ChecarDataNascimento())
+                        msg += "<b>DATA DE NASCIMENTO</b> inválida<br>";
+                }
+
+                if (this.$validator.not(this.$root.usuario.creci)) {
+                    msg += "<b>CRECI</b> não informado<br>";
+                } else if (this.$root.usuario.creci.length < 4)
+                    msg += "<b>CRECI</b> inválido<br>";
+                else {
+                    if (this.$validator.not(this.$root.usuario.creciEstado))
+                        msg += "<b>CRECI - ESTADO</b> não selecionado<br>";
+                    //if(this.$validator.not(this.$root.usuario.creciCidade))
+                    //	msg += "<b>CRECI - CIDADE</b> não selecionada<br>";
+                }
+
+                if (this.$validator.not(this.$root.usuario.estado))
+                    msg += "<b>ESTADO</b> não selecionado<br>";
+
+                if (this.$validator.not(this.$root.usuario.cidade))
+                    msg += "<b>CIDADE</b> não selecionada<br>";
+
+                if (this.$validator.not(this.$root.usuario.bairro))
+                    msg += "<b>BAIRRO</b> não selecionado<br>";
+
+                if (this.$validator.not(this.$root.usuario.logradouro))
+                    msg += "<b>LOGRADOURO</b> não informado<br>";
+
+                if (this.$validator.not(this.$root.usuario.numero))
+                    msg += "<b>NÚMERO</b> não informado (informe <b>SN</b> se não houver)<br>";
+
+                //if(this.$root.usuario.idTipo == 1){
+                if (this.$validator.not(this.$root.usuario.senha))
+                    msg += "<b>SENHA</b> não informada<br>";
+                if (this.$root.usuario.senha.length < 4)
+                    msg += "<b>SENHA</b> precisa ter pelo menos 4 caracteres<br>";
+                if (this.$validator.not(this.senhaConfirma))
+                    msg += "<b>CONFIRMAR SENHA</b> não informada<br>";
+                else if (this.$root.usuario.senha != this.senhaConfirma)
+                    msg += "<b>SENHA e CONFIRMAR SENHA</b> não combinam<br>";
+                //}
+
+
+
+
+
+                if (!this.$root.usuario.aceitouTermos)
+                    msg += "<b>TERMOS DE USO</b> não aceito<br>";
+
+                if (!this.$root.usuario.aceitouPoliticaPrivacidade)
+                    msg += "<b>POLÍTICA DE PRIVACIDADE</b> não aceita<br>";
+
+
+                if (msg.length > 0) {
+                    this.$tools.Alert(msg);
+                } else {
+
+                    this.$root.usuario.AnoNascimento = this.AnoNascimento;
+                    this.$root.usuario.MesNascimento = this.MesNascimento;
+                    this.$root.usuario.DiaNascimento = this.DiaNascimento;
+
+                    this.$root.usuario.tipo = this.tipo;
+                    this.$tools.ScrollTo("form-area");
+                    this.ShowView('sending');
+                    //window.setTimeout(()=>this.ShowView('success'),1000);
+                    //c2("this.$root.usuario",this.$root.usuario)
+
+                    axios.post(this.$api.BuildURL("parceiro/inserir"), this.$root.usuario).then((request) => {
+                        //c(request)
+                        if (request.data.status.success) {
+                            this.ShowView("success");
+                        } else {
+                            this.ShowView("form");
+                            this.$tools.AlertNotes(request.data);
+                        }
+                    }).catch((error) => {
+                        this.ShowView("form");
+                        c2("error.response.data", error.response.data)
+                        if (error.response) {
+                            this.$tools.AlertNotes(error.response.data);
+                        } else
+                            this.$tools.Alert("Não foi possível atender a requisição");
+                        //c(error.response.status);
+                        //c(error.response.headers); 								//ce(error);
+                        //this.ShowView("form");
+                    }).finally(() => {
+
+                    });
+
+                    //axios.post(this.$api.BuildURL("InserirUsuario"),this.$root.usuario).then((request) => {
+                    //		//c(request)
+                    //		if(request.data.success){
+                    //			this.ShowView("success");
+                    //		}else{
+                    //			this.ShowView("form");
+                    //			this.$tools.Alert(request.data.messages);
+                    //		}
+                    //	}).catch((error) => {
+                    //		ce(error);
+                    //		this.ShowView("form");
+                    //		this.$tools.Alert("Não foi possível atender a requisição");
+                    //	}).finally(() => {
+
+                    //	});
+
+
+
+
+
+
+                }
+            },
+
+
+
+
+
+
+
+
+
+
+
+        }
+
+    }
+
+</script>
+
+
+<style scoped>
+    .s-input {
+        margin: 20px;
+        margin-bottom: 0px;
+        height: 70px;
+    }
+</style>
+
+
