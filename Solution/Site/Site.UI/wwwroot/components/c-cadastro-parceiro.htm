@@ -36,9 +36,9 @@
 
                                     <el-select filterable v-model="$root.usuario.idPlano" class="m-4" placeholder="Selecionar" size="large" style="width:100%">
                                         <el-option v-for="item in [
-                                                                    {label: 'CORRETOR AUTÔNOMO ESSENCIAL por R$387/mês',  value: 2 },
-                                                                    {label: 'IMOBILIÁRIA ATÉ 03 USUÁRIOS por R$499/mês',  value: 3 },
-                                                                    {label: 'IMOBILIÁRIA ATÉ 05 USUÁRIOS por R$699/mês',  value: 4 }
+                                                                    {label: 'BASIC',  value: 2 },
+                                                                    {label: 'PRO',  value: 3 },
+                                                                    {label: 'ADVANCED',  value: 4 }
                                                                 ]"
                                                    :key="item.value"
                                                    :label="item.label"
