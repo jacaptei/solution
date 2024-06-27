@@ -6,7 +6,7 @@ using RepoDb;
 using JaCaptei.Model;
 using JaCaptei.Application.Services;
 using JaCaptei.Model.Model;
-using JaCaptei.Application.Suporte;
+using JaCaptei.Application;
 using JaCaptei.Application.DAL;
 
 namespace JaCaptei.Application{

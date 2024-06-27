@@ -12,10 +12,10 @@ export default class Api{
         this.error                  = null;
         this.status = { requesting: false, success: true, error: false };
 
-        if (this.ENDPOINT == "https://api.localhost:52658/")
-            this.ENDPOINT = "https://localhost:52650/";
+        if (this.ENDPOINT == "https://api.localhost:62256/")
+            this.ENDPOINT = "https://localhost:62257/";
         else if (this.ENDPOINT == "https://api.localhost:52658/")
-            this.ENDPOINT = "https://localhost:52650/";
+            this.ENDPOINT = "http://localhost:62261/";
             //this.ENDPOINT  = "https://localhost:52650/";
             //this.ENDPOINT  = "https://homolog-api.jacaptei.com.br/";
         //console.log(this.ENDPOINT)
