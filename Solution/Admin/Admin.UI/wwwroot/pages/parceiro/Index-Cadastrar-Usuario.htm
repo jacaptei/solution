@@ -145,7 +145,7 @@
                 <div style="height:40px" v-if="carregandoEstados">
                     <c-loading size="30px" style="padding-left:5px"></c-loading>
                 </div>
-                <el-select v-else filterable v-model="opcoes.estado" class="m-4" placeholder="Selecionar" size="large" style="width:100%" @change="(item)=>{ObterCidades(item);enableFilterButton = true;}">
+                <el-select v-else filterable v-model="this.$root.usuario.estado" class="m-4" placeholder="Selecionar" size="large" style="width:100%" @change="(item)=>{ObterCidades(item);enableFilterButton = true;}">
                     <el-option v-for="item in opcoes.estados"
                                :key="item.id"
                                :label="item.label"
@@ -159,7 +159,7 @@
                 <div style="height:40px" v-if="carregandoCidades">
                     <c-loading size="30px" style="padding-left:5px"></c-loading>
                 </div>
-                <el-select v-else v-model="opcoes.cidade" filterable class="m-4" placeholder="Selecionar" size="large" style="width:100%" @click="()=>{ if($validator.not(opcoes.estado)){ $tools.Alert('Selecione um <b>Estado</b> antes');} }" @change="(item)=>{ObterBairros(item);enableFilterButton = true;}">
+                <el-select v-else v-model="this.$root.usuario.cidade" filterable class="m-4" placeholder="Selecionar" size="large" style="width:100%" @click="()=>{ if($validator.not(opcoes.estado)){ $tools.Alert('Selecione um <b>Estado</b> antes');} }" @change="(item)=>{ObterBairros(item);enableFilterButton = true;}">
                     <el-option v-for="item in opcoes.cidades"
                                :key="item.id"
                                :label="item.label"
@@ -174,7 +174,7 @@
                 <div style="height:40px" v-if="carregandoBairros">
                     <c-loading size="30px" style="padding-left:5px"></c-loading>
                 </div>
-                <el-select v-else v-model="opcoes.bairro" filterable :clearable="true" class="m-4" placeholder="Selecionar" size="large" style="width:100%;" @click="()=>{ if($validator.not(opcoes.estado)){ $tools.Alert('Selecione <b>Estado</b> e <b>Cidade</b> antes');} }" @change="(item)=>{DefinirBairro(item);enableFilterButton = true;}">
+                <el-select v-else v-model="this.$root.usuario.bairro" filterable :clearable="true" class="m-4" placeholder="Selecionar" size="large" style="width:100%;" @click="()=>{ if($validator.not(opcoes.estado)){ $tools.Alert('Selecione <b>Estado</b> e <b>Cidade</b> antes');} }" @change="(item)=>{DefinirBairro(item);enableFilterButton = true;}">
                     <el-option v-for="item in opcoes.bairros"
                                :key="item.id"
                                :label="item.label"
@@ -184,7 +184,7 @@
 
             <el-col :span="8" class="register-input">
                 <div>LOGRADOURO<span style="color:#808080">&nbsp;(rua, avenida, praça, etc)</span></div>
-                <el-input @keyup.enter="Enviar()" v-model="opcoes.logradouro" placeholder="" maxlength="80" input-style="text-transform:uppercase;"></el-input>
+                <el-input @keyup.enter="Enviar()" v-model="this.$root.usuario.logradouro" placeholder="" maxlength="80" input-style="text-transform:uppercase;"></el-input>
             </el-col>
 
             <el-col :span="8" class="register-input">
@@ -304,6 +304,8 @@
             async BuscarEndereco() {
 
                 if (this.cep.numero !== this.$root.usuario.cep) {
+
+                    console.log(this.cep.numero, this.$root.usuario.cep);
 
                     this.carregandoCEP = true;
                     this.carregandoEstados = true;
