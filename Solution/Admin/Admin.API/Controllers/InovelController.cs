@@ -21,7 +21,7 @@ namespace JaCaptei.Administrativo.API.Controllers {
     [Authorize(Roles = "ADMIN_GOD,ADMIN_GESTOR,ADMIN_PADRAO")]
     public class ImovelController:ApiControllerBase {
 
-        ImovelService service = new ImovelService();
+        ImovelServiceOld service = new ImovelServiceOld();
 
 
         private Microsoft.AspNetCore.Hosting.IHostingEnvironment hosting;
@@ -33,7 +33,7 @@ namespace JaCaptei.Administrativo.API.Controllers {
 
         [HttpPost]
         [Route("[action]")]
-        public async Task<IActionResult> Adicionar([FromForm] Imovel imovel,List<IFormFile> imageFiles) {
+        public async Task<IActionResult> Adicionar([FromForm] ImovelOld imovel,List<IFormFile> imageFiles) {
         //public async Task<IActionResult> Adicionar([FromForm] IFormFile file) {
 
            Usuario logado          = ObterUsuarioAutenticado();
@@ -49,7 +49,7 @@ namespace JaCaptei.Administrativo.API.Controllers {
 
 
 
-        public async Task<AppReturn> ImageShackUploadImagens(Imovel imovel,List<IFormFile> imageFiles) {
+        public async Task<AppReturn> ImageShackUploadImagens(ImovelOld imovel,List<IFormFile> imageFiles) {
 
             int     ordem           = 1;
             string  pathToSave      = "";
@@ -105,7 +105,7 @@ namespace JaCaptei.Administrativo.API.Controllers {
 
         public async Task<AppReturn> ImageShackDownload_ImoviewUpload(string URLimagem) {
 
-            Imovel imovel = new Imovel();
+            ImovelOld imovel = new ImovelOld();
             byte[]  file;
 
             // ------------------------------------------
@@ -169,7 +169,7 @@ namespace JaCaptei.Administrativo.API.Controllers {
 
         [HttpPost]
         [Route("adicionar/lote")]
-        public IActionResult AdicionarLote([FromBody] List<Imovel> entities) {
+        public IActionResult AdicionarLote([FromBody] List<ImovelOld> entities) {
 
             Usuario logado              = ObterUsuarioAutenticado();
 

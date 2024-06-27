@@ -12,7 +12,7 @@ namespace JaCaptei.Application {
 
     public class ImovelBLO:BLOBase {
 
-        ImovelDAO DAO = new ImovelDAO();
+        ImovelDAOOld DAO = new ImovelDAOOld();
 
         /*
         public AppReturn Validar(Imovel entity) {
@@ -63,7 +63,7 @@ namespace JaCaptei.Application {
 
 
 
-        public Imovel Normalizar(Imovel entity) {
+        public ImovelOld Normalizar(ImovelOld entity) {
 
             if(entity is null)
                 return entity;

@@ -30,7 +30,7 @@ namespace JaCaptei.Application
             dicModels.Add("usuario"     ,   user);
             dicModels.Add("proprietario",   new Proprietario());
             dicModels.Add("parceiro"    ,   new Parceiro());
-            dicModels.Add("imovel"      ,   new Imovel());
+            dicModels.Add("imovel"      ,   new ImovelOld());
             dicModels.Add("tiposImoveis",   ObterTiposImoveis() );
             dicModels.Add("localidade"  ,   localidade );
             dicModels.Add("solicitacao" ,   new Solicitacao());

@@ -11,6 +11,7 @@ using Microsoft.IdentityModel.Tokens;
 using System.Reflection;
 using Polly.Contrib.WaitAndRetry;
 using Polly;
+using JaCaptei.Application.DAL;
 
 //var builder = WebApplication.CreateBuilder(new WebApplicationOptions {
 //    ApplicationName = typeof(Program).Assembly.FullName,
@@ -171,6 +172,7 @@ var types = assembly.GetTypes()
                     .ToArray();
 
 builder.Services.AddAutoMapper(types);
+builder.Services.AddScoped<DBcontext>();
 
 var app = builder.Build();
 

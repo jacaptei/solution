@@ -1,126 +1,117 @@
-﻿using System.ComponentModel.DataAnnotations.Schema;
-using System.Text.Json;
-using System.Text.Json.Nodes;
+﻿using RepoDb.Attributes;
 
-namespace JaCaptei.Model {
+namespace JaCaptei.Model.Entities;
 
+public class Imovel
+{
+    [Map("id")]
+    public int Id { get; set; }
 
-    public class Imovel {
-        
-            public int          id                      {get;set;}
-            public string       idCRM                   {get;set;} = "";
-            public string       cod                     {get;set;} = "";
-            public string       codCRM                  {get;set;} = "";
-            public int          index                   {get;set;}
+    [Map("cod")]
+    public string Cod { get; set; } = string.Empty;
 
-            public string       nome                    {get;set;} = "";
-            public string       titulo                  {get;set;} = "";
-            public string       descricao               {get;set;} = "";
-            
-            public short        idTipo                  {get;set;} = 1;
-            public string       tipo                    {get;set;} = "";
-            public short        idFinalidade            {get;set;} = 1;
-            public string       finalidade              {get;set;} = "VENDA";
+    [Map("idCRM")]
+    public string IdCRM { get; set; }
 
-            public double       valor                   {get;set;} = 0d;
-            public double       valorMinimo             {get;set;} = 0d;
-            public double       valorMaximo             {get;set;} = 0d;
-            public double       valorIPTU               {get;set;} = 0d;
-            public double       valorCondominio         {get;set;} = 0d;
-            public double       valorAnterior           {get;set;} = 0d;
-            public double       valorConsulta           {get;set;} = 0d;
+    [Map("codCRM")]
+    public string CodCRM { get; set; }
 
-            public double       areaMinima              {get;set;} = 0d ;
-            public double       areaMaxima              {get;set;} = 0d ;
-            public double       areaInterna             {get;set;} = 0d ;
-            public double       areaExterna             {get;set;} = 0d ;
-            public double       areaTotal               {get;set;} = 0d ;
+    [Map("idAdmin")]
+    public int? IdAdmin { get; set; }
 
-            public short        quartos                 {get;set;} = 0;
-            public short        banheiros               {get;set;} = 0;
-            public short        vagas                   {get;set;} = 0;
-            public short        suites                  {get;set;} = 0;
-            public short        elevafores              {get;set;} = 0;
+    [Map("idProprietario")]
+    public int? IdProprietario { get; set; }
 
-            public bool         aguaIndividual          {get;set;}
-            public bool         areaServico             {get;set;}
-            public bool         alarme                  {get;set;}
-            public bool         armarioCozinha          {get;set;}
-            public bool         armarioBanheiro         {get;set;}
-            public bool         armarioQuarto           {get;set;}
-            public bool         boxDespejo              {get;set;}
-            public bool         cercaEletrica           {get;set;}
-            public bool         churrasqueira           {get;set;}
-            public bool         closet                  {get;set;}
-            public bool         dce                     {get;set;}
-            public bool         gasCanalizado           {get;set;}
-            public bool         hidromassagem           {get;set;}
-            public bool         interfone               {get;set;}
-            public bool         jardim                  {get;set;}
-            public bool         lavabo                  {get;set;}
-            public bool         piscina                 {get;set;}
-            public bool         portaoEletronico        {get;set;}
-            public bool         salas                   {get;set;}
-            public bool         salaoFestas             {get;set;}
-            public bool         quadraEsportiva         {get;set;}
-            public bool         elevador                {get;set;}
+    [Map("idTipo")]
+    public short IdTipo { get; set; } = 1;
 
-            // --------------- ENDERECO
+    [Map("construtora")]
+    public string Construtora { get; set; } = string.Empty;
 
-	        public string       cep                     {get;set;} = "";
-	        public string       cepNorm                 {get;set;} = "";
-                                                                   
- 	        public string       logradouro			    {get;set;} = "";
-	        public string	    logradouroNorm		    {get;set;} = "";
-	        public string       numero          	    {get;set;} = "";
-	        public string       andar             	    {get;set;} = "";
-	        public string       complemento             {get;set;} = "";
-	        public string       referencia              {get;set;} = "";
-                                                                   
- 	        public string       bairro                  {get;set;} = "";
-	        public string       bairroNorm   	        {get;set;} = "";
-	        public string       cidade				    {get;set;} = "";
-	        public string       cidadeNorm     		    {get;set;} = "";
-	        public string       estado				    {get;set;} = "";
-	        public string       estadoNorm   		    {get;set;} = "";
-	        public string       pais                    {get;set;} = "BRASIL";
-	        public string       paisNorm      	        {get;set;} = "BRASIL";
+    [Map("construtoraNorm")]
+    public string ConstrutoraNorm { get; set; } = string.Empty;
 
-            public short        idEstado                {get;set;}  =   0;
-            public short        idCidade                {get;set;}  =   0;
-            public short        idBairro                {get;set;}  =   0;
+    [Map("edificio")]
+    public string Edificio { get; set; } = string.Empty;
 
-            // ---------------
+    [Map("edificioNorm")]
+    public string EdificioNorm { get; set; } = string.Empty;
 
-            public string       imagensStr              {get;set;}  = "";
-            public List<Imagem> imagens                 {get;set;}  =   new List<Imagem>();
-            public List<dynamic>imgFiles                {get;set;}  =   new List<dynamic>();
-            
-            public string       status                  {get;set;}  =   "ATIVO";
-            public bool         ativo                   {get;set;}  =   false;
-            public bool         ativoCRM                {get;set;}  =   false;
-            public bool         sucesso                 {get;set;}  =   false;
-            
-            public string       token                   {get;set;}  =   "";
-            public long         tokenNum                {get;set;}  =   0;
-            public string       tokenUID                {get;set;}  =   "";
+    [Map("nome")]
+    public string Nome { get; set; } = string.Empty;
 
-            public bool         favorito                {get;set;}  = false;
-            public string       obs                     {get;set;}  =   "";
+    [Map("titulo")]
+    public string Titulo { get; set; } = string.Empty;
 
-            public int          inseridoPorId           {get;set;}
-            public string       inseridoPorNome         {get;set;}  =   "";
-            public int          atualizadoPorId         {get;set;}
-            public string       atualizadoPorNome       {get;set;}  =   "";
+    [Map("descricao")]
+    public string Descricao { get; set; } = string.Empty;
 
-            public int          carga                   {get;set;}
+    [Map("tag")]
+    public string Tag { get; set; } = string.Empty;
 
-            public DateTime     dataAtualizacao         {get;set;}  = Utils.Date.GetLocalDateTime();
-            public DateTime     data                    {get;set;}  = Utils.Date.GetLocalDateTime();
+    [Map("venda")]
+    public bool Venda { get; set; } = true;
 
+    [Map("locacao")]
+    public bool Locacao { get; set; } = true;
 
+    [Map("urlImagemPrincipal")]
+    public string UrlImagemPrincipal { get; set; } = string.Empty;
 
+    [Map("urlVideo")]
+    public string UrlVideo { get; set; } = string.Empty;
 
-    }
+    [Map("urlPublica")]
+    public string UrlPublica { get; set; } = string.Empty;
+
+    [Map("urlPrivada")]
+    public string UrlPrivada { get; set; } = string.Empty;
+
+    [Map("status")]
+    public string Status { get; set; } = "ATIVO";
+
+    [Map("ativo")]
+    public bool Ativo { get; set; } = false;
+
+    [Map("ativoCRM")]
+    public bool AtivoCRM { get; set; } = false;
+
+    [Map("token")]
+    public string Token { get; set; }
+
+    [Map("tokenNum")]
+    public long TokenNum { get; set; }
+
+    [Map("tokenUID")]
+    public string TokenUID { get; set; }
+
+    [Map("obs")]
+    public string Obs { get; set; } = string.Empty;
+
+    [Map("inseridoPorId")]
+    public int InseridoPorId { get; set; } = 0;
+
+    [Map("inseridoPorNome")]
+    public string InseridoPorNome { get; set; } = "ADMIN";
+
+    [Map("atualizadoPorId")]
+    public int AtualizadoPorId { get; set; } = 0;
+
+    [Map("atualizadoPorNome")]
+    public string AtualizadoPorNome { get; set; } = "ADMIN";
+
+    [Map("origem")]
+    public string Origem { get; set; } = "JACAPTEI_ADMIN";
+
+    [Map("origemImagens")]
+    public string OrigemImagens { get; set; } = "IMAGESHACK";
+
+    [Map("codCarga")]
+    public string CodCarga { get; set; } = string.Empty;
+
+    [Map("dataAtualizacao")]
+    public DateTime? DataAtualizacao { get; set; }
+
+    [Map("data")]
+    public DateTime Data { get; set; } = DateTime.UtcNow;
 }
-

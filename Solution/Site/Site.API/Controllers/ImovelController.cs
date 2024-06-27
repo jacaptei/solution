@@ -11,7 +11,7 @@ namespace JaCaptei.API.Controllers {
     [Route("[controller]")]
     public class ImovelController:ApiControllerBase {
 
-        ImovelService service = new ImovelService();
+        ImovelServiceOld service = new ImovelServiceOld();
 
         
         //[Route("[action]")]
