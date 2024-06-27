@@ -1,17 +1,7 @@
 ﻿<template>
 
     <div>
-             <div class="row" style="width:100%;margin-bottom:40px;display:block">
-                 <div class="col-12" style="width:100%;text-align:center;padding:40px;padding-left:0px" v-if="onrequest">
-                        <c-loading size="60px"></c-loading>
-                 </div>
-                 <div class="col-12" style="width:100%" v-else>
-                     <div class="col-12">
-                         <q-btn label="Importar" color="primary" @click="Enviar()" :loading="onrequest"></q-btn><br /><br />
-                         Paginacao: {{page}}
-                     </div>
-                 </div>
-             </div>
+
     </div>
 </template>
 
@@ -49,7 +39,7 @@
         created: function () {
 
             //for(var i=0;i<8;i++)
-            //    this.results.push({name:"card"+i});
+            //    this.resultsToImport.push({name:"card"+i});
         },
         mounted() {
             
@@ -57,111 +47,12 @@
         methods: {
 
 
-            async BuscarCep(imovel) {
-                var endereco = imovel.estado + "/" + imovel.cidade.replaceAll(" ", "%20") + "/" + imovel.logradouro.replaceAll(" ", "%20")
-                let res = await this.$sdata.BuscarCep(endereco);
-                return res.cep;
-            },
+          async BuscarCep(imovel) {
+              var endereco = imovel.endereco.estado + "/" + imovel.endereco.cidade.replaceAll(" ", "%20") + "/" + imovel.endereco.logradouro.replaceAll(" ", "%20")
+              let res = await this.$sdata.BuscarCep(endereco);
+              return res.cep;
+          },
 
-            
-          async  Enviar() {
-
-                this.page += 1;
-
-                this.importacaoTitulo = "importando...";
-                this.onrequest = true;
-                var request = await this.$api.Post("imovel/importar",{"page":this.page});
-                this.onrequest = false;
-
-                this.totalResults=0;
-                this.results = [];
-
-                var imagens = [];
-                var thumbs = [];
-
-                                if(request.status.success){
-									//this.$root.search.imovelimportacao
-									this.totalResults = request.result.result.totalResults;
-
-                                    if(this.totalResults != this.totalNav)
-                                        this.totalNav = this.totalResults;
-
-									//c2("request.result.images",request.result.images);
-                                    //this.OutputResults(request);
-
-                                    if (this.$validator.is(request.result.crmResult) && request.result.crmResult?.result?.records?.length > 0){
-
-                                                var imoveisRes = request.result.crmResult.result.records;
-                                                var imagensRes = JSON.parse(request.result.result.imagensJson);
-                                                
-                                                //c2("imovelCRM", imoveisRes)
-                                                var imagensJSON = [];
-                                                var imagens = [];
-
-                                                for(var i=0;i<imoveisRes.length;i++){
-                                                //for(var i=0;i<1;i++){
-                                                    var item            =   imoveisRes[i];
-                                                    var imovel          =   this.$models.imovel();
-                                                    
-                                                    imovel              =   this.$imovelHandler.Parse(imovel,item,i);
-                                                    imovel.carga        = 20240317;
-
-                                                    imagens = [];
-                                                    imagensJSON = [];
-
-
-                                                    var imgtemp = { url: "" };
-                                                    if (this.$validator.is(imagensRes) && this.$validator.is(imagensRes?.result[imovel.idCRM])) {
-                                                        imagensRes.result[imovel.idCRM].forEach(
-                                                            img => {
-                                                                try {
-                                                                    imagensJSON.push({ id: i, index: i, nome: this.$imovelHandler.GetName(img), full: img.url, thumb: this.$imovelHandler.GetThumbnail(img, "640x480")});
-                                                                    imagens.push(img.url);
-                                                                } catch (e) {
-                                                                    //if(imgens.length == 0){
-                                                                    imagensJSON.push({ nome: "sem-imagem", url: "https://jacaptei.com.br/resources/images/noimages.jpg", thumbnail:"https://jacaptei.com.br/resources/images/noimages.jpg"});
-                                                                    imagens.push("https://jacaptei.com.br/resources/images/noimages.jpg");
-                                                                    //}
-                                                                }
-                                                            }
-                                                        );
-                                                    }
-
-                                                    //imovel.imagens = JSON.stringify(imagens);
-                                                    imovel.imagens = "";
-                                                    imovel.imagens = imagens.join();
-
-                                                    if (this.$validator.not(imovel.cep))
-                                                        imovel.cep = await this.BuscarCep(imovel);
-
-                                                    
-
-                                                        this.results.push(imovel);
-                                                        
-                                                    
-                                                }
-                                                if(this.results.length > 0){
-                                                    var requestInsert = await this.$api.Post("imovel/adicionar/lote", this.results);
-                                                    this.Enviar();
-                                                }
-                                                //c2("requestInsert", requestInsert)
-                                                
-
-
-                                    }
-                                    
-
-                                } else if (this.results?.length == 0){
-                                    this.importacaoTitulo = "nada encontrado";
-                                }else{
-                                    this.importacaoTitulo = "sem resultados";
-									this.$tools.Alert("Não foi possível efetuar a importacao.");
-								}
-                        }
-
-
-
-            },
 
 
 

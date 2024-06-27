@@ -31,6 +31,7 @@ namespace JaCaptei.Application
             dicModels.Add("proprietario",   new Proprietario());
             dicModels.Add("parceiro"    ,   new Parceiro());
             dicModels.Add("imovel"      ,   new Imovel());
+            dicModels.Add("imovelEndereco" ,   new ImovelEndereco());
             dicModels.Add("tiposImoveis",   ObterTiposImoveis() );
             dicModels.Add("localidade"  ,   localidade );
             dicModels.Add("solicitacao" ,   new Solicitacao());

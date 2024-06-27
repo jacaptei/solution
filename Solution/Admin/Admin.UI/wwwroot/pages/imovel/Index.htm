@@ -12,7 +12,7 @@
                         indicator-color="primary">
                     <q-tab name="buscar"      icon="fa fa-search" label="BUSCAR"   ></q-tab>
                     <q-tab name="adicionar"   icon="fa fa-plus"   label="ADICIONAR"   ></q-tab>
-                    <!--<q-tab name="importar"    icon="fa fa-plus"   label="IMPORTAR"   ></q-tab>-->
+                    <q-tab name="importar"    icon="fa fa-plus"   label="IMPORTAR"   ></q-tab>
                 </q-tabs>
                 <q-tab-panels v-model="view" animated>
 
@@ -24,9 +24,9 @@
                         <page_adicionar />
                     </q-tab-panel>
 
-                    <q-tab-panel name="importar">
+                    <!--<q-tab-panel name="importar">
                         <page_importar />
-                    </q-tab-panel>
+                    </q-tab-panel>-->
 
                 </q-tab-panels>
             </div>
@@ -44,12 +44,12 @@
         components: {
 			page_buscar:	LoadComponent("./pages/imovel/Index-Buscar.htm"),
 			page_adicionar:	LoadComponent("./pages/imovel/Index-Adicionar.htm"),
-			//page_importar:	LoadComponent("./pages/imovel/Index-Importar.htm"),
+			page_importar:	LoadComponent("./pages/imovel/Index-Importar.htm"),
         },
 
 		data: function () {
 			return {
-                view:"adicionar"
+                view:"buscar"
 			}
 		}, computed: {
 

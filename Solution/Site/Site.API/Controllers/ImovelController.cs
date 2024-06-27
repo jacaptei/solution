@@ -33,6 +33,12 @@ namespace JaCaptei.API.Controllers {
         [Route("[action]")]
         public async Task<IActionResult> Buscar([FromBody] ImovelBusca busca) {
 
+            if(ObterUsuarioAutenticado() is null) {
+                busca.crmResult = null;
+                appReturn.result = busca;
+                return Result(appReturn);
+            }
+
             dynamic result;
             dynamic crmResult;
             dynamic images;

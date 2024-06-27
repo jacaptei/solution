@@ -54,10 +54,6 @@
                   </el-dialog>
             </div>
 
-
-            <div>
-                    <input type="file" id="fileInput" />
-            </div>
         </div>
 
 
@@ -202,7 +198,7 @@
             return {
                 onrequest: false,
                 view: "imagens",
-                imagensFiles: [],
+                imagesFiles: [],
                 imagesInputs: [],
                 previewImagemModal:false,
                 previewImagem:null,
@@ -286,15 +282,15 @@
 
             async Enviar() {
 
-            this.imagensFiles = [];
+            this.imagesFiles = [];
 
                 const formData = new FormData();
                 formData.append('object', this.imovel);
 
                 this.imagesInputs.forEach((img)=>{
                     var imageFile = Object.assign({}, img).raw;
-                    formData.append('imageFiles',imageFile, imageFile.name);
-                    //this.imagensFiles.push(imageFile); 
+                    formData.append('imagesFiles',imageFile, imageFile.name);
+                    //this.imagesFiles.push(imageFile); 
                 });
 
                  var url = this.$api.BuildURL("imovel/adicionar");

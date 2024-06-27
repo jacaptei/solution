@@ -18,6 +18,7 @@
     parceiro(){             return this.Unbind(this.data.parceiro);         }
     proprietario(){         return this.Unbind(this.data.proprietario);     }
     imovel(){               return this.Unbind(this.data.imovel);           }
+    imovelEndereco(){       return this.Unbind(this.data.imovelEndereco);   }
     localidade(){           return this.Unbind(this.data.localidade);       }
     solicitacao(){          return this.Unbind(this.data.solicitacao);      }
     tiposImoveis(){         return this.Unbind(this.data.tiposImoveis);     }
