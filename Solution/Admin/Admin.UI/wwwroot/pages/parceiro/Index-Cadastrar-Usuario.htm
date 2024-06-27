@@ -1,5 +1,5 @@
 ﻿<template>
-    <div>
+    <div class="form-area">
         <el-row :gutter="20">
             <el-col :span="24" class="register-input">
                 <div>SELECIONE O PLANO</div>
@@ -159,7 +159,7 @@
                 <div style="height:40px" v-if="carregandoCidades">
                     <c-loading size="30px" style="padding-left:5px"></c-loading>
                 </div>
-                <el-select v-else v-model="this.$root.usuario.cidade" filterable class="m-4" placeholder="Selecionar" size="large" style="width:100%" @click="()=>{ if($validator.not(opcoes.estado)){ $tools.Alert('Selecione um <b>Estado</b> antes');} }" @change="(item)=>{ObterBairros(item);enableFilterButton = true;}">
+                <el-select v-else v-model="this.$root.usuario.cidade" filterable class="m-4" placeholder="Selecionar" size="large" style="width:100%" @click="()=>{ if($validator.not(this.$root.usuario.estado)){ $tools.Alert('Selecione um <b>Estado</b> antes');} }" @change="(item)=>{ObterBairros(item);enableFilterButton = true;}">
                     <el-option v-for="item in opcoes.cidades"
                                :key="item.id"
                                :label="item.label"
@@ -174,7 +174,7 @@
                 <div style="height:40px" v-if="carregandoBairros">
                     <c-loading size="30px" style="padding-left:5px"></c-loading>
                 </div>
-                <el-select v-else v-model="this.$root.usuario.bairro" filterable :clearable="true" class="m-4" placeholder="Selecionar" size="large" style="width:100%;" @click="()=>{ if($validator.not(opcoes.estado)){ $tools.Alert('Selecione <b>Estado</b> e <b>Cidade</b> antes');} }" @change="(item)=>{DefinirBairro(item);enableFilterButton = true;}">
+                <el-select v-else v-model="this.$root.usuario.bairro" filterable :clearable="true" class="m-4" placeholder="Selecionar" size="large" style="width:100%;" @click="()=>{ if($validator.not(this.$root.usuario.estado && this.$root.usuario.cidade)){ $tools.Alert('Selecione <b>Estado</b> e <b>Cidade</b> antes');} }" @change="(item)=>{DefinirBairro(item);enableFilterButton = true;}">
                     <el-option v-for="item in opcoes.bairros"
                                :key="item.id"
                                :label="item.label"
@@ -183,13 +183,13 @@
             </el-col>
 
             <el-col :span="8" class="register-input">
-                <div>LOGRADOURO<span style="color:#808080">&nbsp;(rua, avenida, praça, etc)</span></div>
+                <div>LOGRADOURO<span style="color:#808080">&nbsp;rua, avenida, praça, etc</span></div>
                 <el-input @keyup.enter="Enviar()" v-model="this.$root.usuario.logradouro" placeholder="" maxlength="80" input-style="text-transform:uppercase;"></el-input>
             </el-col>
 
             <el-col :span="8" class="register-input">
-                <div>NÚMERO<span style="color:#808080">&nbsp;(informe <b>SN</b> se não houver)</span></div>
-                <el-input @keyup.enter="Enviar()" v-model="opcoes.numero" placeholder="" maxlength="80" input-style="text-transform:uppercase;" ref="addressnumber"></el-input>
+                <div>NÚMERO<span style="color:#808080">&nbsp;informe <b>SN</b> se não houver</span></div>
+                <el-input @keyup.enter="Enviar()" v-model="this.$root.usuario.numero" placeholder="" maxlength="80" input-style="text-transform:uppercase;" ref="addressnumber"></el-input>
             </el-col>
         </el-row>
 
@@ -200,13 +200,23 @@
             </el-col>
 
             <el-col :span="8" class="register-input" v-if="$root.usuario.idTipo != 2">
-                <div>SENHA <span style="color:#808080">&nbsp;(pelo menos 4 caracteres)</span></div>
+                <div>SENHA <span style="color:#808080">&nbsp;pelo menos 4 caracteres</span></div>
                 <el-input @keyup.enter="Send()" v-model="$root.usuario.senha" type="password" placeholder="" maxlength="20" show-password></el-input>
             </el-col>
 
             <el-col :span="8" class="register-input" v-if="$root.usuario.idTipo != 2">
-                <div>CONFIRMAR SENHA <span style="color:#808080">&nbsp;(repetir senha)</span></div>
+                <div>CONFIRMAR SENHA <span style="color:#808080">&nbsp;repetir senha</span></div>
                 <el-input @keyup.enter="Send()" v-model="senhaConfirma" type="password" placeholder="" maxlength="20" show-password></el-input>
+            </el-col>
+        </el-row>
+
+        <el-row :gutter="20" style="margin-top:10px">
+            <el-col :md="12" class="s-input-optional">
+                <q-btn label="Adicionar" color="primary" @click="Send()" :loading="onrequest"></q-btn><br /><br />
+                <!--<q-btn label="VOLTAR" outline color="primary" @click="$emit('voltar')"></q-btn>-->
+            </el-col>
+            <el-col :md="12" class="s-input">
+                <div><i class="fa fa-square"></i> campos necessários</div>
             </el-col>
         </el-row>
     </div>
@@ -238,6 +248,8 @@
                 carregandoBairros: false,
                 carregandoEstadosCreci: false,
                 carregandoCidadesCreci: false,
+                aceitouTermos: true,
+                aceitouPoliticaPrivacidade: true,
                 estadoSelecionado: {},
                 cidadeSelecionada: {},
                 bairroSelecionado: {},
@@ -342,7 +354,7 @@
 
             ObterCidades(estado) {
 
-                this.$sdata.opcoes.cidade = "";
+                this.$root.usuario.logradouro = this.$root.usuario.bairro = this.$root.usuario.cidade = "";
                 this.cidadeSelecionada = this.bairroSelecionado = {};
 
                 this.carregandoCidades = true;
@@ -505,12 +517,6 @@
                 else if (this.$root.usuario.senha != this.senhaConfirma)
                     msg += "<b>SENHA e CONFIRMAR SENHA</b> não combinam<br>";
 
-                if (!this.$root.usuario.aceitouTermos)
-                    msg += "<b>TERMOS DE USO</b> não aceito<br>";
-
-                if (!this.$root.usuario.aceitouPoliticaPrivacidade)
-                    msg += "<b>POLÍTICA DE PRIVACIDADE</b> não aceita<br>";
-
                 if (msg.length > 0) {
                     this.$tools.Alert(msg);
                 } else {
@@ -518,14 +524,13 @@
                     this.$root.usuario.MesNascimento = this.MesNascimento;
                     this.$root.usuario.DiaNascimento = this.DiaNascimento;
                     this.$root.usuario.tipo = this.tipo;
-                    this.$tools.ScrollTo("form-area");
                     this.ShowView('sending');
 
-                    axios.post(this.$api.BuildURL("parceiro/inserir"), this.$root.usuario).then((request) => {
+                    axios.post(this.$api.BuildURL("parceiro/adicionar"), this.$root.usuario).then((request) => {
                         if (request.data.status.success) {
                             this.ShowView("success");
                         } else {
-                            this.ShowView("form");
+                            this.ShowView("form");x
                             this.$tools.AlertNotes(request.data);
                         }
                     }).catch((error) => {
