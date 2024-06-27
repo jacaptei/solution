@@ -93,12 +93,12 @@ html {
   min-height: 100%;
   color:#666 !important;
   font-family: Marine,hind, sans-serif !important;
+  overflow-y: hidden;
   margin:0px;
   padding:0px;
   height:100%;
   background-color:var(--s-bg-color);
   outline: none;
-
 }
 
 
