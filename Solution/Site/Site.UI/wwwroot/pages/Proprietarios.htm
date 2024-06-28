@@ -267,9 +267,9 @@
 		    VenderAgora(){
                 var link = "";
                 if(this.$root.usuario.id > 0)
-			        link = "https://api.whatsapp.com/send?phone=553140039998&text=Olá, meu nome é " + this.$tools.Capitalize(this.$root.usuario.nome) + " (" + this.$root.usuario.email + ") e gostaria de vender meu imóvel." ;
+                    link = "https://api.whatsapp.com/send?phone=553140039992&text=Olá, meu nome é " + this.$tools.Capitalize(this.$root.usuario.nome) + " (" + this.$root.usuario.email + ") e gostaria de vender meu imóvel." ;
 			    else
-			        link = "https://api.whatsapp.com/send?phone=553140039998&text=Olá, estava navegando pelo site e gostaria de vender meu imóvel." ;
+                    link = "https://api.whatsapp.com/send?phone=553140039992&text=Olá, estava navegando pelo site e gostaria de vender meu imóvel." ;
                     
                 //this.$tools.Alert(link);
 			    window.open(link, "_blank");
