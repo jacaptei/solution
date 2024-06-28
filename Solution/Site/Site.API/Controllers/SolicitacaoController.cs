@@ -6,7 +6,6 @@ using JaCaptei.Model;
 using System.Text.Json;
 using Microsoft.AspNetCore.Authorization;
 using Newtonsoft.Json;
-using JaCaptei.Application.Suporte;
 using System.Security.Claims;
 
 namespace JaCaptei.API.Controllers {
