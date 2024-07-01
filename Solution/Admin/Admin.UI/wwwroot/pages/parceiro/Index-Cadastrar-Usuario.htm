@@ -1,5 +1,5 @@
 ﻿<template>
-    <div class="form-area">
+    <div>
         <el-row :gutter="20">
             <el-col :span="24" class="register-input">
                 <div>SELECIONE O PLANO</div>
@@ -212,7 +212,7 @@
 
         <el-row :gutter="20" style="margin-top:10px">
             <el-col :md="12" class="s-input-optional">
-                <q-btn label="Adicionar" color="primary" @click="Send()" :loading="onrequest"></q-btn><br /><br />
+                <q-btn label="Adicionar" color="primary" @click="SalvarCadastro()" :loading="onrequest"></q-btn><br /><br />
                 <!--<q-btn label="VOLTAR" outline color="primary" @click="$emit('voltar')"></q-btn>-->
             </el-col>
             <el-col :md="12" class="s-input">
@@ -438,7 +438,7 @@
                 this.view = v;
             },
 
-            Send() {
+            SalvarCadastro() {
 
                 this.$root.usuario.idTipo = 5;
 
@@ -528,7 +528,8 @@
 
                     axios.post(this.$api.BuildURL("parceiro/adicionar"), this.$root.usuario).then((request) => {
                         if (request.data.status.success) {
-                            this.ShowView("success");
+                            this.$tools.AlertSuccess("Cadastro efetuado");
+                            this.$sdata = this.$models.usuario();
                         } else {
                             this.ShowView("form");x
                             this.$tools.AlertNotes(request.data);
