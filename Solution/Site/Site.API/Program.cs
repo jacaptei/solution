@@ -19,8 +19,6 @@ using JaCaptei.API.Filters;
 
 var builder = WebApplication.CreateBuilder(args);
 
-builder.WebHost.UseUrls("http://localhost:52200","https://localhost:52220");
-
 //builder.Services.AddEndpointsApiExplorer();  // to mvc application 
 builder.Services.AddRouting(options => options.LowercaseUrls = true);
 builder.Services.AddControllers();
@@ -65,7 +63,7 @@ if(!RepoDb.SqlServerBootstrap.IsInitialized)
 // -------------------------- GERAL --------------------------
 
 
-//AppContext.SetSwitch("System.Globalization.Invariant",true);
+AppContext.SetSwitch("System.Globalization.Invariant",true);
 
 builder.Services.AddCors(options => {
     options.AddPolicy("AllowAll",builder =>
@@ -78,9 +76,9 @@ builder.Services.AddCors(options => {
 
 builder.Services.AddCors(options => {
     options.AddPolicy("AllowSites",builder =>
-         builder.WithOrigins("https://jacaptei.com.br"          ,
-                             "https://homolog.jacaptei.com.br"  ,
-                             "https://localhost:52240"          ,
+         builder.WithOrigins("https://jacaptei.com.br",
+                             "https://homolog.jacaptei.com.br",
+                             "https://localhost:52240",
                              "https://*.jacaptei.com.br"
                              )
                             .SetIsOriginAllowedToAllowWildcardSubdomains()

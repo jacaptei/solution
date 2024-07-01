@@ -14,7 +14,9 @@ namespace JaCaptei.Model {
 
             public short    totalAndares        {get;set;}
             public short    totalElevadores     {get;set;}
+            public short    totalUnidadesAndar  {get;set;}
             public short    totalVagas          {get;set;}
+            public string   tipoVagas           {get;set;} = "";
 
             public bool     academia            {get;set;}
             public bool     alarme              {get;set;}

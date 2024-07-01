@@ -13,13 +13,16 @@ namespace JaCaptei.Model {
             public string               cod                {get;set;} = "";
             public string               idCRM              {get;set;} = "";
             public string               codCRM             {get;set;} = "";
-            public int                  index              {get;set;}
+            public string               idChave            {get;set;} = "";
+            public string               localChaves        {get;set;} = "";
+            public short                index              {get;set;}
 
             public Admin                admin              {get;set;} = new Admin();
             public int                  idAdmin            {get;set;} = 0;
             public Proprietario         proprietario       {get;set;} = new Proprietario();
             public int                  idProprietario     {get;set;} = 0;
             
+            public bool                 exclusivo          {get;set;}
             public ImovelTipo           tipo               {get;set;} = new ImovelTipo();
             public int                  idTipo             {get;set;}
             public string               construtora        {get;set;} = "";
@@ -30,6 +33,7 @@ namespace JaCaptei.Model {
             public string               titulo             {get;set;} = "";
             public string               descricao          {get;set;} = "";
 
+            public string               destinacao         {get;set;} = "";
              //finalidade
             public bool                 venda              {get;set;} = true;
             public bool                 locacao            {get;set;}
@@ -61,6 +65,7 @@ namespace JaCaptei.Model {
             public long                             tokenNum                {get;set;}  = 0;
             public string                           tokenUID                {get;set;}  = "";
 
+            public string                           anotacoes               {get;set;}  = "";
             public string                           obs                     {get;set;}  = "";
 
             public int                              inseridoPorId           {get;set;}

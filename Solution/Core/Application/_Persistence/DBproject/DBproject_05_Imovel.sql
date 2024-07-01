@@ -1,5 +1,4 @@
 ﻿
-
 DROP TABLE  IF EXISTS "ImovelDisposicao";
 DROP TABLE  IF EXISTS "ImovelLazer";
 DROP TABLE  IF EXISTS "ImovelAreas";
@@ -74,9 +73,14 @@ CREATE	TABLE "Imovel"(
 	cod				 	            VARCHAR(20)		    DEFAULT '',
 	"idCRM"				 	        VARCHAR(20)		    UNIQUE NOT NULL,
 	"codCRM"		 	            VARCHAR(20)		    UNIQUE NOT NULL,
+	"idChave"		 	            VARCHAR(20)		    DEFAULT '',
+	"localChaves"	 	            VARCHAR(80)		    DEFAULT '',
+    index			 	            SMALLINT            DEFAULT 0,
+
 
 	"idAdmin"				        INTEGER,
 	"idProprietario"			    INTEGER,
+    exclusivo          			    BOOLEAN             DEFAULT FALSE,
 	"idTipo"			 	        SMALLINT            DEFAULT 1,
 	construtora 		 	        VARCHAR(60)		    DEFAULT '',
 	"construtoraNorm"	 	        VARCHAR(60)		    DEFAULT '',
@@ -87,6 +91,7 @@ CREATE	TABLE "Imovel"(
 	descricao  						TEXT              	DEFAULT '',
     tag                             VARCHAR(40)         DEFAULT '',
 
+	destinacao 						VARCHAR(60)       	DEFAULT '',
     venda           			    BOOLEAN             DEFAULT TRUE,
     locacao           			    BOOLEAN             DEFAULT TRUE,
 
@@ -147,11 +152,11 @@ CREATE	TABLE "ImovelImagem"(
 	nome				 	        VARCHAR(120)        DEFAULT '',
 	tipo				 	        VARCHAR(10)		    DEFAULT '',
     "contentType"                   VARCHAR(40)         ,
-    index			 	            SMALLINT            ,
-    ordem			 	            SMALLINT            ,
-	width			 	            SMALLINT            ,
-	height			 	            SMALLINT            ,
-	size			 	            INTEGER             ,
+    index			 	            SMALLINT            DEFAULT 0,
+    ordem			 	            SMALLINT            DEFAULT 0,
+	width			 	            SMALLINT            DEFAULT 0,
+	height			 	            SMALLINT            DEFAULT 0,
+	size			 	            INTEGER             DEFAULT 0,
     base64                          TEXT                ,
 
  	principal                     	BOOLEAN			    DEFAULT FALSE,
@@ -266,12 +271,14 @@ ALTER TABLE "ImovelCaracteristicasInternas"	ADD CONSTRAINT fk_ImovelCaracInterna
 
 CREATE	TABLE "ImovelCaracteristicasExternas"(
 
-	id      			 SERIAL 				NOT NULL,
+	id      			 SERIAL 			 NOT NULL,
 	"idImovel"			 INTEGER,
 
-    "totalAndares"       SMALLINT  DEFAULT 0,
-    "totalElevadores"    SMALLINT  DEFAULT 0,
-    "totalVagas"         SMALLINT  DEFAULT 0,
+    "totalAndares"       SMALLINT            DEFAULT 0,
+    "totalElevadores"    SMALLINT            DEFAULT 0,
+    "totalUnidadesAndar" SMALLINT            DEFAULT 0,
+    "totalVagas"         SMALLINT            DEFAULT 0,
+	"tipoVagas"          VARCHAR(40)		 DEFAULT '',
 
      academia            BOOLEAN             DEFAULT FALSE,
      alarme              BOOLEAN             DEFAULT FALSE,
