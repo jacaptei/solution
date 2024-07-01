@@ -410,12 +410,7 @@ article{
     color: var(--s-color-primary);
     /*margin-top:30px;*/
 }
-.register-input {
-    margin-bottom: 10px;
-    letter-spacing: 0.02em;
-    margin-top: 2px;
-    color: var(--s-color-primary);
-}
+
 .s-input > div:first-child{
     font-size: 0.9em;
     font-weight: 600;
