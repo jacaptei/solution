@@ -287,3 +287,5 @@ __pycache__/
 *.btm.cs
 *.odx.cs
 *.xsd.cs
+/Solution/Admin/Admin.UI/wwwroot/pages/account/Login.htm
+/Solution/Admin/Admin.UI/wwwroot/pages/account/Login.htm
