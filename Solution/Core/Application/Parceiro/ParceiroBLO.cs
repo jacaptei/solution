@@ -170,11 +170,11 @@ namespace JaCaptei.Application {
             if(Utils.Validator.Not(entity.numero))
                appReturn.AddException("NUMERO","Número não informado (informe 'SN' se não houver).");
 
-            if(!entity.aceitouTermos)
-               appReturn.AddException("TERMOS_USO","Termos de uso não aceito.");
+            //if(!entity.aceitouTermos)
+            //   appReturn.AddException("TERMOS_USO","Termos de uso não aceito.");
 
-            if(!entity.aceitouPoliticaPrivacidade)
-               appReturn.AddException("POLITICA_PRIVACIDADE","Política de privacidade não aceita.");
+            //if(!entity.aceitouPoliticaPrivacidade)
+            //   appReturn.AddException("POLITICA_PRIVACIDADE","Política de privacidade não aceita.");
 
             if(entity.idPlano < 2 || entity.idPlano > 4 )
                appReturn.AddException("PLANO","Plano contratado não identificado.");
