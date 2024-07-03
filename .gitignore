@@ -289,3 +289,4 @@ __pycache__/
 *.xsd.cs
 /Solution/Admin/Admin.UI/wwwroot/pages/account/Login.htm
 /Solution/Admin/Admin.UI/wwwroot/pages/account/Login.htm
+/Solution/Admin/Admin.API/appsettings.Development.json
