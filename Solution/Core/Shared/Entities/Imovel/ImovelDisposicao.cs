@@ -15,7 +15,6 @@ namespace JaCaptei.Model {
             public bool     aceitaFinanciamento     {get;set;} = false;
             public bool     aceitaPermuta           {get;set;} = false;
             public bool     alugado                 {get;set;} = false;
-            public double   comissao                {get;set;} = 0d;
             public bool     desativado              {get;set;} = false;
             public bool     disponivel              {get;set;} = true;
             public bool     gestaoJacaptei          {get;set;} = true;

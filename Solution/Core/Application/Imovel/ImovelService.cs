@@ -20,6 +20,16 @@ namespace JaCaptei.Application{
 
             entity = BLO.Normalizar(entity);
 
+            if(entity.idProprietario <= 0)
+                appReturn.AddException("Proprietário não informado.");
+            if(entity.valor.venda <= 0)
+                appReturn.AddException("Valor não informado.");
+            if(entity.area.total <= 0)
+                appReturn.AddException("Área não informada.");
+
+            if(!appReturn.status.success)
+                return appReturn;
+
             try {
                 LocalidadeService localidade = new LocalidadeService();
                 if(entity.endereco.idEstado == 0)
@@ -31,6 +41,7 @@ namespace JaCaptei.Application{
             } catch(Exception ex) { }
 
             return DAO.Adicionar(entity);
+
         }
 
 

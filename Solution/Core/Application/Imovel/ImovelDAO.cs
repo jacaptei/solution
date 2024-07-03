@@ -72,6 +72,9 @@ namespace JaCaptei.Application {
                         entity.externo.idImovel = entity.id;
                         conn.Insert<ImovelCaracteristicasExternas>(entity.externo);
 
+                        entity.documentacao.idImovel = entity.id;
+                        conn.Insert<ImovelDocumentacao>(entity.documentacao);
+
                         entity.disposicao.idImovel = entity.id;
                         conn.Insert<ImovelDisposicao>(entity.disposicao);
 

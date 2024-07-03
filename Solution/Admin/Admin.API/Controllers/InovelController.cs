@@ -52,12 +52,12 @@ namespace JaCaptei.Administrativo.API.Controllers {
         public async Task<IActionResult> Adicionar([FromForm] Imovel imovel,List<IFormFile> imagesFiles) {
         //public async Task<IActionResult> Adicionar([FromForm] IFormFile file) {
 
-           Usuario logado           = ObterUsuarioAutenticado();
+            Usuario logado           = ObterUsuarioAutenticado();
             imovel.inseridoPorId    = imovel.atualizadoPorId    = logado.id;
             imovel.inseridoPorNome  = imovel.atualizadoPorNome  = logado.nome;
 
-            appReturn = await ImageShackUploadImages(imovel,imagesFiles);
-            appReturn.result = imovel;
+            //appReturn = await ImageShackUploadImages(imovel,imagesFiles);
+            //appReturn.result = imovel;
             //await ImageShackDownload_ImoviewUpload("https://imagizer.imageshack.com/img924/9249/XXPIrP.jpg");
             return Result(appReturn);
         }

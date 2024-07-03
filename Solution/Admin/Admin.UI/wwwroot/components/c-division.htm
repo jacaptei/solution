@@ -1,0 +1,45 @@
+<template>
+		<div :style="'min-width:'+width+';width:'+width+';min-height:'+height+';height:'+height+';display:inline-block;background-color:'+color+';margin-top:'+margin+';margin-bottom:'+margin">.</div>
+</template>
+
+<script>
+module.exports = {
+
+    components: {
+
+	},	
+	
+	data: function () {
+		return {
+		}
+	},computed: {
+      
+	},
+	
+	props:{
+		width:		{ type: String, required: false, default: "100%"	},
+		height:		{ type: String, required: false, default: "1px"		},
+		color:		{ type: String, required: false, default: "#dbdbdb" },
+		margin:		{ type: String, required: false, default: "20px"	},
+	},
+	watch:{
+	},
+	created: function () {
+	 },
+	mounted(){
+	},		  
+	methods: {
+
+	}				
+		
+}
+
+</script>
+
+
+<style scoped>
+
+
+</style>
+
+

@@ -9,16 +9,28 @@ namespace JaCaptei.Model {
 
         public class ImovelAreas{
 
-            public int      id            {get;set;}
-            public int      idImovel      {get;set;}
+            public int      id                          {get;set;}
+            public int      idImovel                    {get;set;}
 
-            public double   minima        {get;set;} = 0d ;
-            public double   maxima        {get;set;} = 0d ;
-            public double   interna       {get;set;} = 0d ;
-            public double   externa       {get;set;} = 0d ;
-            public double   total         {get;set;} = 0d ;
+            public double   interna                     {get;set;}
+            public double   externa                     {get;set;}
+            public double   terreno                     {get;set;}
+            public double   frente                      {get;set;}
+            public double   fundo                       {get;set;}
+            public double   direito                     {get;set;}
+            public double   esquerdo                    {get;set;}
+            public double   confrontacaoFrente          {get;set;}
+            public double   confrontacaoFundo           {get;set;}
+            public double   confrontacaoDireito         {get;set;}
+            public double   confrontacaoEsquerdo        {get;set;}
+            public double   zona                        {get;set;}
+            public double   coeficienteAproveitamento   {get;set;}
+            public double   minima                      {get;set;}
+            public double   maxima                      {get;set;}
+            public double   total                       {get;set;}
 
         }
+
 
 
 

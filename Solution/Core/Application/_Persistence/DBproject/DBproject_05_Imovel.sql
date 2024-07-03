@@ -1,4 +1,5 @@
 ﻿
+DROP TABLE  IF EXISTS "ImovelDocumentacao";
 DROP TABLE  IF EXISTS "ImovelDisposicao";
 DROP TABLE  IF EXISTS "ImovelLazer";
 DROP TABLE  IF EXISTS "ImovelAreas";
@@ -73,8 +74,9 @@ CREATE	TABLE "Imovel"(
 	cod				 	            VARCHAR(20)		    DEFAULT '',
 	"idCRM"				 	        VARCHAR(20)		    UNIQUE NOT NULL,
 	"codCRM"		 	            VARCHAR(20)		    UNIQUE NOT NULL,
-	"idChave"		 	            VARCHAR(20)		    DEFAULT '',
+	"idChaves"		 	            VARCHAR(20)		    DEFAULT '',
 	"localChaves"	 	            VARCHAR(80)		    DEFAULT '',
+    "totalChaves"	 	            SMALLINT            DEFAULT 0,
     index			 	            SMALLINT            DEFAULT 0,
 
 
@@ -84,6 +86,7 @@ CREATE	TABLE "Imovel"(
 	"idTipo"			 	        SMALLINT            DEFAULT 1,
 	construtora 		 	        VARCHAR(60)		    DEFAULT '',
 	"construtoraNorm"	 	        VARCHAR(60)		    DEFAULT '',
+    "anoConstrucao"	 	            SMALLINT            DEFAULT 0,
 	edificio			 	        VARCHAR(60)		    DEFAULT '',
 	"edificioNorm"    	 	        VARCHAR(60)		    DEFAULT '',
 	nome				 	        VARCHAR(60)		    DEFAULT '',
@@ -306,13 +309,20 @@ CREATE	TABLE "ImovelValores"(
 	id      					    SERIAL 				NOT NULL,
 	"idImovel"			            INTEGER,
 
-    anterior     REAL DEFAULT 0,
-    atual        REAL DEFAULT 0,
-    condominio   REAL DEFAULT 0,
-    consulta     REAL DEFAULT 0,
-    maximo       REAL DEFAULT 0,
-    minimo       REAL DEFAULT 0,
-    iptu         REAL DEFAULT 0
+    "sobConsulta"       BOOLEAN             DEFAULT FALSE,
+
+    venda               REAL DEFAULT 0,
+    "vendaAnterior"     REAL DEFAULT 0,
+    aluguel             REAL DEFAULT 0,
+    "aluguelAnterior"   REAL DEFAULT 0,
+    condominio          REAL DEFAULT 0,
+    consulta            REAL DEFAULT 0,
+    "iptuMensal"        REAL DEFAULT 0,
+    "iptuAnual"         REAL DEFAULT 0,
+    comissao            REAL DEFAULT 0, -- %
+	rentabilidade       REAL DEFAULT 0, -- %
+    maximo              REAL DEFAULT 0,
+    minimo              REAL DEFAULT 0
 
 );
 
@@ -326,11 +336,22 @@ CREATE	TABLE "ImovelAreas"(
 	id      	  SERIAL 				NOT NULL,
 	"idImovel"	  INTEGER,
 
-    minima        REAL DEFAULT 0,
-    maxima        REAL DEFAULT 0,
-    interna       REAL DEFAULT 0,
-    externa       REAL DEFAULT 0,
-    total         REAL DEFAULT 0
+    interna                     REAL DEFAULT 0,
+    externa                     REAL DEFAULT 0,
+    terreno                     REAL DEFAULT 0,
+    frente                      REAL DEFAULT 0,
+    fundo                       REAL DEFAULT 0,
+    direito                     REAL DEFAULT 0,
+    esquerdo                    REAL DEFAULT 0,
+    "confrontacaoFrente"        REAL DEFAULT 0,
+    "confrontacaoFundo"         REAL DEFAULT 0,
+    "confrontacaoDireito"       REAL DEFAULT 0,
+    "confrontacaoEsquerdo"      REAL DEFAULT 0,
+    zona                        REAL DEFAULT 0,
+    "coeficienteAproveitamento" REAL DEFAULT 0,
+    minima                      REAL DEFAULT 0,
+    maxima                      REAL DEFAULT 0,
+    total                       REAL DEFAULT 0
 
 );
 
@@ -383,3 +404,22 @@ CREATE	TABLE "ImovelDisposicao"(
 
 ALTER TABLE "ImovelDisposicao"	ADD CONSTRAINT pk_ImovelDisposicao  			PRIMARY KEY (id);
 ALTER TABLE "ImovelDisposicao"	ADD CONSTRAINT fk_ImovelDisposicao_Imovel	    FOREIGN KEY ("idImovel")          REFERENCES "Imovel"(id)  ON DELETE CASCADE;
+
+
+CREATE	TABLE "ImovelDocumentacao"(
+
+	id      				SERIAL 				NOT NULL,
+	"idImovel"			    INTEGER,
+    
+    cartorio                VARCHAR(40)			DEFAULT '',
+    "cartorioFolha"         VARCHAR(40)			DEFAULT '',
+    "cartorioLivro"         VARCHAR(40)			DEFAULT '',
+    matricula               VARCHAR(40)			DEFAULT '',
+    "vencimentoVenda"       VARCHAR(40)			DEFAULT ''
+    --"vencimentoVenda"       TIMESTAMP WITHOUT TIME ZONE 
+
+);
+
+ALTER TABLE "ImovelDocumentacao"	ADD CONSTRAINT pk_ImovelDocumentacao  			PRIMARY KEY (id);
+ALTER TABLE "ImovelDocumentacao"	ADD CONSTRAINT fk_ImovelDocumentacaoo_Imovel	FOREIGN KEY ("idImovel")      REFERENCES "Imovel"(id)  ON DELETE CASCADE;
+

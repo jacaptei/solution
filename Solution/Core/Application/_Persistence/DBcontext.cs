@@ -31,7 +31,7 @@ namespace JaCaptei.Application.DAL{
         }
 
         public NpgsqlConnection GetConn() {
-            if(conn is null)
+            //if(conn is null)
                 conn = new NpgsqlConnection(GetConnectionString());
             return conn; 
         }

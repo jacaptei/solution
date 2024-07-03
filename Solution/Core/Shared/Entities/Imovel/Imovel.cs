@@ -13,8 +13,9 @@ namespace JaCaptei.Model {
             public string               cod                {get;set;} = "";
             public string               idCRM              {get;set;} = "";
             public string               codCRM             {get;set;} = "";
-            public string               idChave            {get;set;} = "";
+            public string               idChaves           {get;set;} = "";
             public string               localChaves        {get;set;} = "";
+            public short                totalChaves        {get;set;}
             public short                index              {get;set;}
 
             public Admin                admin              {get;set;} = new Admin();
@@ -24,9 +25,10 @@ namespace JaCaptei.Model {
             
             public bool                 exclusivo          {get;set;}
             public ImovelTipo           tipo               {get;set;} = new ImovelTipo();
-            public int                  idTipo             {get;set;}
+            public short                idTipo             {get;set;}
             public string               construtora        {get;set;} = "";
             public string               construtoraNorm    {get;set;} = "";
+            public short                anoConstrucao      {get;set;}
             public string               edificio           {get;set;} = "";
             public string               edificioNorm       {get;set;} = "";
             public string               nome               {get;set;} = "";
@@ -48,6 +50,7 @@ namespace JaCaptei.Model {
             public List<ImovelImagem>               imagensLegadas  {get;set;} = new List<ImovelImagem>();
             public ImovelValores                    valor           {get;set;} = new ImovelValores();
             public ImovelAreas                      area            {get;set;} = new ImovelAreas();
+            public ImovelDocumentacao               documentacao    {get;set;} = new ImovelDocumentacao();
             public ImovelDisposicao                 disposicao      {get;set;} = new ImovelDisposicao();
             public ImovelCaracteristicasInternas    interno         {get;set;} = new ImovelCaracteristicasInternas();
             public ImovelCaracteristicasExternas    externo         {get;set;} = new ImovelCaracteristicasExternas();
@@ -84,9 +87,9 @@ namespace JaCaptei.Model {
             public string ObterTitulo(){
                 string res = "";
                 res  =    tipo.label;
-                res  +=   (interno.totalQuartos > 0) ? (", " + interno.totalQuartos + ((interno.totalQuartos == 1) ? " quarto" : " quartos")) : "";
-                res  +=   (interno.totalSuites  > 0) ? (", " + interno.totalSuites  + ((interno.totalSuites  == 1) ? " suite" : " suites")) : "";
-                res  +=   (externo.totalVagas   > 0) ? (", " + externo.totalVagas   + ((externo.totalVagas   == 1) ? " vaga" : " vagas")) : "";
+                res  +=   (interno.quarto) ? (", " + interno.totalQuartos + ((interno.totalQuartos == 1) ? " quarto" : " quartos")) : "";
+                res  +=   (interno.suite ) ? (", " + interno.totalSuites  + ((interno.totalSuites  == 1) ? " suite" : " suites")) : "";
+                res  +=   (externo.vaga  ) ? (", " + externo.totalVagas   + ((externo.totalVagas   == 1) ? " vaga" : " vagas")) : "";
                 return res;
             }
 
