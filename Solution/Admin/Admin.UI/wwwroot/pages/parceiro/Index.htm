@@ -12,7 +12,7 @@
                     indicator-color="primary">
                 <q-tab name="buscar" icon="fa fa-search" label="BUSCAR"></q-tab>
                 <q-tab name="validar" icon="fa fa-user-lock" label="VALIDAR"></q-tab>
-                <q-tab name="cadastrar" icon="fa fa-user-plus" label="ADICIONAR"></q-tab>
+                <q-tab name="adicionar" icon="fa fa-user-plus" label="ADICIONAR"></q-tab>
             </q-tabs>
             <q-tab-panels v-model="view" animated>
 
@@ -24,13 +24,9 @@
                     <page_validar />
                 </q-tab-panel>
 
-                <q-tab-panel name="cadastrar">
-                    <page_cadastrar />
-                </q-tab-panel>
-
-                <!--<q-tab-panel name="adicionar">
+               <q-tab-panel name="adicionar">
                     <page_adicionar @voltar="view='buscar'" />
-                </q-tab-panel>-->
+                </q-tab-panel>
 
             </q-tab-panels>
         </div>
@@ -48,8 +44,7 @@
         components: {
             page_buscar:    LoadComponent("./pages/parceiro/Index-Buscar.htm"),
             page_validar:   LoadComponent("./pages/parceiro/Index-Validar.htm"),
-            page_adicionar: LoadComponent("./pages/parceiro/Index-Adicionar.htm"),
-            page_cadastrar: LoadComponent("./pages/parceiro/Index-Cadastrar-Usuario.htm")
+            page_adicionar: LoadComponent("./pages/parceiro/Index-Adicionar.htm")
         },
 
         data: function () {
