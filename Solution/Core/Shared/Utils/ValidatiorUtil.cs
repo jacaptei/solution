@@ -258,28 +258,9 @@ namespace JaCaptei.Model{
              );
         }
 
-
         public bool IsUrlYoutubeVimeo(string url) {
             return (IsUrlYoutube(url) || IsUrlVimeo(url));
         }
 
-
-
-
-
-
-
-
-
-
-
-
-
-
     }
-
-
-
-
-
 }

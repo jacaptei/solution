@@ -1,0 +1,2127 @@
+[
+  {
+    "id": "3260",
+    "nome": "Aarão Reis",
+    "idCidade": "2754"
+  },
+  {
+    "id": "3261",
+    "nome": "Acaiaca",
+    "idCidade": "2754"
+  },
+  {
+    "id": "3262",
+    "nome": "Adelaide",
+    "idCidade": "2754"
+  },
+  {
+    "id": "3263",
+    "nome": "Alípio de Melo",
+    "idCidade": "2754"
+  },
+  {
+    "id": "3264",
+    "nome": "Alto dos Pinheiros",
+    "idCidade": "2754"
+  },
+  {
+    "id": "3265",
+    "nome": "Álvaro Camargos",
+    "idCidade": "2754"
+  },
+  {
+    "id": "3268",
+    "nome": "Anchieta",
+    "idCidade": "2754"
+  },
+  {
+    "id": "3269",
+    "nome": "Aparecida",
+    "idCidade": "2754"
+  },
+  {
+    "id": "3271",
+    "nome": "Bandeirantes (Pampulha)",
+    "idCidade": "2754"
+  },
+  {
+    "id": "3272",
+    "nome": "Barreiro",
+    "idCidade": "2754"
+  },
+  {
+    "id": "3274",
+    "nome": "Barro Preto",
+    "idCidade": "2754"
+  },
+  {
+    "id": "3275",
+    "nome": "Barroca",
+    "idCidade": "2754"
+  },
+  {
+    "id": "3276",
+    "nome": "Belém",
+    "idCidade": "2754"
+  },
+  {
+    "id": "3278",
+    "nome": "Belvedere",
+    "idCidade": "2754"
+  },
+  {
+    "id": "3279",
+    "nome": "Betânia",
+    "idCidade": "2754"
+  },
+  {
+    "id": "3280",
+    "nome": "Boa Vista",
+    "idCidade": "2754"
+  },
+  {
+    "id": "3281",
+    "nome": "Bonfim",
+    "idCidade": "2754"
+  },
+  {
+    "id": "3282",
+    "nome": "Bonsucesso (Barreiro)",
+    "idCidade": "2754"
+  },
+  {
+    "id": "3283",
+    "nome": "Brasil Industrial (Barreiro)",
+    "idCidade": "2754"
+  },
+  {
+    "id": "3284",
+    "nome": "Braúnas",
+    "idCidade": "2754"
+  },
+  {
+    "id": "3285",
+    "nome": "Buritis",
+    "idCidade": "2754"
+  },
+  {
+    "id": "3286",
+    "nome": "Cabana do Pai Tomás",
+    "idCidade": "2754"
+  },
+  {
+    "id": "3287",
+    "nome": "Cachoeirinha",
+    "idCidade": "2754"
+  },
+  {
+    "id": "3288",
+    "nome": "Caetano Furquim",
+    "idCidade": "2754"
+  },
+  {
+    "id": "3289",
+    "nome": "Caiçaras",
+    "idCidade": "2754"
+  },
+  {
+    "id": "3290",
+    "nome": "Calafate",
+    "idCidade": "2754"
+  },
+  {
+    "id": "3291",
+    "nome": "Califórnia",
+    "idCidade": "2754"
+  },
+  {
+    "id": "3292",
+    "nome": "Camargos",
+    "idCidade": "2754"
+  },
+  {
+    "id": "3293",
+    "nome": "Campo Alegre",
+    "idCidade": "2754"
+  },
+  {
+    "id": "3294",
+    "nome": "Canaã",
+    "idCidade": "2754"
+  },
+  {
+    "id": "3295",
+    "nome": "Candelária",
+    "idCidade": "2754"
+  },
+  {
+    "id": "3296",
+    "nome": "Capitão Eduardo",
+    "idCidade": "2754"
+  },
+  {
+    "id": "3297",
+    "nome": "Carlos Prates",
+    "idCidade": "2754"
+  },
+  {
+    "id": "3298",
+    "nome": "Carmo",
+    "idCidade": "2754"
+  },
+  {
+    "id": "3299",
+    "nome": "Casa Branca",
+    "idCidade": "2754"
+  },
+  {
+    "id": "3300",
+    "nome": "Castanheira (Barreiro)",
+    "idCidade": "2754"
+  },
+  {
+    "id": "3303",
+    "nome": "Castelo",
+    "idCidade": "2754"
+  },
+  {
+    "id": "3306",
+    "nome": "Céu Azul",
+    "idCidade": "2754"
+  },
+  {
+    "id": "3311",
+    "nome": "Cidade Jardim",
+    "idCidade": "2754"
+  },
+  {
+    "id": "3312",
+    "nome": "Cidade Nova",
+    "idCidade": "2754"
+  },
+  {
+    "id": "3316",
+    "nome": "Concórdia",
+    "idCidade": "2754"
+  },
+  {
+    "id": "3317",
+    "nome": "Conjunto Ademar Maldonado (Barreiro)",
+    "idCidade": "2754"
+  },
+  {
+    "id": "3318",
+    "nome": "Átila de Paiva (Barreiro)",
+    "idCidade": "2754"
+  },
+  {
+    "id": "3321",
+    "nome": "Conjunto Califórnia",
+    "idCidade": "2754"
+  },
+  {
+    "id": "3323",
+    "nome": "Confisco",
+    "idCidade": "2754"
+  },
+  {
+    "id": "3324",
+    "nome": "Jardim Felicidade",
+    "idCidade": "2754"
+  },
+  {
+    "id": "3325",
+    "nome": "Conjunto Habitacional Vale do Jatobá (Barreiro)",
+    "idCidade": "2754"
+  },
+  {
+    "id": "3327",
+    "nome": "Conjunto Lagoa",
+    "idCidade": "2754"
+  },
+  {
+    "id": "3329",
+    "nome": "Conjunto Minascaixa",
+    "idCidade": "2754"
+  },
+  {
+    "id": "3330",
+    "nome": "Ernesto do Nascimento(Barreiro)",
+    "idCidade": "2754"
+  },
+  {
+    "id": "3331",
+    "nome": "Conjunto Santa Maria",
+    "idCidade": "2754"
+  },
+  {
+    "id": "3332",
+    "nome": "Conjunto Túnel Ibirité (Barreiro)",
+    "idCidade": "2754"
+  },
+  {
+    "id": "3334",
+    "nome": "Copacabana",
+    "idCidade": "2754"
+  },
+  {
+    "id": "3335",
+    "nome": "Coqueiros",
+    "idCidade": "2754"
+  },
+  {
+    "id": "3336",
+    "nome": "Coração de Jesus",
+    "idCidade": "2754"
+  },
+  {
+    "id": "3337",
+    "nome": "Coração Eucarístico",
+    "idCidade": "2754"
+  },
+  {
+    "id": "3340",
+    "nome": "Cruzeiro",
+    "idCidade": "2754"
+  },
+  {
+    "id": "3341",
+    "nome": "Diamante (Barreiro)",
+    "idCidade": "2754"
+  },
+  {
+    "id": "3342",
+    "nome": "Distrito Industrial do Jatobá (Barreiro)",
+    "idCidade": "2754"
+  },
+  {
+    "id": "3343",
+    "nome": "Dom Bosco",
+    "idCidade": "2754"
+  },
+  {
+    "id": "3344",
+    "nome": "Dom Cabral",
+    "idCidade": "2754"
+  },
+  {
+    "id": "3346",
+    "nome": "Dom Silvério",
+    "idCidade": "2754"
+  },
+  {
+    "id": "3347",
+    "nome": "Dona Clara",
+    "idCidade": "2754"
+  },
+  {
+    "id": "3348",
+    "nome": "Engenho Nogueira",
+    "idCidade": "2754"
+  },
+  {
+    "id": "3349",
+    "nome": "Garças",
+    "idCidade": "2754"
+  },
+  {
+    "id": "3350",
+    "nome": "Esplanada",
+    "idCidade": "2754"
+  },
+  {
+    "id": "3352",
+    "nome": "Estoril",
+    "idCidade": "2754"
+  },
+  {
+    "id": "3354",
+    "nome": "Estrela do Oriente",
+    "idCidade": "2754"
+  },
+  {
+    "id": "3355",
+    "nome": "Etelvina Carneiro",
+    "idCidade": "2754"
+  },
+  {
+    "id": "3356",
+    "nome": "Europa",
+    "idCidade": "2754"
+  },
+  {
+    "id": "3357",
+    "nome": "Eymard",
+    "idCidade": "2754"
+  },
+  {
+    "id": "3359",
+    "nome": "Flávio Marques Lisboa (Barreiro)",
+    "idCidade": "2754"
+  },
+  {
+    "id": "3360",
+    "nome": "Floramar",
+    "idCidade": "2754"
+  },
+  {
+    "id": "3361",
+    "nome": "Floresta",
+    "idCidade": "2754"
+  },
+  {
+    "id": "3363",
+    "nome": "Funcionários",
+    "idCidade": "2754"
+  },
+  {
+    "id": "3364",
+    "nome": "Gameleira",
+    "idCidade": "2754"
+  },
+  {
+    "id": "3366",
+    "nome": "Goiânia",
+    "idCidade": "2754"
+  },
+  {
+    "id": "3367",
+    "nome": "Graça",
+    "idCidade": "2754"
+  },
+  {
+    "id": "3368",
+    "nome": "Grajaú",
+    "idCidade": "2754"
+  },
+  {
+    "id": "3369",
+    "nome": "Guarani",
+    "idCidade": "2754"
+  },
+  {
+    "id": "3371",
+    "nome": "Gutierrez",
+    "idCidade": "2754"
+  },
+  {
+    "id": "3372",
+    "nome": "Havaí",
+    "idCidade": "2754"
+  },
+  {
+    "id": "3373",
+    "nome": "Heliópolis",
+    "idCidade": "2754"
+  },
+  {
+    "id": "3374",
+    "nome": "Horto",
+    "idCidade": "2754"
+  },
+  {
+    "id": "3377",
+    "nome": "Indaiá",
+    "idCidade": "2754"
+  },
+  {
+    "id": "3378",
+    "nome": "Independência (Barreiro)",
+    "idCidade": "2754"
+  },
+  {
+    "id": "3379",
+    "nome": "Indians",
+    "idCidade": "2754"
+  },
+  {
+    "id": "3380",
+    "nome": "Indústrias II",
+    "idCidade": "2754"
+  },
+  {
+    "id": "3382",
+    "nome": "Ipiranga",
+    "idCidade": "2754"
+  },
+  {
+    "id": "3385",
+    "nome": "Itaipu (Barreiro)",
+    "idCidade": "2754"
+  },
+  {
+    "id": "3387",
+    "nome": "Itapoã",
+    "idCidade": "2754"
+  },
+  {
+    "id": "3388",
+    "nome": "Itatiaia",
+    "idCidade": "2754"
+  },
+  {
+    "id": "3389",
+    "nome": "Jaqueline",
+    "idCidade": "2754"
+  },
+  {
+    "id": "3390",
+    "nome": "Jaraguá",
+    "idCidade": "2754"
+  },
+  {
+    "id": "3391",
+    "nome": "Jardim Alvorada",
+    "idCidade": "2754"
+  },
+  {
+    "id": "3392",
+    "nome": "Jardim América",
+    "idCidade": "2754"
+  },
+  {
+    "id": "3393",
+    "nome": "Jardim Atlântico",
+    "idCidade": "2754"
+  },
+  {
+    "id": "3395",
+    "nome": "Belmonte",
+    "idCidade": "2754"
+  },
+  {
+    "id": "3396",
+    "nome": "Jardim das Nações",
+    "idCidade": "2754"
+  },
+  {
+    "id": "3397",
+    "nome": "Jardim dos Comerciários (Venda Nova)",
+    "idCidade": "2754"
+  },
+  {
+    "id": "3399",
+    "nome": "Jardim Filadélfia",
+    "idCidade": "2754"
+  },
+  {
+    "id": "3401",
+    "nome": "Jardim Guanabara",
+    "idCidade": "2754"
+  },
+  {
+    "id": "3402",
+    "nome": "Inconfidência",
+    "idCidade": "2754"
+  },
+  {
+    "id": "3403",
+    "nome": "Jardim Montanhês",
+    "idCidade": "2754"
+  },
+  {
+    "id": "3404",
+    "nome": "Paquetá",
+    "idCidade": "2754"
+  },
+  {
+    "id": "3405",
+    "nome": "Jardim Pirineus",
+    "idCidade": "2754"
+  },
+  {
+    "id": "3406",
+    "nome": "Minaslândia (P Maio)",
+    "idCidade": "2754"
+  },
+  {
+    "id": "3407",
+    "nome": "Jardim Vitória",
+    "idCidade": "2754"
+  },
+  {
+    "id": "3408",
+    "nome": "Jardinópolis",
+    "idCidade": "2754"
+  },
+  {
+    "id": "3409",
+    "nome": "João Pinheiro",
+    "idCidade": "2754"
+  },
+  {
+    "id": "3410",
+    "nome": "Jonas Veiga",
+    "idCidade": "2754"
+  },
+  {
+    "id": "3411",
+    "nome": "Juliana",
+    "idCidade": "2754"
+  },
+  {
+    "id": "3413",
+    "nome": "Lagoinha",
+    "idCidade": "2754"
+  },
+  {
+    "id": "3416",
+    "nome": "Lagoinha Leblon (Venda Nova)",
+    "idCidade": "2754"
+  },
+  {
+    "id": "3417",
+    "nome": "Letícia",
+    "idCidade": "2754"
+  },
+  {
+    "id": "3418",
+    "nome": "Liberdade",
+    "idCidade": "2754"
+  },
+  {
+    "id": "3419",
+    "nome": "Lindéia (Barreiro)",
+    "idCidade": "2754"
+  },
+  {
+    "id": "3420",
+    "nome": "Lourdes",
+    "idCidade": "2754"
+  },
+  {
+    "id": "3422",
+    "nome": "Luxemburgo",
+    "idCidade": "2754"
+  },
+  {
+    "id": "3423",
+    "nome": "Madre Gertrudes",
+    "idCidade": "2754"
+  },
+  {
+    "id": "3424",
+    "nome": "Madri",
+    "idCidade": "2754"
+  },
+  {
+    "id": "3425",
+    "nome": "Manacás",
+    "idCidade": "2754"
+  },
+  {
+    "id": "3426",
+    "nome": "Mangabeiras",
+    "idCidade": "2754"
+  },
+  {
+    "id": "3427",
+    "nome": "Mangueiras (Barreiro)",
+    "idCidade": "2754"
+  },
+  {
+    "id": "3429",
+    "nome": "Mantiqueira",
+    "idCidade": "2754"
+  },
+  {
+    "id": "3430",
+    "nome": "Marajó",
+    "idCidade": "2754"
+  },
+  {
+    "id": "3432",
+    "nome": "Jatobá (Barreiro)",
+    "idCidade": "2754"
+  },
+  {
+    "id": "3434",
+    "nome": "Xodó Marize",
+    "idCidade": "2754"
+  },
+  {
+    "id": "3435",
+    "nome": "Milionários (Barreiro)",
+    "idCidade": "2754"
+  },
+  {
+    "id": "3436",
+    "nome": "Minas Brasil",
+    "idCidade": "2754"
+  },
+  {
+    "id": "3438",
+    "nome": "Monsenhor Messias",
+    "idCidade": "2754"
+  },
+  {
+    "id": "3439",
+    "nome": "Monte Azul",
+    "idCidade": "2754"
+  },
+  {
+    "id": "3441",
+    "nome": "Morro das Pedras",
+    "idCidade": "2754"
+  },
+  {
+    "id": "3443",
+    "nome": "Nazaré",
+    "idCidade": "2754"
+  },
+  {
+    "id": "3444",
+    "nome": "Novo Glória",
+    "idCidade": "2754"
+  },
+  {
+    "id": "3445",
+    "nome": "Nossa Senhora da Saúde",
+    "idCidade": "2754"
+  },
+  {
+    "id": "3448",
+    "nome": "Nova Cachoeirinha",
+    "idCidade": "2754"
+  },
+  {
+    "id": "3449",
+    "nome": "Nova Cintra",
+    "idCidade": "2754"
+  },
+  {
+    "id": "3450",
+    "nome": "Nova Esperança",
+    "idCidade": "2754"
+  },
+  {
+    "id": "3452",
+    "nome": "Nova Floresta",
+    "idCidade": "2754"
+  },
+  {
+    "id": "3453",
+    "nome": "Nova Gameleira",
+    "idCidade": "2754"
+  },
+  {
+    "id": "3454",
+    "nome": "Nova Granada",
+    "idCidade": "2754"
+  },
+  {
+    "id": "3455",
+    "nome": "Nova Pampulha",
+    "idCidade": "2754"
+  },
+  {
+    "id": "3456",
+    "nome": "Nova Suíssa",
+    "idCidade": "2754"
+  },
+  {
+    "id": "3457",
+    "nome": "Nova Vista",
+    "idCidade": "2754"
+  },
+  {
+    "id": "3459",
+    "nome": "Novo Aarão Reis",
+    "idCidade": "2754"
+  },
+  {
+    "id": "3460",
+    "nome": "Novo Itamarati",
+    "idCidade": "2754"
+  },
+  {
+    "id": "3461",
+    "nome": "Novo Santa Cecília (Barreiro)",
+    "idCidade": "2754"
+  },
+  {
+    "id": "3463",
+    "nome": "Olaria (Barreiro)",
+    "idCidade": "2754"
+  },
+  {
+    "id": "3464",
+    "nome": "Olhos D'Água",
+    "idCidade": "2754"
+  },
+  {
+    "id": "3465",
+    "nome": "Ouro Preto",
+    "idCidade": "2754"
+  },
+  {
+    "id": "3466",
+    "nome": "Padre Eustáquio",
+    "idCidade": "2754"
+  },
+  {
+    "id": "3468",
+    "nome": "Palmares",
+    "idCidade": "2754"
+  },
+  {
+    "id": "3469",
+    "nome": "Palmeiras",
+    "idCidade": "2754"
+  },
+  {
+    "id": "3470",
+    "nome": "Pampulha",
+    "idCidade": "2754"
+  },
+  {
+    "id": "3471",
+    "nome": "Paraíso",
+    "idCidade": "2754"
+  },
+  {
+    "id": "3477",
+    "nome": "Jardim Leblon",
+    "idCidade": "2754"
+  },
+  {
+    "id": "3479",
+    "nome": "Parque Riachuelo",
+    "idCidade": "2754"
+  },
+  {
+    "id": "3483",
+    "nome": "Conjunto Paulo VI",
+    "idCidade": "2754"
+  },
+  {
+    "id": "3485",
+    "nome": "Pedro II",
+    "idCidade": "2754"
+  },
+  {
+    "id": "3487",
+    "nome": "Petrópolis (Barreiro)",
+    "idCidade": "2754"
+  },
+  {
+    "id": "3488",
+    "nome": "Pilar",
+    "idCidade": "2754"
+  },
+  {
+    "id": "3489",
+    "nome": "Pindorama",
+    "idCidade": "2754"
+  },
+  {
+    "id": "3490",
+    "nome": "Pio XII",
+    "idCidade": "2754"
+  },
+  {
+    "id": "3491",
+    "nome": "Pirajá",
+    "idCidade": "2754"
+  },
+  {
+    "id": "3493",
+    "nome": "Piratininga (Venda Nova)",
+    "idCidade": "2754"
+  },
+  {
+    "id": "3494",
+    "nome": "Planalto",
+    "idCidade": "2754"
+  },
+  {
+    "id": "3495",
+    "nome": "Pompéia",
+    "idCidade": "2754"
+  },
+  {
+    "id": "3496",
+    "nome": "Prado",
+    "idCidade": "2754"
+  },
+  {
+    "id": "3498",
+    "nome": "Primeiro de Maio",
+    "idCidade": "2754"
+  },
+  {
+    "id": "3500",
+    "nome": "Providência",
+    "idCidade": "2754"
+  },
+  {
+    "id": "3502",
+    "nome": "Renascença",
+    "idCidade": "2754"
+  },
+  {
+    "id": "3503",
+    "nome": "Ribeiro de Abreu",
+    "idCidade": "2754"
+  },
+  {
+    "id": "3504",
+    "nome": "Sagrada Família",
+    "idCidade": "2754"
+  },
+  {
+    "id": "3505",
+    "nome": "Salgado Filho",
+    "idCidade": "2754"
+  },
+  {
+    "id": "3506",
+    "nome": "Santa Amélia",
+    "idCidade": "2754"
+  },
+  {
+    "id": "3507",
+    "nome": "Santa Branca",
+    "idCidade": "2754"
+  },
+  {
+    "id": "3508",
+    "nome": "Santa Cecília Vale do Jatobá (Barreiro)",
+    "idCidade": "2754"
+  },
+  {
+    "id": "3510",
+    "nome": "Santa Cruz",
+    "idCidade": "2754"
+  },
+  {
+    "id": "3511",
+    "nome": "Santa Cruz (Barreiro)",
+    "idCidade": "2754"
+  },
+  {
+    "id": "3512",
+    "nome": "Santa Efigênia",
+    "idCidade": "2754"
+  },
+  {
+    "id": "3513",
+    "nome": "Santa Helena (Barreiro)",
+    "idCidade": "2754"
+  },
+  {
+    "id": "3514",
+    "nome": "Santa Inês",
+    "idCidade": "2754"
+  },
+  {
+    "id": "3515",
+    "nome": "Santa Isabel",
+    "idCidade": "2754"
+  },
+  {
+    "id": "3516",
+    "nome": "Santa Lúcia",
+    "idCidade": "2754"
+  },
+  {
+    "id": "3517",
+    "nome": "Santa Maria",
+    "idCidade": "2754"
+  },
+  {
+    "id": "3518",
+    "nome": "Maria Goretti",
+    "idCidade": "2754"
+  },
+  {
+    "id": "3519",
+    "nome": "Santa Mônica",
+    "idCidade": "2754"
+  },
+  {
+    "id": "3520",
+    "nome": "Santa Rosa",
+    "idCidade": "2754"
+  },
+  {
+    "id": "3521",
+    "nome": "Santa Tereza",
+    "idCidade": "2754"
+  },
+  {
+    "id": "3522",
+    "nome": "Santo Agostinho",
+    "idCidade": "2754"
+  },
+  {
+    "id": "3523",
+    "nome": "Santo André",
+    "idCidade": "2754"
+  },
+  {
+    "id": "3524",
+    "nome": "Santo Antônio",
+    "idCidade": "2754"
+  },
+  {
+    "id": "3525",
+    "nome": "São Bento",
+    "idCidade": "2754"
+  },
+  {
+    "id": "3526",
+    "nome": "São Bernardo",
+    "idCidade": "2754"
+  },
+  {
+    "id": "3527",
+    "nome": "São Cristóvão",
+    "idCidade": "2754"
+  },
+  {
+    "id": "3528",
+    "nome": "São Francisco",
+    "idCidade": "2754"
+  },
+  {
+    "id": "3529",
+    "nome": "São Gabriel",
+    "idCidade": "2754"
+  },
+  {
+    "id": "3530",
+    "nome": "São Geraldo",
+    "idCidade": "2754"
+  },
+  {
+    "id": "3531",
+    "nome": "São João Batista (Venda Nova)",
+    "idCidade": "2754"
+  },
+  {
+    "id": "3533",
+    "nome": "Jardim São José",
+    "idCidade": "2754"
+  },
+  {
+    "id": "3534",
+    "nome": "São José",
+    "idCidade": "2754"
+  },
+  {
+    "id": "3535",
+    "nome": "São Lucas",
+    "idCidade": "2754"
+  },
+  {
+    "id": "3536",
+    "nome": "São Luiz",
+    "idCidade": "2754"
+  },
+  {
+    "id": "3537",
+    "nome": "São Marcos",
+    "idCidade": "2754"
+  },
+  {
+    "id": "3538",
+    "nome": "São Paulo",
+    "idCidade": "2754"
+  },
+  {
+    "id": "3539",
+    "nome": "São Pedro",
+    "idCidade": "2754"
+  },
+  {
+    "id": "3540",
+    "nome": "Parque São Pedro (Venda Nova)",
+    "idCidade": "2754"
+  },
+  {
+    "id": "3541",
+    "nome": "São Salvador",
+    "idCidade": "2754"
+  },
+  {
+    "id": "3544",
+    "nome": "Satélite",
+    "idCidade": "2754"
+  },
+  {
+    "id": "3545",
+    "nome": "Saudade",
+    "idCidade": "2754"
+  },
+  {
+    "id": "3546",
+    "nome": "Bom Jesus",
+    "idCidade": "2754"
+  },
+  {
+    "id": "3547",
+    "nome": "Serra",
+    "idCidade": "2754"
+  },
+  {
+    "id": "3548",
+    "nome": "Serra Verde (Venda Nova)",
+    "idCidade": "2754"
+  },
+  {
+    "id": "3549",
+    "nome": "Serrano",
+    "idCidade": "2754"
+  },
+  {
+    "id": "3550",
+    "nome": "Silveira",
+    "idCidade": "2754"
+  },
+  {
+    "id": "3552",
+    "nome": "Sion",
+    "idCidade": "2754"
+  },
+  {
+    "id": "3553",
+    "nome": "Solimões",
+    "idCidade": "2754"
+  },
+  {
+    "id": "3555",
+    "nome": "Taquaril",
+    "idCidade": "2754"
+  },
+  {
+    "id": "3556",
+    "nome": "Teixeira Dias (Barreiro)",
+    "idCidade": "2754"
+  },
+  {
+    "id": "3557",
+    "nome": "Tirol (Barreiro)",
+    "idCidade": "2754"
+  },
+  {
+    "id": "3559",
+    "nome": "Trevo",
+    "idCidade": "2754"
+  },
+  {
+    "id": "3560",
+    "nome": "Tupi A",
+    "idCidade": "2754"
+  },
+  {
+    "id": "3561",
+    "nome": "União",
+    "idCidade": "2754"
+  },
+  {
+    "id": "3562",
+    "nome": "Universitário",
+    "idCidade": "2754"
+  },
+  {
+    "id": "3563",
+    "nome": "Urca",
+    "idCidade": "2754"
+  },
+  {
+    "id": "3565",
+    "nome": "Vale do Jatobá (Barreiro)",
+    "idCidade": "2754"
+  },
+  {
+    "id": "3566",
+    "nome": "Venda Nova",
+    "idCidade": "2754"
+  },
+  {
+    "id": "3567",
+    "nome": "Vera Cruz",
+    "idCidade": "2754"
+  },
+  {
+    "id": "3571",
+    "nome": "Cenáculo",
+    "idCidade": "2754"
+  },
+  {
+    "id": "3572",
+    "nome": "Vila Cloris",
+    "idCidade": "2754"
+  },
+  {
+    "id": "3575",
+    "nome": "Ermelinda",
+    "idCidade": "2754"
+  },
+  {
+    "id": "3576",
+    "nome": "Leonina",
+    "idCidade": "2754"
+  },
+  {
+    "id": "3579",
+    "nome": "Vila Madre Gertrudes I",
+    "idCidade": "2754"
+  },
+  {
+    "id": "3583",
+    "nome": "Nossa Senhora de Fátima",
+    "idCidade": "2754"
+  },
+  {
+    "id": "3585",
+    "nome": "Vila Oeste",
+    "idCidade": "2754"
+  },
+  {
+    "id": "3587",
+    "nome": "Vila Paris",
+    "idCidade": "2754"
+  },
+  {
+    "id": "3589",
+    "nome": "Vila Pinho Vale do Jatobá (Barreiro)",
+    "idCidade": "2754"
+  },
+  {
+    "id": "3591",
+    "nome": "Vila Santa Branca (Venda Nova)",
+    "idCidade": "2754"
+  },
+  {
+    "id": "3593",
+    "nome": "Santa Rita (Barreiro)",
+    "idCidade": "2754"
+  },
+  {
+    "id": "3594",
+    "nome": "Santana do Cafezal",
+    "idCidade": "2754"
+  },
+  {
+    "id": "3600",
+    "nome": "Vila São José",
+    "idCidade": "2754"
+  },
+  {
+    "id": "3601",
+    "nome": "São Tomáz",
+    "idCidade": "2754"
+  },
+  {
+    "id": "3602",
+    "nome": "Suzana",
+    "idCidade": "2754"
+  },
+  {
+    "id": "3605",
+    "nome": "Rio Branco",
+    "idCidade": "2754"
+  },
+  {
+    "id": "3606",
+    "nome": "Vista Alegre",
+    "idCidade": "2754"
+  },
+  {
+    "id": "29325",
+    "nome": "Vila Coqueiral (Vila da Paz)",
+    "idCidade": "2754"
+  },
+  {
+    "id": "30137",
+    "nome": "Fazendinha",
+    "idCidade": "2754"
+  },
+  {
+    "id": "30693",
+    "nome": "Vila Formosa Vale do Jatobá (Barreiro)",
+    "idCidade": "2754"
+  },
+  {
+    "id": "31074",
+    "nome": "Vila Ecológica (Barreiro)",
+    "idCidade": "2754"
+  },
+  {
+    "id": "31075",
+    "nome": "Vila Piratininga (Barreiro)",
+    "idCidade": "2754"
+  },
+  {
+    "id": "31076",
+    "nome": "Vitória da Conquista (Barreiro)",
+    "idCidade": "2754"
+  },
+  {
+    "id": "33478",
+    "nome": "Vista do Sol",
+    "idCidade": "2754"
+  },
+  {
+    "id": "34140",
+    "nome": "Vitória",
+    "idCidade": "2754"
+  },
+  {
+    "id": "37342",
+    "nome": "Vila Bernadete (Barreiro)",
+    "idCidade": "2754"
+  },
+  {
+    "id": "49775",
+    "nome": "Santa Rita de Cássia",
+    "idCidade": "2754"
+  },
+  {
+    "id": "49776",
+    "nome": "Vila Barragem Santa Lúcia",
+    "idCidade": "2754"
+  },
+  {
+    "id": "49880",
+    "nome": "Novo das Indústrias (Barreiro)",
+    "idCidade": "2754"
+  },
+  {
+    "id": "50012",
+    "nome": "Minascaixa",
+    "idCidade": "2754"
+  },
+  {
+    "id": "50029",
+    "nome": "Parque São José",
+    "idCidade": "2754"
+  },
+  {
+    "id": "50040",
+    "nome": "Mariano de Abreu",
+    "idCidade": "2754"
+  },
+  {
+    "id": "50177",
+    "nome": "Ouro Minas",
+    "idCidade": "2754"
+  },
+  {
+    "id": "50279",
+    "nome": "Pousada Santo Antônio",
+    "idCidade": "2754"
+  },
+  {
+    "id": "50453",
+    "nome": "Conjunto Taquaril",
+    "idCidade": "2754"
+  },
+  {
+    "id": "50466",
+    "nome": "Águas Claras (Barreiro)",
+    "idCidade": "2754"
+  },
+  {
+    "id": "50475",
+    "nome": "Marçola",
+    "idCidade": "2754"
+  },
+  {
+    "id": "50476",
+    "nome": "Nossa Senhora da Conceição",
+    "idCidade": "2754"
+  },
+  {
+    "id": "50518",
+    "nome": "Cinquentenário",
+    "idCidade": "2754"
+  },
+  {
+    "id": "50525",
+    "nome": "Cardoso (Barreiro)",
+    "idCidade": "2754"
+  },
+  {
+    "id": "50526",
+    "nome": "Pongelupe (Barreiro)",
+    "idCidade": "2754"
+  },
+  {
+    "id": "50527",
+    "nome": "Flávio de Oliveira (Barreiro)",
+    "idCidade": "2754"
+  },
+  {
+    "id": "50528",
+    "nome": "Solar do Barreiro (Barreiro)",
+    "idCidade": "2754"
+  },
+  {
+    "id": "50529",
+    "nome": "Corumbiara (Barreiro)",
+    "idCidade": "2754"
+  },
+  {
+    "id": "50539",
+    "nome": "Estrela",
+    "idCidade": "2754"
+  },
+  {
+    "id": "50660",
+    "nome": "Maria Helena",
+    "idCidade": "2754"
+  },
+  {
+    "id": "50661",
+    "nome": "Horto Florestal",
+    "idCidade": "2754"
+  },
+  {
+    "id": "50940",
+    "nome": "Colégio Batista",
+    "idCidade": "2754"
+  },
+  {
+    "id": "51340",
+    "nome": "Esperança (Barreiro)",
+    "idCidade": "2754"
+  },
+  {
+    "id": "51776",
+    "nome": "Vila Aeroporto",
+    "idCidade": "2754"
+  },
+  {
+    "id": "51780",
+    "nome": "Frei Leopoldo",
+    "idCidade": "2754"
+  },
+  {
+    "id": "51781",
+    "nome": "Zilah Spósito",
+    "idCidade": "2754"
+  },
+  {
+    "id": "51782",
+    "nome": "São Damião",
+    "idCidade": "2754"
+  },
+  {
+    "id": "52385",
+    "nome": "Santa Terezinha",
+    "idCidade": "2754"
+  },
+  {
+    "id": "52506",
+    "nome": "Maria Virgínia",
+    "idCidade": "2754"
+  },
+  {
+    "id": "52743",
+    "nome": "Sumaré",
+    "idCidade": "2754"
+  },
+  {
+    "id": "52774",
+    "nome": "Santa Sofia",
+    "idCidade": "2754"
+  },
+  {
+    "id": "52775",
+    "nome": "Alpes",
+    "idCidade": "2754"
+  },
+  {
+    "id": "52833",
+    "nome": "Ventosa",
+    "idCidade": "2754"
+  },
+  {
+    "id": "52834",
+    "nome": "Alto Barroca",
+    "idCidade": "2754"
+  },
+  {
+    "id": "52835",
+    "nome": "São Jorge",
+    "idCidade": "2754"
+  },
+  {
+    "id": "52836",
+    "nome": "Vila Antena",
+    "idCidade": "2754"
+  },
+  {
+    "id": "52887",
+    "nome": "Canadá",
+    "idCidade": "2754"
+  },
+  {
+    "id": "52895",
+    "nome": "Beija Flor",
+    "idCidade": "2754"
+  },
+  {
+    "id": "52952",
+    "nome": "Vila Tirol (Barreiro)",
+    "idCidade": "2754"
+  },
+  {
+    "id": "53107",
+    "nome": "Miramar (Barreiro)",
+    "idCidade": "2754"
+  },
+  {
+    "id": "53137",
+    "nome": "Vila Nova Paraíso",
+    "idCidade": "2754"
+  },
+  {
+    "id": "53194",
+    "nome": "Glória",
+    "idCidade": "2754"
+  },
+  {
+    "id": "53211",
+    "nome": "Conjunto Jatobá (Barreiro)",
+    "idCidade": "2754"
+  },
+  {
+    "id": "53453",
+    "nome": "Ipê",
+    "idCidade": "2754"
+  },
+  {
+    "id": "53454",
+    "nome": "Maria Teresa",
+    "idCidade": "2754"
+  },
+  {
+    "id": "53487",
+    "nome": "Nossa Senhora do Rosário",
+    "idCidade": "2754"
+  },
+  {
+    "id": "53796",
+    "nome": "Cidade Jardim Taquaril",
+    "idCidade": "2754"
+  },
+  {
+    "id": "53903",
+    "nome": "Campus UFMG",
+    "idCidade": "2754"
+  },
+  {
+    "id": "53913",
+    "nome": "Comiteco",
+    "idCidade": "2754"
+  },
+  {
+    "id": "53947",
+    "nome": "Indústrias I (Barreiro)",
+    "idCidade": "2754"
+  },
+  {
+    "id": "54020",
+    "nome": "Novo Tupi",
+    "idCidade": "2754"
+  },
+  {
+    "id": "54084",
+    "nome": "CDI Jatobá (Barreiro)",
+    "idCidade": "2754"
+  },
+  {
+    "id": "54085",
+    "nome": "Dom Joaquim",
+    "idCidade": "2754"
+  },
+  {
+    "id": "54086",
+    "nome": "Penha",
+    "idCidade": "2754"
+  },
+  {
+    "id": "54113",
+    "nome": "Alto Caiçaras",
+    "idCidade": "2754"
+  },
+  {
+    "id": "54168",
+    "nome": "Senhor dos Passos",
+    "idCidade": "2754"
+  },
+  {
+    "id": "54174",
+    "nome": "Vila Sumaré",
+    "idCidade": "2754"
+  },
+  {
+    "id": "54726",
+    "nome": "Aeroporto",
+    "idCidade": "2754"
+  },
+  {
+    "id": "54728",
+    "nome": "Vila Rica",
+    "idCidade": "2754"
+  },
+  {
+    "id": "54760",
+    "nome": "Granja Werneck",
+    "idCidade": "2754"
+  },
+  {
+    "id": "54767",
+    "nome": "Tupi B",
+    "idCidade": "2754"
+  },
+  {
+    "id": "54769",
+    "nome": "Lajedo",
+    "idCidade": "2754"
+  },
+  {
+    "id": "55303",
+    "nome": "Conjunto Jardim Filadélfia",
+    "idCidade": "2754"
+  },
+  {
+    "id": "55304",
+    "nome": "Granja de Freitas",
+    "idCidade": "2754"
+  },
+  {
+    "id": "55342",
+    "nome": "Mineirão",
+    "idCidade": "2754"
+  },
+  {
+    "id": "55353",
+    "nome": "Virgínia",
+    "idCidade": "2754"
+  },
+  {
+    "id": "55374",
+    "nome": "São Francisco das Chagas",
+    "idCidade": "2754"
+  },
+  {
+    "id": "55564",
+    "nome": "Conjunto Celso Machado",
+    "idCidade": "2754"
+  },
+  {
+    "id": "55836",
+    "nome": "Mariquinhas",
+    "idCidade": "2754"
+  },
+  {
+    "id": "56028",
+    "nome": "Vila Cemig",
+    "idCidade": "2754"
+  },
+  {
+    "id": "56553",
+    "nome": "São Gonçalo",
+    "idCidade": "2754"
+  },
+  {
+    "id": "56682",
+    "nome": "Imbaúbas",
+    "idCidade": "2754"
+  },
+  {
+    "id": "56684",
+    "nome": "Delta",
+    "idCidade": "2754"
+  },
+  {
+    "id": "56685",
+    "nome": "Sport Club",
+    "idCidade": "2754"
+  },
+  {
+    "id": "56782",
+    "nome": "Caiçara-Adelaide",
+    "idCidade": "2754"
+  },
+  {
+    "id": "56786",
+    "nome": "Baleia",
+    "idCidade": "2754"
+  },
+  {
+    "id": "56940",
+    "nome": "Paulo VI",
+    "idCidade": "2754"
+  },
+  {
+    "id": "56969",
+    "nome": "Conjunto Novo Dom Bosco",
+    "idCidade": "2754"
+  },
+  {
+    "id": "57145",
+    "nome": "Araguaia",
+    "idCidade": "2754"
+  },
+  {
+    "id": "57364",
+    "nome": "Nossa Senhora Aparecida (Aglomerado da Serra)",
+    "idCidade": "2754"
+  },
+  {
+    "id": "57365",
+    "nome": "Vila União",
+    "idCidade": "2754"
+  },
+  {
+    "id": "57391",
+    "nome": "São Benedito",
+    "idCidade": "2754"
+  },
+  {
+    "id": "57697",
+    "nome": "Vila Antena Montanhês",
+    "idCidade": "2754"
+  },
+  {
+    "id": "58399",
+    "nome": "Pedreira Prado Lopes",
+    "idCidade": "2754"
+  },
+  {
+    "id": "58823",
+    "nome": "Vila Santo Antônio Barroquinha",
+    "idCidade": "2754"
+  },
+  {
+    "id": "58829",
+    "nome": "Mala e Cuia (Sion)",
+    "idCidade": "2754"
+  },
+  {
+    "id": "58985",
+    "nome": "Santa Margarida (Barreiro)",
+    "idCidade": "2754"
+  },
+  {
+    "id": "59047",
+    "nome": "Vila Jardim São José",
+    "idCidade": "2754"
+  },
+  {
+    "id": "59143",
+    "nome": "João Paulo II (Barreiro)",
+    "idCidade": "2754"
+  },
+  {
+    "id": "59190",
+    "nome": "Área Rural de Belo Horizonte",
+    "idCidade": "2754"
+  },
+  {
+    "id": "59295",
+    "nome": "Alto Vera Cruz",
+    "idCidade": "2754"
+  },
+  {
+    "id": "59466",
+    "nome": "Marilândia",
+    "idCidade": "2754"
+  },
+  {
+    "id": "59467",
+    "nome": "Montes Claros",
+    "idCidade": "2754"
+  },
+  {
+    "id": "59491",
+    "nome": "Ápia",
+    "idCidade": "2754"
+  },
+  {
+    "id": "59582",
+    "nome": "Mirante",
+    "idCidade": "2754"
+  },
+  {
+    "id": "59626",
+    "nome": "Marieta I",
+    "idCidade": "2754"
+  },
+  {
+    "id": "59657",
+    "nome": "Oeste",
+    "idCidade": "2754"
+  },
+  {
+    "id": "59659",
+    "nome": "Vila Trinta e Um de Março",
+    "idCidade": "2754"
+  },
+  {
+    "id": "59668",
+    "nome": "Vila Inestan",
+    "idCidade": "2754"
+  },
+  {
+    "id": "59669",
+    "nome": "São Sebastião",
+    "idCidade": "2754"
+  },
+  {
+    "id": "59672",
+    "nome": "Bernadete (Barreiro)",
+    "idCidade": "2754"
+  },
+  {
+    "id": "59685",
+    "nome": "Vila São Paulo",
+    "idCidade": "2754"
+  },
+  {
+    "id": "59686",
+    "nome": "Vila da Luz",
+    "idCidade": "2754"
+  },
+  {
+    "id": "59687",
+    "nome": "Madre Gertrudes III",
+    "idCidade": "2754"
+  },
+  {
+    "id": "59688",
+    "nome": "Madre Gertrudes V",
+    "idCidade": "2754"
+  },
+  {
+    "id": "59690",
+    "nome": "Vila Real II",
+    "idCidade": "2754"
+  },
+  {
+    "id": "59707",
+    "nome": "Savassi",
+    "idCidade": "2754"
+  },
+  {
+    "id": "59708",
+    "nome": "Boa Viagem",
+    "idCidade": "2754"
+  },
+  {
+    "id": "59987",
+    "nome": "Vila Independencia II",
+    "idCidade": "2754"
+  },
+  {
+    "id": "60001",
+    "nome": "Boa Esperança",
+    "idCidade": "2754"
+  },
+  {
+    "id": "60036",
+    "nome": "Vila Vista Alegre",
+    "idCidade": "2754"
+  },
+  {
+    "id": "60048",
+    "nome": "Vila Novo São Lucas",
+    "idCidade": "2754"
+  },
+  {
+    "id": "60070",
+    "nome": "Serra do Curral",
+    "idCidade": "2754"
+  },
+  {
+    "id": "60072",
+    "nome": "Aparecida Sétima Seção",
+    "idCidade": "2754"
+  },
+  {
+    "id": "60074",
+    "nome": "Vila Nova Gameleira II",
+    "idCidade": "2754"
+  },
+  {
+    "id": "60078",
+    "nome": "Beira-Linha",
+    "idCidade": "2754"
+  },
+  {
+    "id": "60135",
+    "nome": "São João",
+    "idCidade": "2754"
+  },
+  {
+    "id": "60137",
+    "nome": "Vila Bandeirantes",
+    "idCidade": "2754"
+  },
+  {
+    "id": "60138",
+    "nome": "Vila Calafate",
+    "idCidade": "2754"
+  },
+  {
+    "id": "60190",
+    "nome": "Três Marias",
+    "idCidade": "2754"
+  },
+  {
+    "id": "60204",
+    "nome": "São Jorge II",
+    "idCidade": "2754"
+  },
+  {
+    "id": "60205",
+    "nome": "São Jorge III",
+    "idCidade": "2754"
+  },
+  {
+    "id": "60239",
+    "nome": "Cônego Pinheiro",
+    "idCidade": "2754"
+  },
+  {
+    "id": "60240",
+    "nome": "Acaba Mundo",
+    "idCidade": "2754"
+  },
+  {
+    "id": "60424",
+    "nome": "Vila Ouro Minas",
+    "idCidade": "2754"
+  },
+  {
+    "id": "60655",
+    "nome": "Marmiteiros",
+    "idCidade": "2754"
+  },
+  {
+    "id": "60843",
+    "nome": "Vila Nossa Senhora Aparecida",
+    "idCidade": "2754"
+  },
+  {
+    "id": "60977",
+    "nome": "Pantanal",
+    "idCidade": "2754"
+  },
+  {
+    "id": "61517",
+    "nome": "Apolônia",
+    "idCidade": "2754"
+  },
+  {
+    "id": "61519",
+    "nome": "Universo",
+    "idCidade": "2754"
+  },
+  {
+    "id": "61666",
+    "nome": "Vila Santa Mônica (Venda Nova)",
+    "idCidade": "2754"
+  },
+  {
+    "id": "61687",
+    "nome": "Grotinha",
+    "idCidade": "2754"
+  },
+  {
+    "id": "61906",
+    "nome": "Vila Petrópolis (Barreiro)",
+    "idCidade": "2754"
+  },
+  {
+    "id": "61913",
+    "nome": "Vila Maloca",
+    "idCidade": "2754"
+  },
+  {
+    "id": "62323",
+    "nome": "Vila Independencia I",
+    "idCidade": "2754"
+  },
+  {
+    "id": "62465",
+    "nome": "Vila São Rafael",
+    "idCidade": "2754"
+  },
+  {
+    "id": "63311",
+    "nome": "Trevo (Dandara)",
+    "idCidade": "2754"
+  },
+  {
+    "id": "63313",
+    "nome": "Distrito Industrial do Jatobá (Camilo Torres)",
+    "idCidade": "2754"
+  },
+  {
+    "id": "63314",
+    "nome": "Distrito Industrial do Jatobá (Irmã Doroty)",
+    "idCidade": "2754"
+  },
+  {
+    "id": "63316",
+    "nome": "Distrito Industrial do Jatobá (Eliana Silva)",
+    "idCidade": "2754"
+  },
+  {
+    "id": "63322",
+    "nome": "Barão Homem de Melo I",
+    "idCidade": "2754"
+  },
+  {
+    "id": "63501",
+    "nome": "Vila Jardim Alvorada",
+    "idCidade": "2754"
+  },
+  {
+    "id": "63502",
+    "nome": "Biquinhas",
+    "idCidade": "2754"
+  },
+  {
+    "id": "63512",
+    "nome": "Vila dos Anjos",
+    "idCidade": "2754"
+  },
+  {
+    "id": "63513",
+    "nome": "Bispo de Maura",
+    "idCidade": "2754"
+  },
+  {
+    "id": "63564",
+    "nome": "Conjunto Bonsucesso (Barreiro)",
+    "idCidade": "2754"
+  },
+  {
+    "id": "64085",
+    "nome": "Vila Tiradentes",
+    "idCidade": "2754"
+  },
+  {
+    "id": "64136",
+    "nome": "Vila Maria",
+    "idCidade": "2754"
+  },
+  {
+    "id": "64327",
+    "nome": "Alta Tensão I",
+    "idCidade": "2754"
+  },
+  {
+    "id": "66096",
+    "nome": "Jardim do Vale (Barreiro)",
+    "idCidade": "2754"
+  },
+  {
+    "id": "66653",
+    "nome": "Distrito Industrial do Jatobá (Paulo Freire)",
+    "idCidade": "2754"
+  },
+  {
+    "id": "66654",
+    "nome": "Distrito Industrial do Jatobá (Nelson Mandela)",
+    "idCidade": "2754"
+  },
+  {
+    "id": "66655",
+    "nome": "Novo Lajedo",
+    "idCidade": "2754"
+  },
+  {
+    "id": "66657",
+    "nome": "Várzea da Palma",
+    "idCidade": "2754"
+  },
+  {
+    "id": "66659",
+    "nome": "Diamante (Vila Diamante)",
+    "idCidade": "2754"
+  },
+  {
+    "id": "78196",
+    "nome": "Vila Helena Greco (Granja Werneck)",
+    "idCidade": "2754"
+  },
+  {
+    "id": "78408",
+    "nome": "Ocupação Esperança (Granja Werneck)",
+    "idCidade": "2754"
+  },
+  {
+    "id": "78409",
+    "nome": "Ocupação Rosa Leão (Granja Werneck)",
+    "idCidade": "2754"
+  },
+  {
+    "id": "78410",
+    "nome": "Ocupação Vitória (Granja Werneck)",
+    "idCidade": "2754"
+  },
+  {
+    "id": "78419",
+    "nome": "Guaratã",
+    "idCidade": "2754"
+  },
+  {
+    "id": "79269",
+    "nome": "Vila Nova Gameleira I",
+    "idCidade": "2754"
+  },
+  {
+    "id": "79674",
+    "nome": "Andiroba",
+    "idCidade": "2754"
+  },
+  {
+    "id": "81156",
+    "nome": "Vila Boa Vista",
+    "idCidade": "2754"
+  },
+  {
+    "id": "86601",
+    "nome": "Vila Minaslândia",
+    "idCidade": "2754"
+  },
+  {
+    "id": "87763",
+    "nome": "Conjunto Califórnia II (Vila Chaves)",
+    "idCidade": "2754"
+  },
+  {
+    "id": "89384",
+    "nome": "Xangri-lá",
+    "idCidade": "2754"
+  },
+  {
+    "id": "90309",
+    "nome": "Tiradentes",
+    "idCidade": "2754"
+  },
+  {
+    "id": "91035",
+    "nome": "Conjunto Capitão Eduardo",
+    "idCidade": "2754"
+  },
+  {
+    "id": "92164",
+    "nome": "Vila da Paz",
+    "idCidade": "2754"
+  },
+  {
+    "id": "92255",
+    "nome": "Vila Califórnia",
+    "idCidade": "2754"
+  }
+]

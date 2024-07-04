@@ -799,11 +799,22 @@ namespace JaCaptei.Application{
             return appReturn;
         }
 
+        public async Task<Parceiro?> ObterPorCPF(string cpf)
+        {
+            var conn = DB.GetConn();
+            return (await conn.QueryAsync<Parceiro>(p => p.cpfNum == Utils.Number.ToLong(cpf))).FirstOrDefault();
+        }
 
+        public async Task<Parceiro?> ObterPorCNPJ(string cnpj)
+        {
+            var conn = DB.GetConn();
+            return (await conn.QueryAsync<Parceiro>(p => p.cnpjNum == Utils.Number.ToLong(cnpj))).FirstOrDefault();
+        }
 
-
-
-
-
+        public async Task<Plano?> ObterPlanoParceiro(Parceiro parceiro)
+        {
+            var conn = DB.GetConn();
+            return (await conn.QueryAsync<Plano>(p => p.id == parceiro.idPlano)).FirstOrDefault();
+        }
     }
 }

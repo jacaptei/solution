@@ -212,4 +212,13 @@ public static class ImoviewCampos
         {"Proprietário", 2}
     });
 
+    public static readonly Proprietario ProprietarioJaCaptei = new()
+    {
+        nome       = "JaCaptei",
+        cpfoucnpj  = "51.075.001/0001-36",
+        telefone   = "31 4003-9992",
+        email      = "contato @jacaptei.com.br",
+        percentual = 100
+    };
+
 }

@@ -398,12 +398,20 @@ namespace JaCaptei.Application{
             return appReturn;
         }
 
+        public Task<Parceiro?> ObterPorCPF(string cpf)
+        {
+            return DAO.ObterPorCPF(cpf);
+        }
 
+        public Task<Parceiro?> ObterPorCNPJ(string cnpj)
+        {
+            return DAO.ObterPorCNPJ(cnpj);
+        }
 
-
-
-
-
+        public Task<Plano?> ObterPlanoParceiro(Parceiro parceiro)
+        {
+            return DAO.ObterPlanoParceiro(parceiro);
+        }
         /*
                 public AppReturn ObterViaCPF(Shared.Model.Parceiro entity){
 

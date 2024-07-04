@@ -1,4 +1,5 @@
-﻿using JaCaptei.Model.DTO;
+﻿using JaCaptei.Model;
+using JaCaptei.Model.DTO;
 
 using System.Net;
 using System.Net.Http.Headers;
@@ -95,6 +96,11 @@ public class ImoviewService
         var chaveOk = !(res.StatusCode == HttpStatusCode.Unauthorized || res.StatusCode == HttpStatusCode.Forbidden);
         if (chaveOk) this.Chave = chave;
         return chaveOk;
+    }
+
+    public async Task<object> ObterIntegracaoCliente(Parceiro cliente)
+    {
+        return null;
     }
 }
 

@@ -49,7 +49,7 @@ public class ImovelDTOProfile : Profile
             .ForMember(dest => dest.caracteristicasinterna, opt => opt.MapFrom(src => GetCaracteristicasInterna(src)))
             .ForMember(dest => dest.caracteristicasexterna, opt => opt.MapFrom(src => GetCaracteristicasExterna(src)))
             .ForMember(dest => dest.lazer,                  opt => opt.MapFrom(src => GetLazer(src)))
-            .ForMember(dest => dest.proprietarios,          opt => opt.MapFrom(src => GetProprietarios(src)))
+            .ForMember(dest => dest.proprietarios,          opt => opt.MapFrom(src => GetProprietarios()))
 
             .ForMember(dest => dest.edificio,               opt => opt.MapFrom(src => src.Edificio))
             .ForMember(dest => dest.construtora ,           opt => opt.MapFrom(src => src.Construtora))
@@ -66,11 +66,38 @@ public class ImovelDTOProfile : Profile
             .ForMember(dest => dest.urlpublica,             opt => opt.MapFrom(src => src.UrlPublica))
 
             .ForMember(dest => dest.finalidade, opt => opt.MapFrom(src => 2)) // Hardcoded venda
-            .ForMember(dest => dest.destinacao, opt => opt.MapFrom(src => GetFromDictionary(src.Destinacao, ImoviewCampos.Destinacoes, 3)))
+            .ForMember(dest => dest.destinacao, opt => opt.MapFrom(src => GetFromDictionary(src.Destinacao, ImoviewCampos.Destinacoes, 1)))
             .ForMember(dest => dest.codigotipo, opt => opt.MapFrom(src => GetFromDictionary(src.Tipo, ImoviewCampos.Tipos, 1)))
             .ForMember(dest => dest.localchave, opt => opt.MapFrom(src => GetFromDictionary(src.LocalChaves, ImoviewCampos.LocaisChave, 1)))
 
-            .ForMember(dest => dest.descricao,              opt => opt.MapFrom(src => src.Descricao));       
+            .ForMember(dest => dest.descricao,              opt => opt.MapFrom(src => src.Descricao));
+
+        CreateMap<ImovelFullDTO, ImoviewAddImovelRequest>()
+            .ForMember(dest => dest.valores,                opt => opt.MapFrom(src => GetValoresDTO(src)))
+            .ForMember(dest => dest.endereco,               opt => opt.MapFrom(src => GetEnderecoDTO(src)))
+            .ForMember(dest => dest.caracteristicasinterna, opt => opt.MapFrom(src => GetCaracteristicasInternaDTO(src)))
+            .ForMember(dest => dest.caracteristicasexterna, opt => opt.MapFrom(src => GetCaracteristicasExternaDTO(src)))
+            .ForMember(dest => dest.lazer,                  opt => opt.MapFrom(src => GetLazerDTO(src)))
+            .ForMember(dest => dest.proprietarios,          opt => opt.MapFrom(src => GetProprietarios()))
+            .ForMember(dest => dest.edificio,               opt => opt.MapFrom(src => src.Imovel.Edificio))
+            .ForMember(dest => dest.construtora,            opt => opt.MapFrom(src => src.Imovel.Construtora))
+            .ForMember(dest => dest.ocupado,                opt => opt.MapFrom(src => src.ImovelDisposicao.Ocupado))
+            .ForMember(dest => dest.alugado,                opt => opt.MapFrom(src => src.ImovelDisposicao.Alugado))
+            .ForMember(dest => dest.aceitafinanciamento,    opt => opt.MapFrom(src => src.ImovelDisposicao.AceitaFinanciamento))
+            .ForMember(dest => dest.aceitapermuta,          opt => opt.MapFrom(src => src.ImovelDisposicao.AceitaPermuta))
+            .ForMember(dest => dest.naplanta,               opt => opt.MapFrom(src => src.ImovelDisposicao.NaPlanta))
+            .ForMember(dest => dest.placa,                  opt => opt.MapFrom(src => src.ImovelDisposicao.Placa))
+            .ForMember(dest => dest.rlvideo,                opt => opt.MapFrom(src => src.Imovel.UrlVideo))
+            .ForMember(dest => dest.urlpublica,             opt => opt.MapFrom(src => src.Imovel.UrlPublica))
+
+            //.ForMember(dest => dest.identificadorchave,   opt => opt.MapFrom(src => src.Imovel.IdChave))
+            //.ForMember(dest => dest.exclusivo,            opt => opt.MapFrom(src => src.ImovelDisposicao.Exclusivo))
+            //.ForMember(dest => dest.anotacoes,            opt => opt.MapFrom(src => src.Imovel.Anotacoes))
+            //.ForMember(dest => dest.localchave,           opt => opt.MapFrom(src => GetFromDictionary(src.Imovel.LocalChaves, ImoviewCampos.LocaisChave, 1)))
+            //.ForMember(dest => dest.destinacao,           opt => opt.MapFrom(src => GetFromDictionary(src.Imovel.Destinacao, ImoviewCampos.Destinacoes, 3)))
+            .ForMember(dest => dest.finalidade,             opt => opt.MapFrom(src => 2)) // Hardcoded venda
+            .ForMember(dest => dest.codigotipo,             opt => opt.MapFrom(src => src.Imovel.IdTipo))
+            .ForMember(dest => dest.descricao,              opt => opt.MapFrom(src => src.Imovel.Descricao));
     }
 
     private int GetFromDictionary(string chave, IReadOnlyDictionary<string, int> valuePairs, int defaultValue = 1)
@@ -222,6 +249,17 @@ public class ImovelDTOProfile : Profile
         };
     }
 
+    private static Valores GetValoresDTO(ImovelFullDTO src)
+    {
+        return new Valores()
+        {
+            valor = (decimal)src.ImovelValores.Atual,
+            valorcondominio = (decimal)src.ImovelValores.Condominio,
+            valoriptu = (decimal)src.ImovelValores.Iptu,
+            comissao = (decimal)src.ImovelDisposicao.Comissao
+        };
+    }
+
     public static Endereco GetEndereco(ImovelDTO src)
     {
         return new Endereco()
@@ -235,6 +273,22 @@ public class ImovelDTOProfile : Profile
             bloco           = src.Endereco.Bloco,
             pontoreferencia = src.Endereco.PontoReferencia,
             melhoracesso    = src.Endereco.MelhorAcesso
+        };
+    }
+
+    private static Endereco GetEnderecoDTO(ImovelFullDTO src)
+    {
+        return new Endereco()
+        {
+            rua = src.ImovelEndereco.Logradouro,
+            bairro = src.ImovelEndereco.Bairro,
+            cidade = src.ImovelEndereco.Cidade,
+            estado = src.ImovelEndereco.Estado,
+            numero = int.TryParse(src.ImovelEndereco.Numero, out int nro) ? nro : 0,
+            complemento = src.ImovelEndereco.Complemento,
+            bloco = src.ImovelEndereco.Bloco,
+            pontoreferencia = src.ImovelEndereco.Referencia,
+            melhoracesso = src.ImovelEndereco.Acesso
         };
     }
 
@@ -268,6 +322,36 @@ public class ImovelDTOProfile : Profile
         };
     }
 
+    private static Caracteristicasinterna GetCaracteristicasInternaDTO(ImovelFullDTO src)
+    {
+        return new Caracteristicasinterna()
+        {
+            numeroquartos   = src.ImovelCaracteristicasInternas.TotalQuartos,
+            numerosalas     = src.ImovelCaracteristicasInternas.TotalSalas,
+            numerobanhos    = src.ImovelCaracteristicasInternas.TotalBanheiros,
+            numerosuites    = src.ImovelCaracteristicasInternas.TotalSuites,
+            numeroandar     = StrToInt(src.ImovelEndereco.Andar),
+            areaservico     = src.ImovelCaracteristicasInternas.AreaServico,
+            lavabo          = src.ImovelCaracteristicasInternas.Lavabo,
+            closet          = src.ImovelCaracteristicasInternas.Closet,
+            dce             = src.ImovelCaracteristicasInternas.Dce,
+            armariocozinha  = src.ImovelCaracteristicasInternas.ArmarioCozinha,
+            armariobanheiro = src.ImovelCaracteristicasInternas.ArmarioBanheiro,
+            armarioquarto   = src.ImovelCaracteristicasInternas.ArmarioQuarto,
+            numerovarandas  = src.ImovelCaracteristicasInternas.TotalVarandas,      
+            arcondicionado  = src.ImovelCaracteristicasInternas.ArCondicionado,
+            areaprivativa   = src.ImovelCaracteristicasInternas.AreaPrivativa, 
+            //box             = src.ImovelCaracteristicasInternas.Box,           
+            despensa        = src.ImovelCaracteristicasInternas.Despensa,      
+            escritorio      = src.ImovelCaracteristicasInternas.Escritorio,    
+            mobiliado       = src.ImovelCaracteristicasInternas.Mobilidado,     
+            rouparia        = src.ImovelCaracteristicasInternas.Rouparia,      
+            solmanha        = src.ImovelCaracteristicasInternas.SolManha,    
+            varandagourmet  = src.ImovelCaracteristicasInternas.VarandaGourmet,
+            vistamar        = src.ImovelCaracteristicasInternas.VistaMar,      
+        };
+    }
+
     public static Caracteristicasexterna GetCaracteristicasExterna(ImovelDTO src)
     {
         return new Caracteristicasexterna()
@@ -294,6 +378,33 @@ public class ImovelDTOProfile : Profile
         };
     }
 
+    private static Caracteristicasexterna GetCaracteristicasExternaDTO(ImovelFullDTO src)
+    {
+        return new Caracteristicasexterna()
+        {
+            numerovagas       = src.ImovelCaracteristicasExternas.TotalVagas,
+            numeroelevador = src.ImovelCaracteristicasExternas.TotalElevadores,
+            //aguaindividual    = src.ImovelCaracteristicasExternas.AguaIndividual,
+            alarme            = src.ImovelCaracteristicasExternas.Alarme,
+            boxdespejo        = src.ImovelCaracteristicasInternas.BoxDespejo,
+            cercaeletrica     = src.ImovelCaracteristicasExternas.CercaEletrica,
+            //gascanalizado     = src.ImovelCaracteristicasExternas.GasCanalizado,
+            interfone         = src.ImovelCaracteristicasExternas.Interfone,
+            jardim            = src.ImovelCaracteristicasExternas.Jardim,
+            portaoeletronico  = src.ImovelCaracteristicasExternas.PortaoEletronico,
+            //tipovagas       = src.ImovelCaracteristicasExternas.TipoVagas,         // todo: map cf_1099 string
+            //numeroandares     = src.ImovelCaracteristicasExternas.TotalAndares,           // cf_1105
+            //unidadesporandar  = src.ImovelCaracteristicasExternas.UnidadePorAndar,   // cf_1107
+            //aquecedorgas      = src.ImovelCaracteristicasExternas.AquecedorGas,      // cf_1117
+            //aquecedoreletrico = src.ImovelCaracteristicasExternas.AquecedorEletrico, // cf_1115
+            //aquecedorsolar    = src.ImovelCaracteristicasExternas.AquecedorSolar,    // cf_1119
+            circuitotv        = src.ImovelCaracteristicasExternas.CircuitoTV,        // cf_1125
+            lavanderia        = src.ImovelCaracteristicasExternas.Lavanderia,        // cf_1133
+            portaria24horas   = src.ImovelCaracteristicasExternas.Portaria24h,   // cf_1137
+        };
+    }
+
+
     public static Lazer GetLazer(ImovelDTO src)
     {
         return new Lazer()
@@ -312,7 +423,25 @@ public class ImovelDTOProfile : Profile
         };
     }
 
-    public static List<Proprietario> GetProprietarios(ImovelDTO src) => []; // TODO: mapear campos
+    private static Lazer GetLazerDTO(ImovelFullDTO src)
+    {
+        return new Lazer()
+        {
+            churrasqueira   = src.ImovelCaracteristicasExternas.Churrasqueira,
+            hidromassagem   = src.ImovelLazer.Hidromassagem,
+            quadraesportiva = src.ImovelLazer.QuadraPoliesportiva,
+            salaofestas     = src.ImovelLazer.SalaoFestas,
+            piscina         = src.ImovelLazer.Piscina,
+            academia        = src.ImovelCaracteristicasExternas.Academia,     // cf_1145
+            homecinema      = src.ImovelLazer.Cinema,   // cf_1151
+            playground      = src.ImovelLazer.Playground,   // cf_1155
+            salamassagem    = src.ImovelLazer.SalaoMassagem, // cf_1161
+            salaojogos      = src.ImovelLazer.SalaoJogos,    // cf_1165
+            sauna           = src.ImovelCaracteristicasExternas.Sauna         // cf_1167
+        };
+    }
+
+    public static List<Proprietario> GetProprietarios() => [ImoviewCampos.ProprietarioJaCaptei];
 
     public static string MapTipo(ImovelCRMDTO src)
     {
