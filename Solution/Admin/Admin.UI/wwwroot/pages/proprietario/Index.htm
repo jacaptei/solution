@@ -58,6 +58,8 @@
 		},
 		created: function () {
             this.$root.SetTitle("Proprietários", "fa fa-house-user", null);
+           if(this.$validator.is(this.$router.params?.view))
+               this.view = (this.$router.params.view == "buscar" || this.$router.params.view == "adicionar")? this.$router.params.view : "buscar";
 		},
 		mounted() {
         },

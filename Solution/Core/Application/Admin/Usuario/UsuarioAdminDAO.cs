@@ -146,9 +146,13 @@ namespace JaCaptei.Application{
             Admin entityDB = null;
 
             using(var conn = DB.GetConn()) {
+            try{
                 var res     = conn.ExecuteQuery(sql).FirstOrDefault();
                 if(res?.row_to_json is not null)
                     entityDB   = JsonConvert.DeserializeObject<Admin>(res.row_to_json);
+            }catch(Exception e){
+                    string ex = e.ToString();
+            }
             }
             return entityDB;
         }

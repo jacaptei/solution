@@ -1295,3 +1295,7 @@
     margin: 0px;
     width: calc(100% - 80px);
 }
+
+.el-textarea__inner {
+    height:100px !important;
+}

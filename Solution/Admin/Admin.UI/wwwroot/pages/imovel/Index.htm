@@ -12,7 +12,6 @@
                         indicator-color="primary">
                     <q-tab name="buscar"      icon="fa fa-search" label="BUSCAR"   ></q-tab>
                     <q-tab name="adicionar"   icon="fa fa-plus"   label="ADICIONAR"   ></q-tab>
-                    <!--<q-tab name="importar"    icon="fa fa-plus"   label="IMPORTAR"   ></q-tab>-->
                 </q-tabs>
                 <q-tab-panels v-model="view" animated>
 
@@ -22,10 +21,6 @@
 
                     <q-tab-panel name="adicionar">
                         <page_adicionar />
-                    </q-tab-panel>
-
-                    <q-tab-panel name="importar">
-                        <page_importar />
                     </q-tab-panel>
 
                 </q-tab-panels>
@@ -44,7 +39,6 @@
         components: {
 			page_buscar:	LoadComponent("./pages/imovel/Index-Buscar.htm"),
 			page_adicionar:	LoadComponent("./pages/imovel/Index-Adicionar.htm"),
-			//page_importar:	LoadComponent("./pages/imovel/Index-Importar.htm"),
         },
 
 		data: function () {
@@ -63,6 +57,8 @@
 		},
 		created: function () {
             this.$root.SetTitle("Imóveis", "fa fa-building", null);
+           if(this.$validator.is(this.$router.params?.view))
+               this.view = (this.$router.params.view == "buscar" || this.$router.params.view == "adicionar")? this.$router.params.view : "buscar";
 		},
 		mounted() {
         },
@@ -76,24 +72,8 @@
 
 
 <style scoped>
-    .titler {
-        font-size: 17px;
-        font-family: "hind-regular", "Segoe UI", sans-serif;
-        font-weight: 700;
-        letter-spacing: 1px;
-        margin: 0;
-        color: #FFF;
-        background-color: #0080ff;
-        line-height: 36px;
-        height: 38px;
-        vertical-align: middle;
-        background: rgb(0,90,255);
-        -webkit-box-shadow: 0px 5px 15px 5px rgba(0,44,87,0.29);
-        box-shadow: 0px 5px 10px 2px rgba(0,44,87,0.29);
-        z-index: 1000;
-        /*background: linear-gradient(90deg, rgba(0,90,255,1) 0%, rgba(2,4,118,1) 85%, rgba(0,1,68,1) 100%);*/
-        /*background: linear-gradient(200deg,rgba(0,1,68,1) 0%, rgba(115,85,255,0.8) 0%, rgba(0,1,68,1) 100%);*/
-        background: linear-gradient(292deg,rgba(0,1,68,1) 0%, rgb(69 0 203 / 90%) 0%, rgba(0,1,68,1) 100%);
+    .q-stepper--horizontal .q-stepper__step-inner {
+        padding: 10px;
     }
 </style>
 

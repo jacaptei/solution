@@ -24,6 +24,15 @@ namespace JaCaptei.Application{
             using (var conn = new DBcontext().GetConn())
                 appReturn.result = conn.Insert(log);
         }
+        
+
+        public List<ImovelTipo> ObterTiposImoveis(){
+            List<ImovelTipo> tipos = new List<ImovelTipo>();
+            using (var conn = new DBcontext().GetConn())
+                tipos = conn.QueryAll<ImovelTipo>().ToList();
+
+            return tipos;
+        }
 
 
 

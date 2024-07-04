@@ -26,13 +26,16 @@ namespace JaCaptei.Application
             Localidade localidade   = new Localidade();
             localidade.estados      = (List<Estado>) new LocalidadeService().ObterEstados().result;
 
+            List<ImovelTipo> tiposImoveis = DAO.ObterTiposImoveis();
+
             dicModels.Add("pessoa"      ,   new Pessoa());
             dicModels.Add("usuario"     ,   user);
             dicModels.Add("proprietario",   new Proprietario());
             dicModels.Add("parceiro"    ,   new Parceiro());
-            dicModels.Add("imovel"      ,   new ImovelOld());
-            dicModels.Add("tiposImoveis",   ObterTiposImoveis() );
-            dicModels.Add("localidade"  ,   localidade );
+            dicModels.Add("imovel"      ,   new Imovel());
+            dicModels.Add("imovelEndereco" ,   new ImovelEndereco());
+            dicModels.Add("tiposImoveis",   tiposImoveis );
+            dicModels.Add("localidade"  ,   localidade   );
             dicModels.Add("solicitacao" ,   new Solicitacao());
             dicModels.Add("tiposStatus" ,   ObterTiposStatus());
             dicModels.Add("imovelBusca" ,   new ImovelBusca { usuario = user });
@@ -70,7 +73,13 @@ namespace JaCaptei.Application
 
 
 
-        public List<string> ObterTiposImoveis() {
+        public List<ImovelTipo> ObterTiposImoveis() {
+            List<ImovelTipo> tipos = DAO.ObterTiposImoveis();   
+            return tipos;
+        }
+
+
+        public List<string> ObterTiposImoveis_OLD() {
 
             List<string> tipos = new List<string>();
 

@@ -11,7 +11,7 @@ namespace JaCaptei.API.Controllers {
     [Route("[controller]")]
     public class ImovelController:ApiControllerBase {
 
-        ImovelServiceOld service = new ImovelServiceOld();
+        JaCaptei.Application.ImovelService service = new ImovelService();
 
         
         //[Route("[action]")]
@@ -32,6 +32,12 @@ namespace JaCaptei.API.Controllers {
 
         [Route("[action]")]
         public async Task<IActionResult> Buscar([FromBody] ImovelBusca busca) {
+
+            if(ObterUsuarioAutenticado() is null) {
+                busca.crmResult = null;
+                appReturn.result = busca;
+                return Result(appReturn);
+            }
 
             dynamic result;
             dynamic crmResult;

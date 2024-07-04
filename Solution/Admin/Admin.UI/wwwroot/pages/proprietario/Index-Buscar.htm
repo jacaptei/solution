@@ -87,7 +87,7 @@
 
 
 
-                            <el-table-column fixed="left" label="Ações" width="100" style="color:orange">
+                            <el-table-column fixed="left" label="Ações" width="140" style="color:orange">
                                     <template #default="scope" style="border-right:1px solid #000">
 
                                         <div v-if="scope.row.onrequest">
@@ -118,6 +118,10 @@
 
                                                 <div style="display:inline-block;margin-left:20px;cursor:pointer;font-size:16px;" @click="Alterar(scope)" title="editar">
                                                     <i class="fa fa-edit" :style="(scope.row.ativo)? 'color:var(--s-color-primary)' : (scope.row.excluido)? 'cursor:pointer;color:#555' : 'color:var(--s-color-red)'"></i>
+                                                </div>
+                                                    
+                                                <div style="display:inline-block;margin-left:20px;cursor:pointer;font-size:16px;" @click="$root.RouteTo('imoveis',{view:'adicionar', proprietario: scope.row})" title="adicionar imóvel">
+                                                    <i class="fa fa-house-medical" :style="(scope.row.ativo)? 'color:var(--s-color-primary)' : (scope.row.excluido)? 'cursor:pointer;color:#555' : 'color:var(--s-color-red)'"></i>
                                                 </div>
 
                                                 </div>

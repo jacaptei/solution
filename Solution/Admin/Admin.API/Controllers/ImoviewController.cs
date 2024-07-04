@@ -1,13 +1,12 @@
-﻿using JaCaptei.Application.DAL;
+﻿using AutoMapper;
+
+using JaCaptei.Application;
+using JaCaptei.Application.DAL;
 using JaCaptei.Application.Integracao;
+using JaCaptei.Model;
 using JaCaptei.Model.DTO;
-using JaCaptei.Model.Entities;
 
 using Microsoft.AspNetCore.Mvc;
-using JaCaptei.Application;
-using AutoMapper;
-using JaCaptei.Model;
-using System.Security.Cryptography.Xml;
 namespace JaCaptei.Administrativo.API.Controllers;
 
 [Route("api/[controller]")]
@@ -51,7 +50,7 @@ public class ImoviewController : ControllerBase
     }
 
     [HttpPost("ObterImagens")]
-    public async Task<ActionResult<List<ImovelImagem>>> GetImages([FromBody] int id)
+    public async Task<ActionResult<List<Model.ImovelImagem>>> GetImages([FromBody] int id)
     {
         List<ImagemDTO> list = await GetImageFiles(id);
         return Ok(list);

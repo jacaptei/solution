@@ -1,63 +1,116 @@
-﻿using Microsoft.AspNetCore.Mvc;
-using JaCaptei.Services;
-using System.Numerics;
-using JaCaptei.Application;
+﻿using JaCaptei.Application;
 using JaCaptei.Model;
-using System.Text.Json;
-using Microsoft.AspNetCore.Authorization;
-using RepoDb.Enumerations;
-using static System.Net.Mime.MediaTypeNames;
-using static System.Runtime.InteropServices.JavaScript.JSType;
-using System.IO;
-using System.Net.Http.Headers;
-using System.Net.Http;
-using Azure.Core;
-using MimeKit;
 
-namespace JaCaptei.Administrativo.API.Controllers {
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
+
+using System.Net.Http.Headers;
+
+namespace JaCaptei.Administrativo.API.Controllers
+{
 
     [ApiController]
     [Route("[controller]")]
     [Authorize(Roles = "ADMIN_GOD,ADMIN_GESTOR,ADMIN_PADRAO")]
     public class ImovelController:ApiControllerBase {
 
-        ImovelServiceOld service = new ImovelServiceOld();
-
-
         private Microsoft.AspNetCore.Hosting.IHostingEnvironment hosting;
+        private ImovelService service = new ImovelService();
 
         public ImovelController(Microsoft.AspNetCore.Hosting.IHostingEnvironment environment) {
             hosting = environment;
         }
 
 
+
         [HttpPost]
         [Route("[action]")]
-        public async Task<IActionResult> Adicionar([FromForm] ImovelOld imovel,List<IFormFile> imageFiles) {
+        public IActionResult Buscar([FromBody] ImovelBusca busca) {
+
+            if(busca is null)
+                busca = new ImovelBusca();
+
+            appReturn = service.Buscar(busca);
+            return Result(appReturn);
+
+        }
+
+
+
+        [HttpPost]
+        [Route("[action]")]
+        public async Task<IActionResult> Adicionar([FromForm] Imovel imovel,List<IFormFile> imagesFiles) {
         //public async Task<IActionResult> Adicionar([FromForm] IFormFile file) {
 
-           Usuario logado          = ObterUsuarioAutenticado();
+            Usuario logado           = ObterUsuarioAutenticado();
             imovel.inseridoPorId    = imovel.atualizadoPorId    = logado.id;
             imovel.inseridoPorNome  = imovel.atualizadoPorNome  = logado.nome;
 
-            appReturn = await ImageShackUploadImagens(imovel,imageFiles);
-            appReturn.result = imovel;
-            await ImageShackDownload_ImoviewUpload("https://imagizer.imageshack.com/img924/9249/XXPIrP.jpg");
+            //appReturn = await ImageShackUploadImages(imovel,imagesFiles);
+            //appReturn.result = imovel;
+            //await ImageShackDownload_ImoviewUpload("https://imagizer.imageshack.com/img924/9249/XXPIrP.jpg");
             return Result(appReturn);
         }
 
 
 
 
-        public async Task<AppReturn> ImageShackUploadImagens(ImovelOld imovel,List<IFormFile> imageFiles) {
+        public async Task<Imovel> ImageShackUploadImagesURL(Imovel imovel) {
 
             int     ordem           = 1;
             string  pathToSave      = "";
             string  path            = "";
             byte[]  fileBytes;
 
-            if(imageFiles?.Count > 0) {
-                foreach(IFormFile imageFile in imageFiles) {
+            if(imovel.imagens?.Count > 0) {
+                foreach(ImovelImagem img in imovel.imagens) {
+                        var requestContent = new MultipartFormDataContent();
+                        requestContent.Add(new StringContent("37AGIJQUbe8fab869df40b8dd3dbecfce6e15c22"),"key");
+                        requestContent.Add(new StringContent(imovel.tag),"tags");
+                        requestContent.Add(new StringContent("json"),"format");
+                        requestContent.Add(new StringContent(img.urlLegado),"url");
+
+                        using(HttpClient httpClient = new HttpClient()) {
+                            try {
+                                if(appReturn.status.success) {
+                                    //HttpResponseMessage response = await client.PostAsJsonAsync("https://post.imageshack.us/upload_api.php", requestContent);
+                                    HttpResponseMessage response = await httpClient.PostAsync("https://post.imageshack.us/upload_api.php", requestContent);
+                                    if(response.IsSuccessStatusCode) {
+                                        string res = await response.Content.ReadAsStringAsync();
+                                        var imgShack = Newtonsoft.Json.JsonConvert.DeserializeObject<dynamic>(res);
+                                        //imovel.imagens.Add(new ImovelImagem { cod = "1234" });
+                                        imovel.obs  = $"id = {imgShack.id.ToString()}, img = {imgShack.filename}, url = {imgShack.links.image_link } ";
+                                        img.nome    = imgShack.filename;
+                                        img.urlFull = imgShack.links.image_link;
+                                    } else {
+                                        appReturn.AddException($"Error: {response.StatusCode} - {response.ReasonPhrase}","Não foi possível cadastrar imagens");
+                                    }
+                                }
+                            } catch(HttpRequestException e) {
+                                appReturn.AddException($"HTTP Request Error: {e.Message}","Não foi possível cadastrar imagens");
+                            }
+                        }
+
+                }
+                if(appReturn.status.success)
+                    appReturn.result = imovel;
+            }
+
+            return imovel;
+
+        }
+
+
+
+        public async Task<AppReturn> ImageShackUploadImages(Imovel imovel,List<IFormFile> imagesFiles) {
+
+            int     ordem           = 1;
+            string  pathToSave      = "";
+            string  path            = "";
+            byte[]  fileBytes;
+
+            if(imagesFiles?.Count > 0) {
+                foreach(IFormFile imageFile in imagesFiles) {
                     using(var memoryStream = new MemoryStream()) {
 
                         await imageFile.CopyToAsync(memoryStream);
@@ -68,7 +121,7 @@ namespace JaCaptei.Administrativo.API.Controllers {
 
                         var requestContent = new MultipartFormDataContent();
                         requestContent.Add(new StringContent("37AGIJQUbe8fab869df40b8dd3dbecfce6e15c22"),"key");
-                        requestContent.Add(new StringContent("Test"),"tags");
+                        requestContent.Add(new StringContent(imovel.tag),"tags");
                         requestContent.Add(new StringContent("json"),"format");
                         requestContent.Add(fileContent,"fileupload",imageFile.FileName);
 
@@ -79,8 +132,9 @@ namespace JaCaptei.Administrativo.API.Controllers {
                                     HttpResponseMessage response = await httpClient.PostAsync("https://post.imageshack.us/upload_api.php", requestContent);
                                     if(response.IsSuccessStatusCode) {
                                         string responseBody = await response.Content.ReadAsStringAsync();
-                                        imovel.imagens.Add(new Imagem { cod = "1234" });
-                                        imovel.obs = responseBody;
+                                        var hres = Newtonsoft.Json.JsonConvert.DeserializeObject<dynamic>(responseBody);
+                                        imovel.imagens.Add(new ImovelImagem { cod = "1234" });
+                                        imovel.obs = $"id = {hres.id.ToString()}, img = {hres.filename}, url = {hres.links.image_link } ";
                                     } else {
                                         appReturn.AddException($"Error: {response.StatusCode} - {response.ReasonPhrase}","Não foi possível cadastrar imagens");
                                     }
@@ -105,7 +159,7 @@ namespace JaCaptei.Administrativo.API.Controllers {
 
         public async Task<AppReturn> ImageShackDownload_ImoviewUpload(string URLimagem) {
 
-            ImovelOld imovel = new ImovelOld();
+            Imovel imovel = new Imovel();
             byte[]  file;
 
             // ------------------------------------------
@@ -147,7 +201,7 @@ namespace JaCaptei.Administrativo.API.Controllers {
                 HttpResponseMessage response = await httpClient.PostAsync("https://post.imageshack.us/upload_api.php", requestContent);
                 if(response.IsSuccessStatusCode) {
                     string responseBody = await response.Content.ReadAsStringAsync();
-                    imovel.imagens.Add(new Imagem { cod = "1234" });
+                    imovel.imagens.Add(new ImovelImagem { cod = "1234" });
                     imovel.obs = responseBody;
                 } else {
                     appReturn.AddException($"Error: {response.StatusCode} - {response.ReasonPhrase}","Não foi possível cadastrar imagens");
@@ -168,19 +222,52 @@ namespace JaCaptei.Administrativo.API.Controllers {
 
 
         [HttpPost]
-        [Route("adicionar/lote")]
-        public IActionResult AdicionarLote([FromBody] List<ImovelOld> entities) {
+        [Route("adicionar_lote_netsac")]
+        public async Task<IActionResult> AdicionarLoteNetsacCRM([FromBody] List<Imovel> entities) {
 
-            Usuario logado              = ObterUsuarioAutenticado();
-
-            entities.ForEach((entity)=>{ 
-                entity.inseridoPorId    = entity.atualizadoPorId = logado.id;
-                entity.inseridoPorNome  = entity.atualizadoPorNome = logado.nome;
-                appReturn = service.Adicionar(entity);
+            Usuario logado = ObterUsuarioAutenticado();
+            int count = 0;
+            
+            entities.ForEach(async (entity)=>{ 
+                entity.inseridoPorId    = entity.atualizadoPorId  = entity.admin.id    = 2;
+                entity.inseridoPorNome  = entity.atualizadoPorNome= entity.admin.nome  = "JACAPTEI ADMIN";
+                entity.origem           = "NETSAC";
+                entity.origemImagens    = entity.imagens[0].vendor;
+                count++;
+                entity = service.Adicionar(entity).result;
             });
-            //appReturn.result = entities;
+
+            appReturn.result = entities;
             return Result(appReturn);
         }
+
+
+
+        [HttpPost]
+        [Route("upload_imagens_netsac")]
+        public async Task<IActionResult> ImageShackUrlCRMUpload([FromBody] ImovelBusca busca) {
+
+            List<Imovel> entities = service.ObterImoveisComImagensCRM();
+            
+            //entities.ForEach(async (entity)=>{
+            //    if(entity.id == 1 && entity.imagens[0].index == 0) {
+            //        entity = await service.ImageShackUrlUpload(entity);
+            //        await Task.Delay(2000);
+            //    }
+            //});
+
+            for(int i=0;i<entities.Count;i++){
+                if(entities[i].id == 1 && entities[i].imagens[0].index == 0) {
+                   // entities[i] = await service.ImageShackUrlUpload(entities[i]);
+                    await Task.Delay(2000);
+                }
+            }
+
+            return Result(appReturn);
+
+        }
+
+
 
 
 
@@ -199,7 +286,7 @@ namespace JaCaptei.Administrativo.API.Controllers {
                 if(string.IsNullOrWhiteSpace(busca.usuario.sessaoCRMglobal))
                     busca.usuario.sessaoCRMglobal = await CRM.ObterSessaoGlobal();
 
-                string sql = "SELECT * FROM Products " + ObterQueryBuscaImovel(busca) + " ORDER BY createdtime";
+                string sql = "SELECT * FROM Products " + ObterQueryBuscaImovel(busca) + " ORDER BY createdtime ASC";
 
                 var data = new Dictionary<string, string>();
                 data.Add("_operation","query");
@@ -213,7 +300,7 @@ namespace JaCaptei.Administrativo.API.Controllers {
                         HttpResponseMessage response = await client.PostAsync(CRM.ENDPOINT, new FormUrlEncodedContent(data));
                         response.EnsureSuccessStatusCode();
                         result = response.Content.ReadAsStringAsync().Result;
-                        busca.crmResult = JsonSerializer.Deserialize<dynamic>(result);
+                        busca.crmResult = System.Text.Json.JsonSerializer.Deserialize<dynamic>(result);
                         crmResult = Newtonsoft.Json.JsonConvert.DeserializeObject<dynamic>(result);
                         //var imgResult =  Newtonsoft.Json.JsonConvert.DeserializeObject<dynamic>(result);
                         //var imgResult =  BuscarImoveisImagensCRM(busca.usuario.sessaoCRMglobal)

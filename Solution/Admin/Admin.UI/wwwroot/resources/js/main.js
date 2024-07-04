@@ -25,7 +25,7 @@ $(document).ready(function () {
         mode: 'history', // Add this line
         //history: VueRouter.createWebHashHistory(),
         history: VueRouter.createWebHistory(),
-        //base: "home",
+        action: "home",
         routes: routes,
         scrollBehavior(to, from, savedPosition) {
             return { x: 0, y: 0 };
@@ -68,6 +68,7 @@ $(document).ready(function () {
                     },
                     routing:{
                         title       :this.title,
+                        action      :null,
                         area        :null,
                         label       :null,
                         lastPath    :null,
@@ -109,9 +110,6 @@ $(document).ready(function () {
                   this.routing.area         = to.meta.area;
                   this.routing.label        = to.meta.label;
                   
-                  //next();
-
-                
                   if(to.path !== "/login" && !this.isAuth){
                         this.routing.menuIndex = "00-00-00-00";
                         next({ path: "/login" });
@@ -189,6 +187,7 @@ $(document).ready(function () {
 				this.$models.data                   = request.data;
                 this.log                            = this.$models.log();
                 this.usuario                        = this.$models.usuario();
+                this.proprietario                   = this.$models.proprietario();
                 this.imovel                         = this.$models.imovel();
                 this.favorito                       = this.$models.favorito();
                 this.localidade                     = this.$models.localidade();
@@ -323,7 +322,7 @@ $(document).ready(function () {
 
                 // ROUTING --------------------------------
 
-                RouteTo(destiny,action=null) {
+                RouteTo(destiny,params=null) {
                     //c(action)
                     var link = { name: "home", route: "/home" };
                     if (this.$validator.IsSet(destiny) && typeof destiny === "object") {
@@ -334,11 +333,9 @@ $(document).ready(function () {
                     } else {
                         link.route = destiny;
                      }
-
-                     if(this.$validator.IsSet(action))
-                        link.route += (this.$validator.IsSet(action))? "/"+action : "/";
-
-                    this.$router.push({ path: link.route  }).catch((e) => { console.log("RouteTo Error - " + e); });
+                    
+                    this.$router.params = params;
+                    this.$router.push({ path: link.route   }).catch((e) => { console.log("RouteTo Error - " + e); });
 
                     this.$tools.ToTop();
 
@@ -448,6 +445,7 @@ $(document).ready(function () {
 	App.component("c-notes"             , c_notes               );
 	App.component("c-tip"               , c_tip                 );
 	App.component("c-footer"            , c_footer              );
+	App.component("c-division"          , c_division            );
 
 	// --------- MOUNT
 	App.mount("#app");

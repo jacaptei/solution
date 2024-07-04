@@ -2,7 +2,7 @@
 
 namespace JaCaptei.Model.Entities;
 
-public class Imovel
+public class ImovelMapped
 {
     [Map("id")]
     public int Id { get; set; }

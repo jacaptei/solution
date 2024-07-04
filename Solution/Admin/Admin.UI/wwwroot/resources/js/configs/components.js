@@ -24,3 +24,4 @@ const c_login                   = LoadComponent(componentPath+"c-login.htm");
 const c_info                    = LoadComponent(componentPath+"c-info.htm");
 const c_notes                   = LoadComponent(componentPath+"c-notes.htm");
 const c_tip                     = LoadComponent(componentPath+"c-tip.htm");
+const c_division                = LoadComponent(componentPath+"c-division.htm");

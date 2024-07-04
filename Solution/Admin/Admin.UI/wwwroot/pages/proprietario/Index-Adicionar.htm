@@ -143,7 +143,17 @@
                 <div v-if="view=='success'">
                     <div style="max-width:360px;text-align:center">
                         <c-info type="success" title="Sucesso" subtitle="Cadastro efetuado"></c-info>
-                        <q-btn label="Cadastrar outro" color="primary" style="width:240px;" @click="NovoCadastro"></q-btn>
+                        <q-btn label="Adicionar um imóvel deste proprietário" color="primary" style="width:320px;"  @click="$root.RouteTo('imoveis',{view:'adicionar', proprietario: proprietario})" ></q-btn><br />
+                        <q-btn label="Adicionar outro proprietário"  color="primary" style="width:320px;" @click="NovoCadastro"></q-btn>
+                    </div>
+                </div>
+            
+                <div v-if="view=='success-redirect'">
+                    <div style="max-width:360px;text-align:center">
+                        <c-info type="success" title="Sucesso" subtitle="Cadastro efetuado"></c-info>
+                        <!--<q-btn label="Adicionar imóvel" color="primary" style="width:240px;"  @click="$root.RouteTo('imoveis',{view:'adicionar', proprietario: proprietario})" ></q-btn><br />-->
+                        <q-btn label="Adicionar imóvel" color="primary" style="width:320px;"  @click="$root.RouteTo('imoveis',{view:'adicionar', proprietario: {id:1,nome:'PROP1'}})" ></q-btn><br />
+                        <q-btn label="Adicionar outro"  color="primary" style="width:320px;" @click="NovoCadastro"></q-btn>
                     </div>
                 </div>
 
@@ -180,7 +190,7 @@
         data: function () {
             return {
                 onrequest: false,
-                view: "form",
+                view: "success",
                 messageSuccess: "Cadastrado!",
                 messageAlert: "",
                 messageFail: "Não foi possível cadastrar, favor tentar novamente.",
@@ -225,12 +235,16 @@
         },
         methods: {
 
-
+            
 
             ShowView(v) {
                 this.view = v;
             },
 
+            NovoCadastro(){
+                this.proprietario = this.$models.usuario();
+                this.ShowView("form");
+            },
 
            async Enviar() {
 
@@ -291,8 +305,12 @@
 
                     this.onrequest = false;
                     if (this.$validator.is(request?.status?.success)){
-                        this.$tools.AlertSuccess("Cadastro efetuado");
-                        this.proprietario = this.$models.usuario();
+                        if(this.$validator.is(this.$router.params?.from)){
+                            this.$tools.AlertSuccess("Cadastro efetuado");
+                            window.setTimeout(()=>$root.RouteTo('imoveis',{view:this.$router.params.from, proprietario:this.proprietario}))
+                         }else
+                        this.view = "success";
+                        //this.proprietario = this.$models.usuario();
                     }
                     //else
                     //    this.$tools.AlertSuccess("Não foi possível realizar o cadastro.");
