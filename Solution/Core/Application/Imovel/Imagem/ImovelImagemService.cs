@@ -5,7 +5,7 @@ using JaCaptei.Model.Entities;
 
 namespace JaCaptei.Application;
 
-public class ImovelImagemService
+public class ImovelImagemService: IDisposable
 {
     private readonly DBcontext _context;
     private readonly ImovelImagemDAO _imagemDAO;
@@ -19,5 +19,9 @@ public class ImovelImagemService
     public async Task<List<ImovelImagem>> ObterImagensImovel(int idImovel)
     {
         return await _imagemDAO.GetByImovelId(idImovel);
+    }
+    public void Dispose()
+    {
+        _imagemDAO.Dispose();
     }
 }

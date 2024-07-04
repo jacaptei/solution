@@ -13,7 +13,15 @@ using RepoDb.Enumerations;
 
 namespace JaCaptei.Application{
 
-    public class ParceiroDAO : DAOBase{
+    public class ParceiroDAO : DAOBase, IDisposable{
+        private readonly DBcontext _context;
+        public ParceiroDAO()
+        {
+        }
+        public ParceiroDAO(DBcontext context)
+        {
+            _context = context;
+        }
 
         //public AppReturn Inserir(Parceiro entity){
 
@@ -26,7 +34,7 @@ namespace JaCaptei.Application{
 
         //}
 
-        
+
         public AppReturn Adicionar(Parceiro entity){
 
             Conta conta = new Conta();
@@ -759,10 +767,6 @@ namespace JaCaptei.Application{
             return appReturn;
         }
 
-
-
-
-
         public AppReturn BuscarConta(Search busca) {
 
             string sql      = "SELECT * FROM \"Parceiro\" ";
@@ -801,20 +805,26 @@ namespace JaCaptei.Application{
 
         public async Task<Parceiro?> ObterPorCPF(string cpf)
         {
-            var conn = DB.GetConn();
+            var conn = _context.GetConn();
             return (await conn.QueryAsync<Parceiro>(p => p.cpfNum == Utils.Number.ToLong(cpf))).FirstOrDefault();
         }
 
         public async Task<Parceiro?> ObterPorCNPJ(string cnpj)
         {
-            var conn = DB.GetConn();
+            var conn = _context.GetConn();
             return (await conn.QueryAsync<Parceiro>(p => p.cnpjNum == Utils.Number.ToLong(cnpj))).FirstOrDefault();
         }
 
         public async Task<Plano?> ObterPlanoParceiro(Parceiro parceiro)
         {
-            var conn = DB.GetConn();
+            var conn = _context.GetConn();
             return (await conn.QueryAsync<Plano>(p => p.id == parceiro.idPlano)).FirstOrDefault();
+        }
+
+        public void Dispose()
+        {
+            _context?.GetConn()?.Close();
+            _context?.GetConn()?.Dispose(); 
         }
     }
 }

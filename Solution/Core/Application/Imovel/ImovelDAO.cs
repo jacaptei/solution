@@ -12,7 +12,7 @@ using RepoDb.Extensions;
 namespace JaCaptei.Application;
 
 
-public class ImovelDAO
+public class ImovelDAO: IDisposable
 {
     private readonly NpgsqlConnection _conn;
     private readonly DBcontext DB;
@@ -319,6 +319,12 @@ public class ImovelDAO
             ImovelLazer = lazer.First()
         };
         return res;
+    }
+
+    public void Dispose()
+    {
+        _conn?.Close();
+        _conn?.Dispose();
     }
 }
 

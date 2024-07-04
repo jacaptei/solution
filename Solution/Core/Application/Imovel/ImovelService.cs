@@ -4,7 +4,7 @@ using JaCaptei.Model.DTO;
 
 namespace JaCaptei.Application;
 
-public class ImovelService
+public class ImovelService: IDisposable
 {
 	private readonly DBcontext _context;
 	private readonly ImovelDAO _imovelDAO;
@@ -140,4 +140,9 @@ public class ImovelService
 	{
 		return await _imovelDAO.GetFullImovel(idImovel) ?? new ImovelFullDTO();
 	}
+
+    public void Dispose()
+    {
+        _imovelDAO?.Dispose();
+    }
 }

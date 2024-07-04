@@ -32,7 +32,7 @@ public class ImoviewController : ControllerBase
         _mapper = mapper;
         _imagemService = new ImovelImagemService(context);
         _imovelService = new ImovelService(context);
-        _parceiroService = new ParceiroService();
+        _parceiroService = new ParceiroService(context);
     }
 
     [HttpGet("Unidades")]
@@ -96,16 +96,18 @@ public class ImoviewController : ControllerBase
         if (cliente == null)
             return NotFound("Cliente não encontrado!");
         var plano = await _parceiroService.ObterPlanoParceiro(cliente);
+        if(plano == null)
+            return NotFound("Cliente não possui plano de integração!");
         var integracao = await _service.ObterIntegracaoCliente(cliente);
         var fileBairros = Path.Combine(Directory.GetCurrentDirectory(), "Data/Placeholder/", "bairros.json");
         var txtBairros = System.IO.File.ReadAllText(fileBairros);
         var res = new
         {
-            Cliente = new { Id = 1, Nome = "GHX Imóveis" },
-            Plano = new { Id = 3, Nome = "IMOBILIÁRIA 03 USUÁRIOS", QtdBairros = 3 },
-            Integracao = new {
+            Cliente = new { Id = cliente.id, Nome = cliente.nome },
+            Plano = new { Id = plano.id, Nome = plano.nome, QtdBairros = 3 },
+            Integracao = integracao ?? new {
                 Id = 1,
-                IdCliente = 1,
+                IdCliente = cliente.id,
                 IdOperador = 2,
                 DataInclusao = DateTime.UtcNow.AddDays(-1),
                 DataAtualizacao = DateTime.UtcNow,
@@ -121,9 +123,11 @@ public class ImoviewController : ControllerBase
                 },
             },
             BairrosNaoSelecionados = Newtonsoft.Json.JsonConvert.DeserializeObject<List<BairroDTO>>(txtBairros),
-            Unidades = new List<object>() { new { Id = 6237, Nome = "GHX Imóveis" } },
-            Crms = new List<object>() { new { Id = 1, Nome = "Imoview" }, new { Id = 2, Nome = "VistaSoft" } }
+            Unidades = await _service.GetUnidades(),
+            Crms = new List<ComboDTO>() { new(1, "Imoview"), new (2,"VistaSoft")}
         };
         return Ok(res);
     }
 }
+
+public record ComboDTO(int Id, string Nome);
