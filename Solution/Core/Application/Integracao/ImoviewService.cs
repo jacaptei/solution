@@ -1,20 +1,25 @@
-﻿using JaCaptei.Model;
+﻿using JaCaptei.Application.DAL;
+using JaCaptei.Model;
 using JaCaptei.Model.DTO;
-
+using JaCaptei.Model.Entities;
 using System.Net;
 using System.Net.Http.Headers;
 
 namespace JaCaptei.Application.Integracao;
 
-public class ImoviewService
+public class ImoviewService: IDisposable
 {
     private readonly IHttpClientFactory _httpClientFactory;
+    private readonly DBcontext _context;
+    private readonly ImoviewDAO _imoviewDAO;
     private string _chave;
 
-    public ImoviewService(IHttpClientFactory httpClientFactory, string chave)
+    public ImoviewService(IHttpClientFactory httpClientFactory, DBcontext context, string chave)
     {
         _httpClientFactory = httpClientFactory;
+        _context = context;
         _chave = chave;
+        _imoviewDAO = new ImoviewDAO(_context.GetConn());
     }
 
     public string Chave { get => _chave; set => _chave = value; }
@@ -98,9 +103,14 @@ public class ImoviewService
         return chaveOk;
     }
 
-    public async Task<object> ObterIntegracaoCliente(Parceiro cliente)
+    public async Task<IntegracaoImoview?> ObterIntegracaoCliente(Parceiro cliente)
     {
-        return null;
+        return await _imoviewDAO.GetIntegracao(cliente.id);
+    }
+
+    public void Dispose()
+    {
+        _imoviewDAO.Dispose();
     }
 }
 

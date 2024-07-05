@@ -26,7 +26,7 @@ public class ImoviewController : ControllerBase
     public ImoviewController(IHttpClientFactory httpClientFactory, DBcontext context, IMapper mapper)
     {
         //_httpClientFactory = httpClientFactory;
-        _service = new ImoviewService(httpClientFactory, _apiKey);
+        _service = new ImoviewService(httpClientFactory, context, _apiKey);
         _httpClientFactory = httpClientFactory;
         _context = context;
         _mapper = mapper;
@@ -105,7 +105,7 @@ public class ImoviewController : ControllerBase
         {
             Cliente = new { Id = cliente.id, Nome = cliente.nome },
             Plano = new { Id = plano.id, Nome = plano.nome, QtdBairros = 3 },
-            Integracao = integracao ?? new {
+            Integracao = integracao ?? new Model.Entities.IntegracaoImoview () {
                 Id = 1,
                 IdCliente = cliente.id,
                 IdOperador = 2,
@@ -116,11 +116,11 @@ public class ImoviewController : ControllerBase
                 ChaveApi = "qnnYE4Fev/v2kRbZ5F9PgEGCkJI3Ixflcl0FADcTGyA=",
                 IdPlano = 3,
                 Status = "Importado com sucesso",
-                Bairros = new List<BairroDTO>() {
+                Bairros = Newtonsoft.Json.JsonConvert.SerializeObject(new List<BairroDTO>() {
                     new() { Id = 3305, Nome = "Centro", IdCidade = 2754 },
                     new() { Id = 3358, Nome = "Fernão Dias", IdCidade = 2754 },
                     new() { Id = 3412, Nome = "Lagoa", IdCidade = 2754 }
-                },
+                }),
             },
             BairrosNaoSelecionados = Newtonsoft.Json.JsonConvert.DeserializeObject<List<BairroDTO>>(txtBairros),
             Unidades = await _service.GetUnidades(),
