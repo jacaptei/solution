@@ -87,7 +87,7 @@ public class ImoviewController : ControllerBase
     }
 
     [HttpPost("integracao/cliente")]
-    public async Task<ActionResult<object>> GetIntegracaoCliente([FromBody] string cpfCnpj)
+    public async Task<ActionResult<IntegracaoReponseDTO>> GetIntegracaoCliente([FromBody] string cpfCnpj)
     {
         var (isCpf, cpfCnpjNum) = Utils.DistictCpfCnpj(cpfCnpj);
         if (string.IsNullOrEmpty(cpfCnpjNum))
@@ -99,6 +99,19 @@ public class ImoviewController : ControllerBase
         if(plano == null)
             return NotFound("Cliente não possui plano de integração!");
         var integracao = await _service.ObterIntegracaoCliente(cliente);
+        var res = new IntegracaoReponseDTO()
+        {
+            Cliente = new ComboDTO(cliente.id, cliente.nome),
+            Plano = new ComboPlanoDTO(plano.id, plano.nome, 3),
+            Integracao = integracao, 
+            Unidades = (await _service.GetUnidades())!.lista!.ConvertAll(x => new ComboDTO(x.codigo, x.nome)),
+            Crms = [new(1, "Imoview"), new (2,"VistaSoft")]
+        };
+        return Ok(res);
+    }
+
+    private void ConsultaBairros() 
+    {
         // var fileBairros = Path.Combine(Directory.GetCurrentDirectory(), "Data/Placeholder/", "bairros.json");
         // var txtBairros = System.IO.File.ReadAllText(fileBairros);
         // var bairrosNSelec = Newtonsoft.Json.JsonConvert.DeserializeObject<List<BairroDTO>>(txtBairros) ?? [];
@@ -109,11 +122,10 @@ public class ImoviewController : ControllerBase
         //     }
         //     catch{}
         // }
-        var res = new
-        {
-            Cliente = new { Id = cliente.id, Nome = cliente.nome },
-            Plano = new { Id = plano.id, Nome = plano.nome, QtdBairros = 3 },
-            Integracao = integracao, 
+    }
+
+    private void MockIntegracao() 
+    {
             // new Model.Entities.IntegracaoImoview () {
             //     Id = 1,
             //     IdCliente = cliente.id,
@@ -132,11 +144,17 @@ public class ImoviewController : ControllerBase
             //     }),
             // },
             // BairrosNaoSelecionados = bairrosNSelec,
-            Unidades = await _service.GetUnidades(),
-            Crms = new List<ComboDTO>() { new(1, "Imoview"), new (2,"VistaSoft")}
-        };
-        return Ok(res);
     }
 }
 
 public record ComboDTO(int Id, string Nome);
+public record ComboPlanoDTO(int Id, string Nome, int QtdBairros);
+
+public record IntegracaoReponseDTO 
+{
+    public ComboDTO Cliente { get; set; }
+    public ComboPlanoDTO Plano { get; set; }
+    public Model.Entities.IntegracaoImoview? Integracao { get; set; }
+    public List<ComboDTO> Unidades { get; set; }
+    public List<ComboDTO> Crms { get; set; }
+}
