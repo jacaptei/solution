@@ -11,18 +11,18 @@ public class ImovelAreas
     public int IdImovel { get; set; }
 
     [Map("minima")]
-    public float Minima { get; set; } = 0;
+    public Single Minima { get; set; } = 0;
 
     [Map("maxima")]
-    public float Maxima { get; set; } = 0;
+    public Single Maxima { get; set; } = 0;
 
     [Map("interna")]
-    public float Interna { get; set; } = 0;
+    public Single Interna { get; set; } = 0;
 
     [Map("externa")]
-    public float Externa { get; set; } = 0;
+    public Single Externa { get; set; } = 0;
 
     [Map("total")]
-    public float Total { get; set; } = 0;
+    public Single Total { get; set; } = 0;
 }
 

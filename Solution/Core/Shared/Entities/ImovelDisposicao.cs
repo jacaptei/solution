@@ -20,7 +20,7 @@ public class ImovelDisposicao
     public bool Alugado { get; set; } = false;
 
     [Map("comissao")]
-    public float Comissao { get; set; } = 0;
+    public decimal Comissao { get; set; } = 0m;
 
     [Map("desativado")]
     public bool Desativado { get; set; } = false;

@@ -294,11 +294,12 @@ public class ImovelDAO: IDisposable
         if (imovel == null) return null;
         if (!imovel.Any()) return null;
 
-        var (area, valores, endereco, disposicao, crsInternas, crsExternas, lazer) =
-            await _conn.QueryMultipleAsync<ImovelAreas, ImovelValores, ImovelEndereco,
-            ImovelDisposicao, ImovelCaracteristicasInternas,
+       var (area, valores, endereco, disposicao, crsInternas, crsExternas, lazer) =
+            await _conn.QueryMultipleAsync<ImovelAreas,
+            ImovelValores, ImovelEndereco,ImovelDisposicao, 
+            ImovelCaracteristicasInternas, 
             ImovelCaracteristicasExternas, ImovelLazer>(
-            a => a.idImovel == idImovel, // area
+            a => a.idImovel == idImovel,// area
             v => v.idImovel == idImovel, // valor
             e => e.idImovel == idImovel, // endereco
             d => d.idImovel == idImovel, // dísposicao
