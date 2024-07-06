@@ -99,30 +99,39 @@ public class ImoviewController : ControllerBase
         if(plano == null)
             return NotFound("Cliente não possui plano de integração!");
         var integracao = await _service.ObterIntegracaoCliente(cliente);
-        var fileBairros = Path.Combine(Directory.GetCurrentDirectory(), "Data/Placeholder/", "bairros.json");
-        var txtBairros = System.IO.File.ReadAllText(fileBairros);
+        // var fileBairros = Path.Combine(Directory.GetCurrentDirectory(), "Data/Placeholder/", "bairros.json");
+        // var txtBairros = System.IO.File.ReadAllText(fileBairros);
+        // var bairrosNSelec = Newtonsoft.Json.JsonConvert.DeserializeObject<List<BairroDTO>>(txtBairros) ?? [];
+        // if (integracao != null && !string.IsNullOrWhiteSpace(integracao.Bairros)) {
+        //     try {
+        //         var bairros = Newtonsoft.Json.JsonConvert.DeserializeObject<List<BairroDTO>>(integracao.Bairros) ?? [];
+        //         bairrosNSelec = bairrosNSelec.Where(x => bairros.Any(y => y.Id != x.Id)).ToList();
+        //     }
+        //     catch{}
+        // }
         var res = new
         {
             Cliente = new { Id = cliente.id, Nome = cliente.nome },
             Plano = new { Id = plano.id, Nome = plano.nome, QtdBairros = 3 },
-            Integracao = integracao ?? new Model.Entities.IntegracaoImoview () {
-                Id = 1,
-                IdCliente = cliente.id,
-                IdOperador = 2,
-                DataInclusao = DateTime.UtcNow.AddDays(-1),
-                DataAtualizacao = DateTime.UtcNow,
-                CodUsuario = "4907",
-                CodUnidade = "6237",
-                ChaveApi = "qnnYE4Fev/v2kRbZ5F9PgEGCkJI3Ixflcl0FADcTGyA=",
-                IdPlano = 3,
-                Status = "Importado com sucesso",
-                Bairros = Newtonsoft.Json.JsonConvert.SerializeObject(new List<BairroDTO>() {
-                    new() { Id = 3305, Nome = "Centro", IdCidade = 2754 },
-                    new() { Id = 3358, Nome = "Fernão Dias", IdCidade = 2754 },
-                    new() { Id = 3412, Nome = "Lagoa", IdCidade = 2754 }
-                }),
-            },
-            BairrosNaoSelecionados = Newtonsoft.Json.JsonConvert.DeserializeObject<List<BairroDTO>>(txtBairros),
+            Integracao = integracao, 
+            // new Model.Entities.IntegracaoImoview () {
+            //     Id = 1,
+            //     IdCliente = cliente.id,
+            //     IdOperador = 2,
+            //     DataInclusao = DateTime.UtcNow.AddDays(-1),
+            //     DataAtualizacao = DateTime.UtcNow,
+            //     CodUsuario = "4907",
+            //     CodUnidade = "6237",
+            //     ChaveApi = "qnnYE4Fev/v2kRbZ5F9PgEGCkJI3Ixflcl0FADcTGyA=",
+            //     IdPlano = 3,
+            //     Status = "Importado com sucesso",
+            //     Bairros = Newtonsoft.Json.JsonConvert.SerializeObject(new List<BairroDTO>() {
+            //         new() { Id = 3305, Nome = "Centro", IdCidade = 2754 },
+            //         new() { Id = 3358, Nome = "Fernão Dias", IdCidade = 2754 },
+            //         new() { Id = 3412, Nome = "Lagoa", IdCidade = 2754 }
+            //     }),
+            // },
+            // BairrosNaoSelecionados = bairrosNSelec,
             Unidades = await _service.GetUnidades(),
             Crms = new List<ComboDTO>() { new(1, "Imoview"), new (2,"VistaSoft")}
         };
