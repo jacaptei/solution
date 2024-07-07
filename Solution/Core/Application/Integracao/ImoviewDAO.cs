@@ -21,4 +21,10 @@ public class ImoviewDAO: IDisposable {
         _conn?.Close();
         _conn?.Dispose();
     }
+
+    public async Task<bool> SaveIntegracao(IntegracaoImoview integracao)
+    {
+        await _conn.InsertAsync(integracao);
+        return true;
+    }
 }

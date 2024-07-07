@@ -5,7 +5,7 @@ using JaCaptei.Application.DAL;
 using JaCaptei.Application.Integracao;
 using JaCaptei.Model;
 using JaCaptei.Model.DTO;
-
+using JaCaptei.Model.Entities;
 using Microsoft.AspNetCore.Mvc;
 namespace JaCaptei.Administrativo.API.Controllers;
 
@@ -109,6 +109,12 @@ public class ImoviewController : ControllerBase
         };
         return Ok(res);
     }
+ 
+    [HttpPost("integracao/cliente/integrar")]
+    public async Task<ActionResult<object>> IntegrarCliente([FromBody] IntegracaoImoview integracao)
+    {
+        return Ok(await _service.IntegrarCliente(integracao));
+    }
 
     private void ConsultaBairros() 
     {
@@ -122,6 +128,7 @@ public class ImoviewController : ControllerBase
         //     }
         //     catch{}
         // }
+        // BairrosNaoSelecionados = bairrosNSelec,
     }
 
     private void MockIntegracao() 
@@ -143,7 +150,6 @@ public class ImoviewController : ControllerBase
             //         new() { Id = 3412, Nome = "Lagoa", IdCidade = 2754 }
             //     }),
             // },
-            // BairrosNaoSelecionados = bairrosNSelec,
     }
 }
 

@@ -2,6 +2,8 @@
 using JaCaptei.Model;
 using JaCaptei.Model.DTO;
 using JaCaptei.Model.Entities;
+using MassTransit;
+using System.ComponentModel;
 using System.Net;
 using System.Net.Http.Headers;
 
@@ -13,12 +15,14 @@ public class ImoviewService: IDisposable
     private readonly DBcontext _context;
     private readonly ImoviewDAO _imoviewDAO;
     private string _chave;
+    private readonly IPublishEndpoint _bus;
 
-    public ImoviewService(IHttpClientFactory httpClientFactory, DBcontext context, string chave)
+    public ImoviewService(IHttpClientFactory httpClientFactory, DBcontext context, string chave, IPublishEndpoint bus)
     {
         _httpClientFactory = httpClientFactory;
         _context = context;
         _chave = chave;
+        _bus = bus;
         _imoviewDAO = new ImoviewDAO(_context.GetConn());
     }
 
@@ -27,7 +31,6 @@ public class ImoviewService: IDisposable
     {
         var client = _httpClientFactory.CreateClient("imoview");
         client.DefaultRequestHeaders.Clear();
-        //client.DefaultRequestHeaders.Add("Content-Type","application/json; charset=utf-8");
         client.DefaultRequestHeaders.Add("chave", _chave);
 
         var res = await client.GetStringAsync(url);
@@ -95,7 +98,6 @@ public class ImoviewService: IDisposable
     {
         var client = _httpClientFactory.CreateClient("imoview");
         client.DefaultRequestHeaders.Clear();
-        //client.DefaultRequestHeaders.Add("Content-Type","application/json; charset=utf-8");
         client.DefaultRequestHeaders.Add("chave", chave);
         var res = await client.GetAsync("Imovel/RetornarListaFinalidades");
         var chaveOk = !(res.StatusCode == HttpStatusCode.Unauthorized || res.StatusCode == HttpStatusCode.Forbidden);
@@ -108,9 +110,55 @@ public class ImoviewService: IDisposable
         return await _imoviewDAO.GetIntegracao(cliente.id);
     }
 
+    public async Task<object?> IntegrarCliente(IntegracaoImoview integracao)
+    {
+        var integracaoOld = await _imoviewDAO.GetIntegracao(integracao.IdCliente);
+        if (integracaoOld!= null) {
+            integracao.Id = integracaoOld.Id;
+            integracao.DataAtualizacao = DateTime.UtcNow;
+            integracao.Status = StatusIntegracao.Aguardando.GetDescription();
+        }
+        else {
+            integracao.Status = StatusIntegracao.Aguardando.GetDescription();
+        }
+        await _imoviewDAO.SaveIntegracao(integracao);
+        var integracaoEvent = new IntegracaoEvent() 
+        {
+            IdIntegracao = integracao.Id,
+            IdCliente = integracao.IdCliente
+        };
+        await _bus.Publish(integracaoEvent);
+        return integracaoEvent;
+    }
+
+    public async Task<object?> ImportarIntegracao(IntegracaoImoview integracao) 
+    {
+        // TODO: Verificar se a integracao do cliente ja existe no imoview, atualizar os dados da integracao ou criar se nao existir
+        // TODO: Verificar bairros ja existentes no imoview, atualizar os que existem e criar os novos
+        // TODO: Verificar se o imovel ja existe no imoview, criar se nao existir
+        // TODO: Iniciar a importacao dos imoveis - API Imoview
+        // TODO: Atualizar o status da integracao do cliente (integracao, bairros, imovel)
+        // TODO: Retornar objeto com o status da integracao do cliente e os dados da importacao do imovel
+        return new {};
+    }
+
+    public async Task<object?> ObterStatusIntegracao(Parceiro cliente) 
+    {
+        // TODO: Obter o status da integracao do cliente
+        return new {};
+    }
+
     public void Dispose()
     {
         _imoviewDAO.Dispose();
     }
 }
-
+ public enum StatusIntegracao 
+ {
+    [Description("Aguardando")]
+    Aguardando,
+    [Description("Processando")]
+    Processando,
+    [Description("Concluido")]
+    Concluido
+ }

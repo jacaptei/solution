@@ -1,4 +1,6 @@
 ﻿
+using System.ComponentModel;
+using System.Net.NetworkInformation;
 using System.Text.RegularExpressions;
 
 namespace JaCaptei.Model {
@@ -38,6 +40,12 @@ namespace JaCaptei.Model {
             }
         }
 
+        public static string GetDescription<T>(this T value) where T : Enum
+        {
+            var fieldInfo = value.GetType().GetField(value.ToString());
+            var attributes = fieldInfo.GetCustomAttributes(typeof(DescriptionAttribute), false);
+            return attributes.Length > 0? ((DescriptionAttribute)attributes[0]).Description : value.ToString();
+        }
     }
 
 }

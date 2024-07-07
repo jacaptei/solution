@@ -1,17 +1,11 @@
 using Microsoft.AspNetCore.Authentication.JwtBearer;
-using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.Extensions.Options;
 using JaCaptei.Model;
 using JaCaptei.Administrativo.API.Filters;
 using System.Text.Json;
 using System.Text;
-using Microsoft.Net.Http.Headers;
-using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
-using System.Reflection;
-using Polly.Contrib.WaitAndRetry;
-using Polly;
-using JaCaptei.Application.DAL;
+using JaCaptei.Admin.API;
 
 //var builder = WebApplication.CreateBuilder(new WebApplicationOptions {
 //    ApplicationName = typeof(Program).Assembly.FullName,
@@ -146,33 +140,9 @@ builder.Services.AddAuthentication(x => {
 
 });
 
+builder.Services.AddServices(settings);
 
-// ------------------------------------------------------
-builder.Services.AddHttpClient("crm", client =>
-{
-    client.BaseAddress = new Uri(settings.crmEndpoint);
-})
-.AddTransientHttpErrorPolicy(policyBuilder => policyBuilder.WaitAndRetryAsync(Backoff.DecorrelatedJitterBackoffV2(TimeSpan.FromSeconds(1), 3)));
-
-builder.Services.AddHttpClient("location", client =>
-{
-    client.BaseAddress = new Uri("https://brasilaberto.com/api/v1/");
-})
-.AddTransientHttpErrorPolicy(policyBuilder => policyBuilder.WaitAndRetryAsync(Backoff.DecorrelatedJitterBackoffV2(TimeSpan.FromSeconds(1), 5)));
-
-builder.Services.AddHttpClient("imoview", client =>
-{
-    client.BaseAddress = new Uri("https://api.imoview.com.br/");
-})
-.AddTransientHttpErrorPolicy(policyBuilder => policyBuilder.WaitAndRetryAsync(Backoff.DecorrelatedJitterBackoffV2(TimeSpan.FromSeconds(1), 5)));
-
-var assembly = Assembly.GetExecutingAssembly();
-var types = assembly.GetTypes()
-                    .Where(t => t.Namespace != null && t.Namespace.StartsWith("JaCaptei.Application.Mapper"))
-                    .ToArray();
-
-builder.Services.AddAutoMapper(types);
-builder.Services.AddScoped<DBcontext>();
+// -----------------------------------------------------
 
 var app = builder.Build();
 
