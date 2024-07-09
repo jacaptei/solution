@@ -1,0 +1,143 @@
+﻿<template>
+    <div>
+        <el-dialog v-model="$root.showTermsAndPolicyModal" @close="resetView" style="margin-top: 23px; margin-bottom: 23px" width="80%">
+            <div>
+                <el-row :gutter="20" style="margin-bottom: 20px;">
+                    <el-col :md="24" style="text-align: center;">
+                        <el-button type="text" @click="changeView('termos-de-uso')" :disabled="viewActive === 'termos-de-uso'">Termos de Uso</el-button>
+                        <el-button type="text" @click="changeView('politicas-e-privacidade')" :disabled="viewActive === 'politicas-e-privacidade'">Políticas de Privacidade</el-button>
+                    </el-col>
+                </el-row>
+
+                <div v-if="viewActive == 'termos-de-uso'">
+                    <iframe :src="pdfUrlTermosDeUso + '#toolbar=0&navpanes=0&scrollbar=0'"
+                            type="application/pdf"
+                            width="100%"
+                            height="600px"
+                            v-if="pdfUrlTermosDeUso"></iframe>
+                    <div v-else>
+                        <p>PDF não encontrado ou não pode ser carregado.</p>
+                    </div>
+                    <el-row :gutter="20">
+                        <el-col :md="24" style="margin-top:15px">
+                            <div>
+                                <el-checkbox v-model="$root.usuario.aceitouTermos">
+                                    Aceito os termos e condições de uso
+                                </el-checkbox>
+                            </div>
+                        </el-col>
+                    </el-row>
+                </div>
+
+                <div v-if="viewActive == 'politicas-e-privacidade'">
+                    <iframe :src="pdfUrlPoliticaPrivacidade + '#toolbar=0&navpanes=0&scrollbar=0'"
+                            type="application/pdf"
+                            width="100%"
+                            height="600px"
+                            v-if="pdfUrlPoliticaPrivacidade"></iframe>
+                    <div v-else>
+                        <p>PDF não encontrado ou não pode ser carregado.</p>
+                    </div>
+                    <el-row :gutter="20" style="margin-top:15px">
+                        <el-col :xs="24" :sm="18" class="margin-bottom">
+                            <el-checkbox v-model="$root.usuario.aceitouPoliticaPrivacidade">
+                                Aceito a política de privacidade dos dados
+                            </el-checkbox>
+                        </el-col>
+
+                        <el-col :xs="24" :sm="6" style="width:100%">
+                            <el-button type="primary"
+                                       :disabled="!$root.usuario.aceitouTermos || !$root.usuario.aceitouPoliticaPrivacidade"
+                                       @click="confirmar"
+                                       style="width:100%">
+                                Confirmar
+                            </el-button>
+                        </el-col>
+                    </el-row>
+                </div>
+
+                <el-row :gutter="20" style="text-align: center; margin-top: 20px;">
+                    
+                </el-row>
+            </div>
+        </el-dialog>
+    </div>
+</template>
+
+<script>
+    module.exports = {
+        components: {
+
+        },
+
+        data: function () {
+            return {
+                showModal: false,
+                isPwd: true,
+                pwdConfirm: "",
+                pdfUrlPoliticaPrivacidade: "../files/JaCaptei_Politica_Privacidade.pdf",
+                pdfUrlTermosDeUso: "../files/JaCaptei_Termos_de_Uso.pdf",
+                viewLast: "login",
+                viewActive: "termos-de-uso",
+                messageFail: "Algo deu errado, favor tentar novamente.",
+                messageSuccess: "Conteúdo restrito liberado.",
+                selectStates: [],
+            }
+        }, computed: {
+
+        },
+
+        props: {
+        },
+        watch: {
+        },
+        created: function () {
+        },
+        mounted() {
+
+        },
+        methods: {
+            Back() {
+            },
+            changeView(view) {
+                this.viewActive = view;
+            },
+            confirmar() {
+                // Lógica para confirmar a aceitação dos termos e política de privacidade
+                console.log('Termos e políticas aceitos:', this.$root.usuario.aceitouTermos, this.$root.usuario.aceitouPoliticaPrivacidade);
+                this.$root.showTermsAndPolicyModal = false;
+            },
+            resetView() {
+                this.viewActive = 'termos-de-uso';
+            },
+        }
+    }
+
+</script>
+
+
+<style scoped>
+
+    .user_drop {
+        height: 22px;
+        padding-top: 15px
+    }
+
+    .margin-bottom {
+        margin-bottom: 10px;
+    }
+
+    .privacy-link {
+        font-weight: 800;
+        color: var(--s-accent-color);
+    }
+
+    .icon-spacing {
+        padding-left: 10px;
+        padding-right: 4px;
+        font-size: 14px;
+        color: var(--s-accent-color);
+    }
+</style>
+
+
