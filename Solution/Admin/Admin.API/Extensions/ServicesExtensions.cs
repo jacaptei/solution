@@ -1,4 +1,6 @@
 ﻿using System.Reflection;
+
+using JaCaptei.Admin.API.Consumers;
 using JaCaptei.Application.DAL;
 using MassTransit;
 using Polly;
@@ -12,12 +14,14 @@ internal static class ServicesExtensions
     {
         services.AddMassTransit(busConfig =>
         {
+            busConfig.AddConsumer<IntegracaoClienteConsumer>();
             busConfig.UsingRabbitMq((context, cfg) =>
             {
-                // cfg.Host("rabbitmq", 5672, "/", h => {
-                //     h.Username("guest");
-                //     h.Password("guest");
-                // });
+                //cfg.Host("rabbitmq", 5672, "/", h =>
+                //{
+                //    h.Username("guest");
+                //    h.Password("guest");
+                //});
                 cfg.Host(new Uri("amqp://localhost:5672"), h =>
                 {
                     h.Username("guest");

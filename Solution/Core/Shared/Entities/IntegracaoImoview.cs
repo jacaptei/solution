@@ -1,4 +1,7 @@
-﻿using RepoDb.Attributes;
+﻿using NpgsqlTypes;
+
+using RepoDb.Attributes;
+using RepoDb.Attributes.Parameter.Npgsql;
 
 namespace JaCaptei.Model.Entities
 {
@@ -36,9 +39,11 @@ namespace JaCaptei.Model.Entities
         public string Status { get; set; }
 
         [Map("bairros")]
+        [NpgsqlDbType(NpgsqlDbType.Jsonb)]
         public string Bairros { get; set; } 
 
         [Map("imoveis")]
+        [NpgsqlDbType(NpgsqlDbType.Jsonb)]
         public string Imoveis { get; set; }
     }
 }

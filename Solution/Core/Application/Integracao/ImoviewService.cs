@@ -17,7 +17,7 @@ public class ImoviewService: IDisposable
     private string _chave;
     private readonly IPublishEndpoint _bus;
 
-    public ImoviewService(IHttpClientFactory httpClientFactory, DBcontext context, string chave, IPublishEndpoint bus)
+    public ImoviewService(IHttpClientFactory httpClientFactory, DBcontext context, string chave, IPublishEndpoint? bus = null)
     {
         _httpClientFactory = httpClientFactory;
         _context = context;
@@ -125,14 +125,16 @@ public class ImoviewService: IDisposable
         var integracaoEvent = new IntegracaoEvent() 
         {
             IdIntegracao = integracao.Id,
-            IdCliente = integracao.IdCliente
+            IdCliente = integracao.IdCliente,
+            IdOperador = integracao.IdOperador
         };
         await _bus.Publish(integracaoEvent);
         return integracaoEvent;
     }
 
-    public async Task<object?> ImportarIntegracao(IntegracaoImoview integracao) 
+    public async Task<object?> ImportarIntegracao(IntegracaoEvent integracaoEvent) 
     {
+        var integracaoOld = await _imoviewDAO.GetIntegracao(integracaoEvent.IdCliente);
         // TODO: Verificar se a integracao do cliente ja existe no imoview, atualizar os dados da integracao ou criar se nao existir
         // TODO: Verificar bairros ja existentes no imoview, atualizar os que existem e criar os novos
         // TODO: Verificar se o imovel ja existe no imoview, criar se nao existir

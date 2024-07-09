@@ -15,9 +15,9 @@ namespace JaCaptei.Administrativo.API.Controllers {
         [HttpPost]
         [Route("inserir")]
         [Authorize(Roles = "ADMIN_GOD,ADMIN_GESTOR")]
-        public IActionResult Inserir([FromBody] Admin entity) {
+        public IActionResult Inserir([FromBody] Model.Admin entity) {
 
-            Admin   logado              = ObterAdminAutenticado();
+            Model.Admin   logado              = ObterAdminAutenticado();
             entity.inseridoPorId        = entity.atualizadoPorId      = logado.id;
             entity.inseridoPorNome      = entity.atualizadoPorNome    = logado.nome;
 
@@ -28,7 +28,7 @@ namespace JaCaptei.Administrativo.API.Controllers {
 
         [HttpPost]
         [Route("autenticar")]
-        public async Task<IActionResult> Autenticar([FromBody] Admin entity) {
+        public async Task<IActionResult> Autenticar([FromBody] Model.Admin entity) {
 
             appReturn = service.Autenticar(entity);
 
@@ -51,13 +51,13 @@ namespace JaCaptei.Administrativo.API.Controllers {
         [HttpPost]
         [Route("alterar")]
         [Authorize(Roles = "ADMIN_GOD,ADMIN_GESTOR,ADMIN_PADRAO")]
-        public IActionResult Alterar([FromBody] Admin entity) {
+        public IActionResult Alterar([FromBody] Model.Admin entity) {
             if(entity is null) {
                 appReturn.AddException("Usuário inexistente ou inválido");
                 return Result(appReturn);
             }
 
-            Admin   logado              = ObterAdminAutenticado();
+            Model.Admin   logado              = ObterAdminAutenticado();
             entity.atualizadoPorId      = logado.id;
             entity.atualizadoPorNome    = logado.nome;
 
@@ -72,12 +72,12 @@ namespace JaCaptei.Administrativo.API.Controllers {
         [HttpPost]
         [Route("alterar/disponibilidade")]
         [Authorize(Roles = "ADMIN_GOD,ADMIN_GESTOR")]
-        public IActionResult AlterarDisponibilidade([FromBody] Admin entity) {
+        public IActionResult AlterarDisponibilidade([FromBody] Model.Admin entity) {
             if(entity is null) {
                 appReturn.AddException("Usuário inexistente ou inválido");
                 return Result(appReturn);
             }
-            Admin   logado              = ObterAdminAutenticado();
+            Model.Admin   logado              = ObterAdminAutenticado();
             entity.atualizadoPorId      = logado.id;
             entity.atualizadoPorNome    = logado.nome;
             appReturn = service.AlterarDisponibilidade(entity);
@@ -89,16 +89,16 @@ namespace JaCaptei.Administrativo.API.Controllers {
 
         [HttpPost]
         [Route("senha/solicitar")]
-        public async Task<IActionResult> SolicitarAlterarSenha([FromBody] Admin entity) {
+        public async Task<IActionResult> SolicitarAlterarSenha([FromBody] Model.Admin entity) {
             string msg = "";
-            Admin entityDB = (Admin ) service.ObterPeloDocumentoOuEmail(entity).result;
+            Model.Admin entityDB = (Model.Admin ) service.ObterPeloDocumentoOuEmail(entity).result;
             if(entityDB is not null) {
                 MailAdmin mail    = new MailAdmin();
                 mail.emailTo = entityDB.email;
                 mail.about = "Recuperação de senha";
                 mail.message = "Olá " + entityDB.apelido + ".<br><br>Clique (ou copie e cole no navegador) o link abaixo para alterar sua senha:<br><a href='" + Config.settings.baseURL + "/#/login?t=" + entityDB.token + "' target='_blank' style='color:#0072ff'>" + Config.settings.baseURL + "/#/login?t=" + entityDB.token + "</a>";
                 mail.Send();
-                appReturn.result = new Admin { email = entityDB.email };
+                appReturn.result = new Model.Admin { email = entityDB.email };
             }else
                 appReturn.AddException("Usuário não encontrado");
             return Result(appReturn);
@@ -107,7 +107,7 @@ namespace JaCaptei.Administrativo.API.Controllers {
 
         [HttpPost]
         [Route("senha/alterar")]
-        public IActionResult AlterarSenha([FromBody] Admin entity) {
+        public IActionResult AlterarSenha([FromBody] Model.Admin entity) {
             if(entity is null) {
                 appReturn.AddException("Usuário inexistente ou inválido");
                 return Result(appReturn);

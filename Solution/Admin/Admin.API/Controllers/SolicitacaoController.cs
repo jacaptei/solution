@@ -56,7 +56,7 @@ namespace JaCaptei.Administrativo.API.Controllers {
             entity.atualizadoPorNome    = logado.nome;
             entity.atualizadoPorPerfil  = logado.roles;
 
-            entity.admin = new Admin { id = entity.idAdmin };
+            entity.admin = new Model.Admin { id = entity.idAdmin };
 
             appReturn = service.Alterar(entity);
             return Result(appReturn);
@@ -67,7 +67,7 @@ namespace JaCaptei.Administrativo.API.Controllers {
         [HttpPost]
         [Route("alterar/disponibilidade")]
         [Authorize(Roles = "ADMIN_GOD,ADMIN_GESTOR")]
-        public IActionResult AlterarDisponibilidade([FromBody] Admin entity) {
+        public IActionResult AlterarDisponibilidade([FromBody] Model.Admin entity) {
             if(entity is null) {
                 appReturn.AddException("Usuário inexistente ou inválido");
                 return Result(appReturn);
@@ -94,7 +94,7 @@ namespace JaCaptei.Administrativo.API.Controllers {
         [Route("captar")]
         public IActionResult Captar([FromBody] Solicitacao entity) {
             Usuario logado = ObterUsuarioAutenticado();
-            entity.admin        = new Admin();
+            entity.admin        = new Model.Admin();
             entity.admin.id     = entity.idAdmin = logado.id;
             entity.admin.nome   = logado.nome;
             appReturn = service.Captar(entity);
@@ -106,8 +106,8 @@ namespace JaCaptei.Administrativo.API.Controllers {
         [HttpPost]
         [Route("cancelar")]
         public IActionResult Cancelar([FromBody] Solicitacao entity) {
-            Admin logado        = ObterAdminAutenticado();
-            entity.admin        = new Admin();
+            Model.Admin logado        = ObterAdminAutenticado();
+            entity.admin        = new Model.Admin();
             entity.admin.id     = entity.idAdmin = logado.id;
             entity.admin.nome   = logado.nome;
             appReturn = service.Cancelar(entity);
@@ -155,8 +155,8 @@ namespace JaCaptei.Administrativo.API.Controllers {
         [HttpPost]
         [Route("finalizar")]
         public IActionResult Finalizar([FromBody] Solicitacao entity) {
-            Admin logado        = ObterAdminAutenticado();
-            entity.admin        = new Admin();
+            Model.Admin logado        = ObterAdminAutenticado();
+            entity.admin        = new Model.Admin();
             entity.admin.id     = entity.idAdmin = logado.id;
             entity.admin.nome   = logado.nome;
             appReturn = service.Finalizar(entity);
@@ -170,7 +170,7 @@ namespace JaCaptei.Administrativo.API.Controllers {
         [Route("buscar")]
         public IActionResult Buscar([FromBody] Solicitacao entity) {
 
-            Admin logado = ObterAdminAutenticado();
+            Model.Admin logado = ObterAdminAutenticado();
             if(!logado.gestor)
                 entity.idAdmin = logado.id;
 
@@ -187,7 +187,7 @@ namespace JaCaptei.Administrativo.API.Controllers {
 
             busca.item = JsonConvert.DeserializeObject<Solicitacao>(busca.item.ToString());
 
-            Admin logado = ObterAdminAutenticado();
+            Model.Admin logado = ObterAdminAutenticado();
             if(!logado.gestor)
                 busca.item.idAdmin = logado.id;
 
@@ -214,7 +214,7 @@ namespace JaCaptei.Administrativo.API.Controllers {
         [Route("obter/todos/admin/{id:int}")]
         public IActionResult ObterTodosAdmin(int id) {
 
-            Admin logado = ObterAdminAutenticado();
+            Model.Admin logado = ObterAdminAutenticado();
             if(logado.god || logado.gestor)
                 logado.id = id;
 

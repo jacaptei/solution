@@ -18,7 +18,7 @@ namespace JaCaptei.Administrativo.API.Controllers {
         [Route("[action]")]
         public IActionResult Adicionar([FromBody] Proprietario entity) {
 
-            Admin logado                = ObterAdminAutenticado();
+            Model.Admin logado                = ObterAdminAutenticado();
             entity.inseridoPorId        = entity.atualizadoPorId      = logado.id;
             entity.inseridoPorNome      = entity.atualizadoPorNome    = logado.nome;
 
@@ -35,7 +35,7 @@ namespace JaCaptei.Administrativo.API.Controllers {
                 return Result(appReturn);
             }
 
-            Admin logado                = ObterAdminAutenticado();
+            Model.Admin logado                = ObterAdminAutenticado();
             entity.atualizadoPorId      = logado.id;
             entity.atualizadoPorNome    = logado.nome;
 

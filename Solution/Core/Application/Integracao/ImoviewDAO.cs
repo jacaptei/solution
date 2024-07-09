@@ -24,7 +24,13 @@ public class ImoviewDAO: IDisposable {
 
     public async Task<bool> SaveIntegracao(IntegracaoImoview integracao)
     {
-        await _conn.InsertAsync(integracao);
+        if(integracao.Id > 0)
+        {
+            var fields = Field.Parse<IntegracaoImoview>(e => new { e.Status, e.DataAtualizacao, e.Bairros });
+            await _conn.UpdateAsync<IntegracaoImoview>(integracao, fields);
+        }
+        else
+            await _conn.InsertAsync<IntegracaoImoview>(integracao);
         return true;
     }
 }

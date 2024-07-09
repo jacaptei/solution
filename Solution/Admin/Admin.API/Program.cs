@@ -170,7 +170,5 @@ app.MapControllerRoute(name: "default",pattern: "{controller=Home}/{action=Index
 
 //app.MapDefaultControllerRoute();
 //app.UseEndpoints(endpoints =>{    endpoints.MapControllerRoute(        name: "default",        pattern: "{controller=home}/{action=index}");});
-
-
 app.Run();
 

@@ -76,11 +76,11 @@ namespace JaCaptei.Administrativo.API.Controllers {
         }
 
 
-        public Admin ObterAdminAutenticado() {
-            return ObterAdminAutenticado(new Admin());
+        public Model.Admin ObterAdminAutenticado() {
+            return ObterAdminAutenticado(new Model.Admin());
         }
 
-        public Admin ObterAdminAutenticado(Admin usuario) {
+        public Model.Admin ObterAdminAutenticado(Model.Admin usuario) {
             if (HttpContext.User is not null && HttpContext.User?.FindFirst("_id") is not null){
                 usuario.id               = int.Parse(HttpContext.User.FindFirst("_id").Value);
                 usuario.idTipoUsuario    = int.Parse(HttpContext.User.FindFirst("_idTipoUsuario").Value);
