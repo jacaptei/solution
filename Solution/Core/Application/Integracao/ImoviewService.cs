@@ -9,7 +9,7 @@ using System.Net.Http.Headers;
 
 namespace JaCaptei.Application.Integracao;
 
-public class ImoviewService: IDisposable
+public class ImoviewService : IDisposable
 {
     private readonly IHttpClientFactory _httpClientFactory;
     private readonly DBcontext _context;
@@ -113,7 +113,7 @@ public class ImoviewService: IDisposable
     public async Task<object?> IntegrarCliente(IntegracaoImoview integracao)
     {
         var integracaoOld = await _imoviewDAO.GetIntegracao(integracao.IdCliente);
-        if (integracaoOld!= null) {
+        if (integracaoOld != null) {
             integracao.Id = integracaoOld.Id;
             integracao.DataAtualizacao = DateTime.UtcNow;
             integracao.Status = StatusIntegracao.Aguardando.GetDescription();
@@ -122,7 +122,7 @@ public class ImoviewService: IDisposable
             integracao.Status = StatusIntegracao.Aguardando.GetDescription();
         }
         await _imoviewDAO.SaveIntegracao(integracao);
-        var integracaoEvent = new IntegracaoEvent() 
+        var integracaoEvent = new IntegracaoEvent()
         {
             IdIntegracao = integracao.Id,
             IdCliente = integracao.IdCliente,
@@ -132,11 +132,75 @@ public class ImoviewService: IDisposable
         return integracaoEvent;
     }
 
-    public async Task<object?> ImportarIntegracao(IntegracaoEvent integracaoEvent) 
+    public async Task<object?> ImportarIntegracao(IntegracaoEvent integracaoEvent)
     {
-        var integracaoOld = await _imoviewDAO.GetIntegracao(integracaoEvent.IdCliente);
-        // TODO: Verificar se a integracao do cliente ja existe no imoview, atualizar os dados da integracao ou criar se nao existir
+        var integracao = await _imoviewDAO.GetIntegracao(integracaoEvent.IdCliente);
+        if (integracao == null) return null; // Integração deve estar cadastrada
+        if (integracao.Status != StatusIntegracao.Aguardando.GetDescription() 
+            || integracao.Status != StatusIntegracao.Concluido.GetDescription()) 
+            return null; // Importação só pode ocorrer em status inicial ou final
+        // Atualiza o status                                                                             
+        integracao.DataAtualizacao = DateTime.UtcNow;
+        integracao.Status = StatusIntegracao.Processando.GetDescription();
+        await _imoviewDAO.SaveIntegracao(integracao);
         // TODO: Verificar bairros ja existentes no imoview, atualizar os que existem e criar os novos
+        var bairros = Newtonsoft.Json.JsonConvert.DeserializeObject<List<BairroDTO>>(integracao.Bairros);
+        List<IntegracaoBairroImoview> bairrosIntegrados = await _imoviewDAO.GetIntegracaoBairros(integracao.Id);
+        foreach (var bairro in bairros)
+        {
+            var bairroIntegrado = bairrosIntegrados?.FirstOrDefault(b => b.Id == bairro.Id);
+            if (bairroIntegrado == null)
+            {
+                bairroIntegrado = new IntegracaoBairroImoview()
+                {
+                    Id = 0,
+                    IdIntegracao = integracao.Id,
+                    DataInclusao = DateTime.UtcNow,
+                    IdOperador = integracaoEvent.IdOperador,
+                    IdPlano = integracao.IdPlano.Value,
+                    IdBairro = bairro.Id,
+                    IdCidade = bairro.IdCidade,
+                    Status = StatusIntegracao.Processando.GetDescription(),
+                    Bairro = Newtonsoft.Json.JsonConvert.SerializeObject(bairro)
+                };
+            }
+            else
+            {
+                bairroIntegrado.Status = StatusIntegracao.Processando.GetDescription();
+                bairroIntegrado.DataAtualizacao = DateTime.UtcNow;
+            }
+            await _imoviewDAO.SaveIntegracaoBairro(bairroIntegrado);
+        }
+        bairrosIntegrados = await _imoviewDAO.GetIntegracaoBairros(integracao.Id); // rebind
+        // iniciar controles de importação
+        List<ImportacaoBairroImoview> importacaoBairros = [];
+        foreach (var bairroIntegrado in bairrosIntegrados)
+        {
+            List<ImportacaoBairroImoview> importacoesBairro = await _imoviewDAO.ImportacaoBairros(bairroIntegrado.Id) ?? [];
+            if (importacoesBairro.Count > 0)
+            {
+                // TODO: buscar os imoveis ja importados
+                // TODO: buscar imoveis do bairro
+                // TODO: comparar as listas, caso haja, gerar nova importacao de bairro incluir os imoveis q ainda não foram importado
+            }
+            else
+            {
+                // TODO: buscar imoveis do bairro
+                List<ImovelMapped> imoveis = [];
+                // TODO: gravar importação do bairro
+                var importacaoBairro = new ImportacaoBairroImoview()
+                {
+                    Id = 0,
+                    IdIntegracaoBairro = bairroIntegrado.Id,
+                    IdOperador = integracaoEvent.IdOperador,
+                    IdPlano = integracao.IdPlano.Value,
+                    Status = StatusIntegracao.Aguardando.GetDescription(),
+                    Imoveis = Newtonsoft.Json.JsonConvert.SerializeObject(imoveis.Select(i => new { i.Id, i.IdCRM }))
+                };
+                await _imoviewDAO.SaveImportacaoBairro(importacaoBairro);
+            }
+            importacaoBairros.AddRange(importacoesBairro);
+        }
         // TODO: Verificar se o imovel ja existe no imoview, criar se nao existir
         // TODO: Iniciar a importacao dos imoveis - API Imoview
         // TODO: Atualizar o status da integracao do cliente (integracao, bairros, imovel)

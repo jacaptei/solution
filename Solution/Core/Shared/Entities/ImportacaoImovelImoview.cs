@@ -11,8 +11,8 @@ public class ImportacaoImovelImoview
     [Map("id")]
     public int Id { get; set; }
 
-    [Map("idHistorico")]
-    public int IdHistorico { get; set; }
+    [Map("idImportacaoBairro")]
+    public int IdImportacaoBairro { get; set; }
 
     [Map("idImovel")]
     public int IdImovel { get; set; }

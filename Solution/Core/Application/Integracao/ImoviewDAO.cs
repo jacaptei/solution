@@ -33,4 +33,34 @@ public class ImoviewDAO: IDisposable {
             await _conn.InsertAsync<IntegracaoImoview>(integracao);
         return true;
     }
+
+    public async Task<List<IntegracaoBairroImoview>> GetIntegracaoBairros(int idIntegracao)
+    {
+        var res = await _conn.QueryAsync<IntegracaoBairroImoview>(i => i.IdIntegracao == idIntegracao);
+        return res.ToList();
+    }
+
+    internal async Task<bool> SaveIntegracaoBairro(IntegracaoBairroImoview bairroIntegrado)
+    {
+        if (bairroIntegrado.Id > 0)
+        {
+            var fields = Field.Parse<IntegracaoBairroImoview>(e => new { e.Status, e.DataAtualizacao });
+            await _conn.UpdateAsync<IntegracaoBairroImoview>(bairroIntegrado, fields);
+        }
+        else
+            await _conn.InsertAsync<IntegracaoBairroImoview>(bairroIntegrado);
+        return true;
+    }
+
+    internal async Task<List<ImportacaoBairroImoview>> ImportacaoBairros(int idIntegracaoBairro)
+    {
+        var res = await _conn.QueryAsync<ImportacaoBairroImoview>(i => i.IdIntegracaoBairro == idIntegracaoBairro);
+        return res.ToList();
+    }
+
+    internal async Task<bool> SaveImportacaoBairro(ImportacaoBairroImoview importacaoBairro)
+    {
+        await _conn.InsertAsync<ImportacaoBairroImoview>(importacaoBairro);
+        return true;
+    }
 }

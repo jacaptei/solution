@@ -12,8 +12,8 @@ public class IntegracaoBairroImoview
     [Map("id")]
     public int Id { get; set; }
 
-    [Map("idImportacao")]
-    public int IdImportacao { get; set; }
+    [Map("idIntegracao")]
+    public int IdIntegracao { get; set; }
 
     [Map("idOperador")]
     public int IdOperador { get; set; }
@@ -27,6 +27,7 @@ public class IntegracaoBairroImoview
     [Map("idPlano")]
     public int IdPlano { get; set; }
 
+    [Map("status")]
     public string Status { get; set; }
 
     [Map("bairro")]
