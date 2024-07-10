@@ -61,6 +61,7 @@ $(document).ready(function () {
                     zoom            : 1,
                     isAuth          : false,
                     showLoginModal  : false,
+                    showTermsAndPolicyModal: false,
                     autoLogin       : false,
                     rememberMe      : false,
                     //test            : "root context ok",
@@ -291,6 +292,10 @@ $(document).ready(function () {
 				    this.$root.showLoginModal	    =	true;
                 },
 
+                OpenLoginTermsAndPolicyModal(){
+				    this.$root.showTermsAndPolicyModal = true;
+                },
+
 
                 /*
                async  SetUp(){
@@ -401,6 +406,12 @@ $(document).ready(function () {
                 // AUTH --------------------------------
                 SignIn(){
                     this.isAuth = true;
+                    this.usuario.aceitouTermos = false;
+                    this.usuario.aceitouPoliticaPrivacidade = false;
+                    if (this.usuario.aceitouPoliticaPrivacidade === false && this.usuario.aceitouTermos === false) {
+                        this.OpenLoginTermsAndPolicyModal();
+                        console.log(this.usuario.aceitouTermos, this.usuario.aceitouPoliticaPrivacidade);
+                    }
                     //this.$sdata.Storage.Set("utk"    , this.usuario.token);
                     //this.$sdata.Storage.Set("usuario", this.usuario);
 					//this.RouteTo("/home");
@@ -583,7 +594,8 @@ $(document).ready(function () {
 
 	// --------- GLOBAL COMPONENTS
 	App.component("c-loading"           , c_loading             );
-	App.component("c-header-login"      , c_header_login        );
+    App.component("c-header-login"      , c_header_login        );
+    App.component("c-policy-terms"      , c_policy_terms        );
 	App.component("c-header"            , c_header              );
 	App.component("c-title"             , c_title               );
 	App.component("c-search-form"       , c_search_form         );
