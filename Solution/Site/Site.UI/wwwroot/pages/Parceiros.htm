@@ -20,8 +20,8 @@
                     <br />exclusivos.-->
             <!--<br /><span style="font-size:14px">[Texto resumido sobre os benefícios para parceiros]</span>-->
             <!--</div>
-            </div>
-        </div>-->
+                </div>
+            </div>-->
             <div style="cursor:pointer" @click="ScrollTo('planos')">
                 <div class="banner" style="background:url('resources/images/pages/banners/banner_mensalidade.jpg';background-size:cover;"></div>
             </div>
@@ -88,39 +88,47 @@
 
 
 
-        <div v-if="$root.usuario.idConta < 2" class="q-pa-md row items-start q-gutter-md" id="planos" style="margin-top:40px;text-align:center;width:100%;cursor:pointer;margin: auto; ">
+            <div v-if="$root.usuario.idConta < 2" class="q-pa-md row items-start q-gutter-md" id="planos" style="margin-top:40px;text-align:center;width:100%;cursor:pointer;margin: auto; ">
 
-            <div class="row"  style="margin:auto">
-                <div class="col-12">
-                        <div class="row" style="margin-left:25px;margin-bottom:20px">
-                            <div class="col-4 sm-hide xs-hide" style="max-width:290px"  ><q-btn label="PLANO PARA CORRETORES"   color="primary"     rounded @click="SelecionarPlano(2)" style="width:100%;font-size: 16px;padding:10px"></q-btn></div>
-                            <div class="col-8 sm-hide xs-hide" style="padding-left:50px"><q-btn label="PLANO PARA IMOBILIÁRIAS" color="secondary"   rounded @click="SelecionarPlano(3)" style="width:100%;font-size: 16px;padding:10px"></q-btn></div>
+                <div class="row" style="margin:auto">
+                    <div class="col-12">
+                        <div class="row" style="display: flex; flex-wrap: wrap; justify-content: space-between; margin-left: 15px; margin-bottom: 20px ">
+                            <div class="col-4 sm-hide xs-hide" style="width: 32%"><q-btn label="PLANO PARA CORRETORES" color="primary" rounded @click="SelecionarPlano(2)" style="width:100%;font-size: 16px;"></q-btn></div>
+                            <div class="col-9 sm-hide xs-hide" style="width: 67%"><q-btn label="PLANO PARA IMOBILIÁRIAS" color="secondary" rounded @click="SelecionarPlano(3)" style="width:100%;font-size: 16px;"></q-btn></div>
                         </div>
 
-                        <div class="row">
-                            <div class="col-4 " style="width:340px"><img src="../resources/images/plano1.jpg" @click="SelecionarPlano(2)" /></div>
-                            <div class="col-4 " style="width:340px"><img src="../resources/images/plano2.jpg" @click="SelecionarPlano(3)" /></div>
-                            <div class="col-4 " style="width:340px"><img src="../resources/images/plano3.jpg" @click="SelecionarPlano(4)" /></div>
+                        <div class="row" style="display: flex; flex-wrap: wrap; justify-content: space-between;">
+                            <el-col :span="8" style="display: flex; justify-content: center; margin-bottom: 20px;">
+                                <el-image src="../resources/images/plano_basic.png" @click="SelecionarPlano(2)" fit="contain"
+                                          style="width: 100%; height: 580px;" />
+                            </el-col>
+                            <el-col :span="8" style="display: flex; justify-content: center; margin-bottom: 20px;">
+                                <el-image src="../resources/images/plano_pro.png" @click="SelecionarPlano(3)" fit="contain"
+                                          style="width: 100%; height: 580px;" />
+                            </el-col>
+                            <el-col :span="8" style="display: flex; justify-content: center; margin-bottom: 20px;">
+                                <el-image src="../resources/images/plano_advanced.png" @click="SelecionarPlano(4)" fit="contain"
+                                          style="width: 100%; height: 580px;" />
+                            </el-col>
                         </div>
 
+                    </div>
                 </div>
+
+
+
+
+
+                <div class="q-pa-md row items-start q-gutter-md" style="margin-top:0px;text-align:center;width:100%;display:block">
+                    <c-cadastro-parceiro></c-cadastro-parceiro>
+                </div>
+
+
+
             </div>
-        </div>
-
-
-
-
-
-            <div class="q-pa-md row items-start q-gutter-md" style="margin-top:0px;text-align:center;width:100%;display:block">
-                <c-cadastro-parceiro></c-cadastro-parceiro>
-            </div>
-
 
 
         </div>
-
-
-    </div>
 
 
 </template>
@@ -137,7 +145,7 @@
 
         data: function () {
             return {
-                manutencao:false
+                manutencao: false
             }
         }, computed: {
 
@@ -150,19 +158,19 @@
             //"pct":function(){ this.updateLabels(); }
         },
         created: function () {
-            
-          
+
+
         },
         mounted() {
-           // window.setTimeout(() => {
-              //this.$root.RouteTo("/admin/user/home");
+            // window.setTimeout(() => {
+            //this.$root.RouteTo("/admin/user/home");
             //}, 400);
 
         },
         methods: {
 
 
-            SelecionarPlano(idPlano){
+            SelecionarPlano(idPlano) {
                 this.$root.usuario.idPlano = idPlano;
                 this.ScrollTo('form');
             },
@@ -193,7 +201,7 @@
             },
 
 
-            ScrollTo(id){
+            ScrollTo(id) {
                 this.$tools.ScrollTo(id);
             }
 
@@ -217,13 +225,12 @@
 
 <style scoped>
 
-.content-schedules{
-    max-width: 1240px;
-    margin-left: auto;
-    margin-right: auto;
-    text-align: justify;
-}
-
+    .content-schedules {
+        max-width: 1240px;
+        margin-left: auto;
+        margin-right: auto;
+        text-align: justify;
+    }
 </style>
 
 
