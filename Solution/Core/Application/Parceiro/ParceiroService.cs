@@ -37,7 +37,12 @@ namespace JaCaptei.Application{
             return appReturn;
 
         }
-        
+
+        public AppReturn AceitarTermos(int id)
+        {
+            appReturn = DAO.AceitarTermos(id);
+            return appReturn;
+        }
 
         public AppReturn ObterPeloToken(string token){
 
