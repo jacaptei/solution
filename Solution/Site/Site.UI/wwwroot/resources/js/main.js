@@ -406,11 +406,8 @@ $(document).ready(function () {
                 // AUTH --------------------------------
                 SignIn(){
                     this.isAuth = true;
-                    this.usuario.aceitouTermos = false;
-                    this.usuario.aceitouPoliticaPrivacidade = false;
                     if (this.usuario.aceitouPoliticaPrivacidade === false && this.usuario.aceitouTermos === false) {
                         this.OpenLoginTermsAndPolicyModal();
-                        console.log(this.usuario.aceitouTermos, this.usuario.aceitouPoliticaPrivacidade);
                     }
                     //this.$sdata.Storage.Set("utk"    , this.usuario.token);
                     //this.$sdata.Storage.Set("usuario", this.usuario);
