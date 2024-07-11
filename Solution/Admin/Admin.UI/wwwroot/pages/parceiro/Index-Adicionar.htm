@@ -545,11 +545,14 @@
                             this.$tools.AlertNotes(request.data);
                         }
                     }).catch((error) => {
+                        this.OpenLoadingService(false);
                         this.ShowView("form");
                         c2("error.response.data", error.response.data)
                         if (error.response) {
+                            this.OpenLoadingService(false);
                             this.$tools.AlertNotes(error.response.data);
                         } else
+                            this.OpenLoadingService(false);
                             this.$tools.Alert("Não foi possível atender a requisição");
                     }).finally(() => {
 
