@@ -1,5 +1,6 @@
 ﻿<template>
-    <div>
+    <div v-loading.fullscreen.lock="fullscreenLoading"
+         element-loading-background="rgba(12, 8, 8, 0.56)">
         <el-row :gutter="20">
             <el-col :span="24" class="register-input">
                 <div>SELECIONE O PLANO</div>
@@ -231,6 +232,7 @@
         data: function () {
             return {
                 onRequest: false,
+                fullscreenLoading: false,
                 view: "form",
                 viewLast: "form",
                 messageSuccess: "Cadastrado!",
@@ -294,6 +296,10 @@
                     this.parceiro.cpf = "";
 
                 window.setTimeout(() => this.$refs.documento.focus(), 300);
+            },
+
+            OpenLoadingService(status) {
+                this.fullscreenLoading = status;
             },
 
             MudarConta() {
@@ -522,6 +528,7 @@
                 if (msg.length > 0) {
                     this.$tools.Alert(msg);
                 } else {
+                    this.OpenLoadingService(true);
                     this.parceiro.AnoNascimento = this.AnoNascimento;
                     this.parceiro.MesNascimento = this.MesNascimento;
                     this.parceiro.DiaNascimento = this.DiaNascimento;
@@ -530,6 +537,7 @@
 
                     axios.post(this.$api.BuildURL("parceiro/adicionar"), this.parceiro).then((request) => {
                         if (request.data.status.success) {
+                            this.OpenLoadingService(false);
                             this.$tools.AlertSuccess("Cadastro efetuado");
                             this.$sdata = this.$models.usuario();
                         } else {
