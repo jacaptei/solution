@@ -1,6 +1,8 @@
 ﻿<template>
-    <div>
-        <el-dialog v-model="$root.showTermsAndPolicyModal" @close="handleClose" style="margin-top: 23px; margin-bottom: 23px" width="80%" :show-close="false" :close-on-click-modal="false">
+    <div class="dialog-container"
+         v-loading.fullscreen.lock="fullscreenLoading"
+         element-loading-background="rgba(12, 8, 8, 0.56)">
+        <el-dialog v-model="$root.showTermsAndPolicyModal" style="margin-top: 70px; margin-bottom: 23px" width="80%" :show-close="false" :close-on-click-modal="false">
             <div>
                 <el-row :gutter="20" style="margin-bottom: 20px;">
                     <el-col :md="24" style="text-align: center;">
@@ -20,9 +22,9 @@
                     </div>
                     <el-row :gutter="20" style="margin-top:15px">
                         <el-col :xs="24" :sm="18" class="margin-bottom">
-                                <el-checkbox v-model="$root.usuario.aceitouTermos">
-                                    Aceito os termos e condições de uso
-                                </el-checkbox>
+                            <el-checkbox v-model="$root.usuario.aceitouTermos">
+                                Aceito os termos e condições de uso
+                            </el-checkbox>
                         </el-col>
 
                         <el-col :xs="24" :sm="6" style="width:100%">
@@ -51,7 +53,8 @@
                         </el-col>
 
                         <el-col :xs="24" :sm="6" style="width:100%">
-                            <el-button type="primary"
+                            <el-button v-loading.fullscreen.lock="fullscreenLoading"
+                                       type="primary"
                                        :disabled="!$root.usuario.aceitouTermos || !$root.usuario.aceitouPoliticaPrivacidade"
                                        @click="confirmar"
                                        style="width:100%"> Confirmar </el-button>
@@ -61,26 +64,45 @@
             </div>
         </el-dialog>
     </div>
-</template>
+    </template>
 
 <script>
+    import { ref } from 'vue'
+
     module.exports = {
         data() {
             return {
                 pdfUrlPoliticaPrivacidade: "../files/JaCaptei_Politica_Privacidade.pdf",
                 pdfUrlTermosDeUso: "../files/JaCaptei_Termos_de_Uso.pdf",
                 viewActive: "termos-de-uso",
+                fullscreenLoading: false,
             };
         },
         methods: {
             changeView(view) {
                 this.viewActive = view;
             },
+            openLoadingService() {
+                this.fullscreenLoading = true;
+            },
             confirmar() {
                 if (this.$root.usuario.aceitouTermos && this.$root.usuario.aceitouPoliticaPrivacidade) {
-                    this.$root.showTermsAndPolicyModal = false; // Fecha o modal
+                    this.openLoadingService();
+                    var url = this.$api.BuildURL("parceiro/termos/aceitar");
+                    axios.get(url).then((request) => {
+                        if (request.data) {
+                            this.fullscreenLoading = false;
+                            this.$message({
+                                type: 'sucess',
+                                message: 'Procedimento Realizado com Sucesso!'
+                            });
+                            this.$root.showTermsAndPolicyModal = false;
+                        }
+                    }).catch((error) => {
+                        this.changeView('termos-de-uso');
+                        console.warn("error.response.data", error.response.data);
+                    })
                 } else {
-                    // Caso contrário, exibe uma mensagem de erro ou aviso
                     this.$message({
                         type: 'warning',
                         message: 'Você deve aceitar os termos de uso e a política de privacidade antes de continuar.'
@@ -91,17 +113,7 @@
                 if (this.$root.usuario.aceitouTermos) {
                     this.changeView('politicas-e-privacidade');
                 }
-            },
-            handleClose(done) {
-                if (this.$root.usuario.aceitouTermos && this.$root.usuario.aceitouPoliticaPrivacidade) {
-                    done(); // Permite o fechamento do modal
-                } else {
-                    this.$message({
-                        type: 'warning',
-                        message: 'Você deve aceitar os termos de uso e a política de privacidade antes de continuar.'
-                    });
-                }
-            },
+            }
         },
     };
 </script>
@@ -127,4 +139,12 @@
         font-size: 14px;
         color: var(--s-accent-color);
     }
+
+    .dialog-container {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        height: 100%;
+    }
+
 </style>
