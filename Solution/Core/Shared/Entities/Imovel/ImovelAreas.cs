@@ -23,7 +23,7 @@ namespace JaCaptei.Model {
             public double   confrontacaoFundo           {get;set;}
             public double   confrontacaoDireito         {get;set;}
             public double   confrontacaoEsquerdo        {get;set;}
-            public double   zona                        {get;set;}
+            public double   zonaUso                     {get;set;}
             public double   coeficienteAproveitamento   {get;set;}
             public double   minima                      {get;set;}
             public double   maxima                      {get;set;}

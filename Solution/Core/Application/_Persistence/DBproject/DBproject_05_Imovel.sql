@@ -72,15 +72,16 @@ CREATE	TABLE "Imovel"(
 
 	id      					    SERIAL 				NOT NULL,
 	cod				 	            VARCHAR(20)		    DEFAULT '',
-	"idCRM"				 	        VARCHAR(20)		    UNIQUE NOT NULL,
-	"codCRM"		 	            VARCHAR(20)		    UNIQUE NOT NULL,
+	"idCRM"				 	        VARCHAR(20)		    DEFAULT '',
+	"codCRM"		 	            VARCHAR(20)		    DEFAULT '',
 	"idChaves"		 	            VARCHAR(20)		    DEFAULT '',
 	"localChaves"	 	            VARCHAR(80)		    DEFAULT '',
     "totalChaves"	 	            SMALLINT            DEFAULT 0,
     index			 	            SMALLINT            DEFAULT 0,
 
-
 	"idAdmin"				        INTEGER,
+	"idAdminCaptador"		        INTEGER,
+	captador			 	        VARCHAR(40)		    DEFAULT '',
 	"idProprietario"			    INTEGER,
     exclusivo          			    BOOLEAN             DEFAULT FALSE,
 	"idTipo"			 	        SMALLINT            DEFAULT 1,
@@ -121,10 +122,10 @@ CREATE	TABLE "Imovel"(
 	status							VARCHAR(40)			DEFAULT 'ATIVO' ,
 	ativo	                    	BOOLEAN			    DEFAULT FALSE,
 	"ativoCRM"                   	BOOLEAN			    DEFAULT FALSE,
+	"possuiImagens"                 BOOLEAN			    DEFAULT FALSE,
 	
 	token 						 	VARCHAR(200)		UNIQUE NOT NULL,
 	"tokenNum"						BIGINT				UNIQUE NOT NULL,
-	"tokenUID"						VARCHAR(600)		,
 	
 	obs     						VARCHAR(1200)		,
 
@@ -135,7 +136,7 @@ CREATE	TABLE "Imovel"(
 	origem   			            VARCHAR(40) 		DEFAULT 'JACAPTEI_ADMIN',
 	"origemImagens"   			    VARCHAR(40) 		DEFAULT 'IMAGESHACK',
 
-    "codCarga" 	                    VARCHAR(20)         DEFAULT '',
+    "carga" 	                    VARCHAR(20)         DEFAULT '',
 	
 	"dataAtualizacao"				TIMESTAMP WITHOUT TIME ZONE			,
 	data 							TIMESTAMP WITHOUT TIME ZONE		DEFAULT CURRENT_TIMESTAMP 
@@ -152,6 +153,7 @@ CREATE	TABLE "ImovelImagem"(
 	"idImovel"			 	        INTEGER             ,
 	cod				 	            VARCHAR(40)		    DEFAULT '',
 	arquivo     		 	        VARCHAR(120)        DEFAULT '',
+	"arquivoOriginal" 	            VARCHAR(120)        DEFAULT '',
 	nome				 	        VARCHAR(120)        DEFAULT '',
 	tipo				 	        VARCHAR(10)		    DEFAULT '',
     "contentType"                   VARCHAR(40)         ,
@@ -160,6 +162,7 @@ CREATE	TABLE "ImovelImagem"(
 	width			 	            SMALLINT            DEFAULT 0,
 	height			 	            SMALLINT            DEFAULT 0,
 	size			 	            INTEGER             DEFAULT 0,
+	version			 	            INTEGER             DEFAULT 0,
     base64                          TEXT                ,
 
  	principal                     	BOOLEAN			    DEFAULT FALSE,
@@ -201,6 +204,7 @@ CREATE	TABLE "ImovelEndereco"(
 	bloco             	            VARCHAR(24)			DEFAULT '',
 	andar          	                VARCHAR(40)			DEFAULT '',
 	unidade                         VARCHAR(40)		    DEFAULT '',
+	"complementoTipo"               VARCHAR(40)		    DEFAULT '',
 	complemento                     VARCHAR(200)		DEFAULT '',
 	referencia                      VARCHAR(220)		DEFAULT '',	
 	acesso                          VARCHAR(220)		DEFAULT '',	
@@ -214,9 +218,9 @@ CREATE	TABLE "ImovelEndereco"(
 	pais                            VARCHAR(40) 		DEFAULT  'BRASIL',
 	"paisNorm"     	                VARCHAR(40)			DEFAULT  'BRASIL',
 
-    "idEstado"                      SMALLINT            DEFAULT 0, 
-    "idCidade"                      SMALLINT            DEFAULT 0, 
-    "idBairro"                      SMALLINT            DEFAULT 0
+    "idEstado"                      INTEGER             DEFAULT 0, 
+    "idCidade"                      INTEGER             DEFAULT 0, 
+    "idBairro"                      INTEGER             DEFAULT 0
 
 );
 ALTER TABLE "ImovelEndereco"	ADD CONSTRAINT pk_ImovelEndereco  		        PRIMARY KEY (id);
@@ -319,6 +323,7 @@ CREATE	TABLE "ImovelValores"(
     consulta            REAL DEFAULT 0,
     "iptuMensal"        REAL DEFAULT 0,
     "iptuAnual"         REAL DEFAULT 0,
+    "iptuIndice"        REAL DEFAULT 0,
     comissao            REAL DEFAULT 0, -- %
 	rentabilidade       REAL DEFAULT 0, -- %
     maximo              REAL DEFAULT 0,
@@ -347,7 +352,7 @@ CREATE	TABLE "ImovelAreas"(
     "confrontacaoFundo"         REAL DEFAULT 0,
     "confrontacaoDireito"       REAL DEFAULT 0,
     "confrontacaoEsquerdo"      REAL DEFAULT 0,
-    zona                        REAL DEFAULT 0,
+    "zonaUso"                   REAL DEFAULT 0,
     "coeficienteAproveitamento" REAL DEFAULT 0,
     minima                      REAL DEFAULT 0,
     maxima                      REAL DEFAULT 0,
@@ -415,6 +420,7 @@ CREATE	TABLE "ImovelDocumentacao"(
     "cartorioFolha"         VARCHAR(40)			DEFAULT '',
     "cartorioLivro"         VARCHAR(40)			DEFAULT '',
     matricula               VARCHAR(40)			DEFAULT '',
+    "indiceCadastral"       VARCHAR(40)			DEFAULT '',
     "vencimentoVenda"       VARCHAR(40)			DEFAULT ''
     --"vencimentoVenda"       TIMESTAMP WITHOUT TIME ZONE 
 

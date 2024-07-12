@@ -101,11 +101,10 @@ namespace JaCaptei.Application {
                 entity.externo.elevador         = (entity.externo.totalElevadores   > 0);
                 entity.externo.vaga             = (entity.externo.totalVagas        > 0);
                 entity.idAdmin                  = entity.admin.id;
-                entity.idProprietario           = entity.proprietario.id;
+                entity.idProprietario           = (entity.proprietario.id > 0)? entity.proprietario.id : entity.idProprietario;
 
                 entity.token                    =   Utils.Key.CreateToken();
                 entity.tokenNum                 =   Utils.Key.CreateTokenNum();
-                entity.tokenUID                 =   Utils.Key.CreateTokenUID();
                 entity.ativo                    =   entity.ativoCRM = true;
 
                 //entity.data            =   entity.dataAtualizacao = Utils.Date.GetLocalDateTime();

@@ -12,8 +12,9 @@ namespace JaCaptei.Model {
             public double           valorMaximo         {get;set;} = 0d;
             public double           areaMinima          {get;set;} = 0d;
             public double           areaMaxima          {get;set;} = 0d;
+            public string           cepBase             {get;set;} = "";
 
-            public Imovel           imovelMigrado       {get;set;} = new Imovel();
+            public Imovel           imovelJC            {get;set;} = new Imovel();
             public ImovelCRM        imovel              {get;set;} = new ImovelCRM();
             public BuscaRetorno     result              {get;set;} = new BuscaRetorno();
             public dynamic          crmResult           {get;set;}
@@ -34,6 +35,8 @@ namespace JaCaptei.Model {
         
             public string           filter          { get; set; }
 
+            public string           limit           { get => ((page <= 0) ? "" : ("LIMIT " + resultsPerPage + " OFFSET "+ offset)); }
+
             public Usuario          usuario         { get; set; } = new Usuario();
 
     }
@@ -41,7 +44,7 @@ namespace JaCaptei.Model {
 
     public class BuscaRetorno{
             public int              totalResults        {get;set;} = 0;
-            public List<Imovel>     imoveisMigrados     {get;set;} = new List<Imovel>();
+            public List<Imovel>     imoveisJC           {get;set;} = new List<Imovel>();
             public List<ImovelCRM>  imoveis             {get;set;} = new List<ImovelCRM>();
             public List<CrmImage>   imagens             {get;set;} = new List<CrmImage>();
             public string           imagensJson         {get;set;} = "";

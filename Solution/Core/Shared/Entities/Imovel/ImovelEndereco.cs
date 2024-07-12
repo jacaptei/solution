@@ -21,6 +21,7 @@ namespace JaCaptei.Model {
 	        public string       bloco                   {get;set;} = "";
 	        public string       andar             	    {get;set;} = "";
 	        public string       unidade                 {get;set;} = "";
+	        public string       complementoTipo         {get;set;} = "";
 	        public string       complemento             {get;set;} = "";
 	        public string       referencia              {get;set;} = "";
 	        public string       acesso                  {get;set;} = "";
@@ -34,9 +35,9 @@ namespace JaCaptei.Model {
 	        public string       pais                    {get;set;} = "BRASIL";
 	        public string       paisNorm      	        {get;set;} = "BRASIL";
 
-            public short        idEstado                {get;set;}  =   0;
-            public short        idCidade                {get;set;}  =   0;
-            public short        idBairro                {get;set;}  =   0;
+            public int          idEstado                {get;set;}  =   0;
+            public int          idCidade                {get;set;}  =   0;
+            public int          idBairro                {get;set;}  =   0;
 
     }
 
