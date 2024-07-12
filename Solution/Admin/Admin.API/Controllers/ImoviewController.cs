@@ -29,7 +29,7 @@ public class ImoviewController : ControllerBase
     public ImoviewController(IHttpClientFactory httpClientFactory, DBcontext context, IMapper mapper, IPublishEndpoint bus)
     {
         //_httpClientFactory = httpClientFactory;
-        _service = new ImoviewService(httpClientFactory, context, _apiKey, bus);
+        _service = new ImoviewService(httpClientFactory, context, _apiKey, mapper, bus);
         _httpClientFactory = httpClientFactory;
         _context = context;
         _mapper = mapper;

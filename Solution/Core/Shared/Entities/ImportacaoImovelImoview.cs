@@ -31,4 +31,7 @@ public class ImportacaoImovelImoview
     [Map("dataInclusao")]
     public DateTime DataInclusao { get; set; }
 
+    [Map("imoviewResponse")]
+    [NpgsqlDbType(NpgsqlDbType.Jsonb)]
+    public string ImoviewResponse { get; set; }
 }

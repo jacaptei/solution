@@ -29,4 +29,10 @@ public class ImportacaoBairroImoview
     [Map("imoveis")]
     [NpgsqlDbType(NpgsqlDbType.Jsonb)]
     public string Imoveis { get; set; }
+
+    //[Map("idCidade")]
+    //public int IdCidade { get; set; }
+
+    //[Map("idBairro")]
+    //public int IdBairro { get; set; }
 }

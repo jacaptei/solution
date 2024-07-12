@@ -114,4 +114,10 @@ public class ImovelMapped
 
     [Map("data")]
     public DateTime Data { get; set; } = DateTime.UtcNow;
+
+    [Map("idCidade")]
+    public int IdCidade { get; set; }
+
+    [Map("idBairro")]
+    public int IdBairro { get; set; }
 }

@@ -1,13 +1,25 @@
+using JaCaptei.Model;
+using JaCaptei.Model.DTO;
 using JaCaptei.Model.Entities;
 using Npgsql;
 using RepoDb;
 
+using ImovelImagem = JaCaptei.Model.Entities.ImovelImagem;
+
 namespace JaCaptei.Application.Integracao;
 
 public class ImoviewDAO: IDisposable {
+
     private readonly NpgsqlConnection _conn;
-    public ImoviewDAO(NpgsqlConnection conn) {
+    public ImoviewDAO(NpgsqlConnection conn) 
+    {
         _conn = conn;
+    }
+
+    public void Dispose()
+    {
+        _conn?.Close();
+        _conn?.Dispose();
     }
 
     public async Task<IntegracaoImoview?> GetIntegracao(int IdCliente)
@@ -16,11 +28,6 @@ public class ImoviewDAO: IDisposable {
         return res.FirstOrDefault();
     }
 
-    public void Dispose()
-    {
-        _conn?.Close();
-        _conn?.Dispose();
-    }
 
     public async Task<bool> SaveIntegracao(IntegracaoImoview integracao)
     {
@@ -40,7 +47,7 @@ public class ImoviewDAO: IDisposable {
         return res.ToList();
     }
 
-    internal async Task<bool> SaveIntegracaoBairro(IntegracaoBairroImoview bairroIntegrado)
+    public async Task<bool> SaveIntegracaoBairro(IntegracaoBairroImoview bairroIntegrado)
     {
         if (bairroIntegrado.Id > 0)
         {
@@ -52,15 +59,97 @@ public class ImoviewDAO: IDisposable {
         return true;
     }
 
-    internal async Task<List<ImportacaoBairroImoview>> ImportacaoBairros(int idIntegracaoBairro)
+    public async Task<List<ImportacaoBairroImoview>> GetImportacaoBairros(int idIntegracaoBairro)
     {
         var res = await _conn.QueryAsync<ImportacaoBairroImoview>(i => i.IdIntegracaoBairro == idIntegracaoBairro);
         return res.ToList();
     }
 
-    internal async Task<bool> SaveImportacaoBairro(ImportacaoBairroImoview importacaoBairro)
+    public async Task<bool> SaveImportacaoBairro(ImportacaoBairroImoview importacaoBairro)
     {
         await _conn.InsertAsync<ImportacaoBairroImoview>(importacaoBairro);
+        return true;
+    }
+
+    public async Task<List<ImportacaoImovelImoview>> GetImportacaoImoveis(int idImportacaoBairro)
+    {
+        var res = await _conn.QueryAsync<ImportacaoImovelImoview>(i => i.IdImportacaoBairro == idImportacaoBairro);
+        return res.ToList();
+    }
+
+    public async Task<List<ImovelMapped>> GetImoveisBairro(int idBairro)
+    {
+        var res = await _conn.QueryAsync<ImovelMapped>(i => i.IdBairro == idBairro);
+        return res.ToList();
+    }
+
+    public async Task<ImovelFullDTO?> GetFullImovel(int idImovel)
+    {
+        var imovel = await _conn.QueryAsync<Imovel>(i => i.id == idImovel);
+        if (imovel == null) return null;
+        if (!imovel.Any()) return null;
+
+        var (area, valores, endereco, disposicao, crsInternas, crsExternas, lazer) =
+             await _conn.QueryMultipleAsync<ImovelAreas,
+             ImovelValores, ImovelEndereco, ImovelDisposicao,
+             ImovelCaracteristicasInternas,
+             ImovelCaracteristicasExternas, ImovelLazer>(
+             a  => a.idImovel   == idImovel,  // area
+             v  => v.idImovel   == idImovel,  // valor
+             e  => e.idImovel   == idImovel,  // endereco
+             d  => d.idImovel   == idImovel,  // dísposicao
+             ci => ci.idImovel  == idImovel,  // crsInternas
+             ce => ce.idImovel  == idImovel,  // crsInternas
+             l  => l.idImovel   == idImovel   // lazer 
+         );
+
+        var res = new ImovelFullDTO()
+        {
+            Imovel = imovel.First(),
+            ImovelAreas = area.First(),
+            ImovelValores = valores.First(),
+            ImovelEndereco = endereco.First(),
+            ImovelDisposicao = disposicao.First(),
+            ImovelCaracteristicasInternas = crsInternas.First(),
+            ImovelCaracteristicasExternas = crsExternas.First(),
+            ImovelLazer = lazer.First()
+        };
+        return res;
+    }
+
+    public async Task<List<ImportacaoBairroImoview>> GetImportacaoBairrosPendentes(int idIntegracao)
+    {
+        var integracoesPendentes = await _conn.QueryAsync<IntegracaoBairroImoview>
+            (i => i.IdIntegracao == idIntegracao && i.Status != StatusIntegracao.Processando.GetDescription() 
+            && i.Status != StatusIntegracao.Concluido.GetDescription());
+        List<ImportacaoBairroImoview> importacoes = [];
+        foreach(var integracao in  integracoesPendentes)
+        {
+            var res = await _conn.QueryAsync<ImportacaoBairroImoview>
+                (i => i.IdIntegracaoBairro == integracao.Id && i.Status != StatusIntegracao.Concluido.GetDescription());
+            importacoes.AddRange(res.ToList());
+        }
+        return importacoes;
+    }
+
+    public async Task<ImportacaoImovelImoview?> GetImportacaoImovel(int idImportacao, int idImovel)
+    {
+        var res = await _conn.QueryAsync<ImportacaoImovelImoview>(i => i.IdImportacaoBairro == idImportacao && i.IdImovel == idImovel);
+        return res.FirstOrDefault();
+    }
+
+    public async Task<List<ImovelImagem>> ObterImagensImovel(int idImovel)
+    {
+        var list = await _conn.QueryAsync<ImovelImagem>(e => e.IdImovel == idImovel);
+        return list.ToList();
+    }
+
+    internal async Task<bool> SaveImportacaoImovel(ImportacaoImovelImoview importacaoImovel)
+    {
+        if (importacaoImovel.Id > 0)
+            await _conn.UpdateAsync<ImportacaoImovelImoview>(importacaoImovel);
+        else
+            await _conn.InsertAsync<ImportacaoImovelImoview>(importacaoImovel);
         return true;
     }
 }

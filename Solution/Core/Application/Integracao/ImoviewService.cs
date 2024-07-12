@@ -1,8 +1,13 @@
-﻿using JaCaptei.Application.DAL;
+﻿using AutoMapper;
+
+using JaCaptei.Application.DAL;
 using JaCaptei.Model;
 using JaCaptei.Model.DTO;
 using JaCaptei.Model.Entities;
 using MassTransit;
+using MassTransit.Initializers;
+
+using System.Collections.Generic;
 using System.ComponentModel;
 using System.Net;
 using System.Net.Http.Headers;
@@ -15,13 +20,15 @@ public class ImoviewService : IDisposable
     private readonly DBcontext _context;
     private readonly ImoviewDAO _imoviewDAO;
     private string _chave;
+    private readonly IMapper _mapper;
     private readonly IPublishEndpoint _bus;
 
-    public ImoviewService(IHttpClientFactory httpClientFactory, DBcontext context, string chave, IPublishEndpoint? bus = null)
+    public ImoviewService(IHttpClientFactory httpClientFactory, DBcontext context, string chave, IMapper mapper, IPublishEndpoint? bus = null)
     {
         _httpClientFactory = httpClientFactory;
         _context = context;
         _chave = chave;
+        _mapper = mapper;
         _bus = bus;
         _imoviewDAO = new ImoviewDAO(_context.GetConn());
     }
@@ -132,14 +139,14 @@ public class ImoviewService : IDisposable
         return integracaoEvent;
     }
 
-    public async Task<object?> ImportarIntegracao(IntegracaoEvent integracaoEvent)
+    public async Task<bool> ImportarIntegracao(IntegracaoEvent integracaoEvent)
     {
         var integracao = await _imoviewDAO.GetIntegracao(integracaoEvent.IdCliente);
-        if (integracao == null) return null; // Integração deve estar cadastrada
+        if (integracao == null) return false; // Integração deve estar cadastrada
         if (integracao.Status != StatusIntegracao.Aguardando.GetDescription() 
             || integracao.Status != StatusIntegracao.Concluido.GetDescription()) 
-            return null; // Importação só pode ocorrer em status inicial ou final
-        // Atualiza o status                                                                             
+            return false; // Importação só pode ocorrer em status inicial ou final
+        // TODO: arrumar status inconsistentes                                                                           
         integracao.DataAtualizacao = DateTime.UtcNow;
         integracao.Status = StatusIntegracao.Processando.GetDescription();
         await _imoviewDAO.SaveIntegracao(integracao);
@@ -172,22 +179,42 @@ public class ImoviewService : IDisposable
             await _imoviewDAO.SaveIntegracaoBairro(bairroIntegrado);
         }
         bairrosIntegrados = await _imoviewDAO.GetIntegracaoBairros(integracao.Id); // rebind
-        // iniciar controles de importação
-        List<ImportacaoBairroImoview> importacaoBairros = [];
         foreach (var bairroIntegrado in bairrosIntegrados)
         {
-            List<ImportacaoBairroImoview> importacoesBairro = await _imoviewDAO.ImportacaoBairros(bairroIntegrado.Id) ?? [];
+            List<ImportacaoBairroImoview> importacoesBairro = await _imoviewDAO.GetImportacaoBairros(bairroIntegrado.Id) ?? [];
             if (importacoesBairro.Count > 0)
             {
-                // TODO: buscar os imoveis ja importados
-                // TODO: buscar imoveis do bairro
-                // TODO: comparar as listas, caso haja, gerar nova importacao de bairro incluir os imoveis q ainda não foram importado
+                List<ImovelMapped> imoveisNovos = [];
+                foreach (var importacaoBairro in importacoesBairro)
+                {
+                    List<ImportacaoImovelImoview> importacoesImoveis = await _imoviewDAO.GetImportacaoImoveis(importacaoBairro.Id);
+                    List<ImovelMapped> imoveisBairro = await _imoviewDAO.GetImoveisBairro(bairroIntegrado.IdBairro);
+                    imoveisNovos.AddRange(imoveisBairro.Where(imovel => !importacoesImoveis
+                        .Any(importacao => importacao.IdImovel == imovel.Id)));
+                }
+                if (imoveisNovos.Count > 0)
+                {
+                    var importacaoBairro = new ImportacaoBairroImoview()
+                    {
+                        Id = 0,
+                        IdIntegracaoBairro = bairroIntegrado.Id,
+                        IdOperador = integracaoEvent.IdOperador,
+                        IdPlano = integracao.IdPlano.Value,
+                        Status = StatusIntegracao.Aguardando.GetDescription(),
+                        Imoveis = Newtonsoft.Json.JsonConvert.SerializeObject(imoveisNovos.Select(i => new { i.Id, i.IdCRM }))
+                    };
+                    await _imoviewDAO.SaveImportacaoBairro(importacaoBairro);
+                }
+                else
+                {
+                    bairroIntegrado.DataAtualizacao = DateTime.UtcNow;
+                    bairroIntegrado.Status = StatusIntegracao.Concluido.GetDescription();
+                    await _imoviewDAO.SaveIntegracaoBairro(bairroIntegrado);
+                }
             }
             else
             {
-                // TODO: buscar imoveis do bairro
-                List<ImovelMapped> imoveis = [];
-                // TODO: gravar importação do bairro
+                List<ImovelMapped> imoveisBairro = await _imoviewDAO.GetImoveisBairro(bairroIntegrado.IdBairro);
                 var importacaoBairro = new ImportacaoBairroImoview()
                 {
                     Id = 0,
@@ -195,23 +222,88 @@ public class ImoviewService : IDisposable
                     IdOperador = integracaoEvent.IdOperador,
                     IdPlano = integracao.IdPlano.Value,
                     Status = StatusIntegracao.Aguardando.GetDescription(),
-                    Imoveis = Newtonsoft.Json.JsonConvert.SerializeObject(imoveis.Select(i => new { i.Id, i.IdCRM }))
+                    Imoveis = Newtonsoft.Json.JsonConvert.SerializeObject(imoveisBairro.Select(i => new { i.Id, i.IdCRM }))
                 };
                 await _imoviewDAO.SaveImportacaoBairro(importacaoBairro);
             }
-            importacaoBairros.AddRange(importacoesBairro);
         }
-        // TODO: Verificar se o imovel ja existe no imoview, criar se nao existir
-        // TODO: Iniciar a importacao dos imoveis - API Imoview
-        // TODO: Atualizar o status da integracao do cliente (integracao, bairros, imovel)
-        // TODO: Retornar objeto com o status da integracao do cliente e os dados da importacao do imovel
-        return new {};
+        List<ImportacaoBairroImoview> importacaoBairros = await _imoviewDAO.GetImportacaoBairrosPendentes(integracao.Id);
+        foreach (var importacaoBairro in importacaoBairros)
+        {
+            var imoveisIds = Newtonsoft.Json.JsonConvert.DeserializeObject<List<ImovelListDTO>>(importacaoBairro.Imoveis);
+            foreach (var imovelId in imoveisIds)
+            {
+                ImoviewAddImovelRequest request = null;
+                List<ImagemDTO> images = [];
+                ImportacaoImovelImoview? importacaoImovel = await _imoviewDAO.GetImportacaoImovel(importacaoBairro.Id, imovelId.Id);
+                if (importacaoImovel == null)
+                {
+                    var imovelFull = await _imoviewDAO.GetFullImovel(imovelId.Id);
+                    images = await GetImageFiles(imovelId.Id);
+                    if (imovelFull != null)
+                    {
+                        request = _mapper.Map<ImoviewAddImovelRequest>(imovelFull);
+                        var requestBody = Newtonsoft.Json.JsonConvert.SerializeObject(request);
+                        importacaoImovel = new ImportacaoImovelImoview()
+                        {
+                            Id = 0,
+                            IdImovel = imovelId.Id,
+                            IdImportacaoBairro = importacaoBairro.Id,
+                            RequestBody = requestBody,
+                            Status = StatusIntegracao.Aguardando.GetDescription(),
+                            Imagens = Newtonsoft.Json.JsonConvert.SerializeObject(images.Select(i => new { i.Nome, i.Url }))
+                        };
+                    }
+                }
+                else
+                {
+                    request = Newtonsoft.Json.JsonConvert.DeserializeObject<ImoviewAddImovelRequest>(importacaoImovel.RequestBody);
+                    images = await GetImageFiles(imovelId.Id);
+                }
+                try
+                {
+                    var res = await IncluirImovel(request!, images);
+                    //TODO: validar mensagem de retorno e definir status de acordo
+                    importacaoImovel.ImoviewResponse = Newtonsoft.Json.JsonConvert.SerializeObject(res);
+                    await _imoviewDAO.SaveImportacaoImovel(importacaoImovel);
+                }
+                catch (Exception ex)
+                {
+                    //TODO: tratar erro
+                    importacaoImovel.Status = StatusIntegracao.Erro.ToString();
+                }
+            }
+        }
+        return true;
     }
 
     public async Task<object?> ObterStatusIntegracao(Parceiro cliente) 
     {
-        // TODO: Obter o status da integracao do cliente
+        // TODO: Obter o status atual da integracao do cliente
         return new {};
+    }
+
+    private async Task<List<ImagemDTO>> GetImageFiles(int id)
+    {
+        var res = await _imoviewDAO.ObterImagensImovel(id);
+        var list = new List<ImagemDTO>();
+        var client = _httpClientFactory.CreateClient();
+        foreach (var item in res.AsParallel()
+            .WithDegreeOfParallelism(6)
+            .WithMergeOptions(ParallelMergeOptions.FullyBuffered))
+        {
+            var arquivo = await client.GetByteArrayAsync(item.UrlMedium);
+            var dto = new ImagemDTO()
+            {
+                Arquivo = arquivo,
+                Nome = item.Nome,
+                Tipo = item.Tipo,
+                Url = item.UrlMedium
+            };
+            list.Add(dto);
+        }
+
+        return list;
     }
 
     public void Dispose()
@@ -219,12 +311,21 @@ public class ImoviewService : IDisposable
         _imoviewDAO.Dispose();
     }
 }
+
+public record ImovelListDTO
+{
+    public int Id { get; set; }
+    public int IdCRM { get; set; }
+}
+
  public enum StatusIntegracao 
  {
     [Description("Aguardando")]
     Aguardando,
     [Description("Processando")]
     Processando,
+    [Description("Erro")]
+    Erro,
     [Description("Concluido")]
     Concluido
  }

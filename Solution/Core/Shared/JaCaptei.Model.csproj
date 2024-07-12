@@ -8,6 +8,16 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Remove="Entities\ImovelAreas.cs" />
+    <Compile Remove="Entities\ImovelCaracteristicasExternas.cs" />
+    <Compile Remove="Entities\ImovelCaracteristicasInternas.cs" />
+    <Compile Remove="Entities\ImovelDisposicao.cs" />
+    <Compile Remove="Entities\ImovelEndereco.cs" />
+    <Compile Remove="Entities\ImovelLazer.cs" />
+    <Compile Remove="Entities\ImovelValores.cs" />
+  </ItemGroup>
+
+  <ItemGroup>
     <PackageReference Include="MailKit" Version="4.3.0" />
     <PackageReference Include="Npgsql" Version="8.0.3" />
     <PackageReference Include="RepoDb" Version="1.13.1" />

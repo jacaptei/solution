@@ -16,10 +16,10 @@ namespace JaCaptei.Admin.API.Consumers
         private readonly ImoviewService _service;
         private readonly IHttpClientFactory _httpClientFactory;
 
-        public IntegracaoClienteConsumer(ILogger<IntegracaoClienteConsumer> logger, IHttpClientFactory httpClientFactory, DBcontext context)
+        public IntegracaoClienteConsumer(ILogger<IntegracaoClienteConsumer> logger, IHttpClientFactory httpClientFactory, DBcontext context, IMapper mapper)
         {
             _httpClientFactory = httpClientFactory;
-            _service = new ImoviewService(httpClientFactory, context, "");
+            _service = new ImoviewService(httpClientFactory, context, "", mapper);
             _httpClientFactory = httpClientFactory;
         }
 
