@@ -61,6 +61,7 @@ $(document).ready(function () {
                     zoom            : 1,
                     isAuth          : false,
                     showLoginModal  : false,
+                    showTermsAndPolicyModal: false,
                     autoLogin       : false,
                     rememberMe      : false,
                     //test            : "root context ok",
@@ -276,9 +277,11 @@ $(document).ready(function () {
                      });
                 },
 
-                RequestLogin(){
-                    this.$tools.MessageAlert("necessário login para favoritar",100);
-                    window.setTimeout(()=>this.OpenLoginModal(),600);
+                RequestLogin(mensagem = "É necessário estar logado para acessar esta área") {
+                    if (this.$route.name != '/home') {
+                        this.$tools.MessageAlert(mensagem, 100);
+                        window.setTimeout(() => this.OpenLoginModal(), 300);
+                    }
                 },
 
                 Login(){
@@ -289,6 +292,10 @@ $(document).ready(function () {
 				    //this.$root.usuario.usernameCRM	=	"api";
 				    //this.$root.usuario.senhaCRM     =	"Ofeko@123dw";
 				    this.$root.showLoginModal	    =	true;
+                },
+
+                OpenLoginTermsAndPolicyModal(){
+				    this.$root.showTermsAndPolicyModal = true;
                 },
 
 
@@ -401,6 +408,9 @@ $(document).ready(function () {
                 // AUTH --------------------------------
                 SignIn(){
                     this.isAuth = true;
+                    if (this.usuario.aceitouPoliticaPrivacidade === false && this.usuario.aceitouTermos === false) {
+                        this.OpenLoginTermsAndPolicyModal();
+                    }
                     //this.$sdata.Storage.Set("utk"    , this.usuario.token);
                     //this.$sdata.Storage.Set("usuario", this.usuario);
 					//this.RouteTo("/home");
@@ -422,6 +432,7 @@ $(document).ready(function () {
                     this.$sdata.Storage.Set("usuario", null);
                     this.isAuth = false;
                     this.RouteTo("home");
+                    this.$route.name = '/home';
                 },
 
 
@@ -583,7 +594,8 @@ $(document).ready(function () {
 
 	// --------- GLOBAL COMPONENTS
 	App.component("c-loading"           , c_loading             );
-	App.component("c-header-login"      , c_header_login        );
+    App.component("c-header-login"      , c_header_login        );
+    App.component("c-policy-terms"      , c_policy_terms        );
 	App.component("c-header"            , c_header              );
 	App.component("c-title"             , c_title               );
 	App.component("c-search-form"       , c_search_form         );

@@ -12,8 +12,8 @@ export default class Api{
         this.error                  = null;
         this.status = { requesting: false, success: true, error: false };
 
-        if (this.ENDPOINT == "https://api.localhost:52658/")
-            this.ENDPOINT = "https://localhost:52650/";
+        if (this.ENDPOINT == "https://api.localhost:55147/")
+            this.ENDPOINT = "https://localhost:55153/";
         else if (this.ENDPOINT == "https://api.localhost:52658/")
             this.ENDPOINT = "https://localhost:52650/";
             //this.ENDPOINT  = "https://localhost:52650/";

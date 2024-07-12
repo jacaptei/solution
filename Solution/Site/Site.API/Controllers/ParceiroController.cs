@@ -34,6 +34,14 @@ namespace JaCaptei.API.Controllers {
             return Result(appReturn);
         }
 
+        [HttpGet]
+        [Route("termos/aceitar")]
+        public IActionResult AceitarTermos()
+        {
+            Usuario user = ObterUsuarioAutenticado();
+            appReturn = service.AceitarTermos(user.id);
+            return Result(user);
+        }
 
         [HttpPost]
         [Route("autenticar")]

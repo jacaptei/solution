@@ -8,6 +8,7 @@ const componentPath = "./components/";
 
 const c_loading                 = LoadComponent(componentPath+"c-loading.htm");
 const c_header_login            = LoadComponent(componentPath+"c-header-login.htm");
+const c_policy_terms            = LoadComponent(componentPath+"c-policy-terms.htm");
 const c_header                  = LoadComponent(componentPath+"c-header.htm");
 const c_title                   = LoadComponent(componentPath+"c-title.htm");
 const c_search_form             = LoadComponent(componentPath+"c-search-form.htm");
