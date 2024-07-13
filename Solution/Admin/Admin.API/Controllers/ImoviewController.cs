@@ -105,7 +105,7 @@ public class ImoviewController : ControllerBase
         var res = new IntegracaoReponseDTO()
         {
             Cliente = new ComboDTO(cliente.id, cliente.nome),
-            Plano = new ComboPlanoDTO(plano.id, plano.nome, 3),
+            Plano = new ComboPlanoDTO(plano.id, plano.nome, plano.totalBairros),
             Integracao = integracao, 
             Unidades = (await _service.GetUnidades())!.lista!.ConvertAll(x => new ComboDTO(x.codigo, x.nome)),
             Crms = [new(1, "Imoview"), new (2,"VistaSoft")]
