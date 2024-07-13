@@ -12,7 +12,7 @@ export default class Api{
         this.status = { requesting: false, success: true, error: false };
 
         if (this.ENDPOINT == "https://api.localhost:52240/")
-            this.ENDPOINT  = "https://localhost:52220/";
+            this.ENDPOINT = "https://localhost:55150/";
         //console.log(this.ENDPOINT)
 
         this.tools = new ToolClass();

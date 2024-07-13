@@ -20,6 +20,8 @@ namespace JaCaptei.Model {
 
             public Admin                admin              {get;set;} = new Admin();
             public int                  idAdmin            {get;set;} = 0;
+            public int                  idAdminCaptador    {get;set;} = 0;
+            public String               captador           {get;set;} = "";
             public Proprietario         proprietario       {get;set;} = new Proprietario();
             public int                  idProprietario     {get;set;} = 0;
             
@@ -48,25 +50,25 @@ namespace JaCaptei.Model {
             // ------------------- CATEGORIZADOS
             public List<ImovelImagem>               imagens         {get;set;} = new List<ImovelImagem>();
             public List<ImovelImagem>               imagensLegadas  {get;set;} = new List<ImovelImagem>();
+            public ImovelEndereco                   endereco        {get;set;} = new ImovelEndereco();
             public ImovelValores                    valor           {get;set;} = new ImovelValores();
             public ImovelAreas                      area            {get;set;} = new ImovelAreas();
-            public ImovelDocumentacao               documentacao    {get;set;} = new ImovelDocumentacao();
-            public ImovelDisposicao                 disposicao      {get;set;} = new ImovelDisposicao();
             public ImovelCaracteristicasInternas    interno         {get;set;} = new ImovelCaracteristicasInternas();
             public ImovelCaracteristicasExternas    externo         {get;set;} = new ImovelCaracteristicasExternas();
             public ImovelLazer                      lazer           {get;set;} = new ImovelLazer();
-            public ImovelEndereco                   endereco        {get;set;} = new ImovelEndereco();
+            public ImovelDisposicao                 disposicao      {get;set;} = new ImovelDisposicao();
+            public ImovelDocumentacao               documentacao    {get;set;} = new ImovelDocumentacao();
             // ------------------- 
 
             public string                           tag                     {get;set;}  ="";
             public string                           status                  {get;set;}  = "ATIVO";
             public bool                             ativo                   {get;set;}  = false;
             public bool                             ativoCRM                {get;set;}  = false;
+            public bool                             possuiImagens           {get;set;}  = false;
             public bool                             sucesso                 {get;set;}  = false;
             
             public string                           token                   {get;set;}  = "";
             public long                             tokenNum                {get;set;}  = 0;
-            public string                           tokenUID                {get;set;}  = "";
 
             public string                           anotacoes               {get;set;}  = "";
             public string                           obs                     {get;set;}  = "";
@@ -78,7 +80,7 @@ namespace JaCaptei.Model {
             public string                           origem                  {get;set;}  = "JACAPTEI_ADMIN"; // NETSAC_CRM
             public string                           origemImagens           {get;set;}  = "IMAGESHACK"; // NETSAC_CRM
 
-            public string                           codCarga                {get;set;}  = "";
+            public string                           carga                   {get;set;}  = "";
             
             public DateTime                         dataAtualizacao         {get;set;}  = Utils.Date.GetLocalDateTime();
             public DateTime                         data                    {get;set;}  = Utils.Date.GetLocalDateTime();

@@ -44,13 +44,19 @@ namespace JaCaptei.Application
         }
         public AppReturn ObterIdCidade(string nome) {
             using(var conn = DBMSSQL.GetConn())
-                appReturn.result = conn.ExecuteQuery<Cidade>($"SELECT id, nome FROM Cidade WHERE nome = '{nome}'").FirstOrDefault();
+                appReturn.result = conn.ExecuteQuery<Cidade>($"SELECT id, nome FROM Cidade WHERE nomeNorm = '{nome}'").FirstOrDefault();
                 //appReturn.result = conn.Query<Cidade>(c => c.uf == uf).ToList();
             return appReturn;
         }
         public AppReturn ObterIdCidade(int idEstado,string nome) {
             using(var conn = DBMSSQL.GetConn())
                 appReturn.result = conn.ExecuteQuery<Cidade>($"SELECT id, nome FROM Cidade WHERE idEstado = {idEstado} AND nome = '{nome}'").FirstOrDefault();
+                //appReturn.result = conn.Query<Cidade>(c => c.uf == uf).ToList();
+            return appReturn;
+        }
+        public AppReturn ObterIdCidadeNorm(int idEstado,string nome) {
+            using(var conn = DBMSSQL.GetConn())
+                appReturn.result = conn.ExecuteQuery<Cidade>($"SELECT id, nome FROM Cidade WHERE idEstado = {idEstado} AND nomeNorm = '{nome}'").FirstOrDefault();
                 //appReturn.result = conn.Query<Cidade>(c => c.uf == uf).ToList();
             return appReturn;
         }
@@ -75,13 +81,19 @@ namespace JaCaptei.Application
         }
         public AppReturn ObterIdBairro(string nome) {
             using(var conn = DBMSSQL.GetConn())
-                appReturn.result = conn.ExecuteQuery<Bairro>($"SELECT id, nome FROM Bairro WHERE nome = '{nome}'").FirstOrDefault();
+                appReturn.result = conn.ExecuteQuery<Bairro>($"SELECT id, nome FROM Bairro WHERE nomeNorm = '{nome}'").FirstOrDefault();
             //appReturn.result = conn.Query<Cidade>(c => c.uf == uf).ToList();
             return appReturn;
         }
         public AppReturn ObterIdBairro(int idCidade,string nome) {
             using(var conn = DBMSSQL.GetConn())
                 appReturn.result = conn.ExecuteQuery<Bairro>($"SELECT id, nome FROM Bairro WHERE idCidade = {idCidade} AND nome = '{nome}'").FirstOrDefault();
+            //appReturn.result = conn.Query<Cidade>(c => c.uf == uf).ToList();
+            return appReturn;
+        }
+        public AppReturn ObterIdBairroNorm(int idCidade,string nome) {
+            using(var conn = DBMSSQL.GetConn())
+                appReturn.result = conn.ExecuteQuery<Bairro>($"SELECT id, nome FROM Bairro WHERE idCidade = {idCidade} AND nomeNorm = '{nome}'").FirstOrDefault();
             //appReturn.result = conn.Query<Cidade>(c => c.uf == uf).ToList();
             return appReturn;
         }

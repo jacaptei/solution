@@ -143,7 +143,7 @@
                 <div v-if="view=='success'">
                     <div style="max-width:360px;text-align:center">
                         <c-info type="success" title="Sucesso" subtitle="Cadastro efetuado"></c-info>
-                        <q-btn label="Adicionar um imóvel deste proprietário" color="primary" style="width:320px;"  @click="$root.RouteTo('imoveis',{view:'adicionar', proprietario: proprietario})" ></q-btn><br />
+                        <q-btn label="Adicionar um imóvel deste proprietário" color="green-13" style="width:320px;"  @click="$root.RouteTo('imoveis',{view:'adicionar', proprietario: proprietario})" ></q-btn><br /><br />
                         <q-btn label="Adicionar outro proprietário"  color="primary" style="width:320px;" @click="NovoCadastro"></q-btn>
                     </div>
                 </div>
@@ -190,7 +190,7 @@
         data: function () {
             return {
                 onrequest: false,
-                view: "success",
+                view: "form",
                 messageSuccess: "Cadastrado!",
                 messageAlert: "",
                 messageFail: "Não foi possível cadastrar, favor tentar novamente.",

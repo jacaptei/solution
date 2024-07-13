@@ -26,22 +26,23 @@ namespace JaCaptei.Application
             Localidade localidade   = new Localidade();
             localidade.estados      = (List<Estado>) new LocalidadeService().ObterEstados().result;
 
-            List<ImovelTipo> tiposImoveis = DAO.ObterTiposImoveis();
+            List<ImovelTipo> tiposImoveis       = DAO.ObterTiposImoveis();
 
-            dicModels.Add("pessoa"      ,   new Pessoa());
-            dicModels.Add("usuario"     ,   user);
-            dicModels.Add("proprietario",   new Proprietario());
-            dicModels.Add("parceiro"    ,   new Parceiro());
-            dicModels.Add("imovel"      ,   new Imovel());
-            dicModels.Add("imovelEndereco" ,   new ImovelEndereco());
-            dicModels.Add("tiposImoveis",   tiposImoveis );
-            dicModels.Add("localidade"  ,   localidade   );
-            dicModels.Add("solicitacao" ,   new Solicitacao());
-            dicModels.Add("tiposStatus" ,   ObterTiposStatus());
-            dicModels.Add("imovelBusca" ,   new ImovelBusca { usuario = user });
-            dicModels.Add("favorito"    ,   new ImovelFavorito());
-            dicModels.Add("busca"       ,   new Search());
-            dicModels.Add("log"         ,   new Log());
+            dicModels.Add("pessoa"              ,   new Pessoa());
+            dicModels.Add("usuario"             ,   user);
+            dicModels.Add("proprietario"        ,   new Proprietario());
+            dicModels.Add("parceiro"            ,   new Parceiro());
+            dicModels.Add("imovel"              ,   new Imovel());
+            dicModels.Add("imovelEndereco"      ,   new ImovelEndereco());
+            dicModels.Add("imovelBusca"         ,   new ImovelBusca { usuario = user });
+            dicModels.Add("tiposImoveis"        ,   tiposImoveis );
+            dicModels.Add("tiposComplementos"   ,   ObterTiposComplementos());
+            dicModels.Add("localidade"          ,   localidade   );
+            dicModels.Add("solicitacao"         ,   new Solicitacao());
+            dicModels.Add("tiposStatus"         ,   ObterTiposStatus());
+            dicModels.Add("favorito"            ,   new ImovelFavorito());
+            dicModels.Add("busca"               ,   new Search());
+            dicModels.Add("log"                 ,   new Log());
             
             return dicModels;
 
@@ -136,6 +137,22 @@ namespace JaCaptei.Application
 
 
 
+
+        public List<string> ObterTiposComplementos() {
+            List<string> stt = new List<string>();
+            stt.Add("APTO");
+            stt.Add("BLOCO");
+            stt.Add("BOX");
+            stt.Add("CASA");
+            stt.Add("LOJA");
+            stt.Add("LOTE");
+            stt.Add("PÁTIO");
+            stt.Add("SALA");
+            stt.Add("SEÇÃO");
+            stt.Add("TORRE");
+            stt.Add("UNIDADE");
+            return stt;
+        }
 
 
 

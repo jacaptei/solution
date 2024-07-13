@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using RepoDb.Attributes;
+﻿using RepoDb.Attributes;
 
 namespace JaCaptei.Model
 {
@@ -20,7 +15,19 @@ namespace JaCaptei.Model
 
         [Map("maxima")]
         public float maxima { get; set; } = 0;
+        public double   terreno                     {get;set;}
+        public double   frente                      {get;set;}
+        public double   fundo                       {get;set;}
+        public double   direito                     {get;set;}
+        public double   esquerdo                    {get;set;}
+        public double   confrontacaoFrente          {get;set;}
+        public double   confrontacaoFundo           {get;set;}
+        public double   confrontacaoDireito         {get;set;}
+        public double   confrontacaoEsquerdo        {get;set;}
+        public double   zonaUso                     {get;set;}
+        public double   coeficienteAproveitamento   {get;set;}
 
+        
         [Map("interna")]
         public float interna { get; set; } = 0;
 
@@ -30,16 +37,6 @@ namespace JaCaptei.Model
         [Map("total")]
         public float total { get; set; } = 0;
 
-        public double coeficienteAproveitamento { get; set; }
-        public double terreno { get; set; }
-        public double frente { get; set; }
-        public double fundo { get; set; }
-        public double direito { get; set; }
-        public double esquerdo { get; set; }
-        public double confrontacaoFrente { get; set; }
-        public double confrontacaoFundo { get; set; }
-        public double confrontacaoDireito { get; set; }
-        public double confrontacaoEsquerdo { get; set; }
         public double zona { get; set; }
     }
 

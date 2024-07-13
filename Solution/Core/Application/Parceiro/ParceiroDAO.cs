@@ -475,7 +475,32 @@ namespace JaCaptei.Application{
 
         }
 
-
+        public AppReturn AceitarTermos(int id)
+        {
+            try
+            {
+                using (var conn = new DBcontext().GetConn())
+                {
+                    Parceiro entityDB = conn.Query<Parceiro>(e => e.id == id).FirstOrDefault();
+                    if (entityDB != null && entityDB.id > 0)
+                    {
+                        entityDB.aceitouTermos = true;
+                        entityDB.aceitouPoliticaPrivacidade = true;
+                        conn.Update(entityDB);
+                    }
+                    else
+                    {
+                        appReturn.AddException("Não foi possível validar a aceitação dos termos. Verifique se os dados estão corretos e tente novamente. Se o problema persistir, entre em contato com a nossa equipe para assistência adicional.");
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                appReturn.AddException("Ocorreu um erro ao tentar salvar as alterações. Por favor, verifique sua conexão com a internet e tente novamente. Se o problema persistir, entre em contato com a nossa equipe para assistência adicional.");
+                appReturn.status.exception = ex.ToString();
+            }
+            return appReturn;
+        }
 
 
         public Parceiro ObterPorId(int id) {

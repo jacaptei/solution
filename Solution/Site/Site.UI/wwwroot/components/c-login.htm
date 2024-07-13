@@ -37,7 +37,10 @@
 											<q-btn color="green-6" label="Enviar" style="width:120px" @click="Login" id="btn_enviar_1"></q-btn>
 										</div>
 										<div style="font-size:13px;margin-top:14px;width:100%;text-align:center;font-weight:500">
-											esqueceu a senha?  <el-button type="primary" link @click="ShowView('lembrarSenha')">REDEFINIR</el-button>
+											Esqueceu a senha?  <el-button type="primary" link @click="ShowView('lembrarSenha')">REDEFINIR</el-button>
+										</div>
+										<div style="font-size:13px;margin-top:5px;width:100%;text-align:center;font-weight:500">
+											Ainda Não Possui um Plano?  <el-button type="primary" link @click="Planos()">CLIQUE AQUI!</el-button>
 										</div>
 									</q-card-actions>
 
@@ -196,6 +199,10 @@ module.exports = {
 				
 				this.view = v;
 
+			},
+
+			Planos() {
+				this.$root.RouteTo("/parceiros");
 			},
 
 
@@ -357,7 +364,7 @@ module.exports = {
         font-size: 18px;
         font-weight: 300;
         min-height: 260px;
-        height: 320px;
+        height: 350px;
         color: #FFF;
 		text-align:center;
         background-color: var(--s-alt-accent-color);

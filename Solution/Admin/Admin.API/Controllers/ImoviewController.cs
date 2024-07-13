@@ -82,12 +82,12 @@ public class ImoviewController : ControllerBase
         return list;
     }
 
-    [HttpPost("ObterImovel")]
-    public async Task<ActionResult<ImoviewAddImovelRequest>> GetFullImovel([FromBody] int id)
-    {
-        var res = _mapper.Map<ImoviewAddImovelRequest>(await _imovelService.ImovelFullImovel(id));
-        return Ok(res);
-    }
+    //[HttpPost("ObterImovel")]
+    //public async Task<ActionResult<ImoviewAddImovelRequest>> GetFullImovel([FromBody] int id)
+    //{
+    //    var res = _mapper.Map<ImoviewAddImovelRequest>(await _imovelService.ImovelFullImovel(id));
+    //    return Ok(res);
+    //}
 
     [HttpPost("integracao/cliente")]
     public async Task<ActionResult<IntegracaoReponseDTO>> GetIntegracaoCliente([FromBody] string cpfCnpj)
@@ -119,42 +119,7 @@ public class ImoviewController : ControllerBase
         return Ok(await _service.IntegrarCliente(integracao));
     }
 
-    private void ConsultaBairros() 
-    {
-        // var fileBairros = Path.Combine(Directory.GetCurrentDirectory(), "Data/Placeholder/", "bairros.json");
-        // var txtBairros = System.IO.File.ReadAllText(fileBairros);
-        // var bairrosNSelec = Newtonsoft.Json.JsonConvert.DeserializeObject<List<BairroDTO>>(txtBairros) ?? [];
-        // if (integracao != null && !string.IsNullOrWhiteSpace(integracao.Bairros)) {
-        //     try {
-        //         var bairros = Newtonsoft.Json.JsonConvert.DeserializeObject<List<BairroDTO>>(integracao.Bairros) ?? [];
-        //         bairrosNSelec = bairrosNSelec.Where(x => bairros.Any(y => y.Id != x.Id)).ToList();
-        //     }
-        //     catch{}
-        // }
-        // BairrosNaoSelecionados = bairrosNSelec,
-    }
-
-    private void MockIntegracao() 
-    {
-            // new Model.Entities.IntegracaoImoview () {
-            //     Id = 1,
-            //     IdCliente = cliente.id,
-            //     IdOperador = 2,
-            //     DataInclusao = DateTime.UtcNow.AddDays(-1),
-            //     DataAtualizacao = DateTime.UtcNow,
-            //     CodUsuario = "4907",
-            //     CodUnidade = "6237",
-            //     ChaveApi = "qnnYE4Fev/v2kRbZ5F9PgEGCkJI3Ixflcl0FADcTGyA=",
-            //     IdPlano = 3,
-            //     Status = "Importado com sucesso",
-            //     Bairros = Newtonsoft.Json.JsonConvert.SerializeObject(new List<BairroDTO>() {
-            //         new() { Id = 3305, Nome = "Centro", IdCidade = 2754 },
-            //         new() { Id = 3358, Nome = "Fernão Dias", IdCidade = 2754 },
-            //         new() { Id = 3412, Nome = "Lagoa", IdCidade = 2754 }
-            //     }),
-            // },
-    }
-}
+ }
 
 public record ComboDTO(int Id, string Nome);
 public record ComboPlanoDTO(int Id, string Nome, int QtdBairros);

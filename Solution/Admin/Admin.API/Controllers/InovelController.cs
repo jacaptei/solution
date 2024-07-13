@@ -4,10 +4,14 @@ using JaCaptei.Model;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
+using Newtonsoft.Json;
+
 using System.Net.Http.Headers;
 
 namespace JaCaptei.Administrativo.API.Controllers
 {
+
+
 
     [ApiController]
     [Route("[controller]")]
@@ -37,22 +41,129 @@ namespace JaCaptei.Administrativo.API.Controllers
 
 
 
+        
         [HttpPost]
         [Route("[action]")]
-        public async Task<IActionResult> Adicionar([FromForm] Imovel imovel,List<IFormFile> imagesFiles) {
-        //public async Task<IActionResult> Adicionar([FromForm] IFormFile file) {
+        public async Task<IActionResult> Adicionar([FromForm] string jsonImovel, List<IFormFile> imagesFiles) {
+
+            Imovel imovel = JsonConvert.DeserializeObject<Imovel>(jsonImovel);
 
             Usuario logado           = ObterUsuarioAutenticado();
             imovel.inseridoPorId    = imovel.atualizadoPorId    = logado.id;
             imovel.inseridoPorNome  = imovel.atualizadoPorNome  = logado.nome;
 
-            //appReturn = await ImageShackUploadImages(imovel,imagesFiles);
-            //appReturn.result = imovel;
-            //await ImageShackDownload_ImoviewUpload("https://imagizer.imageshack.com/img924/9249/XXPIrP.jpg");
+            appReturn = service.Adicionar(imovel);
+
+            if(appReturn.status.success){
+                if( imagesFiles is not null && imagesFiles?.Count > 0)
+                    appReturn = await ImageShackUploadImagesFiles(imovel,imagesFiles);
+            }
+            
             return Result(appReturn);
+
         }
 
 
+        public async Task<AppReturn> ImageShackUploadImagesFiles(Imovel imovel,List<IFormFile> imagesFiles) {
+
+            short   ordem           = -5;
+            short   index           = 0;
+            string  pathToSave      = "";
+            string  path            = "";
+            string  url             = "";
+            byte[]  fileBytes;
+
+            if(imagesFiles?.Count > 0) {
+
+
+                    foreach(IFormFile imageFile in imagesFiles) {
+
+                      // if(index < 3) { 
+
+                            using(var memoryStream = new MemoryStream()) {
+
+                                await imageFile.CopyToAsync(memoryStream);
+                                fileBytes = memoryStream.ToArray();
+
+                                var fileContent = new ByteArrayContent(fileBytes);
+                                fileContent.Headers.ContentType = MediaTypeHeaderValue.Parse(imageFile.ContentType);
+
+                                var requestContent = new MultipartFormDataContent();
+                                requestContent.Add(new StringContent("37AGIJQUbe8fab869df40b8dd3dbecfce6e15c22"),"key");
+                                requestContent.Add(new StringContent(imovel.tag),"tags");
+                                requestContent.Add(new StringContent("json"),"format");
+                                requestContent.Add(fileContent,"fileupload",imageFile.FileName);
+
+                                using(HttpClient httpClient = new HttpClient()) {
+                                    try {
+                                        if(appReturn.status.success) {
+                                            //HttpResponseMessage response = await client.PostAsJsonAsync("https://post.imageshack.us/upload_api.php", requestContent);
+                                            HttpResponseMessage postResponse = await httpClient.PostAsync("https://post.imageshack.us/upload_api.php", requestContent);
+                                            if(postResponse.IsSuccessStatusCode) {
+                                                string postResponseBody = await postResponse.Content.ReadAsStringAsync();
+                                                var response = Newtonsoft.Json.JsonConvert.DeserializeObject<dynamic>(postResponseBody);
+                                   
+                                                    url = response.links.image_link + "";
+
+                                                    imovel.imagens.Add(new ImovelImagem { 
+
+                                                            idImovel            = imovel.id,
+                                                            principal           = (index == 0),
+                                                            index               = index,
+                                                            ordem               = ordem+=5,
+                                                            tokenNum            = imovel.tokenNum,
+                                                            data                = imovel.data,
+                                                            tag                 = imovel.tag,
+                                                            nome                = imovel.tag+"_"+index.ToString(),
+                                                            cod                 = response.id.ToString(),
+                                                            server              = response.files.server,
+                                                            bucket              = response.files.bucket,
+                                                            contentType         = response.files.thumb.content,
+                                                            size                = response.files.image.size,
+                                                            width               = response.resolution.width,
+                                                            height              = response.resolution.height,
+                                                    
+
+                                                            arquivo             = response.files.image.filename,
+                                                            arquivoOriginal     = response.files.image.original_filename,
+
+                                                            urlFull             = url,
+                                                            urlThumb            = service.GetImageShackResize(url,"320x240"),
+                                                            urlSmall            = service.GetImageShackResize(url,"640x480"),
+                                                            urlMedium           = service.GetImageShackResize(url,"800x600"),
+                                                            urlLarge            = service.GetImageShackResize(url,"1024x768"),
+                                                            urlFlex             = service.GetImageShackResize(url,"[resolution]"),
+
+                                                    });
+                                                    imovel.obs = $"id = {response.id.ToString()}, img = {response.filename}, url = {response.links.image_link } ";
+                                                    index++;
+                                            } else {
+                                                appReturn.AddException($"Error: {postResponse.StatusCode} - {postResponse.ReasonPhrase}","Não foi possível cadastrar imagens");
+                                            }
+
+                                        }
+                                    } catch(HttpRequestException e) {
+                                        appReturn.AddException($"HTTP Request Error: {e.Message}","Não foi possível cadastrar imagens");
+                                    }
+                                }
+
+
+                            }
+
+                       // }
+                    
+                    }
+            
+            
+                    if(appReturn.status.success) {
+                        service.AdicionarImagens(imovel);
+                        appReturn.result = imovel;
+                    }
+
+            }
+            return appReturn;
+
+        }
 
 
         public async Task<Imovel> ImageShackUploadImagesURL(Imovel imovel) {
@@ -102,59 +213,6 @@ namespace JaCaptei.Administrativo.API.Controllers
 
 
 
-        public async Task<AppReturn> ImageShackUploadImages(Imovel imovel,List<IFormFile> imagesFiles) {
-
-            int     ordem           = 1;
-            string  pathToSave      = "";
-            string  path            = "";
-            byte[]  fileBytes;
-
-            if(imagesFiles?.Count > 0) {
-                foreach(IFormFile imageFile in imagesFiles) {
-                    using(var memoryStream = new MemoryStream()) {
-
-                        await imageFile.CopyToAsync(memoryStream);
-                        fileBytes = memoryStream.ToArray();
-
-                        var fileContent = new ByteArrayContent(fileBytes);
-                        fileContent.Headers.ContentType = MediaTypeHeaderValue.Parse(imageFile.ContentType);
-
-                        var requestContent = new MultipartFormDataContent();
-                        requestContent.Add(new StringContent("37AGIJQUbe8fab869df40b8dd3dbecfce6e15c22"),"key");
-                        requestContent.Add(new StringContent(imovel.tag),"tags");
-                        requestContent.Add(new StringContent("json"),"format");
-                        requestContent.Add(fileContent,"fileupload",imageFile.FileName);
-
-                        using(HttpClient httpClient = new HttpClient()) {
-                            try {
-                                if(appReturn.status.success) {
-                                    //HttpResponseMessage response = await client.PostAsJsonAsync("https://post.imageshack.us/upload_api.php", requestContent);
-                                    HttpResponseMessage response = await httpClient.PostAsync("https://post.imageshack.us/upload_api.php", requestContent);
-                                    if(response.IsSuccessStatusCode) {
-                                        string responseBody = await response.Content.ReadAsStringAsync();
-                                        var hres = Newtonsoft.Json.JsonConvert.DeserializeObject<dynamic>(responseBody);
-                                        imovel.imagens.Add(new ImovelImagem { cod = "1234" });
-                                        imovel.obs = $"id = {hres.id.ToString()}, img = {hres.filename}, url = {hres.links.image_link } ";
-                                    } else {
-                                        appReturn.AddException($"Error: {response.StatusCode} - {response.ReasonPhrase}","Não foi possível cadastrar imagens");
-                                    }
-                                }
-                            } catch(HttpRequestException e) {
-                                appReturn.AddException($"HTTP Request Error: {e.Message}","Não foi possível cadastrar imagens");
-                            }
-                        }
-
-
-                    }
-
-                }
-                if(appReturn.status.success)
-                    appReturn.result = imovel;
-            }
-
-            return appReturn;
-
-        }
 
 
         public async Task<AppReturn> ImageShackDownload_ImoviewUpload(string URLimagem) {

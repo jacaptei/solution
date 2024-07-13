@@ -1,36 +1,36 @@
 ﻿<template>
 
-        <div class="row">
-            <div class="col-12">
-                <q-tabs v-model="view"
-                        dense
-                        no-caps
-                        align="left"
-                        narrow-indicator
-                        class="text-grey"
-                        active-color="primary"
-                        indicator-color="primary">
-                    <q-tab name="buscar"    icon="fa fa-search"    label="BUSCAR"   ></q-tab>
-                    <!--<q-tab name="adicionar" icon="fa fa-user-plus" label="ADICIONAR"></q-tab>-->
-                    <q-tab name="validar"	icon="fa fa-user-lock"			label="VALIDAR"></q-tab>
-                </q-tabs>
-                <q-tab-panels v-model="view" animated>
+    <div class="row">
+        <div class="col-12">
+            <q-tabs v-model="view"
+                    dense
+                    no-caps
+                    align="left"
+                    narrow-indicator
+                    class="text-grey"
+                    active-color="primary"
+                    indicator-color="primary">
+                <q-tab name="buscar" icon="fa fa-search" label="BUSCAR"></q-tab>
+                <q-tab name="validar" icon="fa fa-user-lock" label="VALIDAR"></q-tab>
+                <q-tab name="adicionar" icon="fa fa-user-plus" label="ADICIONAR"></q-tab>
+            </q-tabs>
+            <q-tab-panels v-model="view" animated>
 
-                    <q-tab-panel name="buscar">
-                        <page_buscar />
-                    </q-tab-panel>
-                    
-                    <q-tab-panel name="validar">
-                        <page_validar />
-                    </q-tab-panel>
+                <q-tab-panel name="buscar">
+                    <page_buscar />
+                </q-tab-panel>
 
-                    <!--<q-tab-panel name="adicionar">
-                        <page_adicionar @voltar="view='buscar'" />
-                    </q-tab-panel>-->
+                <q-tab-panel name="validar">
+                    <page_validar />
+                </q-tab-panel>
 
-                </q-tab-panels>
-            </div>
+                <q-tab-panel name="adicionar">
+                    <page_adicionar @voltar="view='buscar'" />
+                </q-tab-panel>
+
+            </q-tab-panels>
         </div>
+    </div>
 </template>
 
 

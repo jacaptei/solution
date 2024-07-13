@@ -1,7 +1,6 @@
 <template>
 
 
-
     <div>
         <div style="margin-top:40px;text-align:center;width:100%">
             <div class="form-area" id="form-area" style="background:var(--s-accent-color);min-height:540px">
@@ -36,14 +35,13 @@
 
                                     <el-select filterable v-model="$root.usuario.idPlano" class="m-4" placeholder="Selecionar" size="large" style="width:100%">
                                         <el-option v-for="item in [
-                                                                    {label: 'CORRETOR AUTÔNOMO ESSENCIAL por R$387/mês',  value: 2 },
-                                                                    {label: 'IMOBILIÁRIA ATÉ 03 USUÁRIOS por R$499/mês',  value: 3 },
-                                                                    {label: 'IMOBILIÁRIA ATÉ 05 USUÁRIOS por R$699/mês',  value: 4 }
+                                                                    {label: 'BASIC',  value: 2 },
+                                                                    {label: 'PRO',  value: 3 },
+                                                                    {label: 'ADVANCED',  value: 4 }
                                                                 ]"
                                                    :key="item.value"
                                                    :label="item.label"
-                                                   :value="item.value"
-                                                   ></el-option>
+                                                   :value="item.value"></el-option>
                                     </el-select>
                                 </el-col>
                                 <el-col :xs="24" :sm="24" :md="12" :lg="15" style="max-width:920px" class="s-input" v-else>
