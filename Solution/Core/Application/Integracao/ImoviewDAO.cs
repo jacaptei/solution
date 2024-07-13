@@ -67,6 +67,12 @@ public class ImoviewDAO: IDisposable {
 
     public async Task<bool> SaveImportacaoBairro(ImportacaoBairroImoview importacaoBairro)
     {
+        if (importacaoBairro.Id > 0)
+        {
+            var fields = Field.Parse<ImportacaoBairroImoview>(e => new { e.Status });
+            await _conn.UpdateAsync<ImportacaoBairroImoview>(importacaoBairro);
+            return true;
+        }
         await _conn.InsertAsync<ImportacaoBairroImoview>(importacaoBairro);
         return true;
     }
@@ -115,6 +121,13 @@ public class ImoviewDAO: IDisposable {
             ImovelLazer = lazer.First()
         };
         return res;
+    }
+
+    public async Task<List<IntegracaoBairroImoview>> GetIntegracaoBairroPendetes(int idIntegracao)
+    {
+        var integracoesPendentes = await _conn.QueryAsync<IntegracaoBairroImoview>
+            (i => i.IdIntegracao == idIntegracao && i.Status != StatusIntegracao.Concluido.GetDescription());
+        return integracoesPendentes.ToList();
     }
 
     public async Task<List<ImportacaoBairroImoview>> GetImportacaoBairrosPendentes(int idIntegracao)
