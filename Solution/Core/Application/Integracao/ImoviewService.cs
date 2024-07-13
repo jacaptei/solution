@@ -130,26 +130,57 @@ public class ImoviewService : IDisposable
         return await _imoviewDAO.GetIntegracao(cliente.id);
     }
 
-    public async Task<object?> IntegrarCliente(IntegracaoImoview integracao)
+    public async Task<IntegrarClienteResponse> IntegrarCliente(IntegracaoImoview integracao)
     {
-        var integracaoOld = await _imoviewDAO.GetIntegracao(integracao.IdCliente);
-        if (integracaoOld != null) {
+        var plano = await _retryPolicy.ExecuteAsync(() => _imoviewDAO.ObterPlano(integracao.IdPlano.Value));
+        if (plano == null)
+            return new IntegrarClienteResponse()
+            {
+                Status = "Inválido",
+                Mensagem = "Não foi possivel encontrar o plano do cliente"
+            };
+        var integracaoOld = await _retryPolicy.ExecuteAsync(() => _imoviewDAO.GetIntegracao(integracao.IdCliente));
+        var bairros = Newtonsoft.Json.JsonConvert.DeserializeObject<List<BairroDTO>>(integracao.Bairros);
+        if (integracaoOld != null)
+        {
             integracao.Id = integracaoOld.Id;
             integracao.DataAtualizacao = DateTime.UtcNow;
             integracao.Status = StatusIntegracao.Aguardando.GetDescription();
+            var bairrosOld = Newtonsoft.Json.JsonConvert.DeserializeObject<List<BairroDTO>>(integracaoOld.Bairros);
+            foreach(var bairroOld in bairrosOld)
+            {
+                if (!bairros.Any(b => b.Id == bairroOld.Id))
+                    return new IntegrarClienteResponse()
+                    {
+                        Status = "Inválido",
+                        Mensagem = "Todos os bairros anteriores devem constar na integração"
+                    };
+            }
         }
-        else {
+        else
+        {
             integracao.Status = StatusIntegracao.Aguardando.GetDescription();
         }
-        await _imoviewDAO.SaveIntegracao(integracao);
+        if (bairros.Count > plano.totalBairros)
+            return new IntegrarClienteResponse()
+            {
+                Status = "Inválido",
+                Mensagem = $"Quantidade de bairros {bairros.Count} maior que o permitido pelo plano: {plano.totalBairros}"
+            };
+        await _retryPolicy.ExecuteAsync(() => _imoviewDAO.SaveIntegracao(integracao));
         var integracaoEvent = new IntegracaoEvent()
         {
             IdIntegracao = integracao.Id,
             IdCliente = integracao.IdCliente,
             IdOperador = integracao.IdOperador
         };
-        await _bus.Publish(integracaoEvent);
-        return integracaoEvent;
+
+        await _retryPolicy.ExecuteAsync(() => _bus.Publish(integracaoEvent));
+        return new IntegrarClienteResponse()
+        {
+            Status = "Sucesso",
+            Mensagem = "Integração em fila de processamento"
+        };
     }
 
     public async Task<bool> ImportarIntegracao(IntegracaoEvent integracaoEvent)
@@ -168,7 +199,6 @@ public class ImoviewService : IDisposable
 
         await ProcessImportacaoImoveis(integracao);
 
-        // TODO: atualizar integracao e bairros
         await FinalizeIntegracaoFull(integracao);
         return true;
     }
@@ -401,6 +431,12 @@ public class ImoviewService : IDisposable
     {
         _imoviewDAO.Dispose();
     }
+}
+
+public record IntegrarClienteResponse
+{
+    public string Status { get; set; }
+    public string Mensagem { get; set; }
 }
 
 public record ImovelListDTO

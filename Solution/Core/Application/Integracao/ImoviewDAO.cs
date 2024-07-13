@@ -165,4 +165,10 @@ public class ImoviewDAO: IDisposable {
             await _conn.InsertAsync<ImportacaoImovelImoview>(importacaoImovel);
         return true;
     }
+
+    internal async Task<Plano?> ObterPlano(int idPlano)
+    {
+        var res = await _conn.QueryAsync<Plano>(i => i.id == idPlano);
+        return res.FirstOrDefault();
+    }
 }
