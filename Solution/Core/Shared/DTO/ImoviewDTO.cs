@@ -146,10 +146,11 @@ public class CamposImoview
     public List<CampoImoview> lista { get; set; }
 }
 
-public class ImoviewIncluirResponse
+public record ImoviewIncluirResponse
 {
     public string mensagem { get; set; }
-    public int codigo { get; set; }
+    public int? codigo { get; set; }
+    public bool erro { get; set; }
 }
 
 public class ImagemDTO

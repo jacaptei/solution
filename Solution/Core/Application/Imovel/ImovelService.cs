@@ -5,7 +5,7 @@ namespace JaCaptei.Application;
 
 public class ImovelService : IDisposable
 {
-    private readonly DBcontext _context;
+    private readonly DBcontext? _context;
     private readonly ImovelDAO _imovelDAO;
     private readonly ImovelBLO _blo;
     private readonly AppReturn _appReturn;
