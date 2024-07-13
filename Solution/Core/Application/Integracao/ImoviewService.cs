@@ -4,10 +4,14 @@ using JaCaptei.Application.DAL;
 using JaCaptei.Model;
 using JaCaptei.Model.DTO;
 using JaCaptei.Model.Entities;
+
 using MassTransit;
 using MassTransit.Initializers;
 
-using System.Collections.Generic;
+using Polly;
+using Polly.Contrib.WaitAndRetry;
+using Polly.Retry;
+
 using System.ComponentModel;
 using System.Net;
 using System.Net.Http.Headers;
@@ -22,6 +26,7 @@ public class ImoviewService : IDisposable
     private string _chave;
     private readonly IMapper _mapper;
     private readonly IPublishEndpoint _bus;
+    private readonly AsyncRetryPolicy _retryPolicy;
 
     public ImoviewService(IHttpClientFactory httpClientFactory, DBcontext context, string chave, IMapper mapper, IPublishEndpoint? bus = null)
     {
@@ -31,6 +36,9 @@ public class ImoviewService : IDisposable
         _mapper = mapper;
         _bus = bus;
         _imoviewDAO = new ImoviewDAO(_context.GetConn());
+        _retryPolicy = Policy
+            .Handle<Exception>()
+            .WaitAndRetryAsync(Backoff.DecorrelatedJitterBackoffV2(TimeSpan.FromSeconds(2), 3));
     }
 
     public string Chave { get => _chave; set => _chave = value; }
@@ -146,7 +154,7 @@ public class ImoviewService : IDisposable
 
     public async Task<bool> ImportarIntegracao(IntegracaoEvent integracaoEvent)
     {
-        var integracao = await _imoviewDAO.GetIntegracao(integracaoEvent.IdCliente);
+        var integracao = await _retryPolicy.ExecuteAsync(() => _imoviewDAO.GetIntegracao(integracaoEvent.IdCliente));
         if (integracao == null) return false;
 
         if (!CanProcessIntegracao(integracao)) return false;
@@ -202,12 +210,12 @@ public class ImoviewService : IDisposable
     {
         integracao.DataAtualizacao = DateTime.UtcNow;
         integracao.Status = StatusIntegracao.Processando.GetDescription();
-        await _imoviewDAO.SaveIntegracao(integracao);
+        await _retryPolicy.ExecuteAsync(() => _imoviewDAO.SaveIntegracao(integracao));
     }
 
     private async Task ProcessBairros(IntegracaoImoview integracao, IntegracaoEvent integracaoEvent, List<BairroDTO> bairros)
     {
-        var bairrosIntegrados = await _imoviewDAO.GetIntegracaoBairros(integracao.Id);
+        var bairrosIntegrados = await _retryPolicy.ExecuteAsync(() => _imoviewDAO.GetIntegracaoBairros(integracao.Id));
         foreach (var bairro in bairros)
         {
             var bairroIntegrado = bairrosIntegrados?.FirstOrDefault(b => b.Id == bairro.Id);
@@ -219,16 +227,16 @@ public class ImoviewService : IDisposable
             {
                 UpdateExistingBairroIntegrado(bairroIntegrado);
             }
-            await _imoviewDAO.SaveIntegracaoBairro(bairroIntegrado);
+            await _retryPolicy.ExecuteAsync(() => _imoviewDAO.SaveIntegracaoBairro(bairroIntegrado));
         }
     }
 
     private async Task ProcessImportacaoBairros(IntegracaoImoview integracao, IntegracaoEvent integracaoEvent)
     {
-        var bairrosIntegrados = await _imoviewDAO.GetIntegracaoBairros(integracao.Id);
+        var bairrosIntegrados = await _retryPolicy.ExecuteAsync(() => _imoviewDAO.GetIntegracaoBairros(integracao.Id));
         foreach (var bairroIntegrado in bairrosIntegrados)
         {
-            var importacoesBairro = await _imoviewDAO.GetImportacaoBairros(bairroIntegrado.Id) ?? [];
+            var importacoesBairro = await _retryPolicy.ExecuteAsync(() => _imoviewDAO.GetImportacaoBairros(bairroIntegrado.Id)) ?? [];
             if (importacoesBairro.Count > 0)
             {
                 var imoveisNovos = await GetNovosImoveis(importacoesBairro, bairroIntegrado);
@@ -251,7 +259,7 @@ public class ImoviewService : IDisposable
 
     private async Task ProcessImportacaoImoveis(IntegracaoImoview integracao)
     {
-        var importacaoBairros = await _imoviewDAO.GetImportacaoBairrosPendentes(integracao.Id);
+        var importacaoBairros = await _retryPolicy.ExecuteAsync(() => _imoviewDAO.GetImportacaoBairrosPendentes(integracao.Id));
         foreach (var importacaoBairro in importacaoBairros)
         {
             var imoveisIds = Newtonsoft.Json.JsonConvert.DeserializeObject<List<ImovelListDTO>>(importacaoBairro.Imoveis) ?? [];
@@ -264,13 +272,13 @@ public class ImoviewService : IDisposable
 
     private async Task ProcessSingleImportacaoImovel(ImportacaoBairroImoview importacaoBairro, ImovelListDTO imovelId)
     {
-        ImportacaoImovelImoview? importacaoImovel = await _imoviewDAO.GetImportacaoImovel(importacaoBairro.Id, imovelId.Id);
+        ImportacaoImovelImoview? importacaoImovel = await _retryPolicy.ExecuteAsync(() => _imoviewDAO.GetImportacaoImovel(importacaoBairro.Id, imovelId.Id));
         ImoviewAddImovelRequest? request = null;
         List<ImagemDTO> images = [];
 
         if (importacaoImovel == null)
         {
-            var imovelFull = await _imoviewDAO.GetFullImovel(imovelId.Id);
+            var imovelFull = await _retryPolicy.ExecuteAsync(() => _imoviewDAO.GetFullImovel(imovelId.Id));
             images = await GetImageFiles(imovelId.Id);
             if (imovelFull != null)
             {
@@ -298,13 +306,13 @@ public class ImoviewService : IDisposable
             var res = await IncluirImovel(request!, images);
             importacaoImovel!.Status = res!.erro ? StatusIntegracao.Erro.GetDescription() : StatusIntegracao.Concluido.GetDescription();
             importacaoImovel.ImoviewResponse = Newtonsoft.Json.JsonConvert.SerializeObject(res);
-            await _imoviewDAO.SaveImportacaoImovel(importacaoImovel);
+            await _retryPolicy.ExecuteAsync(() => _imoviewDAO.SaveImportacaoImovel(importacaoImovel));
         }
         catch (Exception ex)
         {
             importacaoImovel!.ImoviewResponse = Newtonsoft.Json.JsonConvert.SerializeObject(new { mensagem = ex.Message, erro = true, stack = ex.StackTrace });
             importacaoImovel.Status = StatusIntegracao.Erro.ToString();
-            await _imoviewDAO.SaveImportacaoImovel(importacaoImovel);
+            await _retryPolicy.ExecuteAsync(() => _imoviewDAO.SaveImportacaoImovel(importacaoImovel));
         }
     }
 
@@ -313,8 +321,8 @@ public class ImoviewService : IDisposable
         var imoveisNovos = new List<ImovelMapped>();
         foreach (var importacaoBairro in importacoesBairro)
         {
-            var importacoesImoveis = await _imoviewDAO.GetImportacaoImoveis(importacaoBairro.Id);
-            var imoveisBairro = await _imoviewDAO.GetImoveisBairro(bairroIntegrado.IdBairro);
+            var importacoesImoveis = await _retryPolicy.ExecuteAsync(() => _imoviewDAO.GetImportacaoImoveis(importacaoBairro.Id));
+            var imoveisBairro = await _retryPolicy.ExecuteAsync(() => _imoviewDAO.GetImoveisBairro(bairroIntegrado.IdBairro));
             imoveisNovos.AddRange(imoveisBairro.Where(imovel => !importacoesImoveis.Any(importacao => importacao.IdImovel == imovel.Id)));
         }
         return imoveisNovos;
@@ -347,14 +355,14 @@ public class ImoviewService : IDisposable
             Status = StatusIntegracao.Aguardando.GetDescription(),
             Imoveis = Newtonsoft.Json.JsonConvert.SerializeObject(imoveisNovos.Select(i => new { i.Id, i.IdCRM }))
         };
-        await _imoviewDAO.SaveImportacaoBairro(importacaoBairro);
+        await _retryPolicy.ExecuteAsync(() => _imoviewDAO.SaveImportacaoBairro(importacaoBairro));
     }
 
     private async Task FinalizeBairroIntegrado(IntegracaoBairroImoview bairroIntegrado)
     {
         bairroIntegrado.DataAtualizacao = DateTime.UtcNow;
         bairroIntegrado.Status = StatusIntegracao.Concluido.GetDescription();
-        await _imoviewDAO.SaveIntegracaoBairro(bairroIntegrado);
+        await _retryPolicy.ExecuteAsync(() => _imoviewDAO.SaveIntegracaoBairro(bairroIntegrado));
     }
 
     private static void UpdateExistingBairroIntegrado(IntegracaoBairroImoview bairroIntegrado)
