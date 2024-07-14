@@ -116,7 +116,8 @@ public class ImoviewController : ControllerBase
     [HttpPost("integracao/cliente/integrar")]
     public async Task<ActionResult<IntegrarClienteResponse>> IntegrarCliente([FromBody] IntegracaoImoview integracao)
     {
-        return Ok(await _service.IntegrarCliente(integracao));
+        var res = await _service.IntegrarCliente(integracao);
+        return Ok(res);
     }
 
  }

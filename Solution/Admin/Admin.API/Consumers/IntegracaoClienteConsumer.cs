@@ -25,6 +25,7 @@ namespace JaCaptei.Admin.API.Consumers
 
         public async Task Consume(ConsumeContext<IntegracaoEvent> context)
         {
+            await Task.Delay(TimeSpan.FromSeconds(10));
             await _service.ImportarIntegracao(context.Message);
         }
     }

@@ -83,9 +83,9 @@ public class ImoviewDAO: IDisposable {
         return res.ToList();
     }
 
-    public async Task<List<ImovelMapped>> GetImoveisBairro(int idBairro)
+    public async Task<List<ImovelEndereco>> GetImoveisBairro(int idBairro)
     {
-        var res = await _conn.QueryAsync<ImovelMapped>(i => i.IdBairro == idBairro);
+        var res = await _conn.QueryAsync<ImovelEndereco>(i => i.idBairro == idBairro);
         return res.ToList();
     }
 
@@ -133,8 +133,7 @@ public class ImoviewDAO: IDisposable {
     public async Task<List<ImportacaoBairroImoview>> GetImportacaoBairrosPendentes(int idIntegracao)
     {
         var integracoesPendentes = await _conn.QueryAsync<IntegracaoBairroImoview>
-            (i => i.IdIntegracao == idIntegracao && i.Status != StatusIntegracao.Processando.GetDescription() 
-            && i.Status != StatusIntegracao.Concluido.GetDescription());
+            (i => i.IdIntegracao == idIntegracao && i.Status != StatusIntegracao.Concluido.GetDescription());
         List<ImportacaoBairroImoview> importacoes = [];
         foreach(var integracao in  integracoesPendentes)
         {

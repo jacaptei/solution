@@ -85,7 +85,6 @@ namespace JaCaptei.Model {
             public DateTime                         dataAtualizacao         {get;set;}  = Utils.Date.GetLocalDateTime();
             public DateTime                         data                    {get;set;}  = Utils.Date.GetLocalDateTime();
 
-
             public string ObterTitulo(){
                 string res = "";
                 res  =    tipo.label;
