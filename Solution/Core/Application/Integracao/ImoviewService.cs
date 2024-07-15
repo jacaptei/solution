@@ -219,7 +219,7 @@ public class ImoviewService : IDisposable
             integracao.Status = StatusIntegracao.Erro.GetDescription();
             integracao.DataAtualizacao = DateTime.UtcNow;
             await _retryPolicy.ExecuteAsync(() => _imoviewDAO.SaveIntegracao(integracao));
-            return false;
+            throw; // lançar exception para registrar fila de erro
         }
     }
 
