@@ -78,6 +78,7 @@ public class ImovelDTOProfile : Profile
             .ForMember(dest => dest.caracteristicasinterna, opt => opt.MapFrom(src => GetCaracteristicasInternaDTO(src)))
             .ForMember(dest => dest.caracteristicasexterna, opt => opt.MapFrom(src => GetCaracteristicasExternaDTO(src)))
             .ForMember(dest => dest.lazer,                  opt => opt.MapFrom(src => GetLazerDTO(src)))
+            .ForMember(dest => dest.areas,                  opt => opt.MapFrom(src => GetAreas(src)))
             .ForMember(dest => dest.proprietarios,          opt => opt.MapFrom(src => GetProprietarios()))
             .ForMember(dest => dest.edificio,               opt => opt.MapFrom(src => src.Imovel.edificio))
             .ForMember(dest => dest.construtora,            opt => opt.MapFrom(src => src.Imovel.construtora))
@@ -98,6 +99,17 @@ public class ImovelDTOProfile : Profile
             .ForMember(dest => dest.finalidade,             opt => opt.MapFrom(src => 2)) // Hardcoded venda
             .ForMember(dest => dest.codigotipo,             opt => opt.MapFrom(src => src.Imovel.idTipo))
             .ForMember(dest => dest.descricao,              opt => opt.MapFrom(src => src.Imovel.descricao));
+    }
+
+    private Areas GetAreas(ImovelFullDTO src)
+    {
+        var areas = new Areas()
+        {
+            areainterna = src.ImovelAreas.interna,
+            areaexterna = src.ImovelAreas.externa,
+            arealote    = src.ImovelAreas.total
+        };
+        return areas;
     }
 
     private int GetFromDictionary(string chave, IReadOnlyDictionary<string, int> valuePairs, int defaultValue = 1)

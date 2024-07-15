@@ -4,9 +4,9 @@ namespace JaCaptei.Model.DTO;
 
 public class Areas
 {
-    public decimal areainterna { get; set; }
-    public decimal areaexterna { get; set; }
-    public decimal arealote { get; set; }
+    public float areainterna { get; set; }
+    public float areaexterna { get; set; }
+    public float arealote { get; set; }
 }
 
 public class Caracteristicasexterna
