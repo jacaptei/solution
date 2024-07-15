@@ -336,18 +336,23 @@ public class ImoviewService : IDisposable
     private async Task<bool> ProcessImportacaoImoveis(IntegracaoImoview integracao)
     {
         var importacaoBairros = await _retryPolicy.ExecuteAsync(() => _imoviewDAO.GetImportacaoBairrosPendentes(integracao.Id));
+        int qtdSucesso = 0, qtdErro = 0;
         foreach (var importacaoBairro in importacaoBairros)
         {
             var imoveisIds = Newtonsoft.Json.JsonConvert.DeserializeObject<List<ImovelListDTO>>(importacaoBairro.Imoveis) ?? [];
             foreach (var imovelId in imoveisIds)
             {
-                await ProcessSingleImportacaoImovel(integracao, importacaoBairro, imovelId);
+                var res = await ProcessSingleImportacaoImovel(integracao, importacaoBairro, imovelId);
+                if (res) qtdSucesso++;
+                else qtdErro++;
             }
         }
+        Console.WriteLine($"{qtdSucesso} imoveis importados com sucesso!");
+        Console.WriteLine($"{qtdErro} imoveis importados com erro!");
         return true;
     }
 
-    private async Task ProcessSingleImportacaoImovel(IntegracaoImoview integracao, ImportacaoBairroImoview importacaoBairro, ImovelListDTO imovelId)
+    private async Task<bool> ProcessSingleImportacaoImovel(IntegracaoImoview integracao, ImportacaoBairroImoview importacaoBairro, ImovelListDTO imovelId)
     {
         ImportacaoImovelImoview? importacaoImovel = await _retryPolicy.ExecuteAsync(() => _imoviewDAO.GetImportacaoImovel(importacaoBairro.Id, imovelId.idImovel));
         ImoviewAddImovelRequest? request = null;
@@ -376,6 +381,8 @@ public class ImoviewService : IDisposable
         }
         else
         {
+            if (importacaoImovel.Status == StatusIntegracao.Concluido.GetDescription())
+                return true;
             request = Newtonsoft.Json.JsonConvert.DeserializeObject<ImoviewAddImovelRequest>(importacaoImovel.RequestBody);
             images = await GetImageFiles(imovelId.idImovel);
         }
@@ -387,6 +394,7 @@ public class ImoviewService : IDisposable
             importacaoImovel!.Status = res!.erro ? StatusIntegracao.Erro.GetDescription() : StatusIntegracao.Concluido.GetDescription();
             importacaoImovel.ImoviewResponse = Newtonsoft.Json.JsonConvert.SerializeObject(res);
             await _retryPolicy.ExecuteAsync(() => _imoviewDAO.SaveImportacaoImovel(importacaoImovel));
+            return true;
         }
         catch (Exception ex)
         {
@@ -394,6 +402,7 @@ public class ImoviewService : IDisposable
             importacaoImovel.Status = StatusIntegracao.Erro.ToString();
             await _retryPolicy.ExecuteAsync(() => _imoviewDAO.SaveImportacaoImovel(importacaoImovel));
         }
+        return false;
     }
 
     private async Task<List<ImovelEndereco>> GetNovosImoveis(List<ImportacaoBairroImoview> importacoesBairro, IntegracaoBairroImoview bairroIntegrado)

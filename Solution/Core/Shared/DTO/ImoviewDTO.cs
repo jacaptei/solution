@@ -150,7 +150,7 @@ public record ImoviewIncluirResponse
 {
     public string mensagem { get; set; }
     public int? codigo { get; set; }
-    public bool erro { get; set; }
+    public bool erro { get; set; } = false;
 }
 
 public class ImagemDTO
