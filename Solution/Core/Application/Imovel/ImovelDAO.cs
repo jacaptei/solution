@@ -24,35 +24,41 @@ namespace JaCaptei.Application {
                 using(var trans = conn.EnsureOpen().BeginTransaction()) {
                     try {
 
-                        ImovelTipo tipo = conn.Query<ImovelTipo>(t=>t.label == entity.tipo.label).FirstOrDefault();
-                        if(tipo is null)
-                            tipo = new ImovelTipo{ id=1, nome="IMOVEL", label="Imóvel" };
-                        entity.idTipo = tipo.id;
+                        entity.tipo = conn.Query<ImovelTipo>(t => t.id == entity.idTipo || t.label == entity.tipo.label).FirstOrDefault();
+                        if(entity.tipo is null)
+                            entity.tipo = new ImovelTipo { id=1,nome="IMOVEL",label="Imóvel" };
+                        
+                        entity.idTipo   = entity.tipo.id;
 
                         entity.id   = conn.Insert<Imovel,int>(entity);
                         
                         entity.cod              = (Utils.Validator.Is(entity.codCRM) ? entity.codCRM : ("JC"+entity.id.ToString("0000")));
-                        entity.nome             = tipo.label + " ID " + entity.id.ToString() + ", COD " + entity.cod;
-                        entity.tag              = "imovel_id_" + entity.id.ToString() + "_cod_"+entity.cod ;
+                        entity.nome             = entity.tipo.label + ", ID " + entity.id.ToString() + ", COD " + entity.cod;
+                        //entity.tag              = "imovel_id_" + entity.id.ToString() + "_cod_"+entity.cod ;
+                        entity.tag              = "homolog" ;
+                        entity.tokenNum         = Utils.Key.CreateTokenNum(entity.id);
                         entity.dataAtualizacao  = Utils.Date.GetLocalDateTime();
+
+                        if(Utils.Validator.Not(entity.carga))
+                            entity.carga = Utils.Key.CreateDaykey().ToString();
 
                         entity.titulo       =    entity.ObterTitulo();
                         entity.urlPublica   =    entity.ObterUrlPublica();
                         
                         conn.Update<Imovel>(entity);
 
-                        short index=0;
-                        short ordem=-5;
-                        entity.imagens.ForEach(i => {
-                            i.idImovel  = entity.id;
-                            i.principal = (index == 0);
-                            i.index     = index++;
-                            i.ordem     = ordem+=5;
-                            i.tokenNum  = entity.tokenNum;
-                            i.data      = entity.data;
-                            i.tag       = entity.tag;
-                            conn.Insert<ImovelImagem>(i);
-                        });
+                        //short index =  0;
+                        //short ordem = -5;
+                        //entity.imagens.ForEach(i => {
+                        //    i.idImovel  = entity.id;
+                        //    i.principal = (index == 0);
+                        //    i.index     = index++;
+                        //    i.ordem     = ordem+=5;
+                        //    i.tokenNum  = entity.tokenNum;
+                        //    i.data      = entity.data;
+                        //    i.tag       = entity.tag;
+                        //    conn.Insert<ImovelImagem>(i);
+                        //});
 
                         entity.endereco.idImovel = entity.id;
                         conn.Insert<ImovelEndereco>(entity.endereco);
@@ -91,9 +97,30 @@ namespace JaCaptei.Application {
         }
 
 
-        public void AlterarImovelImagem(ImovelImagem entity) {
-            using(var conn = DB.GetConn())
-                conn.Update<ImovelImagem>(entity);
+        public void AdicionarImagens(Imovel entity) {
+            using(var conn = DB.GetConn()) {
+
+                using(var trans = conn.EnsureOpen().BeginTransaction()) {
+                    try{ 
+                        conn.Delete<ImovelImagem>((i) => i.idImovel == entity.id);
+                        entity.imagens.ForEach(i => { conn.Insert<ImovelImagem>(i); });
+
+                        Imovel entityDB = conn.Query<Imovel>(i => i.id == entity.id).FirstOrDefault();
+
+                        if(entityDB is not null) {
+                            entityDB.urlImagemPrincipal = entity.imagens[0].urlFull;
+                            entityDB.possuiImagens = true;
+                            conn.Update<Imovel>(entityDB);
+                        }
+                        trans.Commit();
+
+                    } catch(Exception ex) {
+                        appReturn.SetAsException("Falha ao inserir imagens no imóvel",ex);
+                        trans.Rollback();
+                    }
+                }
+
+            }
         }
 
         public List<Imovel> ObterImoveisComImagensCRM(){
@@ -123,20 +150,46 @@ namespace JaCaptei.Application {
 
             List<Imovel> entities = new List<Imovel>();
 
-            if(busca is null || busca.imovelMigrado is null)
+            if(busca is null || busca.imovelJC is null)
                 appReturn.AddException("Busca não identificada");
 
             string  filter   = ObterQueryBuscaImovel(busca);
-            string  sqlCount = "SELECT COUNT(*) FROM \"Imovel\"  WHERE " + filter;
-            string  sql = " SELECT JSON_AGG(res) FROM(     SELECT      imv.* ,                                                                                         "
-                        +"                                            (SELECT json_agg(img.*) FROM \"ImovelImagem\" img where img.\"idImovel\" = imv.id)  as imagens   "
-                        +"                                  FROM                                                                                                       "
-                        +"                                              \"Imovel\" imv                                                                                 "
-                        +"                                                                                                                                             "
-                        +"                                  WHERE  "        + filter + "                                                                               "
-                        +"                                  ORDER BY imv."  + busca.orderBy + "                                                                        "
-                        +"                                  LIMIT "         + busca.resultsPerPage + " OFFSET "+ busca.offset +"                                       "
-                        +"                           ) res;                                                                                                            "
+            string  sqlCount = "SELECT COUNT(*) FROM "
+                        +"      \"Imovel\" imovel                                                                                           "
+                        +"                           JOIN \"ImovelEndereco\"                    endereco        ON (endereco.\"idImovel\"       = imovel.id)  "
+                        +"                           JOIN \"ImovelAreas\"                       area            ON (area.\"idImovel\"           = imovel.id)  "
+                        +"                           JOIN \"ImovelLazer\"                       lazer           ON (lazer.\"idImovel\"          = imovel.id)  "
+                        +"                           JOIN \"ImovelCaracteristicasInternas\"     interno         ON (interno.\"idImovel\"        = imovel.id)  "
+                        +"                           JOIN \"ImovelCaracteristicasExternas\"     externo         ON (externo.\"idImovel\"        = imovel.id)  "
+                        +"                           JOIN \"ImovelDisposicao\"                  disposicao      ON (disposicao.\"idImovel\"     = imovel.id)  "
+                        +"                           JOIN \"ImovelDocumentacao\"                documentacao    ON (documentacao.\"idImovel\"   = imovel.id)  "
+                        + " WHERE " + filter;
+
+            string  sql      = " SELECT JSON_AGG(res) FROM(     SELECT      imovel.* ,                                                                                                       "
+                        +"                                            (SELECT json_agg(img.*) FROM \"ImovelImagem\" img where img.\"idImovel\" = imovel.id)  as imagens ,           "
+                        +"                                            to_json(endereco.*)      as endereco                                                                 ,        "
+                        +"                                            to_json(area.*)          as area                                                                     ,        "
+                        +"                                            to_json(lazer.*)         as lazer                                                                    ,        "
+                        +"                                            to_json(interno.*)       as interno                                                                  ,        "
+                        +"                                            to_json(externo.*)       as externo                                                                  ,        "
+                        +"                                            to_json(disposicao.*)    as disposicao                                                               ,        "
+                        +"                                            to_json(documentacao.*)  as documentacao                                                             ,        "
+                        +"                                            to_json(proprietario.*)  as proprietario                                                                      "
+                        +"                                  FROM                                                                                                                    "
+                        +"                                              \"Imovel\" imovel                                                                                           "
+                        +"                                                                JOIN \"ImovelEndereco\"                    endereco        ON (endereco.\"idImovel\"       = imovel.id)  "
+                        +"                                                                JOIN \"ImovelAreas\"                       area            ON (area.\"idImovel\"           = imovel.id)  "
+                        +"                                                                JOIN \"ImovelLazer\"                       lazer           ON (lazer.\"idImovel\"          = imovel.id)  "
+                        +"                                                                JOIN \"ImovelCaracteristicasInternas\"     interno         ON (interno.\"idImovel\"        = imovel.id)  "
+                        +"                                                                JOIN \"ImovelCaracteristicasExternas\"     externo         ON (externo.\"idImovel\"        = imovel.id)  "
+                        +"                                                                JOIN \"ImovelDisposicao\"                  disposicao      ON (disposicao.\"idImovel\"     = imovel.id)  "
+                        +"                                                                JOIN \"ImovelDocumentacao\"                documentacao    ON (documentacao.\"idImovel\"   = imovel.id)  "
+                        +"                                                                JOIN \"Proprietario\"                      proprietario    ON (proprietario.id             = imovel.\"idProprietario\")  "
+                        +""
+                        +"                                  WHERE  "            + Utils.Validator.ParseSafeSQL(filter)          + " "
+                        +"                                  ORDER BY imovel."   + Utils.Validator.ParseSafeSQL(busca.orderBy)   + " "
+                        +"                                                    " + Utils.Validator.ParseSafeSQL(busca.limit)     + " "
+                        +"                           ) res; "
                         ;
 
             using(var conn = DB.GetConn()) {
@@ -148,7 +201,7 @@ namespace JaCaptei.Application {
                     if(res?.json_agg is not null)
                         entities    = JsonConvert.DeserializeObject<List<Imovel>>(res.json_agg);
 
-                    busca.result.imoveisMigrados = entities;
+                    busca.result.imoveisJC = entities;
                     appReturn.result = busca.result;
 
                 } catch(Exception ex) {
@@ -167,38 +220,55 @@ namespace JaCaptei.Application {
             //sql = "SELECT * from Products where cf_1021 = 'SP';";
             //sql = "SELECT * from Products ;";
 
-            string filter = " ativo = TRUE "; // discontinued <> 1
+            string filter = " imovel.ativo = TRUE "; // discontinued <> 1
 
 
-            if(busca.imovelMigrado.id > 0)
-                filter += " AND id = '" + busca.imovelMigrado.id.ToString() + "' ";
-            else if(Utils.Validator.Is(busca.imovelMigrado.cod))
-                filter += " AND cod = '" + busca.imovelMigrado.cod + "' ";
+            if(busca.imovelJC.id > 0)
+                filter += " AND imovel.id = '" + busca.imovelJC.id.ToString() + "' ";
+            else if(Utils.Validator.Is(busca.imovelJC.cod))
+                filter += " AND imovel.cod = '" + busca.imovelJC.cod + "' ";
             else {
 
-                if(busca.imovelMigrado.externo.totalVagas > 0)
-                    filter += " AND vagas >= " + busca.imovelMigrado.externo.totalVagas.ToString();
+                //if(!System.String.IsNullOrWhiteSpace(busca.imovelJC.endereco.cep))
+                //    filter += " AND endereco.\"cepNorm\" = '" + busca.imovelJC.endereco.cepNorm + "' ";
+                //else if(!System.String.IsNullOrWhiteSpace(busca.cepBase))
+                //    filter += " AND endereco.\"cepNorm\" LIKE '%" + busca.cepBase + "%' ";
 
-                if(busca.imovelMigrado.interno.totalQuartos > 0)
-                    filter += " AND quartos >= " + busca.imovelMigrado.interno.totalQuartos.ToString();
 
-                if(busca.imovelMigrado.interno.totalBanheiros > 0)
-                    filter += " AND banheiros >= " + busca.imovelMigrado.interno.totalBanheiros.ToString();
 
-                if(busca.imovelMigrado.interno.totalSuites > 0)
-                    filter += " AND suites >= " + busca.imovelMigrado.interno.totalSuites.ToString();
+                if(!System.String.IsNullOrWhiteSpace(busca.imovelJC.endereco.cepNorm)){
+                    if(busca.imovelJC.endereco.cepNorm.Length >= 7)
+                        filter += " AND endereco.\"cepNorm\" = '" + busca.imovelJC.endereco.cepNorm + "' ";
+                    else
+                        filter += " AND endereco.\"cepNorm\" LIKE '%" +busca.imovelJC.endereco.cepNorm + "%' ";
+                }
 
-                if(!System.String.IsNullOrWhiteSpace(busca.imovelMigrado.endereco.estado))
-                    filter += " AND estado = '" + busca.imovelMigrado.endereco.estado + "' ";
+                if(!System.String.IsNullOrWhiteSpace(busca.imovelJC.endereco.estadoNorm))
+                    filter += " AND endereco.\"estadoNorm\" = '" + busca.imovelJC.endereco.estadoNorm + "' ";
 
-                if(!System.String.IsNullOrWhiteSpace(busca.imovelMigrado.endereco.cidade))
-                    filter += " AND cidade = '" + busca.imovelMigrado.endereco.cidade + "' ";
+                if(!System.String.IsNullOrWhiteSpace(busca.imovelJC.endereco.cidadeNorm))
+                    filter += " AND endereco.\"cidadeNorm\" = '" + busca.imovelJC.endereco.cidadeNorm + "' ";
 
+                if(!System.String.IsNullOrWhiteSpace(busca.imovelJC.endereco.logradouroNorm))
+                    filter += " AND endereco.\"logradouroNorm\" LIKE '%" + busca.imovelJC.endereco.logradouroNorm + "%' ";
+
+
+                if(busca.imovelJC.externo.totalVagas > 0)
+                    filter += " AND externo.\"totalVagas\" >= " + busca.imovelJC.externo.totalVagas.ToString();
+
+                if(busca.imovelJC.interno.totalQuartos > 0)
+                    filter += " AND interno.\"totalQuartos\" >= " + busca.imovelJC.interno.totalQuartos.ToString();
+
+                if(busca.imovelJC.interno.totalBanheiros > 0)
+                    filter += " AND interno.\"totalBanheiros\" >= " + busca.imovelJC.interno.totalBanheiros.ToString();
+
+                if(busca.imovelJC.interno.totalSuites > 0)
+                    filter += " AND interno.\"totalSuites\" >= " + busca.imovelJC.interno.totalSuites.ToString();
                 //if(!System.String.IsNullOrWhiteSpace(busca.imovelMigrado.tipo))
                 //    filter += " AND tipo = '" + busca.imovelMigrado.tipo + "' ";
 
-                if(busca.imovelMigrado.tipo.id > 0)
-                    filter += " AND idTipo = '" + busca.imovelMigrado.tipo.id.ToString() + "' ";
+                if(busca.imovelJC.tipo.id > 0)
+                    filter += " AND imovel.\"idTipo\" = '" + busca.imovelJC.idTipo.ToString() + "' ";
 
                 if(busca.bairros.Count > 0) {
                     //filter += " AND cf_1011 IN('" + string.Join(",",busca.imovelMigrado.bairros).Replace("(",",").Replace(")","").Replace(",","','") + "') ";
@@ -206,45 +276,48 @@ namespace JaCaptei.Application {
                     busca.bairros.ForEach(item => {
                         items += "'" + item.Replace("(","','").Replace(")","").Trim().Replace(" '","'") + "',";
                     });
-                    filter += " AND ( bairro IN (" + items + ") OR \"bairroNorm\" IN (" + items + ") ) ";
-                }
-
-                if(busca.imovelMigrado.valor.minimo > 0)
-                    filter += " AND valorMinimo  >=  " + busca.imovelMigrado.valor.minimo.ToString();
-                if(busca.imovelMigrado.valor.maximo > 0)
-                    filter += " AND valorMaximo  <=  " + busca.imovelMigrado.valor.maximo.ToString();
+                    filter += " AND ( endereco.bairro IN (" + items + ") OR endereco.\"bairroNorm\" IN (" + items + ") ) ";
+                }else if(!System.String.IsNullOrWhiteSpace(busca.imovelJC.endereco.bairroNorm))
+                    filter += " AND endereco.\"bairroNorm\" = '" + busca.imovelJC.endereco.bairroNorm + "' ";
 
 
-                if(busca.imovelMigrado.area.minima > 0)
-                    filter += " AND areaMinima  >=  " + busca.imovelMigrado.area.minima.ToString();
-                if(busca.imovelMigrado.area.maxima > 0)
-                    filter += " AND areaMaxima  <=  " + busca.imovelMigrado.area.maxima.ToString();
+                if(busca.imovelJC.valor.minimo > 0)
+                    filter += " AND valor.minimo  >=  " + busca.imovelJC.valor.minimo.ToString();
+                if(busca.imovelJC.valor.maximo > 0)
+                    filter += " AND valor.maximo  <=  " + busca.imovelJC.valor.maximo.ToString();
 
-                if(busca.imovelMigrado.interno.areaServico)         { filter += "AND areaServico      = TRUE ";  }
-                if(busca.imovelMigrado.interno.closet)              { filter += "AND closet           = TRUE ";  }
-                if(busca.imovelMigrado.interno.churrasqueira)       { filter += "AND churrasqueira    = TRUE ";  }
-                if(busca.imovelMigrado.interno.sala )               { filter += "AND sala             = TRUE ";  }
-                if(busca.imovelMigrado.interno.armarioBanheiro)     { filter += "AND armarioBanheiro  = TRUE ";  }
-                if(busca.imovelMigrado.interno.armarioQuarto)       { filter += "AND armarioQuarto    = TRUE ";  }
-                if(busca.imovelMigrado.interno.boxDespejo)          { filter += "AND boxDespejo       = TRUE ";  }
-                if(busca.imovelMigrado.interno.lavabo)              { filter += "AND lavabo           = TRUE ";  }
-                if(busca.imovelMigrado.interno.dce)                 { filter += "AND dce              = TRUE ";  }
-                if(busca.imovelMigrado.interno.aguaIndividual)      { filter += "AND aguaIndividual   = TRUE ";  }
-                if(busca.imovelMigrado.interno.gasCanalizado)       { filter += "AND gasCanalizado    = TRUE ";  }
-                if(busca.imovelMigrado.interno.armarioCozinha)      { filter += "AND armarioCozinha   = TRUE ";  }
 
-                if(busca.imovelMigrado.lazer.hidromassagem)       { filter += "AND hidromassagem    = TRUE ";  }
-                if(busca.imovelMigrado.lazer.piscina)             { filter += "AND piscina          = TRUE ";  }
-                if(busca.imovelMigrado.lazer.quadraPoliesportiva)     { filter += "AND quadraPoliesportiva  = TRUE ";  }
-                if(busca.imovelMigrado.lazer.salaoFestas)         { filter += "AND salaoFestas      = TRUE ";  }
+                if(busca.imovelJC.area.minima > 0)
+                    filter += " AND area.minima  >=  " + busca.imovelJC.area.minima.ToString();
+                if(busca.imovelJC.area.maxima > 0)
+                    filter += " AND area.maxima  <=  " + busca.imovelJC.area.maxima.ToString();
 
-                if(busca.imovelMigrado.externo.cercaEletrica)       { filter += "AND cercaEletrica    = TRUE ";  }
-                if(busca.imovelMigrado.externo.jardim)              { filter += "AND jardim           = TRUE ";  }
-                if(busca.imovelMigrado.externo.interfone)           { filter += "AND interfone        = TRUE ";  }
-                if(busca.imovelMigrado.externo.portaoEletronico)    { filter += "AND portaoEletronico = TRUE ";  }
-                if(busca.imovelMigrado.externo.alarme)              { filter += "AND alarme           = TRUE ";  }
-                if(busca.imovelMigrado.externo.elevador)            { filter += "AND elevador         = TRUE ";  }
+                if(busca.imovelJC.interno.areaServico)         { filter += "AND interno.\"areaServico\"        = TRUE ";  }
+                if(busca.imovelJC.interno.closet)              { filter += "AND interno.closet                 = TRUE ";  }
+                if(busca.imovelJC.interno.churrasqueira)       { filter += "AND interno.churrasqueira          = TRUE ";  }
+                if(busca.imovelJC.interno.sala )               { filter += "AND interno.sala                   = TRUE ";  }
+                if(busca.imovelJC.interno.armarioBanheiro)     { filter += "AND interno.\"armarioBanheiro\"    = TRUE ";  }
+                if(busca.imovelJC.interno.armarioQuarto)       { filter += "AND interno.\"armarioQuarto\"      = TRUE ";  }
+                if(busca.imovelJC.interno.boxDespejo)          { filter += "AND interno.\"boxDespejo\"         = TRUE ";  }
+                if(busca.imovelJC.interno.lavabo)              { filter += "AND interno.lavabo                 = TRUE ";  }
+                if(busca.imovelJC.interno.dce)                 { filter += "AND interno.dce                    = TRUE ";  }
+                if(busca.imovelJC.interno.aguaIndividual)      { filter += "AND interno.\"aguaIndividual\"     = TRUE ";  }
+                if(busca.imovelJC.interno.gasCanalizado)       { filter += "AND interno.\"gasCanalizado\"      = TRUE ";  }
+                if(busca.imovelJC.interno.armarioCozinha)      { filter += "AND interno.\"armarioCozinha\"     = TRUE ";  }
 
+                if(busca.imovelJC.externo.cercaEletrica)       { filter += "AND externo.\"cercaEletrica\"      = TRUE ";  }
+                if(busca.imovelJC.externo.jardim)              { filter += "AND externo.jardim                 = TRUE ";  }
+                if(busca.imovelJC.externo.interfone)           { filter += "AND externo.interfone              = TRUE ";  }
+                if(busca.imovelJC.externo.portaoEletronico)    { filter += "AND externo.\"portaoEletronico\"   = TRUE ";  }
+                if(busca.imovelJC.externo.alarme)              { filter += "AND externo.alarme                 = TRUE ";  }
+                if(busca.imovelJC.externo.elevador)            { filter += "AND externo.elevador               = TRUE ";  }
+
+                if(busca.imovelJC.lazer.hidromassagem)         { filter += "AND lazer.hidromassagem          = TRUE ";  }
+                if(busca.imovelJC.lazer.piscina)               { filter += "AND lazer.piscina                = TRUE ";  }
+                if(busca.imovelJC.lazer.quadraPoliesportiva)   { filter += "AND lazer.\"quadraPoliesportiva\"= TRUE ";  }
+                if(busca.imovelJC.lazer.salaoFestas)           { filter += "AND lazer.\"salaoFestas\"        = TRUE ";  }
+
+                filter = Utils.Validator.ParseSafeSQL(filter);
 
             }
 

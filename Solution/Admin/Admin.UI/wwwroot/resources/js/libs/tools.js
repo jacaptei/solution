@@ -522,22 +522,35 @@ export default class Tools {
 
     
     
-    BuildMapLink(entity){
-        var link = "";
+    BuildMapLink(item){
+        var res = "";
 
-        if (this.is(entity)){
-
-            var address      = entity.logradouro + ",";
-            address         += entity.numero + ",";
-            address         += entity.bairro + ",";
-            address         += entity.cidade + ",";
-            address         += entity.estado + ",";
-            address         += this.is(entity.cep)?  entity.cep :"";
+        if (this.is(item)){
+            /*
+            var address      = item.logradouro + ",";
+            address         += item.numero + ",";
+            address         += item.bairro + ",";
+            address         += item.cidade + ",";
+            address         += item.estado + ",";
+            address         += this.is(item.cep)?  item.cep :"";
             address = address.replaceAll(" ", "+");
             
             link = "https://www.google.com/maps/place/" + address;
+            */
+
+            res += this.validator.is(item.endereco )    ? item.endereco     + "," : "";
+            res += this.validator.is(item.logradouro )  ? item.logradouro   + "," : "";
+            res += this.validator.is(item.numero    )   ? item.numero       + "," : "";
+            res += this.validator.is(item.bairro)       ? item.bairro       + "," : "";
+            res += this.validator.is(item.cidade)       ? item.cidade       + "," : "";
+            res += this.validator.is(item.estado)       ? item.estado       + ""  : "";
+            res = res.replaceAll(" ", "%20");
+            res = "https://maps.google.com/maps?q="+res+"+()&amp;t=&amp;z=12&amp;ie=UTF8&amp;iwloc=B&amp;output=embed";
+            //c(res)
         }
-        return link;
+
+        return res;
+
     }
 
 

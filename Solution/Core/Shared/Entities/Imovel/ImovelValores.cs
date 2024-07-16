@@ -22,10 +22,11 @@ namespace JaCaptei.Model {
             public double   aluguelAnterior   {get;set;} = 0d;
             public double   condominio        {get;set;} = 0d;
             public double   consulta          {get;set;} = 0d;
-            public double   iptuMensal        {get;set;} = 0d;
             public double   iptuAnual         {get;set;} = 0d;
-            public double   comissao         {get;set;} = 0d; // %
-            public double   rentabilidade    {get;set;} = 0d; // %
+            public double   iptuMensal        {get;set;} = 0d;
+            public double   iptuIndice        {get;set;} = 0d;
+            public double   comissao          {get;set;} = 0d; // %
+            public double   rentabilidade     {get;set;} = 0d; // %
             public double   maximo            {get;set;} = 0d;
             public double   minimo            {get;set;} = 0d;
 

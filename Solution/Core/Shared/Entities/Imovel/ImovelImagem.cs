@@ -14,6 +14,7 @@ namespace JaCaptei.Model {
             public string       cod                 {get;set;}="";
             public string       nome                {get;set;}="";
             public string       arquivo             {get;set;}="";
+            public string       arquivoOriginal     {get;set;}="";
             
             public string       tipo                {get;set;}="jpg";
             public string       contentType         {get;set;}="img/jpeg";
@@ -22,6 +23,7 @@ namespace JaCaptei.Model {
             public short        width               {get;set;}=0;
             public short        height              {get;set;}=0;
             public int          size                {get;set;}=0;
+            public int          version             {get;set;}=0;
             public string       base64              {get;set;}="";
 
             public bool         principal           {get;set;}=false;

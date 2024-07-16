@@ -38,6 +38,9 @@ namespace JaCaptei.Application{
         public AppReturn ObterIdCidade(int idEstado, string nome) {
             return DAO.ObterIdCidade(idEstado,nome);
         }
+        public AppReturn ObterIdCidadeNorm(int idEstado, string nome) {
+            return DAO.ObterIdCidadeNorm(idEstado,nome);
+        }
 
         public AppReturn ObterBairrosPorCidadeId(int id) {
             return DAO.ObterBairrosPorCidadeId(id);
@@ -47,6 +50,9 @@ namespace JaCaptei.Application{
         }
         public AppReturn ObterIdBairro(int idCidade,string nome) {
             return DAO.ObterIdBairro(idCidade,nome);
+        }
+        public AppReturn ObterIdBairroNorm(int idCidade,string nome) {
+            return DAO.ObterIdBairroNorm(idCidade,nome);
         }
 
         public AppReturn ObterBairrosPorCidadeNome(string nome) {

@@ -22,9 +22,10 @@
     localidade(){           return this.Unbind(this.data.localidade);       }
     solicitacao(){          return this.Unbind(this.data.solicitacao);      }
     //tiposImoveis(){         return this.Unbind(this.data.tiposImoveis);     }
-    tiposImoveis(){         return this.ObterTiposImoveis();     }
+    tiposComplementos(){    return this.Unbind(this.data.tiposComplementos);}
+    tiposImoveis(){         return this.ObterTiposImoveis();                }
     busca(){                return this.Unbind(this.data.busca);            }
-    imovelBusca(){          return this.Unbind(this.data.imovelBusca);      }
+    buscaImovel(){          return this.Unbind(this.data.imovelBusca);      }
     favorito(){             return this.Unbind(this.data.favorito);         }
     
 
