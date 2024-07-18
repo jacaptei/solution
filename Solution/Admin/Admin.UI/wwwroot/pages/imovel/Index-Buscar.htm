@@ -25,40 +25,40 @@
                         <div>ESTADO <span></span></div>
                         <el-select filterable v-model="" class="m-4" placeholder="Selecionar" size="large" style="width:100%" @change="(item)=>{enableFilterButton = true;}">
                             <!--<el-option v-for="item in $root.search.opcoes.estados"
-                                :key="item.id"
-                                :label="item.label"
-                                :value="item">
-                            </el-option>-->
+                    :key="item.id"
+                    :label="item.label"
+                    :value="item">
+                </el-option>-->
                         </el-select>
                     </el-col>
                     <el-col :xs="24" :sm="12" :md="8" :lg="6" class="s-input">
                         <div>CIDADE <span></span></div>
                         <!--<div style="height:40px" v-if="">
-                            <c-loading size="30px" style="padding-left:5px"></c-loading>
-                        </div>-->
+                <c-loading size="30px" style="padding-left:5px"></c-loading>
+            </div>-->
                         <!--<div v-else-if="">
-                            <span style="color:#7d7d7d;padding-left:10px">selecione um estado</span>
-                        </div>-->
+                <span style="color:#7d7d7d;padding-left:10px">selecione um estado</span>
+            </div>-->
                         <el-select v-else v-model="" filterable class="m-4" placeholder="qualquer" size="large" style="width:100%" @change="(item)=>{}">
                             <!--<el-option v-for="item in $root.search.opcoes.cidades"
-                            :key="item.id"
-                            :label="item.label"
-                            :value="item"></el-option>-->
+                :key="item.id"
+                :label="item.label"
+                :value="item"></el-option>-->
                         </el-select>
                     </el-col>
                     <el-col :xs="24" :sm="12" :md="8" :lg="6" class="s-input">
                         <div>BAIRRO<span></span></div>
                         <!--<div style="height:40px" v-if="">
-                            <c-loading size="30px" style="padding-left:5px"></c-loading>
-                        </div>-->
+                <c-loading size="30px" style="padding-left:5px"></c-loading>
+            </div>-->
                         <!--<div v-else-if="">
-                            <span style="color:#7d7d7d;padding-left:10px">selecione um estado</span>
-                        </div>-->
+                <span style="color:#7d7d7d;padding-left:10px">selecione um estado</span>
+            </div>-->
                         <el-select v-else v-model="" multiple filterable :clearable="true" class="m-4" placeholder="qualquer" size="large" style="width:100%">
                             <!--<el-option v-for="item in $root.search.opcoes.bairros"
-                            :key="item.id"
-                            :label="item.label"
-                            :value="item"></el-option>-->
+                :key="item.id"
+                :label="item.label"
+                :value="item"></el-option>-->
                         </el-select>
                     </el-col>
                     <el-col :xs="24" :sm="12" :md="8" :lg="6" class="s-input">
@@ -69,9 +69,9 @@
                         <div>TIPO DE IMÓVEL<span></span></div>
                         <el-select v-model="" filterable class="m-4" placeholder="qualquer" size="large" style="width:100%" @change="enableFilterButton = true">
                             <!--<el-option v-for="item in $root.search.opcoes.tiposImoveis"
-                            :key="item.id"
-                            :label="item.label"
-                            :value="item"></el-option>-->
+                :key="item.id"
+                :label="item.label"
+                :value="item"></el-option>-->
                         </el-select>
                     </el-col>
                     <el-col :xs="24" :sm="12" :md="8" :lg="6" class="s-input">
@@ -96,9 +96,9 @@
                         <div>QUARTOS<span></span></div>
                         <el-select v-model="quartos" placeholder="qualquer" input-style="color:var(--s-accent-color)" :teleported="false" @change="enableFilterButton = true" style="width:100%">
                             <!--<el-option v-for="item in $root.search.opcoes.quantidades" :key="item.id" :label="item.label + item.complement.replace('ou','')" :value="item.value">
-                                <span :style="(item.id > 0)? 'font-weight:bold;margin-right:6px':''">{{ item.label }}</span>
-                                <span style="font-size:12px">{{ item.complement }}</span>
-                            </el-option>-->
+                    <span :style="(item.id > 0)? 'font-weight:bold;margin-right:6px':''">{{ item.label }}</span>
+                    <span style="font-size:12px">{{ item.complement }}</span>
+                </el-option>-->
                         </el-select>
                     </el-col>
 
@@ -106,27 +106,27 @@
                         <div>VAGAS<span></span></div>
                         <el-select v-model="vagas" placeholder="qualquer" size="large" input-style="color:var(--s-accent-color)" :teleported="false" @change="enableFilterButton = true" style="width:100%">
                             <!--<el-option v-for="item in $root.search.opcoes.quantidades" :key="item.id" :label="item.label + item.complement.replace('ou','')" :value="item.value">
-                                <span :style="(item.id > 0)? 'font-weight:bold;margin-right:6px':''">{{ item.label }}</span>
-                                <span style="font-size:12px">{{ item.complement }}</span>
-                            </el-option>-->
+                    <span :style="(item.id > 0)? 'font-weight:bold;margin-right:6px':''">{{ item.label }}</span>
+                    <span style="font-size:12px">{{ item.complement }}</span>
+                </el-option>-->
                         </el-select>
                     </el-col>
                     <el-col :xs="24" :sm="12" :md="8" :lg="6" class="s-input">
                         <div>BANHEIROS<span></span></div>
                         <el-select v-model="banheiros" filterable placeholder="qualquer" size="large" input-style="color:var(--s-accent-color)" :teleported="false" @change="enableFilterButton = true" style="width:100%">
                             <!--<el-option v-for="item in $root.search.opcoes.quantidades" :key="item.id" :label="item.label + item.complement.replace('ou','')" :value="item.value">
-                                <span :style="(item.id > 0)? 'font-weight:bold;margin-right:6px':''">{{ item.label }}</span>
-                                <span style="font-size:12px">{{ item.complement }}</span>
-                            </el-option>-->
+                    <span :style="(item.id > 0)? 'font-weight:bold;margin-right:6px':''">{{ item.label }}</span>
+                    <span style="font-size:12px">{{ item.complement }}</span>
+                </el-option>-->
                         </el-select>
                     </el-col>
                     <el-col :xs="24" :sm="12" :md="8" :lg="6" class="s-input">
                         <div>SUÍTES<span></span></div>
                         <el-select v-model="suites" filterable class="m-4" placeholder="qualquer" size="large" input-style="color:var(--s-accent-color)" :teleported="false" @change="enableFilterButton = true" style="width:100%">
                             <!--<el-option v-for="item in $root.search.opcoes.quantidades" :key="item.id" :label="item.label + item.complement.replace('ou','')" :value="item.value">
-                                <span :style="(item.id > 0)? 'font-weight:bold;margin-right:6px':''">{{ item.label }}</span>
-                                <span style="font-size:12px">{{ item.complement }}</span>
-                            </el-option>-->
+                    <span :style="(item.id > 0)? 'font-weight:bold;margin-right:6px':''">{{ item.label }}</span>
+                    <span style="font-size:12px">{{ item.complement }}</span>
+                </el-option>-->
                         </el-select>
                     </el-col>
                 </el-row>
@@ -144,10 +144,13 @@
                     </el-checkbox-group>
                 </el-col>
 
-                <el-col :xs="24" :sm="12" :md="8" :lg="6" class="s-input">
-                    <div><span></span></div>
-                    <div style="cursor:pointer;padding-top:10px;color:green" @click="LimparFiltro"><i class="fa fa-cancel"></i> limpar filtro</div>
-                </el-col>
+                <el-row style="width: 100%; display: flex; justify-content: flex-end; align-items: center;">
+                    <el-col :xs="24" :sm="12" :md="8" :lg="6" class="s-input" style="width: 100%; display: flex; justify-content: flex-end; align-items: center;">
+                        <div><span></span></div>
+                        <q-btn label="BUSCAR" color="primary" @click="BuscarProprietario()"></q-btn>
+                        <span style="cursor:pointer; padding-left:20px; color:var(--s-color-green)" @click="LimparFiltro"><i class="fa fa-cancel"></i> limpar filtro</span>
+                    </el-col>
+                </el-row>
 
                 <el-row justify="center" v-if="onrequest">
                     <el-col :md="24" style="color:var(--s-color-primary)">
@@ -155,7 +158,6 @@
                         <c-loading padding="20px"></c-loading>
                     </el-col>
                 </el-row>
-
 
                 <el-row v-else>
                     <el-col :md="24">
@@ -230,12 +232,12 @@
                                     <!--</el-table-column>-->
                                     <!--<el-table-column label="ENDEREÇO">-->
                                     <!--<el-table-column prop="cidade"      label="CIDADE"      width="280" />
-                                        <el-table-column prop="estado"      label="ESTADO"      width="140" />
-                                        <el-table-column prop="bairro"      label="BAIRRO"      width="240" />
-                                        <el-table-column prop="logradouro"  label="LOGRADOURO"  width="240" />
-                                        <el-table-column prop="numero"      label="NÚMERO"      width="140" />
-                                        <el-table-column prop="complemento" label="COMPLEMENTO" width="140" />
-                                    <!--</el-table-column>-->
+                            <el-table-column prop="estado"      label="ESTADO"      width="140" />
+                            <el-table-column prop="bairro"      label="BAIRRO"      width="240" />
+                            <el-table-column prop="logradouro"  label="LOGRADOURO"  width="240" />
+                            <el-table-column prop="numero"      label="NÚMERO"      width="140" />
+                            <el-table-column prop="complemento" label="COMPLEMENTO" width="140" />
+                        <!--</el-table-column>-->
                                     <el-table-column prop="data" label="DATA" width="140">
                                         <template #default="scope">
                                             {{$tools.FormatDateToBR(new Date(scope.row.data))}}
