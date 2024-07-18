@@ -46,8 +46,52 @@ namespace JaCaptei.Application{
         }
 
 
+        public AppReturn Alterar(Imovel entity) {
+
+            entity = BLO.Normalizar(entity);
+
+            if(entity.id == 0)
+                 appReturn.AddException("Imóvel não identificado");
+            if(entity.idProprietario <= 0)
+                appReturn.AddException("Proprietário não identificado.");
+
+            if(entity.imagens is null)
+                entity.imagens = new List<ImovelImagem>();
+            else if(entity.imagens.Count > 0) {
+                entity.imagens.ForEach(i => i.principal = false);
+                entity.imagens[0].principal = true;
+            }
+
+            if(!appReturn.status.success)
+                return appReturn;
+
+            try {
+                LocalidadeService localidade = new LocalidadeService();
+                if(entity.endereco.idEstado == 0)
+                   entity.endereco.idEstado = (localidade.ObterIdEstado(entity.endereco.estado)).result.id;
+                if(entity.endereco.idCidade == 0)
+                   entity.endereco.idCidade = (localidade.ObterIdCidadeNorm(entity.endereco.idEstado,entity.endereco.cidadeNorm)).result.id;
+                if(entity.endereco.idBairro == 0)
+                   entity.endereco.idBairro = (localidade.ObterIdBairroNorm(entity.endereco.idCidade,entity.endereco.bairroNorm)).result.id;
+             }catch(Exception ex) { }
+
+            return DAO.Alterar(entity);
+
+        }
+
+
+
+
         public void AdicionarImagens(Imovel entity) {
             DAO.AdicionarImagens(entity);
+        }
+
+        
+        public AppReturn Excluir(int id) {
+           return DAO.Excluir(id);
+        }
+        public AppReturn Excluir(Imovel entity) {
+           return DAO.Excluir(entity);
         }
 
 

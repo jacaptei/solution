@@ -166,6 +166,7 @@ CREATE	TABLE "ImovelImagem"(
     base64                          TEXT                ,
 
  	principal                     	BOOLEAN			    DEFAULT FALSE,
+    url                             VARCHAR(600)        DEFAULT  '',
     "urlThumb"                      VARCHAR(600)        DEFAULT  '',
     "urlSmall"                      VARCHAR(600)        DEFAULT  '',
     "urlMedium"                     VARCHAR(600)        DEFAULT  '',

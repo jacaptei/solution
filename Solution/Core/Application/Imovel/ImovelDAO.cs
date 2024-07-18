@@ -35,7 +35,7 @@ namespace JaCaptei.Application {
                         entity.cod              = (Utils.Validator.Is(entity.codCRM) ? entity.codCRM : ("JC"+entity.id.ToString("0000")));
                         entity.nome             = entity.tipo.label + ", ID " + entity.id.ToString() + ", COD " + entity.cod;
                         //entity.tag              = "imovel_id_" + entity.id.ToString() + "_cod_"+entity.cod ;
-                        entity.tag              = "homolog" ;
+                        entity.tag              = (Config.settings.environment != "PRODUCTION")? "homolog" : "imovel_id_" + entity.id.ToString() + "_cod_"+entity.cod;
                         entity.tokenNum         = Utils.Key.CreateTokenNum(entity.id);
                         entity.dataAtualizacao  = Utils.Date.GetLocalDateTime();
 
@@ -97,25 +97,99 @@ namespace JaCaptei.Application {
         }
 
 
+
+        public AppReturn Alterar(Imovel entity) {
+            //appReturn.result = entity;
+            //return appReturn;
+
+            using(var conn = new DBcontext().GetConn()) {
+                using(var trans = conn.EnsureOpen().BeginTransaction()) {
+                    try {
+
+                        entity.tipo = conn.Query<ImovelTipo>(t => t.id == entity.idTipo || t.label == entity.tipo.label).FirstOrDefault();
+                        if(entity.tipo is null)
+                            entity.tipo = new ImovelTipo { id=1,nome="IMOVEL",label="Imóvel" };
+
+                        entity.idTipo           = entity.tipo.id;
+                        entity.titulo           = entity.ObterTitulo();
+                        entity.urlPublica       = entity.ObterUrlPublica();
+                        entity.dataAtualizacao  = Utils.Date.GetLocalDateTime();
+
+                        conn.Update<Imovel>(entity);
+
+                        conn.Update<ImovelEndereco>(entity.endereco);
+                        conn.Update<ImovelValores>(entity.valor);
+                        conn.Update<ImovelAreas>(entity.area);
+                        conn.Update<ImovelLazer>(entity.lazer);
+                        conn.Update<ImovelCaracteristicasInternas>(entity.interno);
+                        conn.Update<ImovelCaracteristicasExternas>(entity.externo);
+                        conn.Update<ImovelDocumentacao>(entity.documentacao);
+                        conn.Update<ImovelDisposicao>(entity.disposicao);
+
+                        trans.Commit();
+
+                    } catch(Exception ex) {
+                        appReturn.SetAsException("Falha ao inserir imóvel",ex);
+                        trans.Rollback();
+                    }
+                }
+            }
+            appReturn.result = entity;
+            return appReturn;
+        }
+
+        
+        public AppReturn Excluir(int _id) {
+            return Excluir(new Imovel{ id = _id});
+        }
+
+        public AppReturn Excluir(Imovel entity) {
+            using(var conn = new DBcontext().GetConn()) {
+                conn.Delete<Imovel>(entity);
+            }
+            return appReturn;
+        }
+
+
+
         public void AdicionarImagens(Imovel entity) {
             using(var conn = DB.GetConn()) {
 
                 using(var trans = conn.EnsureOpen().BeginTransaction()) {
                     try{ 
-                        conn.Delete<ImovelImagem>((i) => i.idImovel == entity.id);
-                        entity.imagens.ForEach(i => { conn.Insert<ImovelImagem>(i); });
+
 
                         Imovel entityDB = conn.Query<Imovel>(i => i.id == entity.id).FirstOrDefault();
 
                         if(entityDB is not null) {
-                            entityDB.urlImagemPrincipal = entity.imagens[0].urlFull;
-                            entityDB.possuiImagens = true;
-                            conn.Update<Imovel>(entityDB);
-                        }
-                        trans.Commit();
 
+                            conn.Delete<ImovelImagem>((i) => i.idImovel == entity.id);
+
+                            if(entity.imagens.Count > 0) {
+
+                                entity.imagens.ForEach(i => i.principal = false);
+                                entity.imagens[0].principal = true;
+                                entityDB.urlImagemPrincipal = entity.imagens[0].url;
+                                entityDB.possuiImagens = true;
+
+                                entity.imagens.ForEach(i => { conn.Insert<ImovelImagem>(i); });
+
+
+                            } else {
+                                entityDB.urlImagemPrincipal = "https://jacaptei.com.br/resources/images/logo.png";
+                                entityDB.possuiImagens = false;
+                            }
+
+                            conn.Update<Imovel>(entityDB);
+
+                            trans.Commit();
+
+                        } else {
+                            appReturn.AddException("Não foi possível identificar o imóvel para alterar ou adicionar imagens");
+                            trans.Rollback();
+                        }
                     } catch(Exception ex) {
-                        appReturn.SetAsException("Falha ao inserir imagens no imóvel",ex);
+                        appReturn.SetAsException("Falha ao alterar ou adicionar imagens do imóvel",ex);
                         trans.Rollback();
                     }
                 }
@@ -157,6 +231,7 @@ namespace JaCaptei.Application {
             string  sqlCount = "SELECT COUNT(*) FROM "
                         +"      \"Imovel\" imovel                                                                                           "
                         +"                           JOIN \"ImovelEndereco\"                    endereco        ON (endereco.\"idImovel\"       = imovel.id)  "
+                        +"                           JOIN \"ImovelValores\"                     valor           ON (valor.\"idImovel\"          = imovel.id)  "
                         +"                           JOIN \"ImovelAreas\"                       area            ON (area.\"idImovel\"           = imovel.id)  "
                         +"                           JOIN \"ImovelLazer\"                       lazer           ON (lazer.\"idImovel\"          = imovel.id)  "
                         +"                           JOIN \"ImovelCaracteristicasInternas\"     interno         ON (interno.\"idImovel\"        = imovel.id)  "
@@ -168,6 +243,7 @@ namespace JaCaptei.Application {
             string  sql      = " SELECT JSON_AGG(res) FROM(     SELECT      imovel.* ,                                                                                                       "
                         +"                                            (SELECT json_agg(img.*) FROM \"ImovelImagem\" img where img.\"idImovel\" = imovel.id)  as imagens ,           "
                         +"                                            to_json(endereco.*)      as endereco                                                                 ,        "
+                        +"                                            to_json(valor.*)         as valor                                                                    ,        "
                         +"                                            to_json(area.*)          as area                                                                     ,        "
                         +"                                            to_json(lazer.*)         as lazer                                                                    ,        "
                         +"                                            to_json(interno.*)       as interno                                                                  ,        "
@@ -178,6 +254,7 @@ namespace JaCaptei.Application {
                         +"                                  FROM                                                                                                                    "
                         +"                                              \"Imovel\" imovel                                                                                           "
                         +"                                                                JOIN \"ImovelEndereco\"                    endereco        ON (endereco.\"idImovel\"       = imovel.id)  "
+                        +"                                                                JOIN \"ImovelValores\"                     valor           ON (valor.\"idImovel\"          = imovel.id)  "
                         +"                                                                JOIN \"ImovelAreas\"                       area            ON (area.\"idImovel\"           = imovel.id)  "
                         +"                                                                JOIN \"ImovelLazer\"                       lazer           ON (lazer.\"idImovel\"          = imovel.id)  "
                         +"                                                                JOIN \"ImovelCaracteristicasInternas\"     interno         ON (interno.\"idImovel\"        = imovel.id)  "

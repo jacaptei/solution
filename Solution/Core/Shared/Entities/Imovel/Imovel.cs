@@ -19,11 +19,12 @@ namespace JaCaptei.Model {
             public short                index              {get;set;}
 
             public Admin                admin              {get;set;} = new Admin();
-            public int                  idAdmin            {get;set;} = 0;
-            public int                  idAdminCaptador    {get;set;} = 0;
+            public int                  idAdmin            {get;set;}
+            public Admin                adminCaptador      {get;set;} = new Admin();
+            public int                  idAdminCaptador    {get;set;}
             public String               captador           {get;set;} = "";
             public Proprietario         proprietario       {get;set;} = new Proprietario();
-            public int                  idProprietario     {get;set;} = 0;
+            public int                  idProprietario     {get;set;}
             
             public bool                 exclusivo          {get;set;}
             public ImovelTipo           tipo               {get;set;} = new ImovelTipo();
@@ -42,7 +43,7 @@ namespace JaCaptei.Model {
             public bool                 venda              {get;set;} = true;
             public bool                 locacao            {get;set;}
 
-            public string               urlImagemPrincipal{get;set;}  = "";
+            public string               urlImagemPrincipal{get;set;}  = "https://jacaptei.com.br/resources/images/logo.png";
             public string               urlVideo          {get;set;}  = "";
             public string               urlPublica        {get;set;}  = "";
             public string               urlPrivada        {get;set;}  = "";
@@ -68,7 +69,7 @@ namespace JaCaptei.Model {
             public bool                             sucesso                 {get;set;}  = false;
             
             public string                           token                   {get;set;}  = "";
-            public long                             tokenNum                {get;set;}  = 0;
+            public long                             tokenNum                {get;set;}  
 
             public string                           anotacoes               {get;set;}  = "";
             public string                           obs                     {get;set;}  = "";
