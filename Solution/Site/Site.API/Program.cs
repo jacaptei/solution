@@ -63,7 +63,7 @@ if(!RepoDb.SqlServerBootstrap.IsInitialized)
 // -------------------------- GERAL --------------------------
 
 
-AppContext.SetSwitch("System.Globalization.Invariant",true);
+//AppContext.SetSwitch("System.Globalization.Invariant",true);
 
 builder.Services.AddCors(options => {
     options.AddPolicy("AllowAll",builder =>

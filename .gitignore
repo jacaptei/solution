@@ -290,3 +290,4 @@ __pycache__/
 /Solution/Admin/Admin.UI/wwwroot/pages/account/Login.htm
 /Solution/Admin/Admin.UI/wwwroot/pages/account/Login.htm
 /Solution/Admin/Admin.API/appsettings.Development.json
+/Solution/Site/Site.UI/wwwroot/resources/js/libs/api.js
