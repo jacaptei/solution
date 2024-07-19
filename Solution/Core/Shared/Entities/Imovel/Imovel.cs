@@ -63,7 +63,7 @@ namespace JaCaptei.Model {
 
             public string                           tag                     {get;set;}  ="";
             public string                           status                  {get;set;}  = "ATIVO";
-            public bool                             ativo                   {get;set;}  = false;
+            public bool                             ativo                   {get;set;}  = true;
             public bool                             ativoCRM                {get;set;}  = false;
             public bool                             possuiImagens           {get;set;}  = false;
             public bool                             sucesso                 {get;set;}  = false;

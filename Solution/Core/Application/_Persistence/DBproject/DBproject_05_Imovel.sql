@@ -396,7 +396,7 @@ CREATE	TABLE "ImovelDisposicao"(
     "aceitaFinanciamento"   BOOLEAN DEFAULT FALSE,
     "aceitaPermuta"         BOOLEAN DEFAULT FALSE,
     alugado                 BOOLEAN DEFAULT FALSE,
-    comissao                REAL    DEFAULT 0,
+    comissao                BOOLEAN DEFAULT FALSE,
     desativado              BOOLEAN DEFAULT FALSE,
     disponivel              BOOLEAN DEFAULT FALSE,
     "gestaoJacaptei"        BOOLEAN DEFAULT FALSE,

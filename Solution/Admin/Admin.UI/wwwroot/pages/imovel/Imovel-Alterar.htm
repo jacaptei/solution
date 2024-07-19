@@ -535,6 +535,29 @@
                 </el-col>
             </el-row>
 
+                                        
+            <el-row :gutter="20" style="margin-top:30px">
+                <el-col :md="24" style="color:var(--s-color-primary);font-weight:700">
+                    DISPOSIÇÃO
+                </el-col>
+            </el-row>
+                    
+            <el-row :gutter="20" style="margin-top:10px">
+                    <el-col :md="4" :sm="8" :xs="12"><el-checkbox label="Ativo               " v-model="imovel.ativo                          " size="large"></el-checkbox></el-col>
+                    <el-col :md="4" :sm="8" :xs="12"><el-checkbox label="Disponivel          " v-model="imovel.disposicao.disponivel          " size="large"></el-checkbox></el-col>
+                    <el-col :md="4" :sm="8" :xs="12"><el-checkbox label="Gestao JáCaptei     " v-model="imovel.disposicao.gestaoJacaptei      " size="large"></el-checkbox></el-col>
+                    <el-col :md="4" :sm="8" :xs="12"><el-checkbox label="Gestao Premium      " v-model="imovel.disposicao.gestaoPremium       " size="large"></el-checkbox></el-col>
+                    <el-col :md="4" :sm="8" :xs="12"><el-checkbox label="Ocupado             " v-model="imovel.disposicao.ocupado             " size="large"></el-checkbox></el-col>
+                    <el-col :md="4" :sm="8" :xs="12"><el-checkbox label="Alugado             " v-model="imovel.disposicao.alugado             " size="large"></el-checkbox></el-col>
+                    <el-col :md="4" :sm="8" :xs="12"><el-checkbox label="Vendido             " v-model="imovel.disposicao.vendido             " size="large"></el-checkbox></el-col>
+                    <el-col :md="4" :sm="8" :xs="12"><el-checkbox label="Aceita financiamento" v-model="imovel.disposicao.aceitaFinanciamento " size="large"></el-checkbox></el-col>
+                    <el-col :md="4" :sm="8" :xs="12"><el-checkbox label="Aceita permuta      " v-model="imovel.disposicao.aceitaPermuta       " size="large"></el-checkbox></el-col>
+                    <!--<el-col :md="4" :sm="8" :xs="12"><el-checkbox label="Comissao            " v-model="imovel.disposicao.comissao            " size="large"></el-checkbox></el-col>-->
+                    <el-col :md="4" :sm="8" :xs="12"><el-checkbox label="Desativado          " v-model="imovel.disposicao.desativado          " size="large"></el-checkbox></el-col>
+                    <el-col :md="4" :sm="8" :xs="12"><el-checkbox label="Na planta           " v-model="imovel.disposicao.naPlanta            " size="large"></el-checkbox></el-col>
+                    <el-col :md="4" :sm="8" :xs="12"><el-checkbox label="Placa               " v-model="imovel.disposicao.placa               " size="large"></el-checkbox></el-col>
+            </el-row>
+
 
             <el-row :gutter="20">
                 <el-col :md="24">
@@ -575,7 +598,7 @@
                                 <el-input @keyup.enter="CheckoutStep3()" v-model="imovel.localChaves" placeholder=""  maxlength="75"></el-input>
                             </el-col>
                             <el-col :md="6" :sm="12" :xs="24" style="margin-top:10px">
-                                Quantidade de chaves<br />
+                                Qtd de chaves<br />
     						    <el-input-number v-model="imovel.totalChaves" :step="1" size="medium" :min="0"></el-input-number>
                             </el-col>
                             <el-col :md="24" style="margin-top:10px">
@@ -598,37 +621,37 @@
                                     <el-row :gutter="20">
                                         <el-col  :md="4" :sm="8" :xs="12" style="margin-top:10px">
                                             Venda <el-checkbox label="sob consulta" v-model="imovel.valor.sobConsulta  " size="large" style="margin-left:20px;height:20px"></el-checkbox><br />
-                                            <el-input input-style="color:var(--s-accent-color);max-width:200px" v-model="imovel.valor.venda" maxlength="20"  @keyup.enter="CheckoutStep3()"  ref="valor"  :formatter="(value) => `R$ ${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, '.')"    :parser="(value) => value.replace(/\R\$\s?|(\.*)/g, '').replace(/[a-zA-Z]/g, '')"></el-input>
+                                            <el-input input-style="color:var(--s-accent-color);max-width:200px" v-model="imovel.valor.venda" maxlength="20"  @keyup.enter="CheckoutStep3()"  ref="valor"  :formatter="(value) => `${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, '.')"    :parser="(value) => value.replace(/\R\$\s?|(\.*)/g, '').replace(/[a-zA-Z]/g, '')"><template #prepend>R$</template></el-input>
                                         </el-col>
                                         <el-col :md="4" :sm="8" :xs="12" style="margin-top:10px">
                                             Condomínio<br />
-                                            <el-input input-style="color:var(--s-accent-color);max-width:200px" v-model="imovel.valor.condominio" maxlength="20"  @keyup.enter="CheckoutStep3()"  :formatter="(value) => `R$ ${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, '.')"    :parser="(value) => value.replace(/\R\$\s?|(\.*)/g, '').replace(/[a-zA-Z]/g, '')"></el-input>
+                                            <el-input input-style="color:var(--s-accent-color);max-width:200px" v-model="imovel.valor.condominio" maxlength="20"  @keyup.enter="CheckoutStep3()"  :formatter="(value) => `${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, '.')"    :parser="(value) => value.replace(/\R\$\s?|(\.*)/g, '').replace(/[a-zA-Z]/g, '')"><template #prepend>R$</template></el-input>
                                         </el-col>
                                         <el-col  :md="4" :sm="8" :xs="12" style="margin-top:10px">
                                             Consulta<br />
-                                            <el-input input-style="color:var(--s-accent-color);max-width:200px" v-model="imovel.valor.consulta" maxlength="20"  @keyup.enter="CheckoutStep3()"    :formatter="(value) => `R$ ${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, '.')"    :parser="(value) => value.replace(/\R\$\s?|(\.*)/g, '').replace(/[a-zA-Z]/g, '')"></el-input>
+                                            <el-input input-style="color:var(--s-accent-color);max-width:200px" v-model="imovel.valor.consulta" maxlength="20"  @keyup.enter="CheckoutStep3()"    :formatter="(value) => `${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, '.')"    :parser="(value) => value.replace(/\R\$\s?|(\.*)/g, '').replace(/[a-zA-Z]/g, '')"><template #prepend>R$</template></el-input>
                                         </el-col>
                                         <el-col  :md="4" :sm="8" :xs="12" style="margin-top:10px">
                                             Comissao de venda <br />
-                                            <el-input input-style="color:var(--s-accent-color);max-width:200px" v-model="imovel.valor.comissao" maxlength="20" placeholder="%" @keyup.enter="CheckoutStep3()"    :formatter="(value) => `${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, '.')"    :parser="(value) => value.replace(/\R\$\s?|(\.*)/g, '').replace(/[a-zA-Z]/g, '')"></el-input>
+                                            <el-input input-style="color:var(--s-accent-color);max-width:200px" v-model="imovel.valor.comissao" maxlength="20" @keyup.enter="CheckoutStep3()"    :formatter="(value) => `${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, '.')"    :parser="(value) => value.replace(/\R\$\s?|(\.*)/g, '').replace(/[a-zA-Z]/g, '')"><template #prepend>%</template></el-input>
                                         </el-col>
                                         <el-col  :md="4" :sm="8" :xs="12" style="margin-top:10px">
                                             Rentabilidade<br />
-                                            <el-input input-style="color:var(--s-accent-color);max-width:200px" v-model="imovel.valor.rentabilidade" maxlength="20" placeholder="%" @keyup.enter="CheckoutStep3()"    :formatter="(value) => `${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, '.')"    :parser="(value) => value.replace(/\R\$\s?|(\.*)/g, '').replace(/[a-zA-Z]/g, '')"></el-input>
+                                            <el-input input-style="color:var(--s-accent-color);max-width:200px" v-model="imovel.valor.rentabilidade" maxlength="20" @keyup.enter="CheckoutStep3()"    :formatter="(value) => `${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, '.')"    :parser="(value) => value.replace(/\R\$\s?|(\.*)/g, '').replace(/[a-zA-Z]/g, '')"><template #prepend>%</template></el-input>
                                         </el-col>
                                     </el-row>
                                     <el-row :gutter="20">
                                         <el-col  :md="4" :sm="8" :xs="12" style="margin-top:10px">
                                             IPTU mensal<br />
-                                            <el-input input-style="color:var(--s-accent-color);max-width:200px" v-model="imovel.valor.iptuMensal" maxlength="20"  @keyup.enter="CheckoutStep3()"    :formatter="(value) => `R$ ${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, '.')"    :parser="(value) => value.replace(/\R\$\s?|(\.*)/g, '').replace(/[a-zA-Z]/g, '')"></el-input>
+                                            <el-input input-style="color:var(--s-accent-color);max-width:200px" v-model="imovel.valor.iptuMensal" maxlength="20"  @keyup.enter="CheckoutStep3()"    :formatter="(value) => `${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, '.')"    :parser="(value) => value.replace(/\R\$\s?|(\.*)/g, '').replace(/[a-zA-Z]/g, '')"><template #prepend>R$</template></el-input>
                                         </el-col>
                                         <el-col  :md="4" :sm="8" :xs="12" style="margin-top:10px">
                                             IPTU anual<br />
-                                            <el-input input-style="color:var(--s-accent-color);max-width:200px" v-model="imovel.valor.iptuAnual" maxlength="20"  @keyup.enter="CheckoutStep3()"    :formatter="(value) => `R$ ${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, '.')"    :parser="(value) => value.replace(/\R\$\s?|(\.*)/g, '').replace(/[a-zA-Z]/g, '')"></el-input>
+                                            <el-input input-style="color:var(--s-accent-color);max-width:200px" v-model="imovel.valor.iptuAnual" maxlength="20"  @keyup.enter="CheckoutStep3()"    :formatter="(value) => `${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, '.')"    :parser="(value) => value.replace(/\R\$\s?|(\.*)/g, '').replace(/[a-zA-Z]/g, '')"><template #prepend>R$</template></el-input>
                                         </el-col>
                                         <el-col  :md="4" :sm="8" :xs="12" style="margin-top:10px">
                                             IPTU índice<br />
-                                            <el-input input-style="color:var(--s-accent-color);max-width:200px" v-model="imovel.valor.iptuIndice" maxlength="20"  @keyup.enter="CheckoutStep3()"    :formatter="(value) => `${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, '.')"    :parser="(value) => value.replace(/\R\$\s?|(\.*)/g, '').replace(/[a-zA-Z]/g, '')"></el-input>
+                                            <el-input input-style="color:var(--s-accent-color);max-width:200px" v-model="imovel.valor.iptuIndice" maxlength="20"  @keyup.enter="CheckoutStep3()"  ></el-input>
                                         </el-col>
                                     </el-row>
 
@@ -647,43 +670,43 @@
                                     <el-row :gutter="20">
                                         <el-col :md="4" :sm="8" :xs="12" style="margin-top:10px">
                                             Interna<br />
-								            <el-input input-style="color:var(--s-accent-color);max-width:200px" v-model="imovel.area.interna" maxlength="20" placeholder="m²" @keyup.enter="CheckoutStep3()" ref="areainterna"  :formatter="(value) => `${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, '.')"    :parser="(value) => value.replace(/(\.*)/g, '').replace(/[a-zA-Z]/g, '')"></el-input>
+								            <el-input input-style="color:var(--s-accent-color);max-width:200px" v-model="imovel.area.interna" maxlength="20" @keyup.enter="CheckoutStep3()" ref="areainterna"  :formatter="(value) => `${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, '.')"    :parser="(value) => value.replace(/(\.*)/g, '').replace(/[a-zA-Z]/g, '')"><template #prepend>m²</template></el-input>
                                         </el-col>
                                         <el-col :md="4" :sm="8" :xs="12" style="margin-top:10px">
                                             Externa<br />
-								            <el-input input-style="color:var(--s-accent-color);max-width:200px" v-model="imovel.area.externa" maxlength="20" placeholder="m²" @keyup.enter="CheckoutStep3()" ref="areaexterna"  :formatter="(value) => `${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, '.')"    :parser="(value) => value.replace(/(\.*)/g, '').replace(/[a-zA-Z]/g, '')"></el-input>
+								            <el-input input-style="color:var(--s-accent-color);max-width:200px" v-model="imovel.area.externa" maxlength="20" @keyup.enter="CheckoutStep3()" ref="areaexterna"  :formatter="(value) => `${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, '.')"    :parser="(value) => value.replace(/(\.*)/g, '').replace(/[a-zA-Z]/g, '')"><template #prepend>m²</template></el-input>
                                         </el-col>
                                         <el-col :md="4" :sm="8" :xs="12" style="margin-top:10px">
                                             Frente<br />
-								            <el-input input-style="color:var(--s-accent-color);max-width:200px" v-model="imovel.area.frente" maxlength="20" placeholder="m²" @keyup.enter="CheckoutStep3()"   :formatter="(value) => `${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, '.')"    :parser="(value) => value.replace(/(\.*)/g, '').replace(/[a-zA-Z]/g, '')"></el-input>
+								            <el-input input-style="color:var(--s-accent-color);max-width:200px" v-model="imovel.area.frente" maxlength="20" @keyup.enter="CheckoutStep3()"   :formatter="(value) => `${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, '.')"    :parser="(value) => value.replace(/(\.*)/g, '').replace(/[a-zA-Z]/g, '')"><template #prepend>m²</template></el-input>
                                         </el-col>
                                         <el-col :md="4" :sm="8" :xs="12" style="margin-top:10px">
                                             Fundo<br />
-								            <el-input input-style="color:var(--s-accent-color);max-width:200px" v-model="imovel.area.fundo" maxlength="20" placeholder="m²" @keyup.enter="CheckoutStep3()"   :formatter="(value) => `${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, '.')"    :parser="(value) => value.replace(/(\.*)/g, '').replace(/[a-zA-Z]/g, '')"></el-input>
+								            <el-input input-style="color:var(--s-accent-color);max-width:200px" v-model="imovel.area.fundo" maxlength="20" @keyup.enter="CheckoutStep3()"   :formatter="(value) => `${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, '.')"    :parser="(value) => value.replace(/(\.*)/g, '').replace(/[a-zA-Z]/g, '')"><template #prepend>m²</template></el-input>
                                         </el-col>
                                         <el-col :md="4" :sm="8" :xs="12" style="margin-top:10px">
                                             Direito<br />
-								            <el-input input-style="color:var(--s-accent-color);max-width:200px" v-model="imovel.area.direito" maxlength="20" placeholder="m²" @keyup.enter="CheckoutStep3()"   :formatter="(value) => `${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, '.')"    :parser="(value) => value.replace(/(\.*)/g, '').replace(/[a-zA-Z]/g, '')"></el-input>
+								            <el-input input-style="color:var(--s-accent-color);max-width:200px" v-model="imovel.area.direito" maxlength="20" @keyup.enter="CheckoutStep3()"   :formatter="(value) => `${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, '.')"    :parser="(value) => value.replace(/(\.*)/g, '').replace(/[a-zA-Z]/g, '')"><template #prepend>m²</template></el-input>
                                         </el-col>
                                         <el-col :md="4" :sm="8" :xs="12" style="margin-top:10px">
                                             Esquerdo<br />
-								            <el-input input-style="color:var(--s-accent-color);max-width:200px" v-model="imovel.area.esquerdo" maxlength="20" placeholder="m²" @keyup.enter="CheckoutStep3()"   :formatter="(value) => `${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, '.')"    :parser="(value) => value.replace(/(\.*)/g, '').replace(/[a-zA-Z]/g, '')"></el-input>
+								            <el-input input-style="color:var(--s-accent-color);max-width:200px" v-model="imovel.area.esquerdo" maxlength="20" @keyup.enter="CheckoutStep3()"   :formatter="(value) => `${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, '.')"    :parser="(value) => value.replace(/(\.*)/g, '').replace(/[a-zA-Z]/g, '')"><template #prepend>m²</template></el-input>
                                         </el-col>
                                         <el-col :md="4" :sm="8" :xs="12" style="margin-top:10px">
                                             Confrontação frente<br />
-								            <el-input input-style="color:var(--s-accent-color);max-width:200px" v-model="imovel.area.confrontacaoFrente" maxlength="20" placeholder="m²" @keyup.enter="CheckoutStep3()"   :formatter="(value) => `${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, '.')"    :parser="(value) => value.replace(/(\.*)/g, '').replace(/[a-zA-Z]/g, '')"></el-input>
+								            <el-input input-style="color:var(--s-accent-color);max-width:200px" v-model="imovel.area.confrontacaoFrente" maxlength="20" @keyup.enter="CheckoutStep3()"   :formatter="(value) => `${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, '.')"    :parser="(value) => value.replace(/(\.*)/g, '').replace(/[a-zA-Z]/g, '')"><template #prepend>m²</template></el-input>
                                         </el-col>
                                         <el-col :md="4" :sm="8" :xs="12" style="margin-top:10px">
                                              Confrontação fundo<br />
-								            <el-input input-style="color:var(--s-accent-color);max-width:200px" v-model="imovel.area.confrontacaoFundo" maxlength="20" placeholder="m²" @keyup.enter="CheckoutStep3()"   :formatter="(value) => `${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, '.')"    :parser="(value) => value.replace(/(\.*)/g, '').replace(/[a-zA-Z]/g, '')"></el-input>
+								            <el-input input-style="color:var(--s-accent-color);max-width:200px" v-model="imovel.area.confrontacaoFundo" maxlength="20" @keyup.enter="CheckoutStep3()"   :formatter="(value) => `${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, '.')"    :parser="(value) => value.replace(/(\.*)/g, '').replace(/[a-zA-Z]/g, '')"><template #prepend>m²</template></el-input>
                                         </el-col>
                                         <el-col :md="4" :sm="8" :xs="12" style="margin-top:10px">
                                              Confrontação direito<br />
-								            <el-input input-style="color:var(--s-accent-color);max-width:200px" v-model="imovel.area.confrontacaoDireito" maxlength="20" placeholder="m²" @keyup.enter="CheckoutStep3()"   :formatter="(value) => `${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, '.')"    :parser="(value) => value.replace(/(\.*)/g, '').replace(/[a-zA-Z]/g, '')"></el-input>
+								            <el-input input-style="color:var(--s-accent-color);max-width:200px" v-model="imovel.area.confrontacaoDireito" maxlength="20" @keyup.enter="CheckoutStep3()"   :formatter="(value) => `${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, '.')"    :parser="(value) => value.replace(/(\.*)/g, '').replace(/[a-zA-Z]/g, '')"><template #prepend>m²</template></el-input>
                                         </el-col>
                                         <el-col :md="4" :sm="8" :xs="12" style="margin-top:10px">
                                              Confrontação esquerdo<br />
-								            <el-input input-style="color:var(--s-accent-color);max-width:200px" v-model="imovel.area.confrontacaoEsquerdo" maxlength="20" placeholder="m²" @keyup.enter="CheckoutStep3()"   :formatter="(value) => `${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, '.')"    :parser="(value) => value.replace(/(\.*)/g, '').replace(/[a-zA-Z]/g, '')"></el-input>
+								            <el-input input-style="color:var(--s-accent-color);max-width:200px" v-model="imovel.area.confrontacaoEsquerdo" maxlength="20" @keyup.enter="CheckoutStep3()"   :formatter="(value) => `${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, '.')"    :parser="(value) => value.replace(/(\.*)/g, '').replace(/[a-zA-Z]/g, '')"><template #prepend>m²</template></el-input>
                                         </el-col>
                                         <el-col :md="4" :sm="8" :xs="12" style="margin-top:10px">
                                              Coeficiente de aproveitamento<br />
@@ -698,28 +721,6 @@
                             </el-col>
                         </el-row>
                     
-                                        
-                        <el-row :gutter="20" style="margin-top:30px">
-                            <el-col :md="24" style="color:var(--s-color-primary);font-weight:700">
-                                DISPOSIÇÃO
-                            </el-col>
-                        </el-row>
-                    
-                        <el-row :gutter="20" style="margin-top:10px">
-                                <el-col :md="4" :sm="8" :xs="12"><el-checkbox label="Gestao JáCaptei     " v-model="imovel.disposicao.gestaoJacaptei      " size="large"></el-checkbox></el-col>
-                                <el-col :md="4" :sm="8" :xs="12"><el-checkbox label="Disponivel          " v-model="imovel.disposicao.disponivel          " size="large"></el-checkbox></el-col>
-                                <el-col :md="4" :sm="8" :xs="12"><el-checkbox label="Ocupado             " v-model="imovel.disposicao.ocupado             " size="large"></el-checkbox></el-col>
-                                <el-col :md="4" :sm="8" :xs="12"><el-checkbox label="Alugado             " v-model="imovel.disposicao.alugado             " size="large"></el-checkbox></el-col>
-                                <el-col :md="4" :sm="8" :xs="12"><el-checkbox label="Vendido             " v-model="imovel.disposicao.vendido             " size="large"></el-checkbox></el-col>
-                                <el-col :md="4" :sm="8" :xs="12"><el-checkbox label="Aceita financiamento" v-model="imovel.disposicao.aceitaFinanciamento " size="large"></el-checkbox></el-col>
-                                <el-col :md="4" :sm="8" :xs="12"><el-checkbox label="Gestao Premium      " v-model="imovel.disposicao.gestaoPremium       " size="large"></el-checkbox></el-col>
-                                <el-col :md="4" :sm="8" :xs="12"><el-checkbox label="Aceita permuta      " v-model="imovel.disposicao.aceitaPermuta       " size="large"></el-checkbox></el-col>
-                                <el-col :md="4" :sm="8" :xs="12"><el-checkbox label="Comissao            " v-model="imovel.disposicao.comissao            " size="large"></el-checkbox></el-col>
-                                <el-col :md="4" :sm="8" :xs="12"><el-checkbox label="Desativado          " v-model="imovel.disposicao.desativado          " size="large"></el-checkbox></el-col>
-                                <el-col :md="4" :sm="8" :xs="12"><el-checkbox label="Na planta           " v-model="imovel.disposicao.naPlanta            " size="large"></el-checkbox></el-col>
-                                <el-col :md="4" :sm="8" :xs="12"><el-checkbox label="Placa               " v-model="imovel.disposicao.placa               " size="large"></el-checkbox></el-col>
-                        </el-row>
-
 
                         <el-row :gutter="20" style="margin-top:30px">
                             <el-col :md="24" style="color:var(--s-color-primary);font-weight:700">
@@ -773,23 +774,23 @@
                     
                         <el-row :gutter="20" style="margin-top:10px">
                             <el-col  :md="4" :sm="8" :xs="12" >
-                                Quantidade de Quartos<br />
+                                Qtd de Quartos<br />
 								<el-input-number v-model="imovel.interno.totalQuartos" :step="1" size="small" :min="0" @change="()=>{ imovel.interno.quarto = imovel.interno.totalQuartos > 0  }"></el-input-number>
                             </el-col>
                             <el-col  :md="4" :sm="8" :xs="12" >
-                                Quantidade de Banheiros<br />
+                                Qtd de Banheiros<br />
 								<el-input-number v-model="imovel.interno.totalBanheiros" :step="1" size="small" :min="0" @change="()=>{ imovel.interno.banheiro = imovel.interno.totalBanheiros > 0  }"></el-input-number>
                             </el-col>
                             <el-col  :md="4" :sm="8" :xs="12">
-                                Quantidade de Suítes<br />
+                                Qtd de Suítes<br />
 								<el-input-number v-model="imovel.interno.totalSuites" :step="1" size="small" :min="0" @change="()=>{ imovel.interno.suite = imovel.interno.totalSuites > 0  }"></el-input-number>
                             </el-col>
                             <el-col  :md="4" :sm="8" :xs="12">
-                                Quantidade de Salas<br />
+                                Qtd de Salas<br />
 								<el-input-number v-model="imovel.interno.totalSalas" :step="1" size="small" :min="0" @change="()=>{ imovel.interno.sala = imovel.interno.totalSalas > 0  }"></el-input-number>
                             </el-col>
                             <el-col  :md="4" :sm="8" :xs="12">
-                                Quantidade de Varandas<br />
+                                Qtd de Varandas<br />
 								<el-input-number v-model="imovel.interno.totalVarandas" :step="1" size="small" :min="0" @change="()=>{ imovel.interno.varanda = imovel.interno.totalVarandas > 0  }"></el-input-number>
                             </el-col>
                         </el-row>
@@ -833,15 +834,15 @@
 
                         <el-row :gutter="20" style="margin-top:10px">
                             <el-col  :md="4" :sm="8" :xs="12" >
-                                Quantidade de Andares<br />
+                                Qtd de Andares<br />
 								<el-input-number v-model="imovel.externo.totalAndares" :step="1" size="small" :min="0"></el-input-number>
                             </el-col>
                             <el-col  :md="4" :sm="8" :xs="12" >
-                                Quantidade de Elevadores<br />
+                                Qtd de Elevadores<br />
 								<el-input-number v-model="imovel.externo.totalElevadores" :step="1" size="small" :min="0" @change="()=>{ imovel.externo.elevador = imovel.externo.totalElevadores > 0  }"></el-input-number>
                             </el-col>
                             <el-col  :md="4" :sm="8" :xs="12">
-                                Quantidade de Vagas<br />
+                                Qtd de Vagas<br />
 								<el-input-number v-model="imovel.externo.totalVagas" :step="1" size="small" :min="0" @change="()=>{ imovel.externo.vaga = imovel.externo.totalVagas > 0  }"></el-input-number>
                             </el-col>
                         </el-row>
@@ -1343,6 +1344,7 @@
 
                 c2("this.imovel.valor",this.imovel.valor);
                 this.ParseImovel();
+                c2("this.imovel.valor",this.imovel.valor);
 
                 this.imagesFiles = [];
 
@@ -1379,7 +1381,6 @@
                    // this.onrequest = false;
 				});
                 
-
 
             },
 
