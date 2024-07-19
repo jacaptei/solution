@@ -1,270 +1,466 @@
 ﻿<template>
-	<div>
-
-
-
-
-		<el-row @keyup.enter="Buscar()">
-			<el-col :md="24">
-
+    <div>
+        <el-row @keyup.enter="Buscar()">
+            <el-col :md="24">
                 <el-row :gutter="20">
-                        <el-col :xs="24" :sm="12" :md="8":lg="6" class="s-input">
-                            <div>ID<span></span></div>
-                            <el-input-number @keyup.enter="Enviar()" v-model="buscaImovel.imovelJC.id" placeholder="qualquer" maxlength="20" ref="id" :controls="false"></el-input-number>
-                        </el-col>
-                        <el-col :xs="24" :sm="12" :md="8" :lg="6" class="s-input">
-                            <div><span></span></div>
-                            <q-btn label="BUSCAR" color="primary" @click="Enviar()"></q-btn>
-                        </el-col>
-                        <el-col :xs="24" :sm="12" :md="8" :lg="6" class="s-input">
-                            <div><span></span></div>
-                            <div style="cursor:pointer;padding-top:10px;color:green" @click="LimparFiltro"><i class="fa fa-cancel"></i> limpar filtro</div>
-                        </el-col>
+                    <el-col :xs="24" :sm="12" :md="8" :lg="6" class="s-input">
+                        <div>ID<span></span></div>
+                        <el-input @keyup.enter="Enviar()" v-model="busca.item.nome" placeholder="qualquer" maxlength="120" ref="nome" input-style="text-transform:uppercase;"></el-input>
+                    </el-col>
+                    <el-col :xs="24" :sm="12" :md="8" :lg="6" class="s-input">
+                        <div>CÓDIGO<span></span></div>
+                        <el-input @keyup.enter="Enviar()" v-model="busca.item.nome" placeholder="qualquer" maxlength="120" ref="nome" input-style="text-transform:uppercase;"></el-input>
+                    </el-col>
+                    <el-col :xs="24" :sm="12" :md="8" :lg="6" class="s-input">
+                        <div><p>CEP</p><span></span></div>
+                        <el-input v-model="" placeholder="" ref="postalCode" v-maska data-maska="#####-###" @keyup="()=>{}">
+                            <template #append>
+                                <c-loading size="20px" v-if="carregandoCEP"></c-loading>
+                                <i class="fa fa-search" v-else-if="(cep)" style="color:var(--s-accent-color)" @click="$tools.Alert('Preencha todo o CEP para poder realizar a busca.')"></i>
+                                <i class="fa fa-search" v-else style="color:var(--s-accent-color);cursor:pointer" @click="BuscarEndereco"></i>
+                            </template>
+                        </el-input>
+                    </el-col>
+                    <el-col :xs="24" :sm="12" :md="8" :lg="6" class="s-input">
+                        <div>ESTADO <span></span></div>
+                        <el-select filterable v-model="" class="m-4" placeholder="Selecionar" size="large" style="width:100%" @change="(item)=>{enableFilterButton = true;}">
+                            <!--<el-option v-for="item in $root.search.opcoes.estados"
+                                :key="item.id"
+                                :label="item.label"
+                                :value="item">
+                            </el-option>-->
+                        </el-select>
+                    </el-col>
+                    <el-col :xs="24" :sm="12" :md="8" :lg="6" class="s-input">
+                        <div>CIDADE <span></span></div>
+                        <!--<div style="height:40px" v-if="">
+                            <c-loading size="30px" style="padding-left:5px"></c-loading>
+                        </div>-->
+                        <!--<div v-else-if="">
+                            <span style="color:#7d7d7d;padding-left:10px">selecione um estado</span>
+                        </div>-->
+                        <el-select v-else v-model="" filterable class="m-4" placeholder="qualquer" size="large" style="width:100%" @change="(item)=>{}">
+                            <!--<el-option v-for="item in $root.search.opcoes.cidades"
+                            :key="item.id"
+                            :label="item.label"
+                            :value="item"></el-option>-->
+                        </el-select>
+                    </el-col>
+                    <el-col :xs="24" :sm="12" :md="8" :lg="6" class="s-input">
+                        <div>BAIRRO<span></span></div>
+                        <!--<div style="height:40px" v-if="">
+                            <c-loading size="30px" style="padding-left:5px"></c-loading>
+                        </div>-->
+                        <!--<div v-else-if="">
+                            <span style="color:#7d7d7d;padding-left:10px">selecione um estado</span>
+                        </div>-->
+                        <el-select v-else v-model="" multiple filterable :clearable="true" class="m-4" placeholder="qualquer" size="large" style="width:100%">
+                            <!--<el-option v-for="item in $root.search.opcoes.bairros"
+                            :key="item.id"
+                            :label="item.label"
+                            :value="item"></el-option>-->
+                        </el-select>
+                    </el-col>
+                    <el-col :xs="24" :sm="12" :md="8" :lg="6" class="s-input">
+                        <div>LOGRADOURO<span style="color:#808080">&nbsp;rua, avenida, praça, etc</span></div>
+                        <el-input @keyup.enter="Enviar()" v-model="" placeholder="" maxlength="80" input-style="text-transform:uppercase;"></el-input>
+                    </el-col>
+                    <el-col :xs="24" :sm="12" :md="8" :lg="6" class="s-input">
+                        <div>TIPO DE IMÓVEL<span></span></div>
+                        <el-select v-model="" filterable class="m-4" placeholder="qualquer" size="large" style="width:100%" @change="enableFilterButton = true">
+                            <!--<el-option v-for="item in $root.search.opcoes.tiposImoveis"
+                            :key="item.id"
+                            :label="item.label"
+                            :value="item"></el-option>-->
+                        </el-select>
+                    </el-col>
+                    <el-col :xs="24" :sm="12" :md="8" :lg="6" class="s-input">
+                        <div>VALOR MÍNIMO R$<span></span></div>
+                        <el-input input-style="color:var(--s-accent-color)" @keyup.enter="RequestSearch()" v-model="valorMinimo" placeholder="qualquer" maxlength="20" :formatter="(value) => `R$ ${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, '.')" :parser="(value) => value.replace(/\R\$\s?|(\.*)/g, '').replace(/[a-zA-Z]/g, '')"></el-input>
+                    </el-col>
+                    <el-col :xs="24" :sm="12" :md="8" :lg="6" class="s-input">
+                        <div>VALOR MÁXIMO R$<span></span></div>
+                        <el-input input-style="color:var(--s-accent-color)" @keyup.enter="RequestSearch()" v-model="valorMaximo" placeholder="qualquer" maxlength="20" :formatter="(value) => `R$ ${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, '.')" :parser="(value) => value.replace(/\R\$\s?|(\.*)/g, '').replace(/[a-zA-Z]/g, '')"></el-input>
+                    </el-col>
+                    <el-col :xs="24" :sm="12" :md="8" :lg="6" class="s-input">
+                        <div>ÁREA MÍNIMA M²<span></span></div>
+                        <el-input input-style="color:var(--s-accent-color)" @keyup.enter="RequestSearch()" v-model="areaMinima" placeholder="qualquer" maxlength="20" :formatter="(value) => `${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, '.')" :parser="(value) => value.replace(/(\.*)/g, '').replace(/[a-zA-Z]/g, '')"></el-input>
+                    </el-col>
+
+                    <el-col :xs="24" :sm="12" :md="8" :lg="6" class="s-input">
+                        <div>ÁREA MÁXIMA M²<span></span></div>
+                        <el-input input-style="color:var(--s-accent-color)" @keyup.enter="RequestSearch()" v-model="areaMaxima" placeholder="qualquer" maxlength="20" :formatter="(value) => `${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, '.')" :parser="(value) => value.replace(/(\.*)/g, '').replace(/[a-zA-Z]/g, '')"></el-input>
+                    </el-col>
+
+                    <el-col :xs="24" :sm="12" :md="8" :lg="6" class="s-input">
+                        <div>QUARTOS<span></span></div>
+                        <el-select v-model="quartos" placeholder="qualquer" input-style="color:var(--s-accent-color)" :teleported="false" @change="enableFilterButton = true" style="width:100%">
+                            <!--<el-option v-for="item in $root.search.opcoes.quantidades" :key="item.id" :label="item.label + item.complement.replace('ou','')" :value="item.value">
+                                <span :style="(item.id > 0)? 'font-weight:bold;margin-right:6px':''">{{ item.label }}</span>
+                                <span style="font-size:12px">{{ item.complement }}</span>
+                            </el-option>-->
+                        </el-select>
+                    </el-col>
+
+                    <el-col :xs="24" :sm="12" :md="8" :lg="6" class="s-input">
+                        <div>VAGAS<span></span></div>
+                        <el-select v-model="vagas" placeholder="qualquer" size="large" input-style="color:var(--s-accent-color)" :teleported="false" @change="enableFilterButton = true" style="width:100%">
+                            <!--<el-option v-for="item in $root.search.opcoes.quantidades" :key="item.id" :label="item.label + item.complement.replace('ou','')" :value="item.value">
+                                <span :style="(item.id > 0)? 'font-weight:bold;margin-right:6px':''">{{ item.label }}</span>
+                                <span style="font-size:12px">{{ item.complement }}</span>
+                            </el-option>-->
+                        </el-select>
+                    </el-col>
+                    <el-col :xs="24" :sm="12" :md="8" :lg="6" class="s-input">
+                        <div>BANHEIROS<span></span></div>
+                        <el-select v-model="banheiros" filterable placeholder="qualquer" size="large" input-style="color:var(--s-accent-color)" :teleported="false" @change="enableFilterButton = true" style="width:100%">
+                            <!--<el-option v-for="item in $root.search.opcoes.quantidades" :key="item.id" :label="item.label + item.complement.replace('ou','')" :value="item.value">
+                                <span :style="(item.id > 0)? 'font-weight:bold;margin-right:6px':''">{{ item.label }}</span>
+                                <span style="font-size:12px">{{ item.complement }}</span>
+                            </el-option>-->
+                        </el-select>
+                    </el-col>
+                    <el-col :xs="24" :sm="12" :md="8" :lg="6" class="s-input">
+                        <div>SUÍTES<span></span></div>
+                        <el-select v-model="suites" filterable class="m-4" placeholder="qualquer" size="large" input-style="color:var(--s-accent-color)" :teleported="false" @change="enableFilterButton = true" style="width:100%">
+                            <!--<el-option v-for="item in $root.search.opcoes.quantidades" :key="item.id" :label="item.label + item.complement.replace('ou','')" :value="item.value">
+                                <span :style="(item.id > 0)? 'font-weight:bold;margin-right:6px':''">{{ item.label }}</span>
+                                <span style="font-size:12px">{{ item.complement }}</span>
+                            </el-option>-->
+                        </el-select>
+                    </el-col>
                 </el-row>
 
-
-
-
-
-
-
-
-		    <el-row justify="center" v-if="onrequest">
-                <el-col :md="24" style="color:var(--s-color-primary)">
-                    <el-divider style="margin:10px;"><!--resultado--></el-divider>
-                    <c-loading padding="20px"></c-loading>
+                <el-col :span="24" class="s-input-checkbox">
+                    <div>CARACTERÍSTICAS<span></span></div>
+                    <el-checkbox-group v-model="checkedCaracteristicas" class="checkbox-group">
+                        <el-checkbox v-for="caracteristicasImoveis in caracteristicas"
+                                     :key="caracteristicasImoveis"
+                                     :label="caracteristicasImoveis"
+                                     :value="caracteristicasImoveis"
+                                     class="checkbox-item">
+                            {{ caracteristicasImoveis }}
+                        </el-checkbox>
+                    </el-checkbox-group>
                 </el-col>
-		    </el-row>
 
+                <el-row style="width: 100%; display: flex; justify-content: flex-end; align-items: center;">
+                    <el-col :xs="24" :sm="12" :md="8" :lg="6" class="s-input" style="width: 100%; display: flex; justify-content: flex-end; align-items: center;">
+                        <div><span></span></div>
+                        <q-btn label="BUSCAR" color="primary" @click="BuscarProprietario()"></q-btn>
+                        <span style="cursor:pointer; padding-left:20px; color:var(--s-color-green)" @click="LimparFiltro"><i class="fa fa-cancel"></i> limpar filtro</span>
+                    </el-col>
+                </el-row>
 
-		    <el-row v-else>
-			    <el-col :md="24" >
+                <el-row justify="center" v-if="onrequest">
+                    <el-col :md="24" style="color:var(--s-color-primary)">
+                        <el-divider style="margin:10px;"><!--resultado--></el-divider>
+                        <c-loading padding="20px"></c-loading>
+                    </el-col>
+                </el-row>
 
-                <el-row>
+                <el-row v-else>
                     <el-col :md="24">
-                        <el-divider style="margin:10px"><!--resultado--></el-divider>
 
-                        <el-row style="padding-left:20px;padding-right:20px;">
+                        <el-row>
                             <el-col :md="24">
-                                <div style="float:left">
-                                    <span style="color:var(--s-color-primary)">encontrados</span><br />
-                                        <span v-if="busca.total > 0">{{buscaImovel.total}}</span>
-                                        <span v-else style="color:var(--s-color-orange)">nada encontrado</span>
-                                </div>
-                                <div style="float:right">
-                                    <q-input v-model.number="busca.resultsPerPage" type="number" style="max-width:140px" label="RESULTADOS POR PÁGINA" stack-label :min="1" :dense="true" @keyup="()=>{ if(!onrequest){ Enviar(1);}}" @change="()=>{ if(!onrequest){ Enviar(1);}}"></q-input>
-                                </div>
+                                <el-divider style="margin:10px"><!--resultado--></el-divider>
+
+                                <el-row style="padding-left:20px;padding-right:20px;">
+                                    <el-col :md="24">
+                                        <div style="float:left">
+                                            <span style="color:var(--s-color-primary)">encontrados</span><br />
+                                            <span v-if="busca.total > 0">{{busca.total}}</span>
+                                            <span v-else style="color:var(--s-color-orange)">nada encontrado</span>
+                                        </div>
+                                        <div style="float:right">
+                                            <q-input v-model.number="busca.resultsPerPage" type="number" style="max-width:140px" label="RESULTADOS POR PÁGINA" stack-label :min="1" :dense="true" @keyup="()=>{ if(!onrequest){ Enviar(1);}}" @change="()=>{ if(!onrequest){ Enviar(1);}}"></q-input>
+                                        </div>
+                                    </el-col>
+                                </el-row>
+
+                                <el-divider style="margin:10px"></el-divider>
                             </el-col>
                         </el-row>
 
-                        <el-divider style="margin:10px"></el-divider>
-                    </el-col>
-                </el-row>
+                        <el-row>
+                            <el-col :md="24">
 
-                <el-row>
+                                <!--TABLE-->
 
-                <el-col  :md="24" style="color:var(--s-color-primary);font-weight:700" v-if="$validator.is(imoveisBuscaResult) && imoveisBuscaResult.length > 0">
-                        <!-- TABLE IMOVEIS  -->
+                                <el-table :data="data" style="width: 100%" max-height="380" v-loading="ontablequest" :table-layout="auto" :row-class-name="tableRowClassName">
 
-                        <el-table :data="imoveisBuscaResult" style="width: 100%" max-height="380" v-loading="ontablequest" :table-layout="auto" :row-class-name="tableRowClassName">
-
-                            <el-table-column fixed="left" label="" width="120" style="color:orange">
-                                    <template #default="scope" style="border-right:1px solid #000">
-                                          <el-image style="width: 100px;cursor:pointer; height: 100px" :src="scope.row.urlImagemPrincipal" fit="fill"  @click="$root.RouteTo('imovel/'+scope.row.id)"></el-image>
-                                    </template>
-                            </el-table-column>
-
-
-                                <!--<el-table-column prop="id" label="ID" width="60">
-                                    <template #default="scope">
-                                         <b>{{scope.row.id}}</b>
-                                    </template>
-                                </el-table-column>
-                                <el-table-column prop="id" label="COD" width="60">
-                                    <template #default="scope">
-                                         <b>{{scope.row.cod}}</b>
-                                    </template>
-                                </el-table-column>-->
-
-                                <el-table-column label="" width="200">
-                                    <template #default="scope">
-                                        <div style="color:var(--s-color-primary);cursor:pointer"  @click="$root.RouteTo('imovel/'+scope.row.id)">
-                                            <b><span v-html="scope.row.nome.replaceAll(',','<br>')" ></span></b>
-                                        </div>
-                                    </template>
-                                </el-table-column>
-
-                            <!--</el-table-column>-->
-                            <!--<el-table-column label="CONTATO">-->
-                                <el-table-column label="" width="300">
-                                    <template #default="scope">
-                                        <div style="color:var(--s-color-primary);">
-                                                {{scope.row.proprietario.nome}}<br />
-                                                <a :href="$tools.BuildWhatsappLink(scope.row.proprietario.telefone,'Olá '+scope.row.proprietario.apelido)" target="_blank" style="color:var(--s-color-green);text-decoration:none"><i class="fab fa-whatsapp" style="padding-right:3px;"></i> {{scope.row.proprietario.telefone}}</a>
-                                                <br />
-                                                <a :href="'mailto:'+scope.row.proprietario.email" target="_blank" style="color:var(--el-color-primary);text-decoration:none"><i class="fa fa-envelope"></i>&nbsp; {{scope.row.proprietario.email}}</a>
-                                        </div>
-                                    </template>
-                                </el-table-column>
-                                <el-table-column label="" width="400">
-                                    <template #default="scope">
-                                        <div>
-                                            <a v-if="$validator.is(scope.row.endereco.logradouro)" href="javascript:void(0)" @click="$tools.Copy((scope.row.endereco.logradouro+','+scope.row.endereco.numero+','+($validator.is(scope.row.endereco.complemento)? scope.row.endereco.complemento+',':'')+scope.row.endereco.bairro+','+scope.row.endereco.cidade+','+scope.row.endereco.estado))" style="text-decoration:none;color:var(--s-color-primary);margin-right:10px"><i class="fa fa-copy" style="padding-right:3px;text-decoration:none"></i></a>
-                                            <a :href="$tools.BuildMapUrl(scope.row.endereco)" target="_blank" style="color:var(--s-text-color);text-decoration:none;margin-right:6px">
+                                    <el-table-column prop="id" label="ID" width="70">
+                                        <template #default="scope">
+                                            <b @click="Alterar(scope)" style="cursor:pointer;color:var(--s-color-primary)">{{scope.row.id}}</b>
+                                        </template>
+                                    </el-table-column>
+                                    <el-table-column label="NOME" width="250">
+                                        <template #default="scope">
+                                            <b @click="Alterar(scope)" style="cursor:pointer">{{scope.row.nome}}</b>
+                                        </template>
+                                    </el-table-column>
+                                    <el-table-column label="E-Mail" width="220">
+                                        <template #default="scope">
+                                            <a :href="'mailto:'+scope.row.email" target="_blank" style="color:var(--el-color-primary);text-decoration:none"><i class="fa fa-envelope"></i>&nbsp; {{scope.row.email}}</a>
+                                        </template>
+                                    </el-table-column>
+                                    <el-table-column label="TELEFONE" width="150">
+                                        <template #default="scope">
+                                            <a :href="$tools.BuildWhatsappLink(scope.row.telefone,'Olá '+scope.row.apelido)" target="_blank" style="color:var(--s-color-green);text-decoration:none"><i class="fab fa-whatsapp" style="padding-right:3px;"></i> {{scope.row.telefone}}</a>
+                                        </template>
+                                    </el-table-column>
+                                    <el-table-column label="CPF" width="150">
+                                        <template #default="scope">
+                                            <a href="javascript:void(0)" @click="$tools.Copy(scope.row.cpf)" style="text-decoration:none;color:var(--s-color-tex-alt)"><i class="fa fa-copy" style="padding-right:3px;color:var(--el-color-primary);text-decoration:none"></i> {{scope.row.cpf}}  </a>
+                                        </template>
+                                    </el-table-column>
+                                    <el-table-column prop="rg" label="RG" width="120" />
+                                    <!--</el-table-column>-->
+                                    <!--<el-table-column label="CONTATO">-->
+                                    <el-table-column label="ENDEREÇO" width="400">
+                                        <template #default="scope">
+                                            <a :href="$tools.BuildMapLink(scope.row)" target="_blank" style="color:var(--s-text-color);text-decoration:none;margin-right:6px">
                                                 <i style="color:var(--s-color-primary);margin-right:6px" class="fa fa-location-dot"></i>
-                                                <div style="color:var(--s-color-text);">
-                                                    {{scope.row.endereco.logradouro}}, {{scope.row.endereco.numero}}
-                                                    <span v-if="$validator.is(scope.row.complemento)"> , {{scope.row.endereco.complemento}}</span>,
-                                                    {{scope.row.endereco.bairro}},
-                                                    {{scope.row.endereco.cidade}}, {{scope.row.endereco.estado}}, CEP: {{scope.row.endereco.cep}}
-                                                </div>
+                                                {{scope.row.logradouro}}, {{scope.row.numero}}
+                                                <span v-if="$validator.is(scope.row.complemento)"> , {{scope.row.complemento}}</span>,
+                                                {{scope.row.bairro}},
+                                                {{scope.row.cidade}}, {{scope.row.estado}}, CEP: {{scope.row.cep}}
                                             </a>
-                                        </div>
-                                    </template>
-                                </el-table-column>
-                            <el-table-column prop="data" label="" width="140">
-                                <template #default="scope">
-                                    {{$tools.FormatDateToBR(new Date(scope.row.data))}}
-                                </template>
-                            </el-table-column>
-                            <el-table-column label="" width="60">
-                                <template #default="scope">
-                                    <a v-if="$validator.is(scope.row.obs)" href="javascript:void(0)" @click="$tools.Alert(scope.row.obs,'OBSERVAÇÕES')" style="color:var(--s-color-primary);text-decoration:none"><i class="fa fa-message"></i></a>
-                                    <a v-else href="javascript:void(0)" @click="$tools.Message('sem observações')" style="color:var(--s-color-grey);text-decoration:none"><i class="fa fa-message"></i></a>
-                                </template>
-                            </el-table-column>
-                        </el-table>
+                                        </template>
+                                    </el-table-column>
+                                    <!--</el-table-column>-->
+                                    <!--<el-table-column label="ENDEREÇO">-->
+                                    <!--<el-table-column prop="cidade"      label="CIDADE"      width="280" />
+                                        <el-table-column prop="estado"      label="ESTADO"      width="140" />
+                                        <el-table-column prop="bairro"      label="BAIRRO"      width="240" />
+                                        <el-table-column prop="logradouro"  label="LOGRADOURO"  width="240" />
+                                        <el-table-column prop="numero"      label="NÚMERO"      width="140" />
+                                        <el-table-column prop="complemento" label="COMPLEMENTO" width="140" />
+                                    <!--</el-table-column>-->
+                                    <el-table-column prop="data" label="DATA" width="140">
+                                        <template #default="scope">
+                                            {{$tools.FormatDateToBR(new Date(scope.row.data))}}
+                                        </template>
+                                    </el-table-column>
+                                    <el-table-column label="OBS" width="60">
+                                        <template #default="scope">
+                                            <a v-if="$validator.is(scope.row.obs)" href="javascript:void(0)" @click="$tools.Alert(scope.row.obs,'OBSERVAÇÕES')" style="color:var(--s-color-primary);text-decoration:none"><i class="fa fa-message"></i></a>
+                                            <a v-else href="javascript:void(0)" @click="$tools.Message('sem observações')" style="color:var(--s-color-grey);text-decoration:none"><i class="fa fa-message"></i></a>
+                                        </template>
+                                    </el-table-column>
+                                    <el-table-column fixed="right" label="Ações" width="90" style="color:orange">
+                                        <template #default="scope">
 
-                </el-col>
+                                            <div style="display:inline-block;margin-left:8px;margin-right:20px" @click="Alterar(scope)">
+                                                <i class="fa fa-edit" style="color:var(--s-color-primary);cursor:pointer"></i>
+                                            </div>
 
-                </el-row>
+                                            <div style="display:inline-block">
+
+                                                <el-popconfirm width="220"
+                                                               confirm-button-text="SIM"
+                                                               cancel-button-text="Não"
+                                                               :icon="InfoFilled"
+                                                               icon-color="var(--s-color-primary)"
+                                                               :title="'Excluir ID#'+scope.row.id+' . '+scope.row.nome+'?'"
+                                                               @confirm="Excluir(scope)">
+                                                    <template #reference>
+                                                        <i class="fa fa-trash" style="color:var(--s-color-red);cursor:pointer"></i>
+                                                    </template>
+                                                </el-popconfirm>
+                                            </div>
+
+                                        </template>
+                                    </el-table-column>
+                                </el-table>
 
 
-                <el-row>
-                    <el-col :md="24">
 
-                        <div class="q-pa-lg flex flex-center">
-                            <el-pagination layout="prev, pager, next" :total="busca.total" :page-size="busca.resultsPerPage" v-model:current-page="busca.page" @current-change="Enviar"></el-pagination>
-                        </div>
+                            </el-col>
+                        </el-row>
+
+
+                        <el-row>
+                            <el-col :md="24">
+
+                                <div class="q-pa-lg flex flex-center">
+                                    <el-pagination layout="prev, pager, next" :total="busca.total" :page-size="busca.resultsPerPage" v-model:current-page="busca.page" @current-change="Enviar"></el-pagination>
+                                </div>
+
+                            </el-col>
+                        </el-row>
+
 
                     </el-col>
                 </el-row>
 
 
-			    </el-col>
-		    </el-row>
-
-
-			</el-col>
-	</el-row>
-	</div>
+            </el-col>
+        </el-row>
+    </div>
 </template>
 
 
 
 
 <script>
-	module.exports = {
+    import { ref } from 'vue';
+    module.exports = {
 
-		name: 'Buscar',
+        name: 'Buscar',
 
-		components: {
+        components: {
 
-		},
+        },
 
-		data: function () {
-			return {
-				onrequest           : false,
-                ontablequest        : false,
-                busca               : this.$models.busca(),
-                data                : null,
-                id                  : null,
-                busca               : this.$models.busca(),
-                buscaImovel         : this.$models.buscaImovel(),
-                imovel              : this.$models.imovel(),
-                imoveisBuscaResult  : []
-			}
-		}, computed: {
+        data: function () {
+            return {
+                onrequest: false,
+                ontablequest: false,
+                busca: this.$models.busca(),
+                data: null,
+                id: null,
+                checkedCaracteristicas: ref([]),
+                caracteristicas: ['Água individual', 'Alarme', 'Área de Serviço', 'Armário Cozinha', 'Armário banheiro',
+                    'Armário Quarto', 'Box Despejo', 'Cerca Elétrica', 'Churrasqueira', 'Closet', 'DCE', 'Gás Canalizado',
+                    'Hidromassagem', 'Interfone', 'Jardim', 'Lavabo', 'Piscina', 'Portao Eletrônico', 'Elevador', 'Salas', 'Salão de Festas', 'Quadra Esportiva'],
+                tipoImovel: "",
+                tipoOperacao: "",
+                estado: "",
+                cidade: "",
+                bairro: "",
 
-		},
+                valorMinimo: "",
+                valorMaximo: "",
 
-		props: {
-		},
-		watch: {
+                areaMinima: "",
+                areaMaxima: "",
 
-		},
-		created: function () {
-            this.busca.item = this.$models.imovel();
-		},
-		mounted() {
-            this.Enviar();
-		},
-		methods: {
+                quartos: "",
+                vagas: "",
+                banheiros: "",
+                suites: "",
+            }
+        }, computed: {
 
+        },
 
-			async Enviar(page){
+        props: {
 
-                this.buscaImovel.page = page;
+        },
+        watch: {
 
-                this.onrequest  = true;
-                var request     = await this.$api.Post("imovel/buscar",this.buscaImovel);
-
-                // c2("request",request);
-
-                if (request?.status?.success){
-                    if(this.$validator.is(request.result.imoveisJC))
-                            this.imoveisBuscaResult =  request.result.imoveisJC;
-                } 
-
-                this.onrequest  = false;
-
-			},
+        },
+        created: function () {
+            this.busca.item = this.$models.proprietario();
+        },
+        mounted() {
+            this.$refs.nome.focus();
+            //this.Enviar();
+        },
+        methods: {
 
 
-            LimparFiltro(){
+            LimparFiltro() {
                 this.id = null;
                 this.busca.item = this.$models.proprietario();
                 this.Enviar();
             },
 
-            tableRowClassName(scope){
-                if(!scope.row.ativo)
+            tableRowClassName(scope) {
+                if (!scope.row.ativo)
                     return "deleted-row";
             },
 
 
-            Alterar(scope){
+            Alterar(scope) {
                 this.$root.RouteTo('proprietario/' + scope.row.id)
             },
 
-            async Excluir(scope){
+            async Excluir(scope) {
 
-                this.ontablequest   = true;
-                var request         = await this.$api.Get(("proprietario/excluir/"+scope.row.id));
-                this.ontablequest   = false;
-                
+                this.ontablequest = true;
+                var request = await this.$api.Get(("proprietario/excluir/" + scope.row.id));
+                this.ontablequest = false;
+
                 if (request?.status?.success) {
                     this.busca.result.forEach((i) => { i.ativo = (i.ativo && i.id != scope.row.id); });
                     this.$tools.AlertSuccess("Proprietário excluído!");
                 }
-    
+
                 //var item = this.busca.result.filter((i) => i.id === id)[0];
                 //delete this.busca.result[this.busca.result.indexOf(item)];
                 //this.$tools.Message("Item excluído");
             },
 
+            async Enviar(page = 1) {
 
 
-		}
+                if (this.$validator.is(this.id))
+                    this.busca.item.id = this.id;
 
-	}
+                this.busca.page = page;
+                this.busca.result = [];
+                this.onrequest = true;
+                var request = await this.$api.Post("imovel/buscar", this.busca);
+                this.onrequest = false;
+
+                if (request?.status?.success) {
+                    this.busca = request.result;
+                    this.data = this.busca.result;
+                }
+
+
+            }
+
+
+
+
+        }
+
+    }
 
 
 </script>
 
 
 <style>
+    .s-input-checkbox {
+        letter-spacing: 0.02em;
+        color: #0072ff !important;
+        font-size: 0.9em;
+        font-weight: 600;
+        margin-top: 2px;
+        margin-top: 10px;
+    }
 
+    .checkbox-group {
+        display: flex;
+        flex-wrap: wrap;
+    }
+
+    .checkbox-item {
+        width: calc(20% - 60px);
+        margin: 5px;
+        box-sizing: border-box;
+    }
+
+    @media (max-width: 992px) {
+        .checkbox-item {
+            width: calc(33.33% - 10px);
+        }
+    }
+
+    @media (max-width: 768px) {
+        .checkbox-item {
+            width: calc(50% - 10px);
+        }
+    }
+
+    @media (max-width: 576px) {
+        .checkbox-item {
+            width: calc(100% - 10px);
+        }
+    }
 </style>
-
-
