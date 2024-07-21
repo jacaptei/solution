@@ -114,59 +114,57 @@ public class ImovelDAO : IDisposable
         return appReturn;
     }
 
+    public AppReturn Alterar(Imovel entity) {
+        //appReturn.result = entity;
+        //return appReturn;
 
+        using(var conn = new DBcontext().GetConn()) {
+            using(var trans = conn.EnsureOpen().BeginTransaction()) {
+                try {
 
-        public AppReturn Alterar(Imovel entity) {
-            //appReturn.result = entity;
-            //return appReturn;
+                    entity.tipo = conn.Query<ImovelTipo>(t => t.id == entity.idTipo || t.label == entity.tipo.label).FirstOrDefault();
+                    if(entity.tipo is null)
+                        entity.tipo = new ImovelTipo { id=1,nome="IMOVEL",label="Imóvel" };
 
-            using(var conn = new DBcontext().GetConn()) {
-                using(var trans = conn.EnsureOpen().BeginTransaction()) {
-                    try {
+                    entity.idTipo           = entity.tipo.id;
+                    entity.titulo           = entity.ObterTitulo();
+                    entity.urlPublica       = entity.ObterUrlPublica();
+                    entity.dataAtualizacao  = Utils.Date.GetLocalDateTime();
 
-                        entity.tipo = conn.Query<ImovelTipo>(t => t.id == entity.idTipo || t.label == entity.tipo.label).FirstOrDefault();
-                        if(entity.tipo is null)
-                            entity.tipo = new ImovelTipo { id=1,nome="IMOVEL",label="Imóvel" };
+                    conn.Update<Imovel>(entity);
 
-                        entity.idTipo           = entity.tipo.id;
-                        entity.titulo           = entity.ObterTitulo();
-                        entity.urlPublica       = entity.ObterUrlPublica();
-                        entity.dataAtualizacao  = Utils.Date.GetLocalDateTime();
+                    conn.Update<ImovelEndereco>(entity.endereco);
+                    conn.Update<ImovelValores>(entity.valor);
+                    conn.Update<ImovelAreas>(entity.area);
+                    conn.Update<ImovelLazer>(entity.lazer);
+                    conn.Update<ImovelCaracteristicasInternas>(entity.interno);
+                    conn.Update<ImovelCaracteristicasExternas>(entity.externo);
+                    conn.Update<ImovelDocumentacao>(entity.documentacao);
+                    conn.Update<ImovelDisposicao>(entity.disposicao);
 
-                        conn.Update<Imovel>(entity);
+                    trans.Commit();
 
-                        conn.Update<ImovelEndereco>(entity.endereco);
-                        conn.Update<ImovelValores>(entity.valor);
-                        conn.Update<ImovelAreas>(entity.area);
-                        conn.Update<ImovelLazer>(entity.lazer);
-                        conn.Update<ImovelCaracteristicasInternas>(entity.interno);
-                        conn.Update<ImovelCaracteristicasExternas>(entity.externo);
-                        conn.Update<ImovelDocumentacao>(entity.documentacao);
-                        conn.Update<ImovelDisposicao>(entity.disposicao);
-
-                        trans.Commit();
-
-                    } catch(Exception ex) {
-                        appReturn.SetAsException("Falha ao inserir imóvel",ex);
-                        trans.Rollback();
-                    }
+                } catch(Exception ex) {
+                    appReturn.SetAsException("Falha ao inserir imóvel",ex);
+                    trans.Rollback();
                 }
             }
-            appReturn.result = entity;
-            return appReturn;
         }
+        appReturn.result = entity;
+        return appReturn;
+    }
 
         
-        public AppReturn Excluir(int _id) {
-            return Excluir(new Imovel{ id = _id});
-        }
+    public AppReturn Excluir(int _id) {
+        return Excluir(new Imovel{ id = _id});
+    }
 
-        public AppReturn Excluir(Imovel entity) {
-            using(var conn = new DBcontext().GetConn()) {
-                conn.Delete<Imovel>(entity);
-            }
-            return appReturn;
+    public AppReturn Excluir(Imovel entity) {
+        using(var conn = new DBcontext().GetConn()) {
+            conn.Delete<Imovel>(entity);
         }
+        return appReturn;
+    }
 
 
 

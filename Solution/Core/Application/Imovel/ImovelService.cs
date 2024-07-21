@@ -55,12 +55,12 @@ public class ImovelService : IDisposable
 
         public AppReturn Alterar(Imovel entity) {
 
-            entity = BLO.Normalizar(entity);
+            entity = _blo.Normalizar(entity);
 
             if(entity.id == 0)
-                 appReturn.AddException("Imóvel não identificado");
+            _appReturn.AddException("Imóvel não identificado");
             if(entity.idProprietario <= 0)
-                appReturn.AddException("Proprietário não identificado.");
+            _appReturn.AddException("Proprietário não identificado.");
 
             if(entity.imagens is null)
                 entity.imagens = new List<ImovelImagem>();
@@ -69,8 +69,8 @@ public class ImovelService : IDisposable
                 entity.imagens[0].principal = true;
             }
 
-            if(!appReturn.status.success)
-                return appReturn;
+            if(!_appReturn.status.success)
+                return _appReturn;
 
             try {
                 LocalidadeService localidade = new LocalidadeService();
@@ -82,25 +82,23 @@ public class ImovelService : IDisposable
                    entity.endereco.idBairro = (localidade.ObterIdBairroNorm(entity.endereco.idCidade,entity.endereco.bairroNorm)).result.id;
              }catch(Exception ex) { }
 
-            return DAO.Alterar(entity);
+            return _imovelDAO.Alterar(entity);
 
         }
 
 
 
 
-        public void AdicionarImagens(Imovel entity) {
-            DAO.AdicionarImagens(entity);
-        }
-
+    public void AdicionarImagens(Imovel entity) {
+        _imovelDAO.AdicionarImagens(entity);
+    }
         
-        public AppReturn Excluir(int id) {
-           return DAO.Excluir(id);
-        }
-        public AppReturn Excluir(Imovel entity) {
-           return DAO.Excluir(entity);
-        }
-
+    public AppReturn Excluir(int id) {
+        return _imovelDAO.Excluir(id);
+    }
+    public AppReturn Excluir(Imovel entity) {
+        return _imovelDAO.Excluir(entity);
+    }
 
 
     public List<Imovel> ObterImoveisComImagensCRM()
