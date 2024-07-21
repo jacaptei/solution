@@ -26,7 +26,7 @@ namespace JaCaptei.Model {
             }
 
             public string CEP(dynamic value) {
-                return Number(value.ToString(),@"{0:00000\-00}");
+                return Number(value.ToString(),@"{0:00000\-000}");
             }
 
             public string Number(string value, string mask){

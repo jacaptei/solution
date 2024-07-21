@@ -408,7 +408,7 @@ $(document).ready(function () {
                 // AUTH --------------------------------
                 SignIn(){
                     this.isAuth = true;
-                    if (this.usuario.aceitouPoliticaPrivacidade === false && this.usuario.aceitouTermos === false) {
+                    if (this.usuario.aceitouPoliticaPrivacidade === false || this.usuario.aceitouTermos === false) {
                         this.OpenLoginTermsAndPolicyModal();
                     }
                     //this.$sdata.Storage.Set("utk"    , this.usuario.token);

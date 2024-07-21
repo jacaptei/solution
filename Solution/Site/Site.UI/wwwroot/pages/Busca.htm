@@ -1,7 +1,6 @@
 ﻿<template>
     <div>
         <div v-if="$root.isAuth">
-
             <el-container :style="$root.search.onRequest? 'cursor:wait' : 'cursor:default'">
 
                 <c-search-form :show="showForm" @showform="showForm = !showForm" @requestsearch="Search" v-if="$validator.is($root.search.imovelBusca.imovel)" :style="$root.search.onRequest? 'pointer-events: none;opacity:0.4;cursor:wait' : ''"></c-search-form>
@@ -67,8 +66,9 @@
                 </el-container>
             </el-container>
         </div>
-        <div v-else>
+        <div v-else style="width:100%;text-align:center;margin-top:40px">
             {{$root.RequestLogin()}}
+            <q-btn label="Seja nosso parceiro para buscar imóveis" @click="$root.RouteTo('parceiros')" color="primary" style="padding:20px"></q-btn>
         </div>
     </div>
 </template>

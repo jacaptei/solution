@@ -166,6 +166,7 @@ CREATE	TABLE "ImovelImagem"(
     base64                          TEXT                ,
 
  	principal                     	BOOLEAN			    DEFAULT FALSE,
+    url                             VARCHAR(600)        DEFAULT  '',
     "urlThumb"                      VARCHAR(600)        DEFAULT  '',
     "urlSmall"                      VARCHAR(600)        DEFAULT  '',
     "urlMedium"                     VARCHAR(600)        DEFAULT  '',
@@ -395,7 +396,7 @@ CREATE	TABLE "ImovelDisposicao"(
     "aceitaFinanciamento"   BOOLEAN DEFAULT FALSE,
     "aceitaPermuta"         BOOLEAN DEFAULT FALSE,
     alugado                 BOOLEAN DEFAULT FALSE,
-    comissao                REAL    DEFAULT 0,
+    comissao                BOOLEAN DEFAULT FALSE,
     desativado              BOOLEAN DEFAULT FALSE,
     disponivel              BOOLEAN DEFAULT FALSE,
     "gestaoJacaptei"        BOOLEAN DEFAULT FALSE,

@@ -27,6 +27,7 @@ namespace JaCaptei.Model {
             public string       base64              {get;set;}="";
 
             public bool         principal           {get;set;}=false;
+            public string       url                 {get;set;}="";
             public string       urlThumb            {get;set;}="";
             public string       urlSmall            {get;set;}="";
             public string       urlMedium           {get;set;}="";

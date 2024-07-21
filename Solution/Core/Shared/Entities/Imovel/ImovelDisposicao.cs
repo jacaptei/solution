@@ -23,6 +23,7 @@ namespace JaCaptei.Model {
             public bool     placa                   {get;set;} = false;
             public bool     ocupado                 {get;set;} = false;
             public bool     vendido                 {get;set;} = false;
+            public bool     comissao                {get;set;} = false;
 
     }
 
