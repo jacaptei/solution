@@ -2,7 +2,12 @@
 
 using JaCaptei.Admin.API.Consumers;
 using JaCaptei.Application.DAL;
+using JaCaptei.Model;
+
 using MassTransit;
+
+using Microsoft.Extensions.Azure;
+
 using Polly;
 using Polly.Contrib.WaitAndRetry;
 
@@ -10,26 +15,52 @@ namespace JaCaptei.Admin.API;
 
 internal static class ServicesExtensions
 {
-    public static IServiceCollection AddServices(this IServiceCollection services, Model.AppSettingsRecord settings)
+    public static IServiceCollection AddServices(this IServiceCollection services, Model.AppSettingsRecord settings, IConfiguration config)
     {
         services.AddMassTransit(busConfig =>
         {
-            busConfig.AddConsumer<IntegracaoClienteConsumer>();
-            busConfig.UsingRabbitMq((context, cfg) =>
+            busConfig.AddConsumer<IntegracaoClienteConsumer>(c =>
             {
-                //cfg.Host("rabbitmq", 5672, "/", h =>
-                //{
-                //    h.Username("guest");
-                //    h.Password("guest");
-                //});
-                cfg.Host(new Uri("amqp://localhost:5672"), h =>
-                {
-                    h.Username("guest");
-                    h.Password("guest");
-                });
-                cfg.ConfigureEndpoints(context);
+                c.ConcurrentMessageLimit = 1;
             });
+            //busConfig.UsingRabbitMq((context, cfg) =>
+            //{
+            //    //cfg.Host("rabbitmq", 5672, "/", h =>
+            //    //{
+            //    //    h.Username("guest");
+            //    //    h.Password("guest");
+            //    //});
+            //    cfg.Host(new Uri("amqp://localhost:5672"), h =>
+            //    {
+            //        h.Username("guest");
+            //        h.Password("guest");
+            //    });
+            //    cfg.ConfigureEndpoints(context);
+            //});
+            services.AddMassTransit(x =>
+            {
+                x.UsingAzureServiceBus((context, cfg) =>
+                {
+                    var azureMQConn = config.GetValue<string>("Homolog:AzureMQ");
+                    cfg.Host(azureMQConn);
+                    x.AddConsumer<IntegracaoClienteConsumer>();
+
+                    //cfg.Message<IntegracaoEvent>(configTopology =>
+                    //{
+                    //    configTopology.SetEntityName("integracaocliente");
+                    //});
+                    cfg.ReceiveEndpoint("integracaocliente", e =>
+                    {
+                        e.ConfigureConsumer<IntegracaoClienteConsumer>(context);
+                    });
+                    cfg.ConfigureEndpoints(context);
+                });
+            });
+
+
         });
+        services.AddMassTransitHostedService();
+
         services.AddHttpClient("crm", client =>
         {
             client.BaseAddress = new Uri(settings.crmEndpoint);

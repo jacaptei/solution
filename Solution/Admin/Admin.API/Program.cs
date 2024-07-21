@@ -6,6 +6,8 @@ using System.Text.Json;
 using System.Text;
 using Microsoft.IdentityModel.Tokens;
 using JaCaptei.Admin.API;
+using MassTransit;
+using ImoviewWorker;
 
 //var builder = WebApplication.CreateBuilder(new WebApplicationOptions {
 //    ApplicationName = typeof(Program).Assembly.FullName,
@@ -140,7 +142,10 @@ builder.Services.AddAuthentication(x => {
 
 });
 
-builder.Services.AddServices(settings);
+//builder.Services.AddHostedService<ImoviewWorkerService>();
+builder.Services.AddServices(settings, configuration);
+
+
 
 // -----------------------------------------------------
 
@@ -171,4 +176,6 @@ app.MapControllerRoute(name: "default",pattern: "{controller=Home}/{action=Index
 //app.MapDefaultControllerRoute();
 //app.UseEndpoints(endpoints =>{    endpoints.MapControllerRoute(        name: "default",        pattern: "{controller=home}/{action=index}");});
 app.Run();
+//await busControl.StartAsync();
+
 

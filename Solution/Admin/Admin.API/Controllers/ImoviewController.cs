@@ -26,7 +26,7 @@ public class ImoviewController : ControllerBase
     private readonly IMapper _mapper;
     private readonly ParceiroService _parceiroService;
 
-    public ImoviewController(IHttpClientFactory httpClientFactory, DBcontext context, IMapper mapper, IPublishEndpoint bus)
+    public ImoviewController(IHttpClientFactory httpClientFactory, DBcontext context, IMapper mapper, ISendEndpointProvider bus)
     {
         //_httpClientFactory = httpClientFactory;
         _service = new ImoviewService(httpClientFactory, context, _apiKey, mapper, bus);

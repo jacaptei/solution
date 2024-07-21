@@ -7,6 +7,7 @@ using JaCaptei.Model.Entities;
 
 using MassTransit;
 using MassTransit.Initializers;
+using MassTransit.Transports;
 
 using Polly;
 using Polly.Contrib.WaitAndRetry;
@@ -25,10 +26,10 @@ public class ImoviewService : IDisposable
     private readonly ImoviewDAO _imoviewDAO;
     private string _chave;
     private readonly IMapper _mapper;
-    private readonly IPublishEndpoint _bus;
+    private readonly ISendEndpointProvider _bus;
     private readonly AsyncRetryPolicy _retryPolicy;
 
-    public ImoviewService(IHttpClientFactory httpClientFactory, DBcontext context, string chave, IMapper mapper, IPublishEndpoint? bus = null)
+    public ImoviewService(IHttpClientFactory httpClientFactory, DBcontext context, string chave, IMapper mapper, ISendEndpointProvider? bus = null)
     {
         _httpClientFactory = httpClientFactory;
         _context = context;
@@ -186,7 +187,8 @@ public class ImoviewService : IDisposable
             IdOperador = integracao.IdOperador
         };
 
-        await _retryPolicy.ExecuteAsync(() => _bus.Publish(integracaoEvent));
+        var endpoint = await _bus.GetSendEndpoint(new Uri("queue:integracaocliente"));
+        await endpoint.Send(integracaoEvent);
         return new IntegrarClienteResponse()
         {
             Status = "Sucesso",
