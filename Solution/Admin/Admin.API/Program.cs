@@ -8,6 +8,7 @@ using Microsoft.IdentityModel.Tokens;
 using JaCaptei.Admin.API;
 using MassTransit;
 using ImoviewWorker;
+using Microsoft.Extensions.DependencyInjection;
 
 //var builder = WebApplication.CreateBuilder(new WebApplicationOptions {
 //    ApplicationName = typeof(Program).Assembly.FullName,
@@ -142,8 +143,8 @@ builder.Services.AddAuthentication(x => {
 
 });
 
-//builder.Services.AddHostedService<ImoviewWorkerService>();
-builder.Services.AddServices(settings, configuration);
+builder.Services.AddHostedService<ImoviewWorkerService>();
+builder.Services.AddServices(settings);
 
 
 

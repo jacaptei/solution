@@ -1,21 +1,18 @@
-﻿using System.Reflection;
-
-using JaCaptei.Admin.API.Consumers;
+﻿using JaCaptei.Admin.API.Consumers;
 using JaCaptei.Application.DAL;
-using JaCaptei.Model;
 
 using MassTransit;
 
-using Microsoft.Extensions.Azure;
-
 using Polly;
 using Polly.Contrib.WaitAndRetry;
+
+using System.Reflection;
 
 namespace JaCaptei.Admin.API;
 
 internal static class ServicesExtensions
 {
-    public static IServiceCollection AddServices(this IServiceCollection services, Model.AppSettingsRecord settings, IConfiguration config)
+    public static IServiceCollection AddServices(this IServiceCollection services, Model.AppSettingsRecord settings)
     {
         services.AddMassTransit(busConfig =>
         {
@@ -41,14 +38,9 @@ internal static class ServicesExtensions
             {
                 x.UsingAzureServiceBus((context, cfg) =>
                 {
-                    var azureMQConn = config.GetValue<string>("Homolog:AzureMQ");
+                    var azureMQConn = settings.AzureMQ;
                     cfg.Host(azureMQConn);
                     x.AddConsumer<IntegracaoClienteConsumer>();
-
-                    //cfg.Message<IntegracaoEvent>(configTopology =>
-                    //{
-                    //    configTopology.SetEntityName("integracaocliente");
-                    //});
                     cfg.ReceiveEndpoint("integracaocliente", e =>
                     {
                         e.ConfigureConsumer<IntegracaoClienteConsumer>(context);

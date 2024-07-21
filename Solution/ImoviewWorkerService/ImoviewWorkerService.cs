@@ -4,6 +4,7 @@ using Azure.Messaging.ServiceBus;
 
 using JaCaptei.Application.DAL;
 using JaCaptei.Application.Integracao;
+using JaCaptei.Model;
 
 namespace ImoviewWorker;
 
@@ -29,7 +30,7 @@ public class ImoviewWorkerService : BackgroundService
                 _logger.LogInformation("Worker running at: {time}", DateTimeOffset.Now);
             }
             await Task.Delay(10000, stoppingToken);
-            string connectionString = _config.GetValue<string>("Homolog:AzureMQ") ?? "";
+            string connectionString = Config.settings.AzureMQ;
             string queueName = "integracaocliente";
             await using var client = new ServiceBusClient(connectionString);
 
