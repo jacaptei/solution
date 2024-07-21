@@ -23,8 +23,8 @@ $(document).ready(function () {
 
     const ROUTER = VueRouter.createRouter({
         mode: 'history', // Add this line
-        //history: VueRouter.createWebHashHistory(),
-        history: VueRouter.createWebHistory(),
+        history: VueRouter.createWebHashHistory(),
+        //history: VueRouter.createWebHistory(),
         action: "home",
         routes: routes,
         scrollBehavior(to, from, savedPosition) {

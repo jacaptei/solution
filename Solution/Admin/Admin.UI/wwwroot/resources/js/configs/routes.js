@@ -11,10 +11,10 @@ const Parceiros     = httpVueLoader("/pages/parceiro/Index.htm");
 const Parceiro      = httpVueLoader("/pages/parceiro/parceiro.htm");
 
 const Proprietarios = httpVueLoader("/pages/proprietario/Index.htm");
-const Proprietario  = httpVueLoader("/pages/proprietario/proprietario.htm");
+const Proprietario  = httpVueLoader("/pages/proprietario/Proprietario.htm");
 
 const Imoveis       = httpVueLoader("/pages/imovel/Index.htm");
-const Imovel        = httpVueLoader("/pages/imovel/imovel.htm");
+const Imovel        = httpVueLoader("/pages/imovel/Imovel.htm");
 
 const Solicitacoes  = httpVueLoader("/pages/solicitacao/Index.htm");
 

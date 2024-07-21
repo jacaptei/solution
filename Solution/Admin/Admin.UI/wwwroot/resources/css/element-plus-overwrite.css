@@ -1277,6 +1277,7 @@
 
 .el-upload-dragger {
     /* padding: var(--el-upload-dragger-padding-horizontal) var(--el-upload-dragger-padding-vertical); */
+    padding:30px;
     background-color: var(--el-fill-color-blank);
     border: 1px dashed var(--el-border-color);
     border-radius: 6px;
@@ -1286,6 +1287,12 @@
     position: relative;
     overflow: hidden;
     width:100%;
+}
+.el-upload-dragger .el-icon--upload {
+    font-size: 40px;
+    color: var(--el-text-color-placeholder);
+    margin-bottom: -5px;
+    line-height: 50px;
 }
 
 .el-upload-list--picture-card {

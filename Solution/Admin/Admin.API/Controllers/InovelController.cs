@@ -70,6 +70,30 @@ namespace JaCaptei.Administrativo.API.Controllers {
             return Result(appReturn);
 
         }
+        
+        
+        [HttpPost]
+        [Route("[action]")]
+        public async Task<IActionResult> Alterar([FromForm] string jsonImovel, List<IFormFile> imagesFiles) {
+
+            Imovel imovel = JsonConvert.DeserializeObject<Imovel>(jsonImovel);
+
+            Usuario logado           = ObterUsuarioAutenticado();
+            imovel.atualizadoPorId    = logado.id;
+            imovel.atualizadoPorNome  = logado.nome;
+
+            appReturn = service.Alterar(imovel);
+
+            if(appReturn.status.success){
+                if( imagesFiles is not null && imagesFiles?.Count > 0)
+                    appReturn = await ImageShackUploadImagesFiles(imovel,imagesFiles);
+                else
+                    service.AdicionarImagens(imovel);
+            }
+
+            return Result(appReturn);
+
+        }
 
 
         public async Task<AppReturn> ImageShackUploadImagesFiles(Imovel imovel,List<IFormFile> imagesFiles) {
@@ -78,7 +102,7 @@ namespace JaCaptei.Administrativo.API.Controllers {
             short   index           = 0;
             string  pathToSave      = "";
             string  path            = "";
-            string  url             = "";
+            string  urlResult       = "";
             byte[]  fileBytes;
 
             if(imagesFiles?.Count > 0) {
@@ -86,7 +110,7 @@ namespace JaCaptei.Administrativo.API.Controllers {
 
                     foreach(IFormFile imageFile in imagesFiles) {
 
-                      // if(index < 3) { 
+                      if(imageFile.FileName != "noupdate"){ 
 
                             using(var memoryStream = new MemoryStream()) {
 
@@ -111,7 +135,7 @@ namespace JaCaptei.Administrativo.API.Controllers {
                                                 string postResponseBody = await postResponse.Content.ReadAsStringAsync();
                                                 var response = Newtonsoft.Json.JsonConvert.DeserializeObject<dynamic>(postResponseBody);
                                    
-                                                    url = response.links.image_link + "";
+                                                    urlResult = response.links.image_link + "";
 
                                                     imovel.imagens.Add(new ImovelImagem { 
 
@@ -130,20 +154,20 @@ namespace JaCaptei.Administrativo.API.Controllers {
                                                             size                = response.files.image.size,
                                                             width               = response.resolution.width,
                                                             height              = response.resolution.height,
-                                                    
 
                                                             arquivo             = response.files.image.filename,
                                                             arquivoOriginal     = response.files.image.original_filename,
 
-                                                            urlFull             = url,
-                                                            urlThumb            = service.GetImageShackResize(url,"320x240"),
-                                                            urlSmall            = service.GetImageShackResize(url,"640x480"),
-                                                            urlMedium           = service.GetImageShackResize(url,"800x600"),
-                                                            urlLarge            = service.GetImageShackResize(url,"1024x768"),
-                                                            urlFlex             = service.GetImageShackResize(url,"[resolution]"),
+                                                            url                 = urlResult,
+                                                            urlFull             = urlResult,
+                                                            urlThumb            = service.GetImageShackResize(urlResult,"320x240"),
+                                                            urlSmall            = service.GetImageShackResize(urlResult,"640x480"),
+                                                            urlMedium           = service.GetImageShackResize(urlResult,"800x600"),
+                                                            urlLarge            = service.GetImageShackResize(urlResult,"1024x768"),
+                                                            urlFlex             = service.GetImageShackResize(urlResult,"[resolution]"),
 
                                                     });
-                                                    imovel.obs = $"id = {response.id.ToString()}, img = {response.filename}, url = {response.links.image_link } ";
+                                                    //imovel.obs = $"id = {response.id.ToString()}, img = {response.filename}, url = {response.links.image_link } ";
                                                     index++;
                                             } else {
                                                 appReturn.AddException($"Error: {postResponse.StatusCode} - {postResponse.ReasonPhrase}","Não foi possível cadastrar imagens");
@@ -158,7 +182,7 @@ namespace JaCaptei.Administrativo.API.Controllers {
 
                             }
 
-                       // }
+                       }
                     
                     }
             
@@ -306,6 +330,24 @@ namespace JaCaptei.Administrativo.API.Controllers {
             appReturn.result = entities;
             return Result(appReturn);
         }
+        
+
+        [HttpPost]
+        [Route("[action]")]
+        public async Task<IActionResult> Excluir([FromBody] Imovel entity) {
+            appReturn.result = service.Excluir(entity);
+            return Result(appReturn);
+        }
+
+        [HttpGet]
+        [Route("[action]/{id:int}")]
+        public IActionResult Excluir(int id) {
+            appReturn.result = service.Excluir(id);
+            return Result(appReturn);
+        }
+
+
+
 
 
 
