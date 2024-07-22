@@ -30,10 +30,10 @@ namespace JaCaptei.Model {
             public bool     armarioQuarto       {get;set;}
             public bool     banheiro            {get;set;}
             public bool     boxDespejo          {get;set;}
-            public bool     dce                 {get;set;}
-            public bool     despensa            {get;set;}
             public bool     closet              {get;set;}
             public bool     churrasqueira       {get;set;}
+            public bool     dce                 {get;set;}
+            public bool     despensa            {get;set;}
             public bool     escritorio          {get;set;}
             public bool     gasCanalizado       {get;set;}
             public bool     lavabo              {get;set;}

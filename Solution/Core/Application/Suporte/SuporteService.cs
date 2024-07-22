@@ -141,7 +141,7 @@ namespace JaCaptei.Application
         public List<string> ObterTiposComplementos() {
             List<string> stt = new List<string>();
             stt.Add("APTO");
-            stt.Add("BLOCO");
+            //stt.Add("BLOCO");
             stt.Add("BOX");
             stt.Add("CASA");
             stt.Add("LOJA");
@@ -149,7 +149,7 @@ namespace JaCaptei.Application
             stt.Add("PÁTIO");
             stt.Add("SALA");
             stt.Add("SEÇÃO");
-            stt.Add("TORRE");
+            //stt.Add("TORRE");
             stt.Add("UNIDADE");
             return stt;
         }

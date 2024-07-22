@@ -51,6 +51,7 @@ namespace JaCaptei.Model {
             // ------------------- CATEGORIZADOS
             public List<ImovelImagem>               imagens         {get;set;} = new List<ImovelImagem>();
             public List<ImovelImagem>               imagensLegadas  {get;set;} = new List<ImovelImagem>();
+            public List<ImovelAnexo>                anexos          {get;set;} = new List<ImovelAnexo>();
             public ImovelEndereco                   endereco        {get;set;} = new ImovelEndereco();
             public ImovelValores                    valor           {get;set;} = new ImovelValores();
             public ImovelAreas                      area            {get;set;} = new ImovelAreas();
@@ -64,10 +65,12 @@ namespace JaCaptei.Model {
             public string                           tag                     {get;set;}  ="";
             public string                           status                  {get;set;}  = "ATIVO";
             public bool                             ativo                   {get;set;}  = true;
+            public bool                             visivel                 {get;set;}  = true;
             public bool                             ativoCRM                {get;set;}  = false;
             public bool                             possuiImagens           {get;set;}  = false;
             public bool                             sucesso                 {get;set;}  = false;
             
+            public bool                             possuiToken             {get;set;}  = true;
             public string                           token                   {get;set;}  = "";
             public long                             tokenNum                {get;set;}  
 

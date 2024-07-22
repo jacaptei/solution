@@ -45,7 +45,7 @@ $(document).ready(function () {
 
 		data: function () {
 			return {
-                    status          : {loading:false, requesting:false, pageLoading:false, dataLoading:false, online:true, success:true},
+                    status          : {mainLoading:false,loading:false, requesting:false, pageLoading:false, dataLoading:false, online:true, success:true},
                     params          : null,
                     zoom            : 1,
                     loading         : false,
@@ -182,11 +182,11 @@ $(document).ready(function () {
             // --------------------- SETUP
 			this.setupok = axios.get(this.$api.BuildURL("suporte/modelos/obter")).then((request) => {
 
-                this.status.loading = true;
+                this.status.mainLoading = this.status.loading = true;
 
 				this.$models.data                   = request.data;
                 this.log                            = this.$models.log();
-                this.usuario                        = this.$models.usuario();
+                //this.usuario                        = this.$models.usuario();
                 this.proprietario                   = this.$models.proprietario();
                 this.imovel                         = this.$models.imovel();
                 this.favorito                       = this.$models.favorito();
@@ -203,7 +203,7 @@ $(document).ready(function () {
                 ce(error);
                 return false;
 			}).finally(() => {
-                this.status.loading = false;
+                this.status.mainLoading = this.status.loading = false;
 			});  
 
             if(!this.setupok)
@@ -269,15 +269,17 @@ $(document).ready(function () {
                 },
 
                 // AUTH --------------------------------
-                async SignIn(_usuario){
-                    this.usuario = _usuario;
+                async SignIn(){
+
+                    this.admins = (await this.$api.Get("admin/obter/todos")).result;
+
+                    //this.usuario = _usuario;
                     this.usuario.autenticado = true;
                     this.isAuth = this.isAuth = true;
                     //this.$sdata.Storage.Set("utk"    , this.usuario.token);
                     axios.defaults.headers.common["Authorization"] = "Bearer " + this.usuario.tokenJWT; 
                     //c2("user",this.usuario);
 
-                    this.admins = (await this.$api.Get("admin/obter/todos")).result;
                     //c2("GetAdmin", this.GetAdmin(this.admins[0].id));
 
 					//this.RouteTo("/imoveis");

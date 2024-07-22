@@ -40,7 +40,7 @@
         <el-row>
             <el-col :md="24">
                 <q-btn label='ADICIONAR PROPRIETÁRIO' color="primary" @click="$root.RouteTo('proprietarios',{view:'adicionar',from:'imoveis'})" style="width:340px;margin-right:20px"></q-btn>
-                <q-btn label='PROSSEGUIR COM PROPRIETÁRIO "JÁ CAPTEI"' color="orange" @click="CheckoutStep1(proprietarioJacaptei)" style="width:340px"></q-btn>
+                <!--<q-btn label='PROSSEGUIR COM PROPRIETÁRIO "JÁ CAPTEI"' color="orange" @click="CheckoutStep1(proprietarioJacaptei)" style="width:340px"></q-btn>-->
             </el-col>
         </el-row>
 
@@ -367,10 +367,15 @@
                                             <div>COMPLEMENTO <span></span></div>
                                             <el-input @keyup.enter="CheckoutStep2()" v-model="imovel.endereco.complemento" placeholder="" maxlength="80" input-style="text-transform:uppercase;"></el-input>
                                         </el-col>
+
+                                        <el-col :xs="24" :sm="12" :md="8" :lg="6" class="s-input-optional">
+                                            <div>BLOCO / TORRE <span></span></div>
+                                            <el-input @keyup.enter="CheckoutStep2()" v-model="imovel.endereco.bloco" placeholder="" maxlength="80" input-style="text-transform:uppercase;"></el-input>
+                                        </el-col>
                                     </el-row>
                             
 
-                                     <el-row :gutter="20">
+                                     <!--<el-row :gutter="20">
                                         <el-col :xs="24" :sm="12" :md="12" class="s-input-optional" style="width:100%;max-width:100%">
                                             <div>REFERÊNCIAS <span></span></div>
                                             <el-input @keyup.enter="CheckoutStep2()" v-model="imovel.endereco.referencia" placeholder="" maxlength="200" input-style="text-transform:lowercase;"></el-input>
@@ -379,7 +384,7 @@
                                             <div>MELHOR ACESSO <span></span></div>
                                             <el-input @keyup.enter="CheckoutStep2()" v-model="imovel.endereco.acesso" placeholder="" maxlength="200" input-style="text-transform:lowercase;"></el-input>
                                         </el-col>
-                                    </el-row>
+                                    </el-row>-->
 
 
                                 </el-col>
@@ -528,19 +533,19 @@
             </el-row>
 
             <el-row :gutter="20" style="margin-top:10px">
-                    <el-col :md="4" :sm="8" :xs="12"><el-checkbox label="Ativo               " v-model="imovel.ativo                          " size="large"></el-checkbox></el-col>
-                    <el-col :md="4" :sm="8" :xs="12"><el-checkbox label="Disponivel          " v-model="imovel.disposicao.disponivel          " size="large"></el-checkbox></el-col>
-                    <el-col :md="4" :sm="8" :xs="12"><el-checkbox label="Gestao JáCaptei     " v-model="imovel.disposicao.gestaoJacaptei      " size="large"></el-checkbox></el-col>
-                    <el-col :md="4" :sm="8" :xs="12"><el-checkbox label="Gestao Premium      " v-model="imovel.disposicao.gestaoPremium       " size="large"></el-checkbox></el-col>
                     <el-col :md="4" :sm="8" :xs="12"><el-checkbox label="Ocupado             " v-model="imovel.disposicao.ocupado             " size="large"></el-checkbox></el-col>
-                    <el-col :md="4" :sm="8" :xs="12"><el-checkbox label="Alugado             " v-model="imovel.disposicao.alugado             " size="large"></el-checkbox></el-col>
-                    <el-col :md="4" :sm="8" :xs="12"><el-checkbox label="Vendido             " v-model="imovel.disposicao.vendido             " size="large"></el-checkbox></el-col>
                     <el-col :md="4" :sm="8" :xs="12"><el-checkbox label="Aceita financiamento" v-model="imovel.disposicao.aceitaFinanciamento " size="large"></el-checkbox></el-col>
                     <el-col :md="4" :sm="8" :xs="12"><el-checkbox label="Aceita permuta      " v-model="imovel.disposicao.aceitaPermuta       " size="large"></el-checkbox></el-col>
-                    <!--<el-col :md="4" :sm="8" :xs="12"><el-checkbox label="Comissao            " v-model="imovel.disposicao.comissao            " size="large"></el-checkbox></el-col>-->
-                    <el-col :md="4" :sm="8" :xs="12"><el-checkbox label="Desativado          " v-model="imovel.disposicao.desativado          " size="large"></el-checkbox></el-col>
-                    <el-col :md="4" :sm="8" :xs="12"><el-checkbox label="Na planta           " v-model="imovel.disposicao.naPlanta            " size="large"></el-checkbox></el-col>
                     <el-col :md="4" :sm="8" :xs="12"><el-checkbox label="Placa               " v-model="imovel.disposicao.placa               " size="large"></el-checkbox></el-col>
+                    <!--<el-col :md="4" :sm="8" :xs="12"><el-checkbox label="Disponivel          " v-model="imovel.disposicao.disponivel          " size="large"></el-checkbox></el-col>
+                    <el-col :md="4" :sm="8" :xs="12"><el-checkbox label="Gestao JáCaptei     " v-model="imovel.disposicao.gestaoJacaptei      " size="large"></el-checkbox></el-col>
+                    <el-col :md="4" :sm="8" :xs="12"><el-checkbox label="Gestao Premium      " v-model="imovel.disposicao.gestaoPremium       " size="large"></el-checkbox></el-col>
+                    <el-col :md="4" :sm="8" :xs="12"><el-checkbox label="Alugado             " v-model="imovel.disposicao.alugado             " size="large"></el-checkbox></el-col>
+                    <el-col :md="4" :sm="8" :xs="12"><el-checkbox label="Ativo               " v-model="imovel.ativo                          " size="large"></el-checkbox></el-col>
+                    <el-col :md="4" :sm="8" :xs="12"><el-checkbox label="Vendido             " v-model="imovel.disposicao.vendido             " size="large"></el-checkbox></el-col>
+                    <el-col :md="4" :sm="8" :xs="12"><el-checkbox label="Comissao            " v-model="imovel.disposicao.comissao            " size="large"></el-checkbox></el-col>
+                    <el-col :md="4" :sm="8" :xs="12"><el-checkbox label="Desativado          " v-model="imovel.disposicao.desativado          " size="large"></el-checkbox></el-col>
+                    <el-col :md="4" :sm="8" :xs="12"><el-checkbox label="Na planta           " v-model="imovel.disposicao.naPlanta            " size="large"></el-checkbox></el-col>-->
             </el-row>
 
 
@@ -582,12 +587,12 @@
                                 Local das chaves<br />
                                 <el-input @keyup.enter="CheckoutStep3()" v-model="imovel.localChaves" placeholder=""  maxlength="75"></el-input>
                             </el-col>
-                            <el-col :md="6" :sm="12" :xs="24" style="margin-top:10px">
+                            <!--<el-col :md="6" :sm="12" :xs="24" style="margin-top:10px">
                                 Qtd de chaves<br />
     						    <el-input-number v-model="imovel.totalChaves" :step="1" size="medium" :min="0"></el-input-number>
-                            </el-col>
+                            </el-col>-->
                             <el-col :md="24" style="margin-top:10px">
-                                Descrição<br />
+                                Descrição do imóvel<br />
                                 <el-input @keyup.enter="CheckoutStep3()" v-model="imovel.descricao" maxlength="4000" autosize type="textarea"></el-input>
                             </el-col>
                         </el-row>
@@ -605,7 +610,7 @@
 
                                     <el-row :gutter="20">
                                         <el-col  :md="4" :sm="8" :xs="12" style="margin-top:10px">
-                                            Venda <el-checkbox label="sob consulta" v-model="imovel.valor.sobConsulta  " size="large" style="margin-left:20px;height:20px"></el-checkbox><br />
+                                            Venda <!--<el-checkbox label="sob consulta" v-model="imovel.valor.sobConsulta  " size="large" style="margin-left:20px;height:20px"></el-checkbox>--><br />
                                             <el-input input-style="color:var(--s-accent-color);max-width:200px" v-model="imovel.valor.venda" maxlength="20"  @keyup.enter="CheckoutStep3()"  ref="valor"  :formatter="(value) => `${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, '.')"    :parser="(value) => value.replace(/\R\$\s?|(\.*)/g, '').replace(/[a-zA-Z]/g, '')"><template #prepend>R$</template></el-input>
                                         </el-col>
                                         <el-col :md="4" :sm="8" :xs="12" style="margin-top:10px">
@@ -613,17 +618,17 @@
                                             <el-input input-style="color:var(--s-accent-color);max-width:200px" v-model="imovel.valor.condominio" maxlength="20"  @keyup.enter="CheckoutStep3()"  :formatter="(value) => `${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, '.')"    :parser="(value) => value.replace(/\R\$\s?|(\.*)/g, '').replace(/[a-zA-Z]/g, '')"><template #prepend>R$</template></el-input>
                                         </el-col>
                                         <el-col  :md="4" :sm="8" :xs="12" style="margin-top:10px">
+                                            Comissão de venda <br />
+                                            <el-input input-style="color:var(--s-accent-color);max-width:200px" v-model="imovel.valor.comissao" maxlength="20"  @keyup.enter="CheckoutStep3()"    :formatter="(value) => `${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, '.')"    :parser="(value) => value.replace(/\R\$\s?|(\.*)/g, '').replace(/[a-zA-Z]/g, '')"><template #prepend>%</template></el-input>
+                                        </el-col>
+                                        <!--<el-col  :md="4" :sm="8" :xs="12" style="margin-top:10px">
                                             Consulta<br />
                                             <el-input input-style="color:var(--s-accent-color);max-width:200px" v-model="imovel.valor.consulta" maxlength="20"  @keyup.enter="CheckoutStep3()"    :formatter="(value) => `${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, '.')"    :parser="(value) => value.replace(/\R\$\s?|(\.*)/g, '').replace(/[a-zA-Z]/g, '')"><template #prepend>R$</template></el-input>
                                         </el-col>
                                         <el-col  :md="4" :sm="8" :xs="12" style="margin-top:10px">
-                                            Comissao de venda <br />
-                                            <el-input input-style="color:var(--s-accent-color);max-width:200px" v-model="imovel.valor.comissao" maxlength="20"  @keyup.enter="CheckoutStep3()"    :formatter="(value) => `${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, '.')"    :parser="(value) => value.replace(/\R\$\s?|(\.*)/g, '').replace(/[a-zA-Z]/g, '')"><template #prepend>%</template></el-input>
-                                        </el-col>
-                                        <el-col  :md="4" :sm="8" :xs="12" style="margin-top:10px">
                                             Rentabilidade<br />
                                             <el-input input-style="color:var(--s-accent-color);max-width:200px" v-model="imovel.valor.rentabilidade" maxlength="20" @keyup.enter="CheckoutStep3()"    :formatter="(value) => `${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, '.')"    :parser="(value) => value.replace(/\R\$\s?|(\.*)/g, '').replace(/[a-zA-Z]/g, '')"><template #prepend>%</template></el-input>
-                                        </el-col>
+                                        </el-col>-->
                                     </el-row>
                                     <el-row :gutter="20">
                                         <el-col  :md="4" :sm="8" :xs="12" style="margin-top:10px">
@@ -634,10 +639,10 @@
                                             IPTU anual<br />
                                             <el-input input-style="color:var(--s-accent-color);max-width:200px" v-model="imovel.valor.iptuAnual" maxlength="20"  @keyup.enter="CheckoutStep3()"    :formatter="(value) => `R$ ${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, '.')"    :parser="(value) => value.replace(/\R\$\s?|(\.*)/g, '').replace(/[a-zA-Z]/g, '')"><template #prepend>R$</template></el-input>
                                         </el-col>
-                                        <el-col  :md="4" :sm="8" :xs="12" style="margin-top:10px">
+                                        <!--<el-col  :md="4" :sm="8" :xs="12" style="margin-top:10px">
                                             IPTU índice<br />
                                             <el-input input-style="color:var(--s-accent-color);max-width:200px" v-model="imovel.valor.iptuIndice" maxlength="20"  @keyup.enter="CheckoutStep3()"    :formatter="(value) => `${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, '.')"    :parser="(value) => value.replace(/\R\$\s?|(\.*)/g, '').replace(/[a-zA-Z]/g, '')"></el-input>
-                                        </el-col>
+                                        </el-col>-->
                                     </el-row>
 
                             </el-col>
@@ -661,7 +666,7 @@
                                             Externa<br />
 								            <el-input input-style="color:var(--s-accent-color);max-width:200px" v-model="imovel.area.externa" maxlength="20" placeholder="m²" @keyup.enter="CheckoutStep3()" ref="areaexterna"  :formatter="(value) => `${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, '.')"    :parser="(value) => value.replace(/(\.*)/g, '').replace(/[a-zA-Z]/g, '')"><template #prepend>m²</template></el-input>
                                         </el-col>
-                                        <el-col :md="4" :sm="8" :xs="12" style="margin-top:10px">
+                                        <!--<el-col :md="4" :sm="8" :xs="12" style="margin-top:10px">
                                             Frente<br />
 								            <el-input input-style="color:var(--s-accent-color);max-width:200px" v-model="imovel.area.frente" maxlength="20" placeholder="m²" @keyup.enter="CheckoutStep3()"   :formatter="(value) => `${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, '.')"    :parser="(value) => value.replace(/(\.*)/g, '').replace(/[a-zA-Z]/g, '')"><template #prepend>m²</template></el-input>
                                         </el-col>
@@ -700,7 +705,7 @@
                                         <el-col :md="4" :sm="8" :xs="12" style="margin-top:10px">
                                              Zona de uso<br />
 								            <el-input input-style="color:var(--s-accent-color);max-width:200px" v-model="imovel.area.zonaUso" maxlength="20"    @keyup.enter="CheckoutStep3()"   :formatter="(value) => `${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, '.')"    :parser="(value) => value.replace(/(\.*)/g, '').replace(/[a-zA-Z]/g, '')"></el-input>
-                                        </el-col>
+                                        </el-col>-->
                                     </el-row>
 
                             </el-col>
@@ -794,11 +799,12 @@
                                 <el-col :md="4" :sm="8" :xs="12"><el-checkbox label="Banheiro            " v-model="imovel.interno.banheiro          " size="large" @change="()=>{ if(imovel.interno.banheiro && imovel.interno.totalBanheiros < 1){ imovel.interno.totalBanheiros = 1; } else if(!imovel.interno.banheiro){ imovel.interno.totalBanheiros = 0; }  }"></el-checkbox></el-col>
                                 <el-col :md="4" :sm="8" :xs="12"><el-checkbox label="Box despejo         " v-model="imovel.interno.boxDespejo        " size="large"></el-checkbox></el-col>
                                 <el-col :md="4" :sm="8" :xs="12"><el-checkbox label="Churrasqueira       " v-model="imovel.interno.churrasqueira     " size="large"></el-checkbox></el-col>
+                                <el-col :md="4" :sm="8" :xs="12"><el-checkbox label="Closet              " v-model="imovel.interno.closet            " size="large"></el-checkbox></el-col>
                                 <el-col :md="4" :sm="8" :xs="12"><el-checkbox label="Dce                 " v-model="imovel.interno.dce               " size="large"></el-checkbox></el-col>
                                 <el-col :md="4" :sm="8" :xs="12"><el-checkbox label="Despensa            " v-model="imovel.interno.despensa          " size="large"></el-checkbox></el-col>
-                                <el-col :md="4" :sm="8" :xs="12"><el-checkbox label="Closet              " v-model="imovel.interno.closet            " size="large"></el-checkbox></el-col>
                                 <el-col :md="4" :sm="8" :xs="12"><el-checkbox label="Escritório          " v-model="imovel.interno.escritorio        " size="large"></el-checkbox></el-col>
                                 <el-col :md="4" :sm="8" :xs="12"><el-checkbox label="Gás canalizado      " v-model="imovel.interno.gasCanalizado     " size="large"></el-checkbox></el-col>
+                                <el-col :md="4" :sm="8" :xs="12"><el-checkbox label="Hidromassagem       " v-model="imovel.interno.hidromassagem     " size="large"></el-checkbox></el-col>
                                 <el-col :md="4" :sm="8" :xs="12"><el-checkbox label="Lavabo              " v-model="imovel.interno.lavabo            " size="large"></el-checkbox></el-col>
                                 <el-col :md="4" :sm="8" :xs="12"><el-checkbox label="Mobilidado          " v-model="imovel.interno.mobilidado        " size="large"></el-checkbox></el-col>
                                 <el-col :md="4" :sm="8" :xs="12"><el-checkbox label="Quarto              " v-model="imovel.interno.quarto            " size="large" @change="()=>{ if(imovel.interno.quarto && imovel.interno.totalQuartos < 1){ imovel.interno.totalQuartos = 1; } else if(!imovel.interno.quarto){ imovel.interno.totalQuartos = 0; }  }"></el-checkbox></el-col>
@@ -842,7 +848,7 @@
                                 <el-col :md="4" :sm="8" :xs="12"><el-checkbox label="Interfone          " v-model="imovel.externo.interfone         " size="large"></el-checkbox></el-col>
                                 <el-col :md="4" :sm="8" :xs="12"><el-checkbox label="Jardim             " v-model="imovel.externo.jardim            " size="large"></el-checkbox></el-col>
                                 <el-col :md="4" :sm="8" :xs="12"><el-checkbox label="Lavanderia         " v-model="imovel.externo.lavanderia        " size="large"></el-checkbox></el-col>
-                                <el-col :md="4" :sm="8" :xs="12"><el-checkbox label="Portao eletrônico  " v-model="imovel.externo.portaoEletronico  " size="large"></el-checkbox></el-col>
+                                <el-col :md="4" :sm="8" :xs="12"><el-checkbox label="Portão eletrônico  " v-model="imovel.externo.portaoEletronico  " size="large"></el-checkbox></el-col>
                                 <el-col :md="4" :sm="8" :xs="12"><el-checkbox label="Portaria 24h       " v-model="imovel.externo.portaria24h       " size="large"></el-checkbox></el-col>
                                 <el-col :md="4" :sm="8" :xs="12"><el-checkbox label="Sauna              " v-model="imovel.externo.sauna             " size="large"></el-checkbox></el-col>
                                 <el-col :md="4" :sm="8" :xs="12"><el-checkbox label="Vaga               " v-model="imovel.externo.vaga              " size="large" @change="()=>{ if(imovel.externo.vaga && imovel.externo.totalVagas < 1){ imovel.externo.totalVagas = 1; } else if(!imovel.externo.vaga){ imovel.externo.totalVagas = 0; }  }"></el-checkbox></el-col>
@@ -1468,11 +1474,8 @@
                         this.ontablequest  = false;
 
                         if (request?.status?.success){
-                            //this.buscaImovel.total = request.result.totalResults;
-                            //this.buscaImovel.results = request.result.imoveisJC;
-                            //c2("this.buscaImovel.results",this.buscaImovel.results);
-                            this.imoveisBuscaResult =  request.result.imoveisJC;
-                            //c2("this.imoveisBuscaResult",this.imoveisBuscaResult);
+                            this.buscaImovel        =  request.result;
+                            this.imoveisBuscaResult =  this.buscaImovel.result.imoveisJC;
                         } 
                 }else
                     this.$tools.Alert("Necessário informar o CEP ou endereço (estado, cidade, bairro e logradouro)");

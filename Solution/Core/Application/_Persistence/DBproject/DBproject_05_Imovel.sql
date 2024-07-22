@@ -121,9 +121,11 @@ CREATE	TABLE "Imovel"(
 
 	status							VARCHAR(40)			DEFAULT 'ATIVO' ,
 	ativo	                    	BOOLEAN			    DEFAULT FALSE,
+	visivel	                    	BOOLEAN			    DEFAULT TRUE,
 	"ativoCRM"                   	BOOLEAN			    DEFAULT FALSE,
 	"possuiImagens"                 BOOLEAN			    DEFAULT FALSE,
 	
+	"possuiToken"                   BOOLEAN			    DEFAULT TRUE,
 	token 						 	VARCHAR(200)		UNIQUE NOT NULL,
 	"tokenNum"						BIGINT				UNIQUE NOT NULL,
 	
@@ -253,10 +255,10 @@ CREATE	TABLE "ImovelCaracteristicasInternas"(
     "armarioQuarto"     BOOLEAN    DEFAULT FALSE,    
     banheiro            BOOLEAN    DEFAULT FALSE,    
     "boxDespejo"        BOOLEAN    DEFAULT FALSE,    
+    churrasqueira       BOOLEAN    DEFAULT FALSE,    
+    closet              BOOLEAN    DEFAULT FALSE,    
     dce                 BOOLEAN    DEFAULT FALSE,    
     despensa            BOOLEAN    DEFAULT FALSE,    
-    closet              BOOLEAN    DEFAULT FALSE,    
-    churrasqueira       BOOLEAN    DEFAULT FALSE,    
     escritorio          BOOLEAN    DEFAULT FALSE,    
     "gasCanalizado"     BOOLEAN    DEFAULT FALSE,    
     lavabo              BOOLEAN    DEFAULT FALSE,    

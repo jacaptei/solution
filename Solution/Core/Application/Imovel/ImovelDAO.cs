@@ -279,7 +279,7 @@ namespace JaCaptei.Application {
                         entities    = JsonConvert.DeserializeObject<List<Imovel>>(res.json_agg);
 
                     busca.result.imoveisJC = entities;
-                    appReturn.result = busca.result;
+                    appReturn.result = busca;
 
                 } catch(Exception ex) {
                     appReturn.AddException("Não foi possível buscar imóveis");
@@ -297,11 +297,20 @@ namespace JaCaptei.Application {
             //sql = "SELECT * from Products where cf_1021 = 'SP';";
             //sql = "SELECT * from Products ;";
 
-            string filter = " imovel.ativo = TRUE "; // discontinued <> 1
+            string filter = " imovel.\"possuiToken\" = TRUE "; // discontinued <> 1
 
+            if(busca.somenteAtivos)
+                 filter += " AND imovel.ativo = TRUE ";
+            else if(busca.somenteInativos)
+                 filter += " AND imovel.ativo = FALSE ";
+
+            if(busca.somenteVisiveis)
+                 filter += " AND imovel.visivel = TRUE ";
+            else if(busca.somenteInvisiveis)
+                 filter += " AND imovel.visivel = FALSE ";
 
             if(busca.imovelJC.id > 0)
-                filter += " AND imovel.id = '" + busca.imovelJC.id.ToString() + "' ";
+                filter += " AND imovel.id = " + busca.imovelJC.id.ToString() + " ";
             else if(Utils.Validator.Is(busca.imovelJC.cod))
                 filter += " AND imovel.cod = '" + busca.imovelJC.cod + "' ";
             else {

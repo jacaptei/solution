@@ -101,7 +101,7 @@
                         </el-aside>
                     </div>
 
-                    <el-container style="min-height:100%; margin-top:80px;" v-cloak >
+                    <el-container style="min-height:100%; margin-top:80px;" v-cloak v-if="!status.mainLoading">
                         <el-main style="background-color:#fff;" id="content">
                             <div :class="isAuth? 'content':'content-login'">
                                     <div v-if="pageLoading" style="position:absolute">
