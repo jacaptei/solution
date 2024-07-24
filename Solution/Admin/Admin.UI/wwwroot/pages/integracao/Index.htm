@@ -11,8 +11,8 @@
                     active-color="primary"
                     indicator-color="primary">
                 <q-tab name="buscar" icon="fa fa-search" label="BUSCAR"></q-tab>
-                <q-tab name="adicionar" icon="fa fa-user-plus" label="INTEGRAÇÃO"></q-tab>
-                <q-tab name="acompanhamento" icon="fa fa-user-plus" label="ACOMPANHAR INTEGRAÇÕES"></q-tab>
+                <q-tab name="adicionar" icon="fa fa-plus" label="INTEGRAÇÃO"></q-tab>
+                <q-tab name="acompanhamento" icon="fa fa-list-alt" label="ACOMPANHAR INTEGRAÇÕES"></q-tab>
             </q-tabs>
             <q-tab-panels v-model="view" animated>
 
@@ -39,7 +39,7 @@
 <script>
     module.exports = {
 
-        name: 'JCAdminParceiros',
+        name: 'JCAdminIntegracao',
 
         components: {
             page_buscar: LoadComponent("./pages/integracao/Index-Buscar.htm"),

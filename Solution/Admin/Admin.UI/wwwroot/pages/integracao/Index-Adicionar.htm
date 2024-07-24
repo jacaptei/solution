@@ -26,32 +26,32 @@
                     <el-col :xs="24" :sm="12" :md="8" :lg="6" class="s-input">
                         <div>CÓDIGO USUÁRIO IMOVIEW<span></span></div>
                         <!--<div style="height:40px" v-if="">
-            <c-loading size="30px" style="padding-left:5px"></c-loading>
-        </div>-->
+                <c-loading size="30px" style="padding-left:5px"></c-loading>
+            </div>-->
                         <!--<div v-else-if="">
-            <span style="color:#7d7d7d;padding-left:10px">selecione um estado</span>
-        </div>-->
+                <span style="color:#7d7d7d;padding-left:10px">selecione um estado</span>
+            </div>-->
                         <el-select v-else v-model="" filterable class="m-4" placeholder="qualquer" size="large" style="width:100%" @change="(item)=>{}">
                             <!--<el-option v-for="item in $root.search.opcoes.cidades"
-            :key="item.id"
-            :label="item.label"
-            :value="item"></el-option>-->
+                :key="item.id"
+                :label="item.label"
+                :value="item"></el-option>-->
                         </el-select>
                     </el-col>
 
                     <el-col :xs="24" :sm="12" :md="8" :lg="6" class="s-input">
                         <div>UNIDADE<span></span></div>
                         <!--<div style="height:40px" v-if="">
-            <c-loading size="30px" style="padding-left:5px"></c-loading>
-        </div>-->
+                <c-loading size="30px" style="padding-left:5px"></c-loading>
+            </div>-->
                         <!--<div v-else-if="">
-            <span style="color:#7d7d7d;padding-left:10px">selecione um estado</span>
-        </div>-->
+                <span style="color:#7d7d7d;padding-left:10px">selecione um estado</span>
+            </div>-->
                         <el-select v-else v-model="" multiple filterable :clearable="true" class="m-4" placeholder="qualquer" size="large" style="width:100%">
                             <!--<el-option v-for="item in $root.search.opcoes.bairros"
-            :key="item.id"
-            :label="item.label"
-            :value="item"></el-option>-->
+                :key="item.id"
+                :label="item.label"
+                :value="item"></el-option>-->
                         </el-select>
                     </el-col>
 
@@ -94,10 +94,13 @@
                         <el-col>
                             <div>BAIRROS - {{ cidade.label }}<span></span></div>
                             <el-scrollbar height="400px">
-                                <el-checkbox-group v-model="checkedBairros[cidade]" class="checkbox-group">
+                                <el-checkbox-group v-model="checkedBairros[cidade]" class="checkbox-group" @change="handleCheckboxChange">
                                     <div class="checkbox-container">
-                                        <el-checkbox v-for="bairro in bairrosByCity[cidade.id]" :key="bairro.id" :label="bairro.label" :value="bairro" class="checkbox-item">
-                                            {{ bairro.label }}
+                                        <el-checkbox v-for="bairro in bairrosByCity[cidade.id]"
+                                                     :key="bairro.id"
+                                                     :label="bairro"
+                                                     class="checkbox-item">
+                                            {{ bairro.nome }}
                                         </el-checkbox>
                                     </div>
                                 </el-checkbox-group>
@@ -105,17 +108,11 @@
                         </el-col>
                     </el-col>
 
-                    <el-col :xs="24" :sm="12" :md="8" :lg="6" class="s-input">
-                        <div>
-                            <el-button @click="checkBairrosSelecionados">Verificar Bairros Selecionados</el-button>
-                        </div>
-                    </el-col>
-
                     <el-row style="width: 100%; display: flex; justify-content: flex-end; align-items: center;">
                         <el-col :xs="24" :sm="12" :md="8" :lg="6" class="s-input" style="width: 100%; display: flex; justify-content: flex-end; align-items: center;">
                             <div><span></span></div>
-                            <q-btn label="REALIZAR INTEGRAÇÃO" color="primary" @click="BuscarProprietario()"></q-btn>
-                            <span style="cursor:pointer; padding-left:20px; color:var(--s-color-green)" @click="LimparFiltro"><i class="fa fa-cancel"></i> limpar filtro</span>
+                            <q-btn label="INTEGRAR" color="primary" @click="BuscarProprietario()"></q-btn>
+                            <span style="cursor:pointer; padding-left:20px; color:var(--s-color-green)" @click="LimparFiltro"><i class="fa fa-cancel"></i> LIMPAR REGISTRO</span>
                         </el-col>
                     </el-row>
 
@@ -125,7 +122,8 @@
                             <c-loading padding="20px"></c-loading>
                         </el-col>
                     </el-row>
-</el-col>
+                </el-row>
+            </el-col>
         </el-row>
     </div>
 </template>
@@ -137,9 +135,6 @@
 
         name: 'Buscar',
 
-        components: {
-            bairros_component: LoadComponent("../../components/c-bairros-component.htm"),
-        },
         data() {
             return {
                 onrequest: false,
@@ -155,11 +150,27 @@
                 selectedCities: [],
                 bairrosByCity: {},
                 checkedBairros: {},
+                bairrosSelecionados: {},
+                bairrosIds: [],
                 opcoes: {
                     estados: [],
                     cidades: [],
                     bairros: [],
                 },
+                integracao: {
+                    id: 0,
+                    idCliente: 60,
+                    idOperador: 3,
+                    dataInclusao: "",
+                    dataAtualizacao: null,
+                    codUsuario: "",
+                    codUnidade: "",
+                    chaveApi: "",
+                    idPlano: 5,
+                    status: "",
+                    bairros: this.checkedBairros,
+                    imoveis: null
+                }
             }
         },
         computed: {
@@ -240,9 +251,9 @@
                             if (request.data) {
                                 this.bairrosByCity[idCidade] = request.data.result.map(item => ({
                                     id: item.id,
-                                    label: item.label
+                                    idCidade: cidade.id,
+                                    nome: item.label
                                 }));
-                                console.log("o will é foda mano, caralho", this.bairrosByCity[idCidade][0]);
                                 this.checkedBairros[idCidade] = [];
                             }
                         }).catch(error => {
@@ -256,17 +267,12 @@
                     }
                 });
             },
-            checkBairrosSelecionados() {
-                console.log(this.checkedBairros);
-                // Iterar sobre as cidades selecionadas e seus bairros selecionados
-                Object.keys(this.checkedBairros).forEach(cidadeId => {
-                    const bairrosSelecionados = this.checkedBairros[cidadeId];
-                    console.log(`Cidade ID ${cidadeId}:`);
-                    bairrosSelecionados.forEach(bairro => {
-                        console.log(`Bairro: ${bairro.label}, Código: ${bairro.id}`); // Acessa o código real do bairro
-                    });
-                });
-            },
+            handleCheckboxChange() {
+                this.bairrosSelecionados = Object.values(this.checkedBairros).flat();
+                this.bairrosIds = this.bairrosSelecionados.map(bairro => bairro);
+                this.integracao.bairros = this.bairrosIds;
+                console.log(this.integracao);
+            }
         }
     }
 </script>

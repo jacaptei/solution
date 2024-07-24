@@ -2,24 +2,23 @@
     <div>
         <el-row @keyup.enter="Buscar()">
             <el-col :md="24">
-                <el-row :gutter="20">
-                    <el-col :xs="24" :sm="12" :md="8" :lg="6" class="s-input">
-                        <div>ID<span></span></div>
-                        <el-input-number style="width:100%" @keyup.enter="Enviar()" v-model="id" placeholder="qualquer" maxlength="20" ref="id" :controls="false"></el-input-number>
+                <el-row style="margin-left: 10px" :gutter="20">
+                    <div style="width:100%; display: flex; align-items: center; justify-content: space-between;">
+                        <el-col :xs="24" :sm="12" :md="8" :lg="6" class="s-input">
+                            <div>CPF/CNPJ<span></span></div>
+                            <el-input style="width:100%"
+                                      v-model="documento"
+                                      :placeholder="placeholderText"
+                                      :maxlength="maxlength"
+                                      @input="applyMask"
+                                      @blur="CheckDoc"></el-input>
+                        </el-col>
+                    <el-col :xs="24" :sm="12" :md="8" :lg="6" class="s-input" style="display: flex; align-items: center; justify-content: flex-end; margin-top: 25px;">
+                        <div style="display: flex; align-items: center; gap: 20px;">
+                            <q-btn label="CONSULTAR" color="primary" @click="Enviar()"></q-btn>
+                        </div>
                     </el-col>
-                    <el-col :xs="24" :sm="12" :md="8" :lg="6" class="s-input">
-                        <div>CPF<span></span></div>
-                        <el-input style="width:100%" @keyup.enter="Enviar()" v-model="busca.item.cpf" placeholder="qualquer" maxlength="22" v-maska data-maska="###.###.###-##" @blur="CheckDoc"></el-input>
-                    </el-col>
-                    <el-col :xs="24" :sm="12" :md="8" :lg="6" class="s-input">
-                        <div>CNPJ<span></span></div>
-                        <el-input style="width:100%" @keyup.enter="Enviar()" v-model="busca.item.cnpj" placeholder="qualquer" maxlength="22" v-maska data-maska="##.###.###/####-##" @blur="CheckDoc"></el-input>
-                    </el-col>
-                    <el-col :xs="24" :sm="12" :md="8" :lg="6" class="s-input" style="width: 100%; margin-top: 25px;display: flex; justify-content: flex-end; align-items: center;">
-                        <div><span></span></div>
-                        <q-btn label="BUSCAR" color="primary" @click="BuscarProprietario()"></q-btn>
-                        <span style="cursor:pointer; padding-left:20px; color:var(--s-color-green)" @click="LimparFiltro"><i class="fa fa-cancel"></i> limpar filtro</span>
-                    </el-col>
+                    </div>
                 </el-row>
 
                 <el-row justify="center" v-if="onrequest">
@@ -29,12 +28,12 @@
                     </el-col>
                 </el-row>
 
-                <el-row v-else>
+                <!--<el-row v-else>
                     <el-col :md="24">
 
                         <el-row>
                             <el-col :md="24">
-                                <el-divider style="margin:10px"><!--resultado--></el-divider>
+                                <el-divider style="margin:10px">--><!--resultado--><!--</el-divider>
 
                                 <el-row style="padding-left:20px;padding-right:20px;">
                                     <el-col :md="24">
@@ -54,11 +53,11 @@
                         </el-row>
 
                         <el-row>
-                            <el-col :md="24">
+                            <el-col :md="24">-->
 
                                 <!--TABLE-->
 
-                                <el-table :data="data" style="width: 100%" max-height="380" v-loading="ontablequest" :table-layout="auto" :row-class-name="tableRowClassName">
+                                <!--<el-table :data="data" style="width: 100%" max-height="380" v-loading="ontablequest" :table-layout="auto" :row-class-name="tableRowClassName">
 
                                     <el-table-column prop="id" label="ID" width="70">
                                         <template #default="scope">
@@ -85,10 +84,10 @@
                                             <a href="javascript:void(0)" @click="$tools.Copy(scope.row.cpf)" style="text-decoration:none;color:var(--s-color-tex-alt)"><i class="fa fa-copy" style="padding-right:3px;color:var(--el-color-primary);text-decoration:none"></i> {{scope.row.cpf}}  </a>
                                         </template>
                                     </el-table-column>
-                                    <el-table-column prop="rg" label="RG" width="120" />
+                                    <el-table-column prop="rg" label="RG" width="120" />-->
                                     <!--</el-table-column>-->
                                     <!--<el-table-column label="CONTATO">-->
-                                    <el-table-column label="ENDEREÇO" width="400">
+                                    <!--<el-table-column label="ENDEREÇO" width="400">
                                         <template #default="scope">
                                             <a :href="$tools.BuildMapLink(scope.row)" target="_blank" style="color:var(--s-text-color);text-decoration:none;margin-right:6px">
                                                 <i style="color:var(--s-color-primary);margin-right:6px" class="fa fa-location-dot"></i>
@@ -98,7 +97,7 @@
                                                 {{scope.row.cidade}}, {{scope.row.estado}}, CEP: {{scope.row.cep}}
                                             </a>
                                         </template>
-                                    </el-table-column>
+                                    </el-table-column>-->
                                     <!--</el-table-column>-->
                                     <!--<el-table-column label="ENDEREÇO">-->
                                     <!--<el-table-column prop="cidade"      label="CIDADE"      width="280" />
@@ -108,7 +107,7 @@
                                         <el-table-column prop="numero"      label="NÚMERO"      width="140" />
                                         <el-table-column prop="complemento" label="COMPLEMENTO" width="140" />
                                     <!--</el-table-column>-->
-                                    <el-table-column prop="data" label="DATA" width="140">
+                                    <!--<el-table-column prop="data" label="DATA" width="140">
                                         <template #default="scope">
                                             {{$tools.FormatDateToBR(new Date(scope.row.data))}}
                                         </template>
@@ -157,13 +156,11 @@
                             </el-col>
                         </el-row>
                     </el-col>
-                </el-row>
+                </el-row>-->
             </el-col>
         </el-row>
     </div>
 </template>
-
-
 
 
 <script>
@@ -171,54 +168,52 @@
 
         name: 'Buscar',
 
-        components: {
-
-        },
+        components: { },
 
         data: function () {
             return {
                 onrequest: false,
                 ontablequest: false,
-                busca: this.$models.busca(),
+                busca: this.$models.busca,
+                jsonDocumento: "",
                 data: null,
+                valorInserido: '',
                 id: null,
-                cpf: null,
-                cnpj: null
+                documento: '',
+                placeholderText: 'Digite o CPF ou CNPJ',
+                maxlength: 22
             }
-        }, computed: {
-
         },
 
-        props: {
+        computed: {},
+        props: {},
+        watch: {},
 
-        },
-        watch: {
-
-        },
         created: function () {
             this.busca.item = this.$models.proprietario();
         },
         mounted() {
-            this.$refs.id.focus();
+            //this.$refs.documento.focus();
             //this.Enviar();
         },
         methods: {
-
-
-            LimparFiltro() {
-                this.id = null;
-                this.busca.item = this.$models.proprietario();
-                this.Enviar();
+            applyMask() {
+                this.valorInserido = this.documento.replace(/\D/g, '');
+                if (this.valorInserido.length <= 11) {
+                    this.documento = this.valorInserido.replace(/(\d{3})(\d)/, '$1.$2')
+                        .replace(/(\d{3})(\d)/, '$1.$2')
+                        .replace(/(\d{3})(\d{1,2})$/, '$1-$2');
+                } else {
+                    this.documento = this.valorInserido.replace(/^(\d{2})(\d)/, '$1.$2')
+                        .replace(/^(\d{2})\.(\d{3})(\d)/, '$1.$2.$3')
+                        .replace(/\.(\d{3})(\d)/, '.$1/$2')
+                        .replace(/(\d{4})(\d)/, '$1-$2');
+                }
             },
 
             tableRowClassName(scope) {
                 if (!scope.row.ativo)
                     return "deleted-row";
-            },
-
-
-            Alterar(scope) {
-                this.$root.RouteTo('proprietario/' + scope.row.id)
             },
 
             async Excluir(scope) {
@@ -237,34 +232,22 @@
                 //this.$tools.Message("Item excluído");
             },
 
-            async Enviar(page = 1) {
+            async Enviar() {
 
-
-                if (this.$validator.is(this.id))
-                    this.busca.item.id = this.id;
-
-                this.busca.page = page;
-                this.busca.result = [];
+                if (this.$validator.is(this.documento))
                 this.onrequest = true;
-                var request = await this.$api.Post("imovel/buscar", this.busca);
+                this.jsonDocumento = JSON.stringify(this.documento);  // Converte o documento para uma string JSON
+                var request = await this.$api.Post("/imoview/validarchave", this.jsonDocumento);
                 this.onrequest = false;
 
                 if (request?.status?.success) {
                     this.busca = request.result;
                     this.data = this.busca.result;
+                    console.log(this.data);
                 }
-
-
             }
-
-
-
-
         }
-
     }
-
-
 </script>
 
 
