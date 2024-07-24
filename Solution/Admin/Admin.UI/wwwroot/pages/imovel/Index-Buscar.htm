@@ -193,6 +193,8 @@
                 <el-row>
 
                 <el-col  :md="24" style="color:var(--s-color-primary);font-weight:700" v-if="$validator.is(imoveisBuscaResult) && imoveisBuscaResult.length > 0">
+                       
+                    
                         <!-- TABLE IMOVEIS  -->
 
                         <el-table :data="imoveisBuscaResult" style="width: 100%" max-height="380" v-loading="ontablequest" :table-layout="auto" :row-class-name="tableRowClassName">

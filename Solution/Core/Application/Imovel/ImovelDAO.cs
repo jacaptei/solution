@@ -151,6 +151,46 @@ namespace JaCaptei.Application {
         }
 
 
+        public AppReturn Validar(Imovel entity) {
+            Imovel entityDB = new Imovel();
+            try {
+                using(var conn = new DBcontext().GetConn()) {
+
+                    entityDB = conn.Query<Imovel>(e => e.id == entity.id).FirstOrDefault();
+
+                    if(entityDB is not null && entityDB?.id > 0) {
+
+                        entityDB.validado           = entity.validado   = true;
+                        entityDB.ativo              = entity.ativo      = true;
+                        entityDB.status             = "ATIVO";
+                        entityDB.dataAtualizacao    = Utils.Date.GetLocalDateTime();
+                        entityDB.atualizadoPorId    = entity.atualizadoPorId;
+                        entityDB.atualizadoPorNome  = entity.atualizadoPorNome;
+                        entityDB.dataAtualizacao    = Utils.Date.GetLocalDateTime();
+                        conn.Update<Imovel>(entityDB);
+
+                    } else
+                        appReturn.AddException("Não foi possível validar (registro não encontrado ou inválido).");
+                }
+            } catch(Exception ex) {
+                appReturn.AddException("Não foi possível validar (registro não encontrado ou inválido).");
+                appReturn.status.exception = ex.ToString();
+            }
+
+            return appReturn;
+
+        }
+
+
+
+        public AppReturn ObterPendentesValidacao() {
+            ImovelBusca busca = new ImovelBusca();
+            busca.somenteNaoValidados = true;
+            return Buscar(busca);
+        }
+
+
+
 
         public void AdicionarImagens(Imovel entity) {
             using(var conn = DB.GetConn()) {
@@ -227,20 +267,29 @@ namespace JaCaptei.Application {
             if(busca is null || busca.imovelJC is null)
                 appReturn.AddException("Busca não identificada");
 
+
+
+            string from =" \"Imovel\" imovel                                                                                           "
+                        +" JOIN \"ImovelEndereco\"                    endereco        ON (endereco.\"idImovel\"       = imovel.id)  "
+                        +" JOIN \"ImovelValores\"                     valor           ON (valor.\"idImovel\"          = imovel.id)  "
+                        +" JOIN \"ImovelAreas\"                       area            ON (area.\"idImovel\"           = imovel.id)  "
+                        +" JOIN \"ImovelLazer\"                       lazer           ON (lazer.\"idImovel\"          = imovel.id)  "
+                        +" JOIN \"ImovelCaracteristicasInternas\"     interno         ON (interno.\"idImovel\"        = imovel.id)  "
+                        +" JOIN \"ImovelCaracteristicasExternas\"     externo         ON (externo.\"idImovel\"        = imovel.id)  "
+                        +" JOIN \"ImovelDisposicao\"                  disposicao      ON (disposicao.\"idImovel\"     = imovel.id)  "
+                        +" JOIN \"ImovelDocumentacao\"                documentacao    ON (documentacao.\"idImovel\"   = imovel.id)  "
+                        +" JOIN \"Proprietario\"                      proprietario    ON (proprietario.id             = imovel.\"idProprietario\")  "
+                    ;
+
             string  filter   = ObterQueryBuscaImovel(busca);
-            string  sqlCount = "SELECT COUNT(*) FROM "
-                        +"      \"Imovel\" imovel                                                                                           "
-                        +"                           JOIN \"ImovelEndereco\"                    endereco        ON (endereco.\"idImovel\"       = imovel.id)  "
-                        +"                           JOIN \"ImovelValores\"                     valor           ON (valor.\"idImovel\"          = imovel.id)  "
-                        +"                           JOIN \"ImovelAreas\"                       area            ON (area.\"idImovel\"           = imovel.id)  "
-                        +"                           JOIN \"ImovelLazer\"                       lazer           ON (lazer.\"idImovel\"          = imovel.id)  "
-                        +"                           JOIN \"ImovelCaracteristicasInternas\"     interno         ON (interno.\"idImovel\"        = imovel.id)  "
-                        +"                           JOIN \"ImovelCaracteristicasExternas\"     externo         ON (externo.\"idImovel\"        = imovel.id)  "
-                        +"                           JOIN \"ImovelDisposicao\"                  disposicao      ON (disposicao.\"idImovel\"     = imovel.id)  "
-                        +"                           JOIN \"ImovelDocumentacao\"                documentacao    ON (documentacao.\"idImovel\"   = imovel.id)  "
+
+
+
+            string  sqlCount = "SELECT COUNT(*) "
+                        + " FROM " + from
                         + " WHERE " + filter;
 
-            string  sql      = " SELECT JSON_AGG(res) FROM(     SELECT      imovel.* ,                                                                                                       "
+            string  sql      = " SELECT JSON_AGG(res) FROM( SELECT    imovel.* ,                                                                                                       "
                         +"                                            (SELECT json_agg(img.*) FROM \"ImovelImagem\" img where img.\"idImovel\" = imovel.id)  as imagens ,           "
                         +"                                            to_json(endereco.*)      as endereco                                                                 ,        "
                         +"                                            to_json(valor.*)         as valor                                                                    ,        "
@@ -251,23 +300,12 @@ namespace JaCaptei.Application {
                         +"                                            to_json(disposicao.*)    as disposicao                                                               ,        "
                         +"                                            to_json(documentacao.*)  as documentacao                                                             ,        "
                         +"                                            to_json(proprietario.*)  as proprietario                                                                      "
-                        +"                                  FROM                                                                                                                    "
-                        +"                                              \"Imovel\" imovel                                                                                           "
-                        +"                                                                JOIN \"ImovelEndereco\"                    endereco        ON (endereco.\"idImovel\"       = imovel.id)  "
-                        +"                                                                JOIN \"ImovelValores\"                     valor           ON (valor.\"idImovel\"          = imovel.id)  "
-                        +"                                                                JOIN \"ImovelAreas\"                       area            ON (area.\"idImovel\"           = imovel.id)  "
-                        +"                                                                JOIN \"ImovelLazer\"                       lazer           ON (lazer.\"idImovel\"          = imovel.id)  "
-                        +"                                                                JOIN \"ImovelCaracteristicasInternas\"     interno         ON (interno.\"idImovel\"        = imovel.id)  "
-                        +"                                                                JOIN \"ImovelCaracteristicasExternas\"     externo         ON (externo.\"idImovel\"        = imovel.id)  "
-                        +"                                                                JOIN \"ImovelDisposicao\"                  disposicao      ON (disposicao.\"idImovel\"     = imovel.id)  "
-                        +"                                                                JOIN \"ImovelDocumentacao\"                documentacao    ON (documentacao.\"idImovel\"   = imovel.id)  "
-                        +"                                                                JOIN \"Proprietario\"                      proprietario    ON (proprietario.id             = imovel.\"idProprietario\")  "
-                        +""
-                        +"                                  WHERE  "            + Utils.Validator.ParseSafeSQL(filter)          + " "
-                        +"                                  ORDER BY imovel."   + Utils.Validator.ParseSafeSQL(busca.orderBy)   + " "
-                        +"                                                    " + Utils.Validator.ParseSafeSQL(busca.limit)     + " "
+                        + " FROM " + from
+                        +"  WHERE  "            + Utils.Validator.ParseSafeSQL(filter)          + " "
+                        +"  ORDER BY imovel."   + Utils.Validator.ParseSafeSQL(busca.orderBy)   + " "
+                        +"  " + Utils.Validator.ParseSafeSQL(busca.limit)     + " "
                         +"                           ) res; "
-                        ;
+                   ;
 
             using(var conn = DB.GetConn()) {
                 try {
@@ -299,14 +337,15 @@ namespace JaCaptei.Application {
 
             string filter = " imovel.\"possuiToken\" = TRUE "; // discontinued <> 1
 
-            if(busca.somenteAtivos)
-                 filter += " AND imovel.ativo = TRUE ";
-            else if(busca.somenteInativos)
-                 filter += " AND imovel.ativo = FALSE ";
+
+            if(busca.somenteValidados)
+                 filter += " AND imovel.validado = TRUE ";
+            else if(busca.somenteNaoValidados)
+                 filter += " AND imovel.validado = FALSE ";
 
             if(busca.somenteVisiveis)
                  filter += " AND imovel.visivel = TRUE ";
-            else if(busca.somenteInvisiveis)
+            else if(busca.somenteNaoVisiveis)
                  filter += " AND imovel.visivel = FALSE ";
 
             if(busca.imovelJC.id > 0)

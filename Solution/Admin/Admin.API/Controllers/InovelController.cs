@@ -96,6 +96,39 @@ namespace JaCaptei.Administrativo.API.Controllers {
         }
 
 
+        [HttpPost]
+        [Route("[action]")]
+        [Authorize(Roles = "ADMIN_GOD,ADMIN_GESTOR")]
+        public IActionResult Validar([FromBody] Imovel entity) {
+
+
+            if(entity is null) {
+                appReturn.AddException("Parceiro inexistente ou inválido");
+                return Result(appReturn);
+            }
+
+            Usuario logado              = ObterUsuarioAutenticado();
+            entity.atualizadoPorId      = logado.id;
+            entity.atualizadoPorNome    = logado.nome;
+            
+            if(appReturn.status.success)
+                appReturn.result = service.Validar(entity);
+
+            return Result(appReturn);
+
+        }
+
+
+        [HttpGet]
+        [Authorize(Roles = "ADMIN_GOD,ADMIN_GESTOR")]
+        [Route("pendentes")]
+        public IActionResult ObterPendentesValidacao() {
+            appReturn = service.ObterPendentesValidacao();
+            return Result(appReturn);
+        }
+
+
+
         public async Task<AppReturn> ImageShackUploadImagesFiles(Imovel imovel,List<IFormFile> imagesFiles) {
 
             short   ordem           = -5;

@@ -80,6 +80,24 @@ namespace JaCaptei.Application{
         }
 
 
+        public AppReturn Validar(Imovel entity) {
+
+            if(entity is null || entity?.id == 0) {
+                appReturn.AddException("Imóvel não identificado.");
+                return appReturn;
+            }
+
+            appReturn = DAO.Validar(entity);
+
+            return appReturn;
+        }
+
+
+        public AppReturn ObterPendentesValidacao() {
+             return DAO.ObterPendentesValidacao(); 
+        }
+
+
 
 
         public void AdicionarImagens(Imovel entity) {

@@ -119,9 +119,10 @@ CREATE	TABLE "Imovel"(
     ------------------- */
 
 
-	status							VARCHAR(40)			DEFAULT 'ATIVO' ,
+	status							VARCHAR(40)			DEFAULT 'PENDENTE' ,
 	ativo	                    	BOOLEAN			    DEFAULT FALSE,
 	visivel	                    	BOOLEAN			    DEFAULT TRUE,
+	validado                    	BOOLEAN			    DEFAULT FALSE,
 	"ativoCRM"                   	BOOLEAN			    DEFAULT FALSE,
 	"possuiImagens"                 BOOLEAN			    DEFAULT FALSE,
 	
