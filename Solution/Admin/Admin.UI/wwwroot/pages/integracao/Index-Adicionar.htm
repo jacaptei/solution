@@ -4,58 +4,58 @@
         <el-row @keyup.enter="Buscar()">
             <el-col :md="24">
                 <el-row :gutter="20">
-                    <el-col :xs="24" :sm="12" :md="8" :lg="6" class="s-input">
-                        <div>ID<span></span></div>
+                    <el-col :xs="24" :sm="12" :md="8" :lg="8" class="s-input">
+                        <div>CHAVE API<span></span></div>
                         <el-input-number style="width:100%" @keyup.enter="Enviar()" v-model="id" placeholder="qualquer" maxlength="20" ref="id" :controls="false"></el-input-number>
                     </el-col>
 
-                    <el-col :xs="24" :sm="12" :md="8" :lg="6" class="s-input">
+                    <el-col :xs="24" :sm="12" :md="8" :lg="8" class="s-input">
                         <div>CRM<span></span></div>
                         <el-select value-key="id" filterable class="m-4" size="large" style="width: 100%">
                             <el-option placeholder="qualquer"></el-option>
                         </el-select>
                     </el-col>
 
-                    <el-col :xs="24" :sm="12" :md="8" :lg="6" class="s-input">
+                    <el-col :xs="24" :sm="12" :md="8" :lg="8" class="s-input">
                         <div>CRM<span></span></div>
                         <el-select value-key="id" filterable class="m-4" size="large" style="width: 100%">
                             <el-option placeholder="qualquer"></el-option>
                         </el-select>
                     </el-col>
 
-                    <el-col :xs="24" :sm="12" :md="8" :lg="6" class="s-input">
+                    <el-col :xs="24" :sm="12" :md="8" :lg="8" class="s-input">
                         <div>CÓDIGO USUÁRIO IMOVIEW<span></span></div>
                         <!--<div style="height:40px" v-if="">
-                <c-loading size="30px" style="padding-left:5px"></c-loading>
-            </div>-->
-                        <!--<div v-else-if="">
-                <span style="color:#7d7d7d;padding-left:10px">selecione um estado</span>
-            </div>-->
+                            <c-loading size="30px" style="padding-left:5px"></c-loading>
+                        </div>-->
+                                    <!--<div v-else-if="">
+                            <span style="color:#7d7d7d;padding-left:10px">selecione um estado</span>
+                        </div>-->
                         <el-select v-else v-model="" filterable class="m-4" placeholder="qualquer" size="large" style="width:100%" @change="(item)=>{}">
                             <!--<el-option v-for="item in $root.search.opcoes.cidades"
-                :key="item.id"
-                :label="item.label"
-                :value="item"></el-option>-->
+                            :key="item.id"
+                            :label="item.label"
+                            :value="item"></el-option>-->
                         </el-select>
                     </el-col>
 
-                    <el-col :xs="24" :sm="12" :md="8" :lg="6" class="s-input">
+                    <el-col :xs="24" :sm="12" :md="8" :lg="8" class="s-input">
                         <div>UNIDADE<span></span></div>
                         <!--<div style="height:40px" v-if="">
-                <c-loading size="30px" style="padding-left:5px"></c-loading>
-            </div>-->
-                        <!--<div v-else-if="">
-                <span style="color:#7d7d7d;padding-left:10px">selecione um estado</span>
-            </div>-->
+                            <c-loading size="30px" style="padding-left:5px"></c-loading>
+                        </div>-->
+                                    <!--<div v-else-if="">
+                            <span style="color:#7d7d7d;padding-left:10px">selecione um estado</span>
+                        </div>-->
                         <el-select v-else v-model="" multiple filterable :clearable="true" class="m-4" placeholder="qualquer" size="large" style="width:100%">
                             <!--<el-option v-for="item in $root.search.opcoes.bairros"
-                :key="item.id"
-                :label="item.label"
-                :value="item"></el-option>-->
+                            :key="item.id"
+                            :label="item.label"
+                            :value="item"></el-option>-->
                         </el-select>
                     </el-col>
 
-                    <el-col :xs="24" :sm="12" :md="8" :lg="6" class="s-input">
+                    <el-col :xs="24" :sm="12" :md="8" :lg="8" class="s-input">
                         <div>SELECIONE O PLANO</div>
                         <el-select filterable style="width: 100%" placeholder="SELECIONAR">
                             <el-option v-for="item in [
@@ -69,7 +69,9 @@
                             </el-option>
                         </el-select>
                     </el-col>
+                </el-row>
 
+                <el-row :gutter="20">
                     <el-col :xs="24" :sm="12" :md="8" :lg="6" class="s-input">
                         <div><p>ESTADO</p><span></span></div>
                         <div style="height:40px" v-if="carregandoEstados">
@@ -107,21 +109,21 @@
                             </el-scrollbar>
                         </el-col>
                     </el-col>
+                </el-row>
 
-                    <el-row style="width: 100%; display: flex; justify-content: flex-end; align-items: center;">
-                        <el-col :xs="24" :sm="12" :md="8" :lg="6" class="s-input" style="width: 100%; display: flex; justify-content: flex-end; align-items: center;">
-                            <div><span></span></div>
-                            <q-btn label="INTEGRAR" color="primary" @click="BuscarProprietario()"></q-btn>
-                            <span style="cursor:pointer; padding-left:20px; color:var(--s-color-green)" @click="LimparFiltro"><i class="fa fa-cancel"></i> LIMPAR REGISTRO</span>
-                        </el-col>
-                    </el-row>
+                <el-row style="width: 100%; display: flex; justify-content: flex-end; align-items: center;">
+                    <el-col :xs="24" :sm="12" :md="8" :lg="6" class="s-input" style="width: 100%; display: flex; justify-content: flex-end; align-items: center;">
+                        <div><span></span></div>
+                        <q-btn label="INTEGRAR" color="primary" @click="BuscarProprietario()"></q-btn>
+                        <span style="cursor:pointer; padding-left:20px; color:var(--s-color-green)" @click="LimparFiltro"><i class="fa fa-cancel"></i> LIMPAR REGISTRO</span>
+                    </el-col>
+                </el-row>
 
-                    <el-row justify="center" v-if="onrequest">
-                        <el-col :md="24" style="color:var(--s-color-primary)">
-                            <el-divider style="margin:10px;"><!--resultado--></el-divider>
-                            <c-loading padding="20px"></c-loading>
-                        </el-col>
-                    </el-row>
+                <el-row justify="center" v-if="onrequest">
+                    <el-col :md="24" style="color:var(--s-color-primary)">
+                        <el-divider style="margin:10px;"><!--resultado--></el-divider>
+                        <c-loading padding="20px"></c-loading>
+                    </el-col>
                 </el-row>
             </el-col>
         </el-row>
