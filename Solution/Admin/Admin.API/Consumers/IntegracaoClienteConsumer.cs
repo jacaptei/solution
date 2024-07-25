@@ -20,7 +20,6 @@ namespace JaCaptei.Admin.API.Consumers
         {
             _httpClientFactory = httpClientFactory;
             _service = new ImoviewService(httpClientFactory, context, "", mapper);
-            _httpClientFactory = httpClientFactory;
         }
 
         public async Task Consume(ConsumeContext<IntegracaoEvent> context)
