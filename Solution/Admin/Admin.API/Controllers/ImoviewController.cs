@@ -90,9 +90,9 @@ public class ImoviewController : ControllerBase
     //}
 
     [HttpPost("integracao/cliente")]
-    public async Task<ActionResult<IntegracaoReponseDTO>> GetIntegracaoCliente([FromBody] string cpfCnpj)
+    public async Task<ActionResult<IntegracaoReponseDTO>> GetIntegracaoCliente([FromBody] IntergracaoReq cpfCnpj)
     {
-        var (isCpf, cpfCnpjNum) = Utils.DistictCpfCnpj(cpfCnpj);
+        var (isCpf, cpfCnpjNum) = Utils.DistictCpfCnpj(cpfCnpj.CpfCnpj);
         if (string.IsNullOrEmpty(cpfCnpjNum))
             return BadRequest("Formato de CPF/CNPJ inválido!");
         var cliente = isCpf ? await _parceiroService.ObterPorCPF(cpfCnpjNum) : await _parceiroService.ObterPorCNPJ(cpfCnpjNum);
@@ -121,6 +121,11 @@ public class ImoviewController : ControllerBase
     }
 
  }
+
+public record IntergracaoReq
+{
+    public string CpfCnpj { get; set; }
+}
 
 public record ComboDTO(int Id, string Nome);
 public record ComboPlanoDTO(int Id, string Nome, int QtdBairros);
