@@ -13,6 +13,12 @@ namespace JaCaptei.Model {
             public double           areaMinima          {get;set;} = 0d;
             public double           areaMaxima          {get;set;} = 0d;
             public string           cepBase             {get;set;} = "";
+            public bool             somenteAtivos       {get;set;}  = false;
+            public bool             somenteNaoAativos   {get;set;}  = false;
+            public bool             somenteVisiveis     {get;set;}  = false;
+            public bool             somenteNaoVisiveis  {get;set;}  = false;
+            public bool             somenteValidados    {get;set;}  = false;
+            public bool             somenteNaoValidados {get;set;}  = false;
 
             public Imovel           imovelJC            {get;set;} = new Imovel();
             public ImovelCRM        imovel              {get;set;} = new ImovelCRM();
@@ -31,7 +37,7 @@ namespace JaCaptei.Model {
             public Int64            total           { get; set; }
             public List<dynamic>    results         { get; set; } = new List<dynamic>();
 
-            public string           orderBy         { get; set; } = " data ASC ";
+            public string           orderBy         { get; set; } = " id DESC ";
         
             public string           filter          { get; set; }
 

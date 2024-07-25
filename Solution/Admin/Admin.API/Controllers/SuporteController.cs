@@ -1,121 +1,109 @@
-﻿using JaCaptei.Administrativo.API.Controllers;
-using JaCaptei.Application;
+﻿using Microsoft.AspNetCore.Mvc;
 using JaCaptei.Model;
+using System.Diagnostics;
+using JaCaptei.Application;
 
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Caching.Memory;
+namespace JaCaptei.Administrativo.API.Controllers {
 
-namespace JaCaptei.API.Controllers
-{
     [ApiController]
     [Route("[controller]")]
-    public class SuporteController : ApiControllerBase
-    {
-        private readonly LocalidadeService _localidadeService = new();
-        private readonly IMemoryCache _cache;
+    public class SuporteController : ApiControllerBase{
 
-        public SuporteController(IMemoryCache cache)
-        {
-            _cache = cache;
+
+        SuporteService      suporteService      = new SuporteService();
+        LocalidadeService   localidadeService   = new LocalidadeService();
+        Mail mailService = new Mail();
+
+        [HttpGet]
+        [Route("email/teste/{email}")]
+        public IActionResult EmailTeste(string email) {
+            var res="[SUCESSO]";
+            try {
+                Mail mail    = new Mail();
+                mail.emailTo = email;
+                mail.about   = "Teste assunto";
+                mail.message = "Teste conteúdo";
+                mail.Send();
+            } catch(Exception e) {
+                var ex = e.ToString();
+                res = "[FALHOU] " + e.ToString();
+            }
+            return Ok(res);
         }
 
         [HttpGet]
         [Route("modelos/obter")]
-        public async Task<IActionResult> ObterModelos()
-        {
-            string sessaoCRM = await CRM.ObterSessaoGlobal();
-            Usuario user = new() { username = "", senha = "", sessaoCRMglobal = sessaoCRM };
-
-            IDictionary<string, dynamic> dicModels = new SuporteService().ObterModelos(user);
-
+        public async Task<IActionResult> ObterModelos() {
+            IDictionary<string,dynamic> dicModels = new SuporteService().ObterModelos();
             return Ok(dicModels);
         }
 
+
         [HttpPost]
         [Route("log/registrar")]
-        public void RegistrarLog([FromBody] Log log)
-        {
+        public void RegistrarLog([FromBody] Log log) {
             //if (Config.settings.enableLog)
             //    suporteService.RegistrarLog(log);
         }
 
+
         [HttpGet]
         [Route("estados/obter")]
-        public IActionResult ObterEstados()
-        {
-            _cache.TryGetValue<AppReturn>("estados", out AppReturn? estadosRet);
-            if (estadosRet != null)
-                return Ok(estadosRet);
-            else
-            {
-                appReturn = _localidadeService.ObterEstados();
-                var cacheOptions = new MemoryCacheEntryOptions()
-                    .SetAbsoluteExpiration(TimeSpan.FromHours(5))
-                    //.SetSlidingExpiration(TimeSpan.FromMinutes(60))
-                    .SetPriority(CacheItemPriority.High);
-                _cache.Set("estados", appReturn, cacheOptions);
-            }
+        public IActionResult ObterEstados() {
+            appReturn = localidadeService.ObterEstados();
+            return Result(appReturn);
+        }
+        [Route("estado/obter/id/{nome}")]
+        public IActionResult ObterIdEstado(string nome) {
+            appReturn = localidadeService.ObterIdEstado(nome);
             return Result(appReturn);
         }
 
+
+
         [HttpGet]
         [Route("cidades/obter/{id_estado}")]
-        public IActionResult ObterCidadesPorEstadoId(int id_estado)
-        {
-            _cache.TryGetValue<AppReturn>($"cidades-{id_estado}", out AppReturn? cidadesRet);
-            if (cidadesRet != null)
-                return Ok(cidadesRet);
-            else
-            {
-                appReturn = _localidadeService.ObterCidadesPorEstadoId(id_estado);
-                _cache.Set($"cidades-{id_estado}", appReturn, TimeSpan.FromMinutes(60));
-            }
+        public IActionResult ObterCidadesPorEstadoId(int id_estado) {
+            appReturn = localidadeService.ObterCidadesPorEstadoId(id_estado);
+            return Result(appReturn);
+        }
+        [HttpGet]
+        [Route("cidade/obter/id/{idEstado:int}/{nome}")]
+        public IActionResult ObterIdCidade(int idEstado, string nome) {
+            appReturn = localidadeService.ObterIdCidade(idEstado,nome);
             return Result(appReturn);
         }
 
         [HttpGet]
         [Route("cidades/obter/uf/{uf}")]
-        public IActionResult ObterCidadesPorUF(string uf)
-        {
-            _cache.TryGetValue<AppReturn>($"cidades-{uf}", out AppReturn? cidadesRet);
-            if (cidadesRet != null)
-                return Ok(cidadesRet);
-            else
-            {
-                appReturn = _localidadeService.ObterCidadesPorUF(uf);
-                _cache.Set($"cidades-{uf}", appReturn, TimeSpan.FromMinutes(60));
-            }
+        public IActionResult ObterCidadesPorUF(string uf) {
+            appReturn = localidadeService.ObterCidadesPorUF(uf);
             return Result(appReturn);
         }
 
         [HttpGet]
         [Route("bairros/obter/{id_cidade}")]
-        public IActionResult ObterBairrosPorCidadeId(int id_cidade)
-        {
-            _cache.TryGetValue<AppReturn>($"bairros-{id_cidade}", out AppReturn? bairrosRet);
-            if (bairrosRet != null)
-                return Ok(bairrosRet);
-            else
-            {
-                appReturn = _localidadeService.ObterBairrosPorCidadeId(id_cidade);
-                _cache.Set($"bairros-{id_cidade}", appReturn, TimeSpan.FromMinutes(60));
-            }
+        public IActionResult ObterBairrosPorCidadeId(int id_cidade) {
+            appReturn = localidadeService.ObterBairrosPorCidadeId(id_cidade);
+            return Result(appReturn);
+        }
+        [Route("bairro/obter/id/{idCidade:int}/{nome}")]
+        public IActionResult ObterIdBairro(int idCidade,string nome) {
+            appReturn = localidadeService.ObterIdBairro(idCidade,nome);
+            return Result(appReturn);
+        }
+        [HttpGet]
+        [Route("bairros/obter/cidade/{nome}")]
+        public IActionResult ObterBairrosPorCidadeNome(string nome) {
+            appReturn = localidadeService.ObterBairrosPorCidadeNome(nome);
             return Result(appReturn);
         }
 
-        [HttpGet]
-        [Route("bairros/obter/cidade/{nome}")]
-        public IActionResult ObterBairrosPorCidadeNome(string nome)
-        {
-            _cache.TryGetValue<AppReturn>($"bairros-{nome}", out AppReturn? bairrosRet);
-            if (bairrosRet != null)
-                return Ok(bairrosRet);
-            else
-            {
-                appReturn = _localidadeService.ObterBairrosPorCidadeNome(nome);
-                _cache.Set($"bairros-{nome}", appReturn, TimeSpan.FromMinutes(60));
-            }
-            return Result(appReturn);
-        }
+
+
+
+
     }
+
 }
+

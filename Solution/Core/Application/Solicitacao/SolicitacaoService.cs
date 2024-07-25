@@ -238,9 +238,12 @@ namespace JaCaptei.Application{
                     mail.message    += "<br>não informada";
 
 
+                mail.message += "<br><br><b>Obs:</b>";
+                mail.message += "<br>" + (Utils.Validator.Is(entity.descricao) ? entity.descricao : "sem observações");
+
+
                 mail.message += "<br><br><b>Avaliação:</b>";
                 mail.message += "<br>" + (Utils.Validator.Is(entity.avaliacao        )? entity.avaliacao : "não avaliado");
-
 
                 mail.Send();
 

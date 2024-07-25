@@ -4,20 +4,40 @@
 
     <div>
 
+
+        <el-row :gutter="20" v-if="onrequest">
+            <el-col :md="24">
+                    <c-loading padding="20px"></c-loading>
+            </el-col>
+        </el-row>
+
+
+        <el-row :gutter="20" v-else-if="imovel.id==0">
+            <el-col :md="24">
+                Nada encontrado
+            </el-col>
+        </el-row>
+
+
+        <el-row v-else>
+            <el-col :md="24">
+                
+
+
         <el-row>
             <el-col :md="24">
 
                         <q-stepper v-model="step" ref="stepper" color="primary" done-color="green-13" animated >
 
-                          <q-step :name="1" title="PROPRIETÁRIO"    prefix="1" :caption="stepCaptions[1]" :done="step > 1"></q-step>
+                          <!--<q-step :name="1" title="PROPRIETÁRIO"    prefix="1" :caption="stepCaptions[1]" :done="step > 1"></q-step>-->
 
-                          <q-step :name="2" title="LOCALIZAÇÃO"     prefix="2" :caption="stepCaptions[2]" :done="step > 2" ></q-step>
-
-                          <q-step :name="3" title="PARTICULARIDADES" prefix="3" :caption="stepCaptions[3]" :done="step > 3"></q-step>
-
-                          <q-step :name="4" title="CARACTERÍSTICAS" prefix="4" :caption="stepCaptions[4]" :done="step > 4"></q-step>
-
-                          <q-step :name="5" title="IMAGENS"         prefix="5" :caption="stepCaptions[5]" :done="step > 5"></q-step>               
+                          <q-step :name="2" title="LOCALIZAÇÃO"     prefix="1"  :done="step > 2" ></q-step>
+                                                                                
+                          <q-step :name="3" title="PARTICULARIDADES" prefix="2" :done="step > 3"></q-step>
+                                                                                
+                          <q-step :name="4" title="CARACTERÍSTICAS" prefix="3"  :done="step > 4"></q-step>
+                                                                                
+                          <q-step :name="5" title="IMAGENS"         prefix="4"  :done="step > 5"></q-step>               
 
                           <!--<q-step :name="5" title="CONFIRMAÇÃO" prefix="5" :caption="stepCaptions[5]" :done="step == 5" >--><!--describe --><!--</q-step>-->               
 
@@ -40,7 +60,7 @@
         <el-row>
             <el-col :md="24">
                 <q-btn label='ADICIONAR PROPRIETÁRIO' color="primary" @click="$root.RouteTo('proprietarios',{view:'adicionar',from:'imoveis'})" style="width:340px;margin-right:20px"></q-btn>
-                <!--<q-btn label='PROSSEGUIR COM PROPRIETÁRIO "JÁ CAPTEI"' color="orange" @click="CheckoutStep1(proprietarioJacaptei)" style="width:340px"></q-btn>-->
+                <q-btn label='PROSSEGUIR COM PROPRIETÁRIO "JÁ CAPTEI"' color="orange" @click="CheckoutStep1(proprietarioJacaptei)" style="width:340px"></q-btn>
             </el-col>
         </el-row>
 
@@ -385,7 +405,7 @@
                                             <el-input @keyup.enter="CheckoutStep2()" v-model="imovel.endereco.acesso" placeholder="" maxlength="200" input-style="text-transform:lowercase;"></el-input>
                                         </el-col>
                                     </el-row>-->
-
+                            
 
                                 </el-col>
 
@@ -502,8 +522,7 @@
             <el-row :gutter="20" style="margin-top:10px">
                 <el-col  :md="6" :sm="12" :xs="24" style="color:var(--s-color-primary);font-weight:700">
                     RESPONSÁVEL PELA CAPTAÇÃO<br />
-                    <!--<el-select v-model="idAdminSelecionado" filterable placeholder="Todos" size="small" style="width:100%" @change="(idAdmin)=>{FiltrarPorAdmin(idAdmin)}">-->
-                    <el-select v-model="captadorSelecionado" filterable placeholder="selecionar" size="large" style="width:100%" @change="(admin)=>DefinirCaptador(admin)">
+                    <el-select v-model="imovel.adminCaptador"  value-key="id" filterable placeholder="selecionar" size="large" style="width:100%">
                         <el-option v-for="admin in admins"
                                     :key="admin.id"
                                     :label="admin.nome"
@@ -515,23 +534,19 @@
                     ÍNDICE CADASTRAL<br />
                     <el-input v-model="imovel.documentacao.indiceCadastral" placeholder="" maxlength="38" >
                         <template #append>
-                            <!--<c-loading size="20px" v-if="carregandoCEP"></c-loading>
-                            <i class="fa fa-search" v-else-if="(cep.numero.length < 9)" style="color:var(--s-accent-color)" @click="$tools.Alert('Preencha todo o CEP para poder realizar a busca.')"></i>
-                            <i class="fa fa-search" v-else style="color:var(--s-accent-color);cursor:pointer" @click="BuscarEndereco"></i>-->
-                            <i class="fa fa-search" v-else style="color:var(--s-accent-color);cursor:pointer" @click="$tools.Alert('Pesquisa nos orgãos competentes ainda não disponível.')"></i>
+                            <i class="fa fa-search" v-else style="color:var(--s-accent-color);cursor:pointer;padding:10px" @click="$tools.Alert('Pesquisa nos orgãos competentes ainda não disponível.')"></i>
                         </template>
                     </el-input>
                 </el-col>
             </el-row>
 
-                    
                                         
             <el-row :gutter="20" style="margin-top:30px">
                 <el-col :md="24" style="color:var(--s-color-primary);font-weight:700">
                     DISPOSIÇÃO
                 </el-col>
             </el-row>
-
+                    
             <el-row :gutter="20" style="margin-top:10px">
                     <el-col :md="4" :sm="8" :xs="12"><el-checkbox label="Ocupado             " v-model="imovel.disposicao.ocupado             " size="large"></el-checkbox></el-col>
                     <el-col :md="4" :sm="8" :xs="12"><el-checkbox label="Aceita financiamento" v-model="imovel.disposicao.aceitaFinanciamento " size="large"></el-checkbox></el-col>
@@ -548,7 +563,6 @@
                     <el-col :md="4" :sm="8" :xs="12"><el-checkbox label="Na planta           " v-model="imovel.disposicao.naPlanta            " size="large"></el-checkbox></el-col>-->
             </el-row>
 
-
             <el-row :gutter="20">
                 <el-col :md="24">
 
@@ -561,8 +575,8 @@
                         <el-row :gutter="20">
                             <el-col :md="6" :sm="12" :xs="24" style="margin-top:10px">
                                 Tipo<br />
-                                 <el-select v-model="idTipoImovelSelecionado"  value-key="id" filterable class="m-4" size="large" style="width:100%" >
-                                    <el-option v-for="item in opcoes.tiposImoveis" :key="item.nome" :label="item.label" :value="item.id"></el-option>
+                                 <el-select v-model="imovel.tipo"  value-key="id" filterable class="m-4" size="large" style="width:100%" >
+                                    <el-option v-for="item in opcoes.tiposImoveis" :key="item.nome" :label="item.label" :value="item"></el-option>
                                 </el-select>
                             </el-col>
                             <el-col :md="6" :sm="12" :xs="24" style="margin-top:10px">
@@ -592,7 +606,7 @@
     						    <el-input-number v-model="imovel.totalChaves" :step="1" size="medium" :min="0"></el-input-number>
                             </el-col>-->
                             <el-col :md="24" style="margin-top:10px">
-                                Descrição do imóvel<br />
+                                Descrição<br />
                                 <el-input @keyup.enter="CheckoutStep3()" v-model="imovel.descricao" maxlength="4000" autosize type="textarea"></el-input>
                             </el-col>
                         </el-row>
@@ -619,7 +633,7 @@
                                         </el-col>
                                         <el-col  :md="4" :sm="8" :xs="12" style="margin-top:10px">
                                             Comissão de venda <br />
-                                            <el-input input-style="color:var(--s-accent-color);max-width:200px" v-model="imovel.valor.comissao" maxlength="20"  @keyup.enter="CheckoutStep3()"    :formatter="(value) => `${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, '.')"    :parser="(value) => value.replace(/\R\$\s?|(\.*)/g, '').replace(/[a-zA-Z]/g, '')"><template #prepend>%</template></el-input>
+                                            <el-input input-style="color:var(--s-accent-color);max-width:200px" v-model="imovel.valor.comissao" maxlength="20" @keyup.enter="CheckoutStep3()"    :formatter="(value) => `${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, '.')"    :parser="(value) => value.replace(/\R\$\s?|(\.*)/g, '').replace(/[a-zA-Z]/g, '')"><template #prepend>%</template></el-input>
                                         </el-col>
                                         <!--<el-col  :md="4" :sm="8" :xs="12" style="margin-top:10px">
                                             Consulta<br />
@@ -633,15 +647,15 @@
                                     <el-row :gutter="20">
                                         <el-col  :md="4" :sm="8" :xs="12" style="margin-top:10px">
                                             IPTU mensal<br />
-                                            <el-input input-style="color:var(--s-accent-color);max-width:200px" v-model="imovel.valor.iptuMensal" maxlength="20"  @keyup.enter="CheckoutStep3()"    :formatter="(value) => `R$ ${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, '.')"    :parser="(value) => value.replace(/\R\$\s?|(\.*)/g, '').replace(/[a-zA-Z]/g, '')"><template #prepend>R$</template></el-input>
+                                            <el-input input-style="color:var(--s-accent-color);max-width:200px" v-model="imovel.valor.iptuMensal" maxlength="20"  @keyup.enter="CheckoutStep3()"    :formatter="(value) => `${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, '.')"    :parser="(value) => value.replace(/\R\$\s?|(\.*)/g, '').replace(/[a-zA-Z]/g, '')"><template #prepend>R$</template></el-input>
                                         </el-col>
                                         <el-col  :md="4" :sm="8" :xs="12" style="margin-top:10px">
                                             IPTU anual<br />
-                                            <el-input input-style="color:var(--s-accent-color);max-width:200px" v-model="imovel.valor.iptuAnual" maxlength="20"  @keyup.enter="CheckoutStep3()"    :formatter="(value) => `R$ ${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, '.')"    :parser="(value) => value.replace(/\R\$\s?|(\.*)/g, '').replace(/[a-zA-Z]/g, '')"><template #prepend>R$</template></el-input>
+                                            <el-input input-style="color:var(--s-accent-color);max-width:200px" v-model="imovel.valor.iptuAnual" maxlength="20"  @keyup.enter="CheckoutStep3()"    :formatter="(value) => `${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, '.')"    :parser="(value) => value.replace(/\R\$\s?|(\.*)/g, '').replace(/[a-zA-Z]/g, '')"><template #prepend>R$</template></el-input>
                                         </el-col>
                                         <!--<el-col  :md="4" :sm="8" :xs="12" style="margin-top:10px">
                                             IPTU índice<br />
-                                            <el-input input-style="color:var(--s-accent-color);max-width:200px" v-model="imovel.valor.iptuIndice" maxlength="20"  @keyup.enter="CheckoutStep3()"    :formatter="(value) => `${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, '.')"    :parser="(value) => value.replace(/\R\$\s?|(\.*)/g, '').replace(/[a-zA-Z]/g, '')"></el-input>
+                                            <el-input input-style="color:var(--s-accent-color);max-width:200px" v-model="imovel.valor.iptuIndice" maxlength="20"  @keyup.enter="CheckoutStep3()"  ></el-input>
                                         </el-col>-->
                                     </el-row>
 
@@ -660,43 +674,43 @@
                                     <el-row :gutter="20">
                                         <el-col :md="4" :sm="8" :xs="12" style="margin-top:10px">
                                             Interna<br />
-								            <el-input input-style="color:var(--s-accent-color);max-width:200px" v-model="imovel.area.interna" maxlength="20" placeholder="m²" @keyup.enter="CheckoutStep3()" ref="areainterna"  :formatter="(value) => `${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, '.')"    :parser="(value) => value.replace(/(\.*)/g, '').replace(/[a-zA-Z]/g, '')"><template #prepend>m²</template></el-input>
+								            <el-input input-style="color:var(--s-accent-color);max-width:200px" v-model="imovel.area.interna" maxlength="20" @keyup.enter="CheckoutStep3()" ref="areainterna"  :formatter="(value) => `${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, '.')"    :parser="(value) => value.replace(/(\.*)/g, '').replace(/[a-zA-Z]/g, '')"><template #prepend>m²</template></el-input>
                                         </el-col>
                                         <el-col :md="4" :sm="8" :xs="12" style="margin-top:10px">
                                             Externa<br />
-								            <el-input input-style="color:var(--s-accent-color);max-width:200px" v-model="imovel.area.externa" maxlength="20" placeholder="m²" @keyup.enter="CheckoutStep3()" ref="areaexterna"  :formatter="(value) => `${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, '.')"    :parser="(value) => value.replace(/(\.*)/g, '').replace(/[a-zA-Z]/g, '')"><template #prepend>m²</template></el-input>
+								            <el-input input-style="color:var(--s-accent-color);max-width:200px" v-model="imovel.area.externa" maxlength="20" @keyup.enter="CheckoutStep3()" ref="areaexterna"  :formatter="(value) => `${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, '.')"    :parser="(value) => value.replace(/(\.*)/g, '').replace(/[a-zA-Z]/g, '')"><template #prepend>m²</template></el-input>
                                         </el-col>
                                         <!--<el-col :md="4" :sm="8" :xs="12" style="margin-top:10px">
                                             Frente<br />
-								            <el-input input-style="color:var(--s-accent-color);max-width:200px" v-model="imovel.area.frente" maxlength="20" placeholder="m²" @keyup.enter="CheckoutStep3()"   :formatter="(value) => `${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, '.')"    :parser="(value) => value.replace(/(\.*)/g, '').replace(/[a-zA-Z]/g, '')"><template #prepend>m²</template></el-input>
+								            <el-input input-style="color:var(--s-accent-color);max-width:200px" v-model="imovel.area.frente" maxlength="20" @keyup.enter="CheckoutStep3()"   :formatter="(value) => `${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, '.')"    :parser="(value) => value.replace(/(\.*)/g, '').replace(/[a-zA-Z]/g, '')"><template #prepend>m²</template></el-input>
                                         </el-col>
                                         <el-col :md="4" :sm="8" :xs="12" style="margin-top:10px">
                                             Fundo<br />
-								            <el-input input-style="color:var(--s-accent-color);max-width:200px" v-model="imovel.area.fundo" maxlength="20" placeholder="m²" @keyup.enter="CheckoutStep3()"   :formatter="(value) => `${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, '.')"    :parser="(value) => value.replace(/(\.*)/g, '').replace(/[a-zA-Z]/g, '')"><template #prepend>m²</template></el-input>
+								            <el-input input-style="color:var(--s-accent-color);max-width:200px" v-model="imovel.area.fundo" maxlength="20" @keyup.enter="CheckoutStep3()"   :formatter="(value) => `${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, '.')"    :parser="(value) => value.replace(/(\.*)/g, '').replace(/[a-zA-Z]/g, '')"><template #prepend>m²</template></el-input>
                                         </el-col>
                                         <el-col :md="4" :sm="8" :xs="12" style="margin-top:10px">
                                             Direito<br />
-								            <el-input input-style="color:var(--s-accent-color);max-width:200px" v-model="imovel.area.direito" maxlength="20" placeholder="m²" @keyup.enter="CheckoutStep3()"   :formatter="(value) => `${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, '.')"    :parser="(value) => value.replace(/(\.*)/g, '').replace(/[a-zA-Z]/g, '')"><template #prepend>m²</template></el-input>
+								            <el-input input-style="color:var(--s-accent-color);max-width:200px" v-model="imovel.area.direito" maxlength="20" @keyup.enter="CheckoutStep3()"   :formatter="(value) => `${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, '.')"    :parser="(value) => value.replace(/(\.*)/g, '').replace(/[a-zA-Z]/g, '')"><template #prepend>m²</template></el-input>
                                         </el-col>
                                         <el-col :md="4" :sm="8" :xs="12" style="margin-top:10px">
                                             Esquerdo<br />
-								            <el-input input-style="color:var(--s-accent-color);max-width:200px" v-model="imovel.area.esquerdo" maxlength="20" placeholder="m²" @keyup.enter="CheckoutStep3()"   :formatter="(value) => `${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, '.')"    :parser="(value) => value.replace(/(\.*)/g, '').replace(/[a-zA-Z]/g, '')"><template #prepend>m²</template></el-input>
+								            <el-input input-style="color:var(--s-accent-color);max-width:200px" v-model="imovel.area.esquerdo" maxlength="20" @keyup.enter="CheckoutStep3()"   :formatter="(value) => `${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, '.')"    :parser="(value) => value.replace(/(\.*)/g, '').replace(/[a-zA-Z]/g, '')"><template #prepend>m²</template></el-input>
                                         </el-col>
                                         <el-col :md="4" :sm="8" :xs="12" style="margin-top:10px">
                                             Confrontação frente<br />
-								            <el-input input-style="color:var(--s-accent-color);max-width:200px" v-model="imovel.area.confrontacaoFrente" maxlength="20" placeholder="m²" @keyup.enter="CheckoutStep3()"   :formatter="(value) => `${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, '.')"    :parser="(value) => value.replace(/(\.*)/g, '').replace(/[a-zA-Z]/g, '')"><template #prepend>m²</template></el-input>
+								            <el-input input-style="color:var(--s-accent-color);max-width:200px" v-model="imovel.area.confrontacaoFrente" maxlength="20" @keyup.enter="CheckoutStep3()"   :formatter="(value) => `${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, '.')"    :parser="(value) => value.replace(/(\.*)/g, '').replace(/[a-zA-Z]/g, '')"><template #prepend>m²</template></el-input>
                                         </el-col>
                                         <el-col :md="4" :sm="8" :xs="12" style="margin-top:10px">
                                              Confrontação fundo<br />
-								            <el-input input-style="color:var(--s-accent-color);max-width:200px" v-model="imovel.area.confrontacaoFundo" maxlength="20" placeholder="m²" @keyup.enter="CheckoutStep3()"   :formatter="(value) => `${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, '.')"    :parser="(value) => value.replace(/(\.*)/g, '').replace(/[a-zA-Z]/g, '')"><template #prepend>m²</template></el-input>
+								            <el-input input-style="color:var(--s-accent-color);max-width:200px" v-model="imovel.area.confrontacaoFundo" maxlength="20" @keyup.enter="CheckoutStep3()"   :formatter="(value) => `${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, '.')"    :parser="(value) => value.replace(/(\.*)/g, '').replace(/[a-zA-Z]/g, '')"><template #prepend>m²</template></el-input>
                                         </el-col>
                                         <el-col :md="4" :sm="8" :xs="12" style="margin-top:10px">
                                              Confrontação direito<br />
-								            <el-input input-style="color:var(--s-accent-color);max-width:200px" v-model="imovel.area.confrontacaoDireito" maxlength="20" placeholder="m²" @keyup.enter="CheckoutStep3()"   :formatter="(value) => `${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, '.')"    :parser="(value) => value.replace(/(\.*)/g, '').replace(/[a-zA-Z]/g, '')"><template #prepend>m²</template></el-input>
+								            <el-input input-style="color:var(--s-accent-color);max-width:200px" v-model="imovel.area.confrontacaoDireito" maxlength="20" @keyup.enter="CheckoutStep3()"   :formatter="(value) => `${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, '.')"    :parser="(value) => value.replace(/(\.*)/g, '').replace(/[a-zA-Z]/g, '')"><template #prepend>m²</template></el-input>
                                         </el-col>
                                         <el-col :md="4" :sm="8" :xs="12" style="margin-top:10px">
                                              Confrontação esquerdo<br />
-								            <el-input input-style="color:var(--s-accent-color);max-width:200px" v-model="imovel.area.confrontacaoEsquerdo" maxlength="20" placeholder="m²" @keyup.enter="CheckoutStep3()"   :formatter="(value) => `${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, '.')"    :parser="(value) => value.replace(/(\.*)/g, '').replace(/[a-zA-Z]/g, '')"><template #prepend>m²</template></el-input>
+								            <el-input input-style="color:var(--s-accent-color);max-width:200px" v-model="imovel.area.confrontacaoEsquerdo" maxlength="20" @keyup.enter="CheckoutStep3()"   :formatter="(value) => `${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, '.')"    :parser="(value) => value.replace(/(\.*)/g, '').replace(/[a-zA-Z]/g, '')"><template #prepend>m²</template></el-input>
                                         </el-col>
                                         <el-col :md="4" :sm="8" :xs="12" style="margin-top:10px">
                                              Coeficiente de aproveitamento<br />
@@ -710,7 +724,7 @@
 
                             </el-col>
                         </el-row>
-
+                    
 
                         <el-row :gutter="20" style="margin-top:30px">
                             <el-col :md="24" style="color:var(--s-color-primary);font-weight:700">
@@ -915,7 +929,8 @@
                   </el-upload>
 
                 <div style="margin-top:0px">
-                    <q-btn label="REFAZER" outline color="orange" @click="imagesInputs = []" icon="fa fa-refresh"></q-btn>
+                    <q-btn label="EXCLUIR TODAS" outline color="orange" @click="ExcluirTodasImagens" icon="fa fa-trash"></q-btn>
+                    <q-btn label="VOLTAR COMO ESTAVA" outline color="primary" @click="VoltarImagensIniciais" icon="fa fa-refresh" style="margin-left:20px"></q-btn>
                     <!--<q-btn label="SALVAR" color="primary" @click="Enviar()" :loading="onrequest" style="margin-left:20px" icon="fa fa-save"></q-btn>-->
                 </div>
             </div>
@@ -939,21 +954,36 @@
         <div v-if="step == 6">
             <div class="flex-center" style="padding-top:30px;height:240px;width:100%;text-align:center">
                     <c-loading size="50px" color="var(--s-color-primary)"></c-loading>
-                    <div style="color:var(--s-color-primary);margin-top:20px">Adicionando</div>
+                    <div style="color:var(--s-color-primary);margin-top:20px">Alterando</div>
             </div>
         </div>
 
         <div v-if="step == 7">
             <div class="flex-center" style="padding-top:30px;height:240px;width:100%;text-align:center">
-                    <c-info type="success" title="Sucesso" subtitle="Cadastro efetuado"></c-info>
-                    <q-btn label="ADICIONAR OUTRO IMÓVEL" color="primary" @click="StepTo(1)"></q-btn>
+                    <c-info type="success" title="Sucesso" subtitle="Alteração feita"></c-info>
+                    <div style="margin-top:-10px"><q-btn label="Alterar novamente" color="primary" @click="StepTo(1)"></q-btn></div>
+                    <div style="margin-top:10px" ><q-btn label="voltar" color="primary" outline @click="$root.RouteTo('/imoveis')"></q-btn></div>
             </div>
         </div>
 
         <div v-if="step == 8">
             <div class="flex-center" style="padding-top:30px;height:240px;width:100%;text-align:center">
-                    <c-info type="fail" title="Falhou" subtitle="Não foi possível efetuar o cadastro"></c-info>
+                    <c-info type="fail" title="Falhou" subtitle="Não foi possível atender a requisição"></c-info>
                     <q-btn label="TENTAR NOVAMENTE" outline @click="StepTo(5)"></q-btn>
+            </div>
+        </div>
+
+        <div v-if="step == 9">
+            <div class="flex-center" style="padding-top:30px;height:240px;width:100%;text-align:center">
+                    <c-loading size="50px" color="var(--s-color-primary)"></c-loading>
+                    <div style="color:var(--s-color-primary);margin-top:20px">Excluindo</div>
+            </div>
+        </div>
+
+        <div v-if="step == 10">
+            <div class="flex-center" style="padding-top:30px;height:240px;width:100%;text-align:center">
+                    <c-info type="success" title="Sucesso" subtitle="Exclusão feita"></c-info>
+                    <div style="margin-top:10px" ><q-btn label="voltar" color="primary" outline @click="$root.RouteTo('/imoveis')"></q-btn></div>
             </div>
         </div>
 
@@ -966,17 +996,38 @@
         </el-row>
 
         <el-row :gutter="20" style="margin-top:10px">
-            <el-col :md="12" class="s-input-optional">
+            <el-col :md="24">
                 <input type="hidden" id="imovelFormData" />
-                <q-btn label="VOLTAR" outline color="primary" @click="StepTo(--step)" style="margin-right:20px" v-if="step > 1 && step < 6"></q-btn>
-                <q-btn label="PROSSEGUIR" color="primary" @click="Checkout(step)" :loading="onrequest" v-if="step < 5"></q-btn>
-                <q-btn label="CONCLUIR"  color="primary" @click="Enviar()" :loading="onrequest" icon="fa fa-save" v-if="step == 5"></q-btn>
+                <div v-if="step <= 5">
+                        <div style="float:left">
+                            <q-btn label="VOLTAR"       outline color="primary" @click="$root.RouteTo('/imoveis')"  style="margin-right:20px;width:120px"  v-if="step <= 2"></q-btn>
+                            <q-btn label="VOLTAR"       outline color="primary" @click="StepTo(--step)"             style="margin-right:20px;width:120px"  v-if="step > 2 && step < 6"></q-btn>
+                            <q-btn label="PROSSEGUIR"   outline color="primary" @click="Checkout(step)"             style="margin-right:20px;width:120px"  v-if="step < 5"></q-btn>
+                            <q-btn label="SALVAR"               color="primary" @click="Enviar()"                   style="margin-right:20px;width:120px"   icon="fa fa-save"></q-btn>
+                        </div>
+                        <div style="float:right">
+                            <el-popconfirm width="220"
+                                            confirm-button-text="SIM"
+                                            cancel-button-text="Não"
+                                            :icon="InfoFilled"
+                                            icon-color="var(--s-color-primary)"
+                                            :title="'Excluir ID#'+imovel.id+'?'"
+                                            @confirm="Excluir()">
+                                <template #reference>
+                                        <q-btn label="EXCLUIR" color="red" :loading="onrequest" style="width:120px;margin-right:20px" icon="fa fa-trash"></q-btn>
+                                </template>
+                            </el-popconfirm>
+                       </div>
+                </div>
             </el-col>
             <!--<el-col :md="12" class="s-input">
                 <div><i class="fa fa-square"></i> campos necessários</div>
             </el-col>-->
         </el-row>
 
+
+            </el-col>
+        </el-row>
 
 
 
@@ -996,12 +1047,13 @@
 
         data: function () {
             return {
-                onrequest: false,
+                onrequest: true,
                 ontablequest    : false,
                 view: "imagens",
                 step:0,
                 imagesFiles: [],
                 imagesInputs: [],
+                immagesBK:[],
                 previewImagemModal:false,
                 previewImagem:null,
                 carregandoCEP: false,
@@ -1020,42 +1072,103 @@
                 proprietariosBuscaResult:[],
                 imoveisBuscaResult:[],
                 proprietarioJacaptei: {id:1,nome:"JáCaptei"},
-                idTipoImovelSelecionado:0,
                 stepCaptions:['','','','','','','','',''],
                 busca                   : this.$models.busca(),
                 buscaImovel             : this.$models.buscaImovel(),
                 imovel                  : this.$models.imovel(),
-                admins                  : this.$root.admins,
-                captadorSelecionado     :{}
+                admins                  : this.$root.admins
             }
         }, computed: {
 
         },
 
-        props: {},
+		props: {
+            id: { type: Number, required: true, default: 0 },
+		},
         watch: {
         },
         created: function () {
 
            this.opcoes.tiposComplementos.push("OUTRO");
            this.$sdata.ObterEstados().then(res => { this.opcoes.estados = res; });
-           if(this.$validator.is(this.$router.params?.proprietario)){
-               this.busca.item = this.$router.params.proprietario;
-               this.CheckoutStep1(this.busca.item);
-           }else
-                this.StepTo(1);
+           //if(this.$validator.is(this.$router.params?.proprietario)){
+           //    this.busca.item = this.$router.params.proprietario;
+           //    this.CheckoutStep1(this.busca.item);
+           //}else
+           //     this.StepTo(1);
             
            this.opcoes.anos.push({ id:0, label:'indefinido', value:0 });
            for(var i=new Date().getFullYear(); i >= 1000;i--)
               this.opcoes.anos.push({ id:i, label:i, value:i });
 
-
         },
 
         mounted() {
             this.Reset();
+			this.Obter(this.id);
         },
         methods: {
+
+
+			async Obter(id){
+
+                this.buscaImovel.imovelJC.id = id;
+
+                this.onrequest  = true;
+                var request     = await this.$api.Post("imovel/buscar",this.buscaImovel);
+
+                // c2("request",request);
+                if (request?.status?.success){
+                    this.buscaImovel        =  request.result;
+                    if(this.$validator.is(this.buscaImovel.result.imoveisJC)){
+                        this.imoveisBuscaResult =  this.buscaImovel.result.imoveisJC;
+                        this.imovel             =  this.buscaImovel.result.imoveisJC[0];
+                        this.cep.numero         = this.imovel.endereco.cep;
+                        if(this.imovel.imagens?.length > 0 ){
+                            this.imovel.imagens.forEach(i => this.imagesInputs.push({name:"noupdate",url:i.urlFull,}));
+                            this.immagesBK      = this.imovel.imagens;
+                        }
+                        this.imovel.tipo = this.opcoes.tiposImoveis.filter(it => it.id == this.imovel.idTipo)[0];
+                        this.imovel.adminCaptador = this.admins.filter(a => a.id == this.imovel.idAdminCaptador)[0];
+                        this.StepTo(3);
+                    }
+                } 
+
+                this.onrequest  = false;
+
+			},
+
+
+			async Excluir(){
+
+                this.StepTo(9);
+                var url = "imovel/excluir/" + this.imovel.id;
+                var request     = await this.$api.Get(url);
+
+                if (request?.status?.success)
+                    this.StepTo(10);
+                else
+                    this.StepTo(8);
+
+			},
+
+
+
+
+            ExcluirTodasImagens(){
+                this.imagesInputs = [];
+                this.imovel.imagens = [];
+            },
+
+            VoltarImagensIniciais(){
+                this.imagesInputs = [];
+                this.imovel.imagens = [];
+                if(this.immagesBK.length > 0){
+                    this.imovel.imagens = this.immagesBK;
+                    this.imovel.imagens.forEach(i => this.imagesInputs.push({name:"noupdate",url:i.urlFull,}));
+                }
+            },
+
 
             Reset(){
                    this.cep    = { numero: "", estado: "", cidade: "", logradouro: ""};
@@ -1064,22 +1177,19 @@
                    this.buscaImovel            = this.$models.buscaImovel();
                    this.imovel                 = this.$models.imovel();
 
-                   this.imovel.anoConstrucao   = 0;
-                   this.idTipoImovelSelecionado= this.opcoes.tiposImoveis[0].id;
-                   this.imovel.idTipo          = this.imovel.tipo.id;
-                   this.imovel.tipo            =  this.opcoes.tiposImoveis[0];
-
-                   this.captadorSelecionado = this.admins.filter(a => a.id == 1)[0];
-                   this.DefinirCaptador(this.captadorSelecionado);
+                   this.imovel.anoConstrucao    = 0;
+                 //  this.idTipoImovelSelecionado = this.imovel.tipo.id = this.imovel.idTipo;
+                   this.imovel.tipo             = this.opcoes.tiposImoveis.filter(it => it.id == this.imovel.idTipo)[0];
+                   this.imovel.adminCaptador    = this.admins.filter(a => a.id == 1)[0];
 
                    this.busca.item = this.$models.proprietario();
                    this.imagesInputs = [];
                    this.imagesFiles = [];
                    this.stepCaptions = ['','','','','','','','','','','','','','',''];
-                   this.proprietariosBuscaResult    =[],
-                   this.imoveisBuscaResult          =[],
-                   this.proprietarioJacaptei        = {id:1,nome:"JáCaptei"},
-
+                   this.proprietariosBuscaResult    =[];
+                   this.imoveisBuscaResult          =[];
+                   this.proprietarioJacaptei        = {id:1,nome:"JáCaptei"};
+                   /*
                    this.imovel.valor.venda          = 
                    this.imovel.valor.condominio     = 
                    this.imovel.valor.iptuAnual      = 
@@ -1105,17 +1215,19 @@
                    this.imovel.area.minima                      =
                    this.imovel.area.maxima                      =
                    this.imovel.area.total                       = null;
+                   */
                     },
 
 
             StepTo(_step){
                 this.step = _step;
                 if(_step == 1){
-                   this.Reset();
-                   this.BuscarProprietario();
+                   this.StepTo(2);
+                   //this.BuscarProprietario();
                 }
-                if(_step==2)
+                if(_step==2){
                    window.setTimeout(() => this.$refs.postalCode.focus(), 500);
+                }
                 //if(_step==3)
                 //   window.setTimeout(() => this.$refs.valor.focus(), 500);
                 this.$tools.ToTop();
@@ -1137,7 +1249,7 @@
                 this.imovel.proprietario = _proprietario;
                 this.imovel.idPoprietario = _proprietario.id;
                 //this.imovel.endereco.numero = 100;
-                this.stepCaptions[1] = this.imovel.proprietario.nome;
+                //this.stepCaptions[1] = this.imovel.proprietario.nome;
                 this.StepTo(2);
 
             },
@@ -1175,8 +1287,6 @@
 
             CheckoutStep3(){
 
-                this.imovel.tipo.id = this.idTipoImovelSelecionado;
-
                 var msg = "";
 
                 //if(this.imovel.valor.venda <= 0){
@@ -1200,12 +1310,12 @@
             },
 
             CheckoutStep5(){
-                this.stepCaptions[4] = this.imagesInputs.length + " imagens";
+              //  this.stepCaptions[4] = this.imagesInputs.length + " imagens";
                 this.StepTo(6);
             },
 
             CheckoutStep6(){
-                this.stepCaptions[4] = this.imagesInputs.length + " imagens";
+               // this.stepCaptions[4] = this.imagesInputs.length + " imagens";
                 this.StepTo(7);
             },
 
@@ -1219,6 +1329,14 @@
 
             HandleRemoverImagem(uploadFile, uploadFiles){
               //c("remove")
+              //c2("uploadFiles",uploadFiles)
+              c2("imovel.imagens",this.imovel.imagens);
+              c2("uploadFile",uploadFile)
+              if(uploadFile.name == "noupdate")
+                this.imovel.imagens = this.imovel.imagens.filter(i=> i.url !== uploadFile.url);
+            
+              //c2("imovel.imagens",this.imovel.imagens);
+
             },
 
             HandlePreviewImagem(file){
@@ -1228,27 +1346,29 @@
             },
 
 
-
-
             async Enviar() {
 
+                c2("this.imovel.valor",this.imovel.valor);
                 this.ParseImovel();
+                c2("this.imovel.valor",this.imovel.valor);
 
                 this.imagesFiles = [];
 
                 const formData = new FormData();
-
                 formData.append("jsonImovel", JSON.stringify(this.imovel));
 
                 this.imagesInputs.forEach((img)=>{
-                    var imageFile = Object.assign({}, img).raw;
-                    formData.append('imagesFiles',imageFile, imageFile.name);
+                    if(img.name !== "noupdate"){
+                        var imageFile = Object.assign({}, img).raw;
+                        formData.append('imagesFiles',imageFile, imageFile.name);
+                    }
                 });
 
-                this.CheckoutStep5();
-                this.onrequest = true;
 
-                 var url = this.$api.BuildURL("imovel/adicionar");
+                this.CheckoutStep5();
+                //this.onrequest = true;
+
+                 var url = this.$api.BuildURL("imovel/alterar");
                  var result = axios.post(url,formData,{headers:{"Accept": "application/json","Content-Type": "multipart/form-data"} }).then((request) => {
                        //c(request);
                       if (request.data.status.success){
@@ -1264,44 +1384,22 @@
                     }
 					this.CheckoutStep7();
 				}).finally(() => {
-                    this.onrequest = false;
+                   // this.onrequest = false;
 				});
-
                 
-
-               /*
-                formData.append("imovel", JSON.stringify(this.imovel));
-
-                this.imagesInputs.forEach((img)=>{
-                    var imageFile = Object.assign({}, img).raw;
-                    formData.append('imagesFiles',imageFile, imageFile.name);
-                });
-
-                var resultImgs, resultImv;
-
-                 var resultImgs = axios.post(url,formData,{headers:{"Accept": "application/json","Content-Type": "multipart/form-data"} }).then((request) => {
-                        if (this.$validator.is(resultImgs?.status?.success)){
-                                c("success imagens");
-                                resultImv = await this.$api.Post("imovel/adicionar", this.imovel);
-                                if(this.$validator.is(resultImv?.status?.success))
-                                    this.CheckoutStep5();
-                        }
-                 });  
-                 */
-
 
             },
 
 
             ParseImovel(){
-                    this.imovel.valor.venda                     = this.$tools.ParseFloat( this.imovel.valor.venda         );
-                    this.imovel.valor.condominio                = this.$tools.ParseFloat( this.imovel.valor.condominio    );
-                    this.imovel.valor.iptuAnual                 = this.$tools.ParseFloat( this.imovel.valor.iptuAnual     );
-                    this.imovel.valor.iptuMensal                = this.$tools.ParseFloat( this.imovel.valor.iptuMensal    );
-                    this.imovel.valor.iptuIndice                = this.$tools.ParseFloat( this.imovel.valor.iptuIndice    );
-                    this.imovel.valor.consulta                  = this.$tools.ParseFloat( this.imovel.valor.consulta      );
-                    this.imovel.valor.rentabilidade             = this.$tools.ParseFloat( this.imovel.valor.rentabilidade );
-                    this.imovel.valor.comissao                  = this.$tools.ParseFloat( this.imovel.valor.comissao      );
+                    this.imovel.valor.venda                      = this.$tools.ParseFloat( this.imovel.valor.venda         );
+                    this.imovel.valor.condominio                 = this.$tools.ParseFloat( this.imovel.valor.condominio    );
+                    this.imovel.valor.iptuAnual                  = this.$tools.ParseFloat( this.imovel.valor.iptuAnual     );
+                    this.imovel.valor.iptuMensal                 = this.$tools.ParseFloat( this.imovel.valor.iptuMensal    );
+                    this.imovel.valor.iptuIndice                 = this.$tools.ParseFloat( this.imovel.valor.iptuIndice    );
+                    this.imovel.valor.consulta                   = this.$tools.ParseFloat( this.imovel.valor.consulta      );
+                    this.imovel.valor.rentabilidade              = this.$tools.ParseFloat( this.imovel.valor.rentabilidade );
+                    this.imovel.valor.comissao                   = this.$tools.ParseFloat( this.imovel.valor.comissao      );
 
                     this.imovel.area.interna                     = this.$tools.ParseFloat( this.imovel.area.interna                    );
                     this.imovel.area.externa                     = this.$tools.ParseFloat( this.imovel.area.externa                    );
@@ -1320,9 +1418,9 @@
                     this.imovel.area.maxima                      = this.$tools.ParseFloat( this.imovel.area.maxima                     );
                     this.imovel.area.total                       = this.$tools.ParseFloat( this.imovel.area.total                      ); 
 
-                    this.imovel.idTipo                           =  this.idTipoImovelSelecionado;
-                    this.imovel.tipo                             =  this.opcoes.tiposImoveis.filter(t => t.id == this.idTipoImovelSelecionado)[0];
-                    //c2("imovel.tipo",this.imovel.tipo)
+                    this.imovel.idTipo                           = this.imovel.tipo.id;
+                    this.imovel.idAdminCaptador                  = this.imovel.adminCaptador.id;
+                    this.imovel.captador                         = this.imovel.adminCaptador.nome;
 
             },
 
@@ -1477,22 +1575,13 @@
                             this.buscaImovel        =  request.result;
                             this.imoveisBuscaResult =  this.buscaImovel.result.imoveisJC;
                         } 
-                }else
-                    this.$tools.Alert("Necessário informar o CEP ou endereço (estado, cidade, bairro e logradouro)");
+                    }else
+                        this.$tools.Alert("Necessário informar o CEP ou endereço (estado, cidade, bairro e logradouro)");
 
 
 			},
 
 
-
-
-            DefinirCaptador(admin){
-                this.imovel.idAdminCaptador = admin.id;
-                this.imovel.captador        = admin.nome;
-               //c2("this.imovel.idAdminCaptador",this.imovel.idAdminCaptador );
-               //c2("this.imovel.captador       ",this.imovel.captador        );
-
-            },
 
             FocusOutroComplemento(){
                 window.setTimeout(()=>this.$refs.CampoAbertoOutroComplemento.focus(),200);

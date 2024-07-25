@@ -119,11 +119,14 @@ CREATE	TABLE "Imovel"(
     ------------------- */
 
 
-	status							VARCHAR(40)			DEFAULT 'ATIVO' ,
+	status							VARCHAR(40)			DEFAULT 'PENDENTE' ,
 	ativo	                    	BOOLEAN			    DEFAULT FALSE,
+	visivel	                    	BOOLEAN			    DEFAULT TRUE,
+	validado                    	BOOLEAN			    DEFAULT FALSE,
 	"ativoCRM"                   	BOOLEAN			    DEFAULT FALSE,
 	"possuiImagens"                 BOOLEAN			    DEFAULT FALSE,
 	
+	"possuiToken"                   BOOLEAN			    DEFAULT TRUE,
 	token 						 	VARCHAR(200)		UNIQUE NOT NULL,
 	"tokenNum"						BIGINT				UNIQUE NOT NULL,
 	
@@ -166,6 +169,7 @@ CREATE	TABLE "ImovelImagem"(
     base64                          TEXT                ,
 
  	principal                     	BOOLEAN			    DEFAULT FALSE,
+    url                             VARCHAR(600)        DEFAULT  '',
     "urlThumb"                      VARCHAR(600)        DEFAULT  '',
     "urlSmall"                      VARCHAR(600)        DEFAULT  '',
     "urlMedium"                     VARCHAR(600)        DEFAULT  '',
@@ -252,10 +256,10 @@ CREATE	TABLE "ImovelCaracteristicasInternas"(
     "armarioQuarto"     BOOLEAN    DEFAULT FALSE,    
     banheiro            BOOLEAN    DEFAULT FALSE,    
     "boxDespejo"        BOOLEAN    DEFAULT FALSE,    
+    churrasqueira       BOOLEAN    DEFAULT FALSE,    
+    closet              BOOLEAN    DEFAULT FALSE,    
     dce                 BOOLEAN    DEFAULT FALSE,    
     despensa            BOOLEAN    DEFAULT FALSE,    
-    closet              BOOLEAN    DEFAULT FALSE,    
-    churrasqueira       BOOLEAN    DEFAULT FALSE,    
     escritorio          BOOLEAN    DEFAULT FALSE,    
     "gasCanalizado"     BOOLEAN    DEFAULT FALSE,    
     lavabo              BOOLEAN    DEFAULT FALSE,    
@@ -395,7 +399,7 @@ CREATE	TABLE "ImovelDisposicao"(
     "aceitaFinanciamento"   BOOLEAN DEFAULT FALSE,
     "aceitaPermuta"         BOOLEAN DEFAULT FALSE,
     alugado                 BOOLEAN DEFAULT FALSE,
-    comissao                REAL    DEFAULT 0,
+    comissao                BOOLEAN DEFAULT FALSE,
     desativado              BOOLEAN DEFAULT FALSE,
     disponivel              BOOLEAN DEFAULT FALSE,
     "gestaoJacaptei"        BOOLEAN DEFAULT FALSE,

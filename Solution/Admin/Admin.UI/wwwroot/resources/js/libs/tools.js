@@ -269,12 +269,16 @@ export default class Tools {
 
     ParseFloat(n){
         var res = 0.00;
-        try{
-	        res = parseFloat(n);
-          if(isNaN(res))
-  	        res = 0.00;
-        }catch(e){
-	        res = 0.00;
+        var nstr = n + "";
+        if(n){
+            nstr = nstr.replace(/R\$/g,"").replace(/ /g,"").replace(".","").replace(",",".");
+            try{
+                res = parseFloat(nstr);
+                if(isNaN(res))
+  	                res = 0.00;
+            }catch(e){
+	            res = 0.00;
+            }
         }
         return res;
     }

@@ -34,7 +34,7 @@ public class ImoviewController : ControllerBase
         _context = context;
         _mapper = mapper;
         _imagemService = new ImovelImagemService(context);
-        _imovelService = new ImovelService(context);
+        _imovelService = new ImovelService();
         _parceiroService = new ParceiroService(context);
     }
 
