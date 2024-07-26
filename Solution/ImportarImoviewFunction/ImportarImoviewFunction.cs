@@ -20,16 +20,9 @@ public class ImportarImoviewFunction
     private readonly ILogger<ImportarImoviewFunction> _logger;
     private readonly ImoviewService _service;
 
-    public ImportarImoviewFunction(ILogger<ImportarImoviewFunction> logger, IConfiguration config, IHttpClientFactory httpClientFactory, DBcontext context, IMapper mapper)
+    public ImportarImoviewFunction(ILogger<ImportarImoviewFunction> logger, IHttpClientFactory httpClientFactory, DBcontext context, IMapper mapper)
     {
         _logger = logger;
-        AppSettingsRecord settings = new();
-        string EnvironmentSettings = config.GetSection("Environment").Value;
-        new ConfigureFromConfigurationOptions<AppSettingsRecord>(config.GetSection(EnvironmentSettings)).Configure(settings);
-        settings.CopyToStaticSettings();
-        context = new DBcontext();
-        //PostgreSqlBootstrap.Initialize();
-        GlobalConfiguration.Setup().UsePostgreSql();
         _service = new ImoviewService(httpClientFactory, context, "", mapper);
     }
 
