@@ -16,7 +16,6 @@ namespace JaCaptei.Model.DTO
 
     public class IntegracaoImoviewDTO
     {
-        public int Id { get; set; }
         public int IdCliente { get; set; }
         public int IdOperador { get; set; }
         public DateTime DataInclusao { get; set; }

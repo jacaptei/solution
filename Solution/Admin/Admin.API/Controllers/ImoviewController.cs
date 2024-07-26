@@ -82,12 +82,12 @@ public class ImoviewController : ControllerBase
         return list;
     }
 
-    //[HttpPost("ObterImovel")]
-    //public async Task<ActionResult<ImoviewAddImovelRequest>> GetFullImovel([FromBody] int id)
-    //{
-    //    var res = _mapper.Map<ImoviewAddImovelRequest>(await _imovelService.ImovelFullImovel(id));
-    //    return Ok(res);
-    //}
+    [HttpPost("ObterImovel")]
+    public async Task<ActionResult<ImoviewAddImovelRequest>> GetFullImovel([FromBody] int id)
+    {
+        var res = _mapper.Map<ImoviewAddImovelRequest>(await _service.ObterImovel(id));
+        return Ok(res);
+    }
 
     [HttpPost("integracao/cliente")]
     public async Task<ActionResult<IntegracaoReponseDTO>> GetIntegracaoCliente([FromBody] IntergracaoReq cpfCnpj)

@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 
 using JaCaptei.Model.DTO;
+using JaCaptei.Model.Entities;
 
 namespace JaCaptei.Application.Mapper;
 
@@ -99,6 +100,8 @@ public class ImovelDTOProfile : Profile
             .ForMember(dest => dest.finalidade, opt => opt.MapFrom(src => 2)) // Hardcoded venda
             .ForMember(dest => dest.codigotipo, opt => opt.MapFrom(src => src.Imovel.idTipo))
             .ForMember(dest => dest.descricao, opt => opt.MapFrom(src => src.Imovel.descricao));
+
+        CreateMap<IntegracaoImoview, IntegracaoImoviewDTO>();
     }
 
     private Areas GetAreas(ImovelFullDTO src)

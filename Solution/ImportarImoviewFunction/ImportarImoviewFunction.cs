@@ -11,6 +11,8 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 
+using RepoDb;
+
 namespace ImportarImoviewAzureFunction;
 
 public class ImportarImoviewFunction
@@ -25,6 +27,8 @@ public class ImportarImoviewFunction
         string EnvironmentSettings = config.GetSection("Environment").Value;
         new ConfigureFromConfigurationOptions<AppSettingsRecord>(config.GetSection(EnvironmentSettings)).Configure(settings);
         settings.CopyToStaticSettings();
+        context = new DBcontext();
+        PostgreSqlBootstrap.Initialize();
         _service = new ImoviewService(httpClientFactory, context, "", mapper);
     }
 

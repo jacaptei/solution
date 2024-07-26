@@ -86,7 +86,7 @@ public class ImoviewService : IDisposable
         client.DefaultRequestHeaders.Add("chave", _chave);
         using var content = new MultipartFormDataContent();
         var jsonParameters = Newtonsoft.Json.JsonConvert.SerializeObject(req);
-        var builder = new UriBuilder("Imovel/IncluirImovel")
+        var builder = new UriBuilder(client.BaseAddress+"Imovel/IncluirImovel")
         {
             Query = "parametros=" + Uri.EscapeDataString(jsonParameters)
         };
@@ -100,7 +100,7 @@ public class ImoviewService : IDisposable
                 Name = "\"fotos\"",
                 FileName = "\"" + imagem.Nome + "\""
             };
-            fileContent.Headers.ContentType = new MediaTypeHeaderValue(imagem.Tipo);
+            fileContent.Headers.ContentType = new MediaTypeHeaderValue($"image/{imagem.Tipo}");
             content.Add(fileContent);
         }
         var response = await client.PostAsync(uriWithQuery, content);
@@ -151,7 +151,7 @@ public class ImoviewService : IDisposable
         var bairros = Newtonsoft.Json.JsonConvert.DeserializeObject<List<BairroDTO>>(integracao.Bairros);
         if (integracaoOld != null)
         {
-            if (integracaoOld.Status == StatusIntegracao.Processando.GetDescription()) 
+            if (integracaoOld.Status == StatusIntegracao.Processando.GetDescription())
             {
                 return new IntegrarClienteResponse()
                 {
@@ -163,7 +163,7 @@ public class ImoviewService : IDisposable
             integracao.DataAtualizacao = DateTime.UtcNow;
             integracao.Status = StatusIntegracao.Aguardando.GetDescription();
             var bairrosOld = Newtonsoft.Json.JsonConvert.DeserializeObject<List<BairroDTO>>(integracaoOld.Bairros);
-            foreach(var bairroOld in bairrosOld)
+            foreach (var bairroOld in bairrosOld)
             {
                 if (!bairros.Any(b => b.Id == bairroOld.Id))
                     return new IntegrarClienteResponse()
@@ -235,7 +235,7 @@ public class ImoviewService : IDisposable
     private async Task<bool> FinalizeIntegracaoFull(IntegracaoImoview integracao)
     {
         var importacaoBairros = await _retryPolicy.ExecuteAsync(() => _imoviewDAO.GetImportacaoBairrosPendentes(integracao.Id));
-        foreach(var importacaoBairro in importacaoBairros)
+        foreach (var importacaoBairro in importacaoBairros)
         {
             importacaoBairro.Status = StatusIntegracao.Concluido.GetDescription();
             await _retryPolicy.ExecuteAsync(() => _imoviewDAO.SaveImportacaoBairro(importacaoBairro));
@@ -254,10 +254,10 @@ public class ImoviewService : IDisposable
         return true;
     }
 
-    public async Task<object?> ObterStatusIntegracao(Parceiro cliente) 
+    public async Task<object?> ObterStatusIntegracao(Parceiro cliente)
     {
         // TODO: Obter o status atual da integracao do cliente
-        return new {};
+        return new { };
     }
 
     private async Task<List<ImagemDTO>> GetImageFiles(int id)
@@ -361,6 +361,10 @@ public class ImoviewService : IDisposable
         return true;
     }
 
+    public async Task<ImovelFullDTO?> ObterImovel(int id)
+    {
+        return await _imoviewDAO.GetFullImovel(id);
+    }
     private async Task<bool> ProcessSingleImportacaoImovel(IntegracaoImoview integracao, ImportacaoBairroImoview importacaoBairro, ImovelListDTO imovelId)
     {
         ImportacaoImovelImoview? importacaoImovel = await _retryPolicy.ExecuteAsync(() => _imoviewDAO.GetImportacaoImovel(importacaoBairro.Id, imovelId.idImovel));
