@@ -7,16 +7,16 @@ using System.Threading.Tasks;
 namespace JaCaptei.Model.DTO
 {
 
-    public class BairroDTO
+    public record BairroDTO
     {
         public int Id { get; set; }
         public string Nome { get; set; }
         public int IdCidade { get; set; }
+        public int? IdEstado { get; set; }
     }
 
     public class IntegracaoImoviewDTO
     {
-        public int Id { get; set; }
         public int IdCliente { get; set; }
         public int IdOperador { get; set; }
         public DateTime DataInclusao { get; set; }

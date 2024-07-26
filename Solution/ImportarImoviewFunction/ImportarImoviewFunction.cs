@@ -11,6 +11,8 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 
+using RepoDb;
+
 namespace ImportarImoviewAzureFunction;
 
 public class ImportarImoviewFunction
@@ -18,13 +20,9 @@ public class ImportarImoviewFunction
     private readonly ILogger<ImportarImoviewFunction> _logger;
     private readonly ImoviewService _service;
 
-    public ImportarImoviewFunction(ILogger<ImportarImoviewFunction> logger, IConfiguration config, IHttpClientFactory httpClientFactory, DBcontext context, IMapper mapper)
+    public ImportarImoviewFunction(ILogger<ImportarImoviewFunction> logger, IHttpClientFactory httpClientFactory, DBcontext context, IMapper mapper)
     {
         _logger = logger;
-        AppSettingsRecord settings = new();
-        string EnvironmentSettings = config.GetSection("Environment").Value;
-        new ConfigureFromConfigurationOptions<AppSettingsRecord>(config.GetSection(EnvironmentSettings)).Configure(settings);
-        settings.CopyToStaticSettings();
         _service = new ImoviewService(httpClientFactory, context, "", mapper);
     }
 
@@ -44,8 +42,15 @@ public class ImportarImoviewFunction
             IdIntegracao = eventMsg.message.idIntegracao,
             IdOperador = eventMsg.message.idOperador,
         };
-        await _service.ImportarIntegracao(req);
         await messageActions.CompleteMessageAsync(message);
+        try
+        {
+            await _service.ImportarIntegracao(req);
+        }
+        catch (Exception)
+        {
+            await messageActions.DeadLetterMessageAsync(message);
+        }
     }
 }
 

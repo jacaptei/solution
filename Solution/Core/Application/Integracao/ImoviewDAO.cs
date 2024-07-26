@@ -170,4 +170,10 @@ public class ImoviewDAO: IDisposable {
         var res = await _conn.QueryAsync<Plano>(i => i.id == idPlano);
         return res.FirstOrDefault();
     }
+
+    internal async Task<Parceiro?> ObterCliente(int idCliente)
+    {
+        var res = await _conn.QueryAsync<Parceiro>(i => i.id == idCliente);
+        return res.FirstOrDefault();
+    }
 }

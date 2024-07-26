@@ -9,7 +9,7 @@ namespace JaCaptei.Application.DAL;
 public class DBcontext: IDisposable
 {
 
-    public string CS = Config.settings.DBconnectionString;
+    public string CS = Config.settings?.DBconnectionString;
 
     private static bool mapped { get; set; } = false;
 
