@@ -133,7 +133,14 @@ public class ImoviewService : IDisposable
 
     public async Task<IntegrarClienteResponse> IntegrarCliente(IntegracaoImoview integracao)
     {
-        var plano = await _retryPolicy.ExecuteAsync(() => _imoviewDAO.ObterPlano(integracao.IdPlano.Value));
+        var cliente = await _retryPolicy.ExecuteAsync(() => _imoviewDAO.ObterCliente(integracao.IdCliente));
+        if (cliente == null)
+            return new IntegrarClienteResponse()
+            {
+                Status = "Inválido",
+                Mensagem = "Cliente não cadastrado"
+            };
+        var plano = await _retryPolicy.ExecuteAsync(() => _imoviewDAO.ObterPlano(cliente.idPlano));
         if (plano == null)
             return new IntegrarClienteResponse()
             {
