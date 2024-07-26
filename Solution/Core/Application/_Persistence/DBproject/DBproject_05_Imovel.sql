@@ -9,6 +9,7 @@ DROP TABLE  IF EXISTS "ImovelCaracteristicasInternas";
 DROP TABLE  IF EXISTS "ImovelImagem";
 DROP TABLE  IF EXISTS "ImovelEndereco";
 DROP TABLE  IF EXISTS "Imovel";
+DROP TABLE  IF EXISTS "ImovelTipoComplemento";
 DROP TABLE  IF EXISTS "ImovelTipo";
 
 
@@ -67,6 +68,27 @@ INSERT INTO "ImovelTipo" (nome,label) VALUES ('STUDIO'                          
 INSERT INTO "ImovelTipo" (nome,label) VALUES ('TERRENO/AREA'                     ,'Terreno/Área'                    );
 
 
+DROP TABLE  IF EXISTS "ImovelTipoComplemento";
+CREATE	TABLE "ImovelTipoComplemento"(
+	id      					    SMALLSERIAL	    NOT NULL,
+	nome				 	        VARCHAR(40)		UNIQUE DEFAULT '',
+	label				 	        VARCHAR(40)		UNIQUE DEFAULT '',
+    ordem			 	            SMALLINT        DEFAULT 0,
+   	data 							TIMESTAMP       WITHOUT TIME ZONE		DEFAULT CURRENT_TIMESTAMP 
+);
+ALTER TABLE "ImovelTipoComplemento"	ADD CONSTRAINT "pk_ImovelTipoComplemento" PRIMARY KEY (id);
+INSERT INTO "ImovelTipoComplemento" (ordem, nome,label) VALUES (205,'NENHUM','Nenhum'  );
+INSERT INTO "ImovelTipoComplemento" (ordem, nome,label) VALUES (200,'OUTRO' ,'Outro'   );
+INSERT INTO "ImovelTipoComplemento" (ordem, nome,label) VALUES (10,'APTO'   ,'Apto'    );
+INSERT INTO "ImovelTipoComplemento" (ordem, nome,label) VALUES (15,'BOX'    ,'Box'     );
+INSERT INTO "ImovelTipoComplemento" (ordem, nome,label) VALUES (20,'CASA'   ,'Casa'    );
+INSERT INTO "ImovelTipoComplemento" (ordem, nome,label) VALUES (25,'LOJA'   ,'Loja'    );
+INSERT INTO "ImovelTipoComplemento" (ordem, nome,label) VALUES (30,'LOTE'   ,'Lote'    );
+INSERT INTO "ImovelTipoComplemento" (ordem, nome,label) VALUES (35,'PATIO'  ,'Pátio'   );
+INSERT INTO "ImovelTipoComplemento" (ordem, nome,label) VALUES (40,'SALA'   ,'Sala'    );
+INSERT INTO "ImovelTipoComplemento" (ordem, nome,label) VALUES (45,'SECAO'  ,'Seção'   );
+INSERT INTO "ImovelTipoComplemento" (ordem, nome,label) VALUES (50,'UNIDADE','Unidade' );
+
 
 CREATE	TABLE "Imovel"(
 
@@ -98,6 +120,8 @@ CREATE	TABLE "Imovel"(
 	destinacao 						VARCHAR(60)       	DEFAULT '',
     venda           			    BOOLEAN             DEFAULT TRUE,
     locacao           			    BOOLEAN             DEFAULT TRUE,
+    residencial        			    BOOLEAN             DEFAULT TRUE,
+    comercial       			    BOOLEAN             DEFAULT TRUE,
 
 	"urlImagemPrincipal"            VARCHAR(400)    	DEFAULT  '',
 	"urlVideo"                      VARCHAR(400)    	DEFAULT  '',
@@ -208,6 +232,7 @@ CREATE	TABLE "ImovelEndereco"(
 	bloco             	            VARCHAR(24)			DEFAULT '',
 	andar          	                VARCHAR(40)			DEFAULT '',
 	unidade                         VARCHAR(40)		    DEFAULT '',
+	"idTipoComplemento"             SMALLINT            DEFAULT 1,
 	"complementoTipo"               VARCHAR(40)		    DEFAULT '',
 	complemento                     VARCHAR(200)		DEFAULT '',
 	referencia                      VARCHAR(220)		DEFAULT '',	
@@ -227,8 +252,9 @@ CREATE	TABLE "ImovelEndereco"(
     "idBairro"                      INTEGER             DEFAULT 0
 
 );
-ALTER TABLE "ImovelEndereco"	ADD CONSTRAINT pk_ImovelEndereco  		        PRIMARY KEY (id);
-ALTER TABLE "ImovelEndereco"	ADD CONSTRAINT fk_ImovelEndereco_Imovel	        FOREIGN KEY ("idImovel")          REFERENCES "Imovel"(id)  ON DELETE CASCADE;
+ALTER TABLE "ImovelEndereco"	ADD CONSTRAINT pk_ImovelEndereco  		            PRIMARY KEY (id);
+ALTER TABLE "ImovelEndereco"	ADD CONSTRAINT fk_ImovelEndereco_Imovel	            FOREIGN KEY ("idImovel")            REFERENCES "Imovel"(id)  ON DELETE CASCADE;
+ALTER TABLE "ImovelEndereco"	ADD CONSTRAINT fk_ImovelEndereco_TipoComplemento	FOREIGN KEY ("idTipoComplemento")   REFERENCES "ImovelTipoComplemento"(id);
 
 
 

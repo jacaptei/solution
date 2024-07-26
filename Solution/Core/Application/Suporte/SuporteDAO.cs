@@ -9,6 +9,7 @@ using JaCaptei.Application.DAL;
 using System.Collections.Specialized;
 using RepoDb.Enumerations;
 using JaCaptei.Model.Model;
+using MailKit.Search;
 
 namespace JaCaptei.Application{
 
@@ -31,6 +32,13 @@ namespace JaCaptei.Application{
             using (var conn = new DBcontext().GetConn())
                 tipos = conn.QueryAll<ImovelTipo>().ToList();
 
+            return tipos;
+        }
+        
+        public List<ImovelTipoComplemento> ObterTiposComplementosImoveis(){
+            List<ImovelTipoComplemento> tipos = new List<ImovelTipoComplemento>();
+            using (var conn = new DBcontext().GetConn())
+                tipos = conn.QueryAll<ImovelTipoComplemento>(orderBy: OrderField.Parse(new { ordem = Order.Ascending })).ToList();
             return tipos;
         }
 

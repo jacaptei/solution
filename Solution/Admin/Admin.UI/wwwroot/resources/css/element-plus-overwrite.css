@@ -247,7 +247,7 @@
 
 .el-carousel__container {
     position: relative;
-    height: 244px;
+    height: 200px;
     font-size:12px;
     color:var(--s-accent-color);
 }
@@ -389,9 +389,8 @@
     color: #ffffff;
 }
 .el-alert--warning.is-light .el-alert__description {
-    color: #f7a000;
+    color: #ffdd9d;
 }
-
 .el-popper.is-customized {
   /* Set padding to ensure the height is 32px */
   padding: 6px 12px;

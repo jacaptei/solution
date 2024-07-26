@@ -19,6 +19,7 @@ namespace JaCaptei.Model {
             public bool             somenteNaoVisiveis  {get;set;}  = false;
             public bool             somenteValidados    {get;set;}  = false;
             public bool             somenteNaoValidados {get;set;}  = false;
+            public bool             somenteOutroID      {get;set;}  = false;
 
             public Imovel           imovelJC            {get;set;} = new Imovel();
             public ImovelCRM        imovel              {get;set;} = new ImovelCRM();

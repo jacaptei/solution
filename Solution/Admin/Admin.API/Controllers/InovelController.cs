@@ -56,17 +56,17 @@ namespace JaCaptei.Administrativo.API.Controllers {
 
             Imovel imovel = JsonConvert.DeserializeObject<Imovel>(jsonImovel);
 
-            Usuario logado           = ObterUsuarioAutenticado();
+            Usuario logado          = ObterUsuarioAutenticado();
             imovel.inseridoPorId    = imovel.atualizadoPorId    = logado.id;
             imovel.inseridoPorNome  = imovel.atualizadoPorNome  = logado.nome;
 
-            appReturn = service.Adicionar(imovel);
-
-            if(appReturn.status.success){
-                if( imagesFiles is not null && imagesFiles?.Count > 0)
-                    appReturn = await ImageShackUploadImagesFiles(imovel,imagesFiles);
-            }
-            
+            if(imagesFiles is not null && imagesFiles?.Count > 0) {
+                appReturn = service.Adicionar(imovel);
+                if(appReturn.status.success)
+                        appReturn = await ImageShackUploadImagesFiles(imovel,imagesFiles);
+            } else
+                appReturn.AddException("Imagens não inseridas.");
+             
             return Result(appReturn);
 
         }
@@ -79,17 +79,15 @@ namespace JaCaptei.Administrativo.API.Controllers {
             Imovel imovel = JsonConvert.DeserializeObject<Imovel>(jsonImovel);
 
             Usuario logado           = ObterUsuarioAutenticado();
-            imovel.atualizadoPorId    = logado.id;
-            imovel.atualizadoPorNome  = logado.nome;
+            imovel.atualizadoPorId   = logado.id;
+            imovel.atualizadoPorNome = logado.nome;
 
-            appReturn = service.Alterar(imovel);
-
-            if(appReturn.status.success){
-                if( imagesFiles is not null && imagesFiles?.Count > 0)
+            if(imovel.imagens?.Count > 0 || imagesFiles?.Count > 0) {
+                appReturn = service.Alterar(imovel);
+                if(appReturn.status.success && imagesFiles.Count > 0)
                     appReturn = await ImageShackUploadImagesFiles(imovel,imagesFiles);
-                else
-                    service.AdicionarImagens(imovel);
-            }
+            } else
+                appReturn.AddException("Imagens não inseridas.");
 
             return Result(appReturn);
 

@@ -27,8 +27,19 @@ namespace JaCaptei.Application {
                         entity.tipo = conn.Query<ImovelTipo>(t => t.id == entity.idTipo || t.label == entity.tipo.label).FirstOrDefault();
                         if(entity.tipo is null)
                             entity.tipo = new ImovelTipo { id=1,nome="IMOVEL",label="Imóvel" };
-                        
+
                         entity.idTipo   = entity.tipo.id;
+
+                        if(entity.endereco.idTipoComplemento > 2) {
+                            entity.endereco.tipoComplemento = conn.Query<ImovelTipoComplemento>(t => t.id == entity.endereco.idTipoComplemento).FirstOrDefault();
+                            if(entity.endereco.tipoComplemento is null) {
+                                entity.endereco.idTipoComplemento   = 1;
+                                entity.endereco.complementoTipo     = "";
+                            } else
+                                entity.endereco.complementoTipo     = entity.endereco.tipoComplemento.label;
+                        }
+
+                        entity.validado = false;
 
                         entity.id   = conn.Insert<Imovel,int>(entity);
                         
@@ -110,6 +121,15 @@ namespace JaCaptei.Application {
                         if(entity.tipo is null)
                             entity.tipo = new ImovelTipo { id=1,nome="IMOVEL",label="Imóvel" };
 
+                        if(entity.endereco.idTipoComplemento > 2){ 
+                            entity.endereco.tipoComplemento = conn.Query<ImovelTipoComplemento>(t => t.id == entity.endereco.idTipoComplemento).FirstOrDefault();
+                            if(entity.endereco.tipoComplemento is null) {
+                                entity.endereco.idTipoComplemento   = 1;
+                                entity.endereco.complementoTipo     = "";
+                            } else
+                                entity.endereco.complementoTipo     = entity.endereco.tipoComplemento.label;
+                        }
+
                         entity.idTipo           = entity.tipo.id;
                         entity.titulo           = entity.ObterTitulo();
                         entity.urlPublica       = entity.ObterUrlPublica();
@@ -163,10 +183,10 @@ namespace JaCaptei.Application {
                         entityDB.validado           = entity.validado   = true;
                         entityDB.ativo              = entity.ativo      = true;
                         entityDB.status             = "ATIVO";
-                        entityDB.dataAtualizacao    = Utils.Date.GetLocalDateTime();
-                        entityDB.atualizadoPorId    = entity.atualizadoPorId;
-                        entityDB.atualizadoPorNome  = entity.atualizadoPorNome;
-                        entityDB.dataAtualizacao    = Utils.Date.GetLocalDateTime();
+                        //entityDB.dataAtualizacao    = Utils.Date.GetLocalDateTime();
+                        //entityDB.atualizadoPorId    = entity.atualizadoPorId;
+                        //entityDB.atualizadoPorNome  = entity.atualizadoPorNome;
+                        //entityDB.dataAtualizacao    = Utils.Date.GetLocalDateTime();
                         conn.Update<Imovel>(entityDB);
 
                     } else
@@ -186,6 +206,7 @@ namespace JaCaptei.Application {
         public AppReturn ObterPendentesValidacao() {
             ImovelBusca busca = new ImovelBusca();
             busca.somenteNaoValidados = true;
+            busca.page = 0;
             return Buscar(busca);
         }
 
@@ -267,8 +288,6 @@ namespace JaCaptei.Application {
             if(busca is null || busca.imovelJC is null)
                 appReturn.AddException("Busca não identificada");
 
-
-
             string from =" \"Imovel\" imovel                                                                                           "
                         +" JOIN \"ImovelEndereco\"                    endereco        ON (endereco.\"idImovel\"       = imovel.id)  "
                         +" JOIN \"ImovelValores\"                     valor           ON (valor.\"idImovel\"          = imovel.id)  "
@@ -279,6 +298,7 @@ namespace JaCaptei.Application {
                         +" JOIN \"ImovelDisposicao\"                  disposicao      ON (disposicao.\"idImovel\"     = imovel.id)  "
                         +" JOIN \"ImovelDocumentacao\"                documentacao    ON (documentacao.\"idImovel\"   = imovel.id)  "
                         +" JOIN \"Proprietario\"                      proprietario    ON (proprietario.id             = imovel.\"idProprietario\")  "
+                        +" JOIN \"ImovelTipo\"                        tipo            ON (tipo.id                     = imovel.\"idTipo\")  "
                     ;
 
             string  filter   = ObterQueryBuscaImovel(busca);
@@ -299,7 +319,8 @@ namespace JaCaptei.Application {
                         +"                                            to_json(externo.*)       as externo                                                                  ,        "
                         +"                                            to_json(disposicao.*)    as disposicao                                                               ,        "
                         +"                                            to_json(documentacao.*)  as documentacao                                                             ,        "
-                        +"                                            to_json(proprietario.*)  as proprietario                                                                      "
+                        +"                                            to_json(proprietario.*)  as proprietario                                                             ,        "
+                        +"                                            to_json(tipo.*)          as tipo                                                                      "
                         + " FROM " + from
                         +"  WHERE  "            + Utils.Validator.ParseSafeSQL(filter)          + " "
                         +"  ORDER BY imovel."   + Utils.Validator.ParseSafeSQL(busca.orderBy)   + " "
@@ -331,28 +352,30 @@ namespace JaCaptei.Application {
 
         private string ObterQueryBuscaImovel(ImovelBusca busca) {
 
-            //string sql = "SELECT * from Products where cf_1019= 'Mogi das Cruzes' and cf_1021 = 'SP';";
-            //sql = "SELECT * from Products where cf_1021 = 'SP';";
-            //sql = "SELECT * from Products ;";
+                //string sql = "SELECT * from Products where cf_1019= 'Mogi das Cruzes' and cf_1021 = 'SP';";
+                //sql = "SELECT * from Products where cf_1021 = 'SP';";
+                //sql = "SELECT * from Products ;";
 
-            string filter = " imovel.\"possuiToken\" = TRUE "; // discontinued <> 1
+                string filter = " imovel.\"possuiToken\" = TRUE "; // discontinued <> 1
 
 
-            if(busca.somenteValidados)
-                 filter += " AND imovel.validado = TRUE ";
-            else if(busca.somenteNaoValidados)
-                 filter += " AND imovel.validado = FALSE ";
+                if(busca.somenteValidados)
+                     filter += " AND imovel.validado = TRUE ";
+                else if(busca.somenteNaoValidados)
+                     filter += " AND imovel.validado = FALSE ";
 
-            if(busca.somenteVisiveis)
-                 filter += " AND imovel.visivel = TRUE ";
-            else if(busca.somenteNaoVisiveis)
-                 filter += " AND imovel.visivel = FALSE ";
+                if(busca.somenteVisiveis)
+                     filter += " AND imovel.visivel = TRUE ";
+                else if(busca.somenteNaoVisiveis)
+                     filter += " AND imovel.visivel = FALSE ";
 
-            if(busca.imovelJC.id > 0)
-                filter += " AND imovel.id = " + busca.imovelJC.id.ToString() + " ";
-            else if(Utils.Validator.Is(busca.imovelJC.cod))
-                filter += " AND imovel.cod = '" + busca.imovelJC.cod + "' ";
-            else {
+                if(busca.somenteOutroID)
+                     filter += " AND imovel.id <> " +busca.imovelJC.id.ToString() + " " ;
+                else if(busca.imovelJC.id > 0)
+                    filter += " AND imovel.id = " + busca.imovelJC.id.ToString() + " ";
+                else if(Utils.Validator.Is(busca.imovelJC.cod))
+                    filter += " AND imovel.cod = '" + busca.imovelJC.cod + "' ";
+           
 
                 //if(!System.String.IsNullOrWhiteSpace(busca.imovelJC.endereco.cep))
                 //    filter += " AND endereco.\"cepNorm\" = '" + busca.imovelJC.endereco.cepNorm + "' ";
@@ -360,13 +383,12 @@ namespace JaCaptei.Application {
                 //    filter += " AND endereco.\"cepNorm\" LIKE '%" + busca.cepBase + "%' ";
 
 
+                if(!System.String.IsNullOrWhiteSpace(busca.imovelJC.documentacao.indiceCadastral))
+                    filter += " AND documentacao.\"indiceCadastral\" = '" + busca.imovelJC.documentacao.indiceCadastral + "' ";
 
-                if(!System.String.IsNullOrWhiteSpace(busca.imovelJC.endereco.cepNorm)){
-                    if(busca.imovelJC.endereco.cepNorm.Length >= 7)
-                        filter += " AND endereco.\"cepNorm\" = '" + busca.imovelJC.endereco.cepNorm + "' ";
-                    else
+
+                if(!System.String.IsNullOrWhiteSpace(busca.imovelJC.endereco.cepNorm))
                         filter += " AND endereco.\"cepNorm\" LIKE '%" +busca.imovelJC.endereco.cepNorm + "%' ";
-                }
 
                 if(!System.String.IsNullOrWhiteSpace(busca.imovelJC.endereco.estadoNorm))
                     filter += " AND endereco.\"estadoNorm\" = '" + busca.imovelJC.endereco.estadoNorm + "' ";
@@ -376,6 +398,12 @@ namespace JaCaptei.Application {
 
                 if(!System.String.IsNullOrWhiteSpace(busca.imovelJC.endereco.logradouroNorm))
                     filter += " AND endereco.\"logradouroNorm\" LIKE '%" + busca.imovelJC.endereco.logradouroNorm + "%' ";
+
+                if(!System.String.IsNullOrWhiteSpace(busca.imovelJC.endereco.complementoTipo))
+                    filter += " AND endereco.\"complementoTipo\" = '" + busca.imovelJC.endereco.complementoTipo + "' ";
+
+                if(!System.String.IsNullOrWhiteSpace(busca.imovelJC.endereco.complemento))
+                    filter += " AND endereco.complemento LIKE '%" + busca.imovelJC.endereco.complemento + "%' ";
 
 
                 if(busca.imovelJC.externo.totalVagas > 0)
@@ -443,8 +471,6 @@ namespace JaCaptei.Application {
                 if(busca.imovelJC.lazer.salaoFestas)           { filter += "AND lazer.\"salaoFestas\"        = TRUE ";  }
 
                 filter = Utils.Validator.ParseSafeSQL(filter);
-
-            }
 
 
             return filter;

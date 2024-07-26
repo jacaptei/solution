@@ -10,9 +10,9 @@
                         class="text-grey"
                         active-color="primary"
                         indicator-color="primary">
-                    <q-tab name="buscar"    icon="fa fa-search"     label="BUSCAR"      ></q-tab>
-                    <q-tab name="validar"   icon="fa fa-user-lock"  label="VALIDAR"     v-if="$root.usuario.gestor || $root.usuario.god " ></q-tab>
-                    <q-tab name="adicionar" icon="fa fa-plus"       label="ADICIONAR"   ></q-tab>
+                    <q-tab name="buscar"    icon="fa fa-search"         label="BUSCAR"      ></q-tab>
+                    <q-tab name="validar"   icon="fa fa-building-lock"  label="VALIDAR"     v-if="$root.usuario.gestor || $root.usuario.god " ></q-tab>
+                    <q-tab name="adicionar" icon="fa fa-plus"           label="ADICIONAR"   ></q-tab>
                 </q-tabs>
                 <q-tab-panels v-model="view" animated>
 

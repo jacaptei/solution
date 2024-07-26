@@ -80,78 +80,10 @@ namespace JaCaptei.Application
         }
 
 
-        public List<string> ObterTiposImoveis_OLD() {
 
-            List<string> tipos = new List<string>();
-
-            tipos.Add("Apartamento");
-            tipos.Add("Casa");
-            tipos.Add("Andar");
-            tipos.Add("Andar corrido");
-            tipos.Add("Apart Hotel");
-            tipos.Add("Apartamento com área privativa");
-            tipos.Add("Apartamento Duplex");
-            tipos.Add("Área Comercial");
-            tipos.Add("Área privativa");
-            tipos.Add("Barracão");
-            tipos.Add("Casa");
-            tipos.Add("Casa comercial");
-            tipos.Add("Casa Duplex");
-            tipos.Add("Casa em condomínio");
-            tipos.Add("Casa geminada");
-            tipos.Add("Casa geminada coletiva");
-            tipos.Add("Casa Triplex");
-            tipos.Add("Chácara");
-            tipos.Add("Cobertura");
-            tipos.Add("Cobertura Duplex");
-            tipos.Add("Cobertura Triplex");
-            tipos.Add("Estacionamento");
-            tipos.Add("Fazenda");
-            tipos.Add("Fazendinha");
-            tipos.Add("Flat");
-            tipos.Add("Galpão");
-            tipos.Add("Garagem");
-            tipos.Add("Haras");
-            tipos.Add("Ilha");
-            tipos.Add("Kitnet");
-            tipos.Add("Loft");
-            tipos.Add("Loja");
-            tipos.Add("Lote");
-            tipos.Add("Lote Comercial");
-            tipos.Add("Lote em condomínio");
-            tipos.Add("Lotes em Condomínio");
-            tipos.Add("Ponto Comercial");
-            tipos.Add("Pousada");
-            tipos.Add("Prédio");
-            tipos.Add("Prédio Comercial");
-            tipos.Add("Sala");
-            tipos.Add("Salão");
-            tipos.Add("Sítio");
-            tipos.Add("Sobre Loja");
-            tipos.Add("Studio");
-            tipos.Add("Terreno / Área");
-
+        public List<ImovelTipoComplemento> ObterTiposComplementos() {
+            List<ImovelTipoComplemento> tipos = DAO.ObterTiposComplementosImoveis();   
             return tipos;
-
-        }
-
-
-
-
-        public List<string> ObterTiposComplementos() {
-            List<string> stt = new List<string>();
-            stt.Add("APTO");
-            //stt.Add("BLOCO");
-            stt.Add("BOX");
-            stt.Add("CASA");
-            stt.Add("LOJA");
-            stt.Add("LOTE");
-            stt.Add("PÁTIO");
-            stt.Add("SALA");
-            stt.Add("SEÇÃO");
-            //stt.Add("TORRE");
-            stt.Add("UNIDADE");
-            return stt;
         }
 
 
