@@ -179,7 +179,7 @@
                 data: null,
                 valorInserido: '',
                 id: null,
-                documento: '',
+                documento: "",
                 placeholderText: 'Digite o CPF ou CNPJ',
                 maxlength: 22
             }
@@ -232,20 +232,21 @@
                 //this.$tools.Message("Item excluído");
             },
 
-            async Enviar() {
+                async Enviar() {
 
-                if (this.$validator.is(this.documento))
-                this.onrequest = true;
-                this.jsonDocumento = JSON.stringify(this.documento);  // Converte o documento para uma string JSON
-                var request = await this.$api.Post("/imoview/validarchave", this.jsonDocumento);
-                this.onrequest = false;
+                    if (this.$validator.is(this.documento))
+                    this.onrequest = true;
+                    this.jsonDocumento = JSON.stringify(this.documento);  // Converte o documento para uma string JSON
+                    var request = await this.$api.Post("api/imoview/integracao/cliente", { cpfCnpj: this.documento });
+                    this.onrequest = false;
 
-                if (request?.status?.success) {
-                    this.busca = request.result;
-                    this.data = this.busca.result;
-                    console.log(this.data);
+                    if (request?.status?.success) {
+                        this.busca = request.result;
+                        this.data = this.busca.result;
+                    } else {
+
+                    }
                 }
-            }
         }
     }
 </script>
