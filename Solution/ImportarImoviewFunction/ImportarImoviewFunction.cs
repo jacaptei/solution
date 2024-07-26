@@ -28,7 +28,8 @@ public class ImportarImoviewFunction
         new ConfigureFromConfigurationOptions<AppSettingsRecord>(config.GetSection(EnvironmentSettings)).Configure(settings);
         settings.CopyToStaticSettings();
         context = new DBcontext();
-        PostgreSqlBootstrap.Initialize();
+        //PostgreSqlBootstrap.Initialize();
+        GlobalConfiguration.Setup().UsePostgreSql();
         _service = new ImoviewService(httpClientFactory, context, "", mapper);
     }
 
@@ -48,8 +49,15 @@ public class ImportarImoviewFunction
             IdIntegracao = eventMsg.message.idIntegracao,
             IdOperador = eventMsg.message.idOperador,
         };
-        await _service.ImportarIntegracao(req);
         await messageActions.CompleteMessageAsync(message);
+        try
+        {
+            await _service.ImportarIntegracao(req);
+        }
+        catch (Exception)
+        {
+            await messageActions.DeadLetterMessageAsync(message);
+        }
     }
 }
 

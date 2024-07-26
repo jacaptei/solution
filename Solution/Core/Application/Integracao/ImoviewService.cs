@@ -387,6 +387,7 @@ public class ImoviewService : IDisposable
                     IdImovel = imovelId.idImovel,
                     IdImportacaoBairro = importacaoBairro.Id,
                     RequestBody = requestBody,
+                    DataInclusao = DateTime.UtcNow,
                     Status = StatusIntegracao.Aguardando.GetDescription(),
                     Imagens = Newtonsoft.Json.JsonConvert.SerializeObject(images.Select(i => new { i.Nome, i.Url }))
                 };
