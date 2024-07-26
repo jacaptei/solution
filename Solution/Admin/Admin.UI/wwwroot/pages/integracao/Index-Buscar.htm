@@ -13,11 +13,11 @@
                                       @input="applyMask"
                                       @blur="CheckDoc"></el-input>
                         </el-col>
-                    <el-col :xs="24" :sm="12" :md="8" :lg="6" class="s-input" style="display: flex; align-items: center; justify-content: flex-end; margin-top: 25px;">
-                        <div style="display: flex; align-items: center; gap: 20px;">
-                            <q-btn label="CONSULTAR" color="primary" @click="Enviar()"></q-btn>
-                        </div>
-                    </el-col>
+                        <el-col :xs="24" :sm="12" :md="8" :lg="6" class="s-input" style="display: flex; align-items: center; justify-content: flex-end; margin-top: 25px;">
+                            <div style="display: flex; align-items: center; gap: 20px;">
+                                <q-btn label="CONSULTAR" color="primary" @click="Enviar()"></q-btn>
+                            </div>
+                        </el-col>
                     </div>
                 </el-row>
 
@@ -33,81 +33,81 @@
 
                         <el-row>
                             <el-col :md="24">
-                                <el-divider style="margin:10px">--><!--resultado--><!--</el-divider>
+                                <el-divider style="margin:10px">-->
+                <!--resultado-->
+                <!--</el-divider>
 
-                                <el-row style="padding-left:20px;padding-right:20px;">
-                                    <el-col :md="24">
-                                        <div style="float:left">
-                                            <span style="color:var(--s-color-primary)">encontrados</span><br />
-                                            <span v-if="busca.total > 0">{{busca.total}}</span>
-                                            <span v-else style="color:var(--s-color-orange)">nada encontrado</span>
-                                        </div>
-                                        <div style="float:right">
-                                            <q-input v-model.number="busca.resultsPerPage" type="number" style="max-width:140px" label="RESULTADOS POR PÁGINA" stack-label :min="1" :dense="true" @keyup="()=>{ if(!onrequest){ Enviar(1);}}" @change="()=>{ if(!onrequest){ Enviar(1);}}"></q-input>
-                                        </div>
-                                    </el-col>
-                                </el-row>
-
-                                <el-divider style="margin:10px"></el-divider>
+                        <el-row style="padding-left:20px;padding-right:20px;">
+                            <el-col :md="24">
+                                <div style="float:left">
+                                    <span style="color:var(--s-color-primary)">encontrados</span><br />
+                                    <span v-if="busca.total > 0">{{busca.total}}</span>
+                                    <span v-else style="color:var(--s-color-orange)">nada encontrado</span>
+                                </div>
+                                <div style="float:right">
+                                    <q-input v-model.number="busca.resultsPerPage" type="number" style="max-width:140px" label="RESULTADOS POR PÁGINA" stack-label :min="1" :dense="true" @keyup="()=>{ if(!onrequest){ Enviar(1);}}" @change="()=>{ if(!onrequest){ Enviar(1);}}"></q-input>
+                                </div>
                             </el-col>
                         </el-row>
 
-                        <el-row>
-                            <el-col :md="24">-->
+                        <el-divider style="margin:10px"></el-divider>
+                    </el-col>
+                </el-row>
 
-                                <!--TABLE-->
+                <el-row>
+                    <el-col :md="24">-->
+                <!--TABLE-->
+                <!--<el-table :data="data" style="width: 100%" max-height="380" v-loading="ontablequest" :table-layout="auto" :row-class-name="tableRowClassName">
 
-                                <!--<el-table :data="data" style="width: 100%" max-height="380" v-loading="ontablequest" :table-layout="auto" :row-class-name="tableRowClassName">
-
-                                    <el-table-column prop="id" label="ID" width="70">
-                                        <template #default="scope">
-                                            <b @click="Alterar(scope)" style="cursor:pointer;color:var(--s-color-primary)">{{scope.row.id}}</b>
-                                        </template>
-                                    </el-table-column>
-                                    <el-table-column label="NOME" width="250">
-                                        <template #default="scope">
-                                            <b @click="Alterar(scope)" style="cursor:pointer">{{scope.row.nome}}</b>
-                                        </template>
-                                    </el-table-column>
-                                    <el-table-column label="E-Mail" width="220">
-                                        <template #default="scope">
-                                            <a :href="'mailto:'+scope.row.email" target="_blank" style="color:var(--el-color-primary);text-decoration:none"><i class="fa fa-envelope"></i>&nbsp; {{scope.row.email}}</a>
-                                        </template>
-                                    </el-table-column>
-                                    <el-table-column label="TELEFONE" width="150">
-                                        <template #default="scope">
-                                            <a :href="$tools.BuildWhatsappLink(scope.row.telefone,'Olá '+scope.row.apelido)" target="_blank" style="color:var(--s-color-green);text-decoration:none"><i class="fab fa-whatsapp" style="padding-right:3px;"></i> {{scope.row.telefone}}</a>
-                                        </template>
-                                    </el-table-column>
-                                    <el-table-column label="CPF" width="150">
-                                        <template #default="scope">
-                                            <a href="javascript:void(0)" @click="$tools.Copy(scope.row.cpf)" style="text-decoration:none;color:var(--s-color-tex-alt)"><i class="fa fa-copy" style="padding-right:3px;color:var(--el-color-primary);text-decoration:none"></i> {{scope.row.cpf}}  </a>
-                                        </template>
-                                    </el-table-column>
-                                    <el-table-column prop="rg" label="RG" width="120" />-->
-                                    <!--</el-table-column>-->
-                                    <!--<el-table-column label="CONTATO">-->
-                                    <!--<el-table-column label="ENDEREÇO" width="400">
-                                        <template #default="scope">
-                                            <a :href="$tools.BuildMapLink(scope.row)" target="_blank" style="color:var(--s-text-color);text-decoration:none;margin-right:6px">
-                                                <i style="color:var(--s-color-primary);margin-right:6px" class="fa fa-location-dot"></i>
-                                                {{scope.row.logradouro}}, {{scope.row.numero}}
-                                                <span v-if="$validator.is(scope.row.complemento)"> , {{scope.row.complemento}}</span>,
-                                                {{scope.row.bairro}},
-                                                {{scope.row.cidade}}, {{scope.row.estado}}, CEP: {{scope.row.cep}}
-                                            </a>
-                                        </template>
-                                    </el-table-column>-->
-                                    <!--</el-table-column>-->
-                                    <!--<el-table-column label="ENDEREÇO">-->
-                                    <!--<el-table-column prop="cidade"      label="CIDADE"      width="280" />
-                                        <el-table-column prop="estado"      label="ESTADO"      width="140" />
-                                        <el-table-column prop="bairro"      label="BAIRRO"      width="240" />
-                                        <el-table-column prop="logradouro"  label="LOGRADOURO"  width="240" />
-                                        <el-table-column prop="numero"      label="NÚMERO"      width="140" />
-                                        <el-table-column prop="complemento" label="COMPLEMENTO" width="140" />
-                                    <!--</el-table-column>-->
-                                    <!--<el-table-column prop="data" label="DATA" width="140">
+                    <el-table-column prop="id" label="ID" width="70">
+                        <template #default="scope">
+                            <b @click="Alterar(scope)" style="cursor:pointer;color:var(--s-color-primary)">{{scope.row.id}}</b>
+                        </template>
+                    </el-table-column>
+                    <el-table-column label="NOME" width="250">
+                        <template #default="scope">
+                            <b @click="Alterar(scope)" style="cursor:pointer">{{scope.row.nome}}</b>
+                        </template>
+                    </el-table-column>
+                    <el-table-column label="E-Mail" width="220">
+                        <template #default="scope">
+                            <a :href="'mailto:'+scope.row.email" target="_blank" style="color:var(--el-color-primary);text-decoration:none"><i class="fa fa-envelope"></i>&nbsp; {{scope.row.email}}</a>
+                        </template>
+                    </el-table-column>
+                    <el-table-column label="TELEFONE" width="150">
+                        <template #default="scope">
+                            <a :href="$tools.BuildWhatsappLink(scope.row.telefone,'Olá '+scope.row.apelido)" target="_blank" style="color:var(--s-color-green);text-decoration:none"><i class="fab fa-whatsapp" style="padding-right:3px;"></i> {{scope.row.telefone}}</a>
+                        </template>
+                    </el-table-column>
+                    <el-table-column label="CPF" width="150">
+                        <template #default="scope">
+                            <a href="javascript:void(0)" @click="$tools.Copy(scope.row.cpf)" style="text-decoration:none;color:var(--s-color-tex-alt)"><i class="fa fa-copy" style="padding-right:3px;color:var(--el-color-primary);text-decoration:none"></i> {{scope.row.cpf}}  </a>
+                        </template>
+                    </el-table-column>
+                    <el-table-column prop="rg" label="RG" width="120" />-->
+                <!--</el-table-column>-->
+                <!--<el-table-column label="CONTATO">-->
+                <!--<el-table-column label="ENDEREÇO" width="400">
+                    <template #default="scope">
+                        <a :href="$tools.BuildMapLink(scope.row)" target="_blank" style="color:var(--s-text-color);text-decoration:none;margin-right:6px">
+                            <i style="color:var(--s-color-primary);margin-right:6px" class="fa fa-location-dot"></i>
+                            {{scope.row.logradouro}}, {{scope.row.numero}}
+                            <span v-if="$validator.is(scope.row.complemento)"> , {{scope.row.complemento}}</span>,
+                            {{scope.row.bairro}},
+                            {{scope.row.cidade}}, {{scope.row.estado}}, CEP: {{scope.row.cep}}
+                        </a>
+                    </template>
+                </el-table-column>-->
+                <!--</el-table-column>-->
+                <!--<el-table-column label="ENDEREÇO">-->
+                <!--<el-table-column prop="cidade"      label="CIDADE"      width="280" />
+                    <el-table-column prop="estado"      label="ESTADO"      width="140" />
+                    <el-table-column prop="bairro"      label="BAIRRO"      width="240" />
+                    <el-table-column prop="logradouro"  label="LOGRADOURO"  width="240" />
+                    <el-table-column prop="numero"      label="NÚMERO"      width="140" />
+                    <el-table-column prop="complemento" label="COMPLEMENTO" width="140" />
+                <!--</el-table-column>-->
+                <!--<el-table-column prop="data" label="DATA" width="140">
                                         <template #default="scope">
                                             {{$tools.FormatDateToBR(new Date(scope.row.data))}}
                                         </template>
@@ -168,13 +168,14 @@
 
         name: 'Buscar',
 
-        components: { },
+        components: {},
 
         data: function () {
             return {
                 onrequest: false,
                 ontablequest: false,
                 busca: this.$models.busca,
+                usuarioIntegracao: this.$models.usuarioIntegracao,
                 jsonDocumento: "",
                 data: null,
                 valorInserido: '',
@@ -190,7 +191,6 @@
         watch: {},
 
         created: function () {
-            this.busca.item = this.$models.proprietario();
         },
         mounted() {
             //this.$refs.documento.focus();
@@ -232,21 +232,29 @@
                 //this.$tools.Message("Item excluído");
             },
 
-                async Enviar() {
+            async Enviar() {
+                if (this.$validator.is(this.documento)) {
+                    var url = this.$api.BuildURL('api/imoview/integracao/cliente');
+                    var res = await axios.post(url, { cpfCnpj: this.documento }).then((request) => {
+                        if (request.data) {
+                            if (request.data.status = 200) {
+                                this.$root.perfilIntegracao = request.data;
+                            }
+                            else {
+                                this.tools.HandleFails(request.data)
+                                return null;
+                            }
+                        } else
+                            return null;
+                    }).catch((error) => {
+                        this.tools.HandleErrors(error);
+                        ce(error);
+                    }).finally(() => { });
 
-                    if (this.$validator.is(this.documento))
-                    this.onrequest = true;
-                    this.jsonDocumento = JSON.stringify(this.documento);  // Converte o documento para uma string JSON
-                    var request = await this.$api.Post("api/imoview/integracao/cliente", { cpfCnpj: this.documento });
+                    return res;
                     this.onrequest = false;
-
-                    if (request?.status?.success) {
-                        this.busca = request.result;
-                        this.data = this.busca.result;
-                    } else {
-
-                    }
                 }
+            }
         }
     }
 </script>

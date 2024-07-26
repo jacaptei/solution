@@ -15,6 +15,7 @@
     log(){                  return this.Unbind(this.data.log);              }
     pessoa(){               return this.Unbind(this.data.pessoa);           }
     usuario(){              return this.Unbind(this.data.usuario);          }
+    usuarioIntegracao(){    return this.Unbind(this.data.usuarioIntegracao);}
     parceiro(){             return this.Unbind(this.data.parceiro);         }
     proprietario(){         return this.Unbind(this.data.proprietario);     }
     imovel(){               return this.Unbind(this.data.imovel);           }
