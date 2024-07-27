@@ -1,127 +1,123 @@
-﻿﻿
-<template>
+﻿<template>
     <div>
         <el-row @keyup.enter="Buscar()">
-            <el-col :md="24">
+            <el-col :span="24">
                 <el-row :gutter="20">
-                    <el-col :xs="24" :sm="12" :md="8" :lg="6" class="s-input">
-                        <div>ID<span></span></div>
-                        <el-input-number style="width:100%" @keyup.enter="Enviar()" v-model="id" placeholder="qualquer" maxlength="20" ref="id" :controls="false"></el-input-number>
-                    </el-col>
-
-                    <el-col :xs="24" :sm="12" :md="8" :lg="6" class="s-input">
-                        <div>CRM<span></span></div>
-                        <el-select value-key="id" filterable class="m-4" size="large" style="width: 100%">
-                            <el-option placeholder="qualquer"></el-option>
-                        </el-select>
-                    </el-col>
-
-                    <el-col :xs="24" :sm="12" :md="8" :lg="6" class="s-input">
-                        <div>CRM<span></span></div>
-                        <el-select value-key="id" filterable class="m-4" size="large" style="width: 100%">
-                            <el-option placeholder="qualquer"></el-option>
-                        </el-select>
-                    </el-col>
-
-                    <el-col :xs="24" :sm="12" :md="8" :lg="6" class="s-input">
-                        <div>CÓDIGO USUÁRIO IMOVIEW<span></span></div>
-                        <!--<div style="height:40px" v-if="">
-                <c-loading size="30px" style="padding-left:5px"></c-loading>
-            </div>-->
-                        <!--<div v-else-if="">
-                <span style="color:#7d7d7d;padding-left:10px">selecione um estado</span>
-            </div>-->
-                        <el-select v-else v-model="" filterable class="m-4" placeholder="qualquer" size="large" style="width:100%" @change="(item)=>{}">
-                            <!--<el-option v-for="item in $root.search.opcoes.cidades"
-                :key="item.id"
-                :label="item.label"
-                :value="item"></el-option>-->
-                        </el-select>
-                    </el-col>
-
-                    <el-col :xs="24" :sm="12" :md="8" :lg="6" class="s-input">
-                        <div>UNIDADE<span></span></div>
-                        <!--<div style="height:40px" v-if="">
-                <c-loading size="30px" style="padding-left:5px"></c-loading>
-            </div>-->
-                        <!--<div v-else-if="">
-                <span style="color:#7d7d7d;padding-left:10px">selecione um estado</span>
-            </div>-->
-                        <el-select v-else v-model="" multiple filterable :clearable="true" class="m-4" placeholder="qualquer" size="large" style="width:100%">
-                            <!--<el-option v-for="item in $root.search.opcoes.bairros"
-                :key="item.id"
-                :label="item.label"
-                :value="item"></el-option>-->
-                        </el-select>
-                    </el-col>
-
-                    <el-col :xs="24" :sm="12" :md="8" :lg="6" class="s-input">
+                    <el-col :xs="24" :sm="24" :md="16" :lg="16" class="register-input">
                         <div>SELECIONE O PLANO</div>
-                        <el-select filterable style="width: 100%" placeholder="SELECIONAR">
+                        <el-select filterable v-model="planos" style="width: 100%" placeholder="SELECIONAR">
                             <el-option v-for="item in [
-                                             {label: 'CORRETOR AUTÔNOMO ESSENCIAL por R$387/mês',  value: 2 },
-                                             {label: 'IMOBILIÁRIA ATÉ 03 USUÁRIOS por R$499/mês',  value: 3 },
-                                             {label: 'IMOBILIÁRIA ATÉ 05 USUÁRIOS por R$699/mês',  value: 4 }
-                                             ]"
-                                       :key="item.value"
-                                       :label="item.label"
-                                       :value="item.value">
+                                        {nome: 'CORRETOR AUTÔNOMO ESSENCIAL por R$387/mês',  id: 2 },
+                                        {nome: 'IMOBILIÁRIA ATÉ 03 USUÁRIOS por R$499/mês',  id: 3 },
+                                        {nome: 'IMOBILIÁRIA ATÉ 05 USUÁRIOS por R$699/mês',  id: 4 }
+                                        ]"
+                                       :key="item.id"
+                                       :label="item.nome"
+                                       :value="item.id">
                             </el-option>
                         </el-select>
                     </el-col>
-
-                    <el-col :xs="24" :sm="12" :md="8" :lg="6" class="s-input">
-                        <div><p>ESTADO</p><span></span></div>
-                        <div style="height:40px" v-if="carregandoEstados">
-                            <c-loading size="30px" style="padding-left:5px"></c-loading>
-                        </div>
-                        <el-select v-else filterable v-model="selectedEstado" class="m-4" placeholder="Selecionar" size="large" style="width:100%" @change="(item)=>{ObterCidades(item); enableFilterButton = true;}">
-                            <el-option v-for="item in opcoes.estados" :key="item.id" :label="item.label" :value="item.value"></el-option>
+                    <el-col :xs="24" :sm="12" :md="8" :lg="8" class="register-input">
+                        <div>CHAVE API<span></span></div>
+                        <el-input style="width:100%"
+                                  @keyup.enter="Enviar()"
+                                  v-model="chaveApi"
+                                  placeholder="Insira sua Chave API"
+                                  ref="id"
+                                  @input="(value) => VerificarChaveApi(value)"
+                                  :controls="false"></el-input>
+                    </el-col>
+                    <el-col :xs="24" :sm="12" :md="8" :lg="8" class="register-input">
+                        <div>CRM<span></span></div>
+                        <el-select v-model="crms" multiple filterable :clearable="true" value-key="id" class="m-4" size="large" style="width: 100%">
+                            <el-option v-for="item in opcoes.crm" :key="item.id" :label="item.nome" :value="item.id"></el-option>
                         </el-select>
                     </el-col>
-
-                    <el-col :xs="24" :sm="12" :md="8" :lg="6" class="s-input">
-                        <div><p>CIDADE</p><span></span></div>
-                        <div style="height:40px" v-if="carregandoCidades">
-                            <c-loading size="30px" style="padding-left:5px"></c-loading>
-                        </div>
-                        <el-select multiple v-else v-model="selectedCities" filterable class="m-4" placeholder="Selecionar" size="large" style="width:100%" @change="ObterBairros">
-                            <el-option v-for="item in opcoes.cidades" :key="item.id" :label="item.label" :value="item"></el-option>
+                    <el-col :xs="24" :sm="12" :md="8" :lg="8" class="register-input">
+                        <div>CÓDIGO USUÁRIO IMOVIEW<span></span></div>
+                        <el-select v-else v-model="" filterable class="m-4" placeholder="qualquer" size="large" style="width:100%">
+                            <el-option placeholder="qualquer"></el-option>
                         </el-select>
                     </el-col>
-
-                    <el-col :xs="24" :sm="12" :md="8" :lg="12" v-for="(cidade, index) in selectedCities" :key="cidade.id" class="container-checkbox">
-                        <el-col>
-                            <div>BAIRROS - {{ cidade.label }}<span></span></div>
-                            <el-scrollbar height="400px">
-                                <el-checkbox-group v-model="checkedBairros[cidade]" class="checkbox-group" @change="handleCheckboxChange">
-                                    <div class="checkbox-container">
-                                        <el-checkbox v-for="bairro in bairrosByCity[cidade.id]"
-                                                     :key="bairro.id"
-                                                     :label="bairro"
-                                                     class="checkbox-item">
-                                            {{ bairro.nome }}
-                                        </el-checkbox>
-                                    </div>
-                                </el-checkbox-group>
-                            </el-scrollbar>
-                        </el-col>
+                    <el-col :xs="24" :sm="12" :md="8" :lg="8" class="register-input">
+                        <div>UNIDADE<span></span></div>
+                        <el-select v-else v-model="unidades" multiple filterable :clearable="true" class="m-4" placeholder="qualquer" size="large" style="width:100%">
+                            <el-option v-for="item in opcoes.unidades" :key="item.id" :label="item.nome" :value="item.id"></el-option>
+                        </el-select>
                     </el-col>
+                </el-row>
 
-                    <el-row style="width: 100%; display: flex; justify-content: flex-end; align-items: center;">
-                        <el-col :xs="24" :sm="12" :md="8" :lg="6" class="s-input" style="width: 100%; display: flex; justify-content: flex-end; align-items: center;">
-                            <div><span></span></div>
-                            <q-btn label="INTEGRAR" color="primary" @click="BuscarProprietario()"></q-btn>
-                            <span style="cursor:pointer; padding-left:20px; color:var(--s-color-green)" @click="LimparFiltro"><i class="fa fa-cancel"></i> LIMPAR REGISTRO</span>
-                        </el-col>
-                    </el-row>
+                <el-row style="width: 100%; display: flex; justify-content: flex-end; align-items: flex-end; margin-top: 20px">
+                    <el-col :xs="24" :sm="12" :md="8" :lg="6" class="register-input" style="width: 100%; display: flex; justify-content: flex-end; align-items: center;">
+                        <p>Total de bairros selecionados: {{ totalSelectedBairros }}</p>
+                        <div style="display: flex; width: 100%; align-items: flex-end;">
+                            <span style="cursor:pointer; padding-left:20px; color:var(--s-color-green)" @click="addLocationGroup">
+                                <i class="fa fa-plus-circle"></i> ADICIONAR BAIRROS PARA INTEGRAÇÃO
+                            </span>
+                        </div>
+                    </el-col>
+                    <el-divider style=""><!--resultado--></el-divider>
+                </el-row>
 
-                    <el-row justify="center" v-if="onrequest">
-                        <el-col :md="24" style="color:var(--s-color-primary)">
-                            <el-divider style="margin:10px;"><!--resultado--></el-divider>
-                            <c-loading padding="20px"></c-loading>
-                        </el-col>
-                    </el-row>
+                <el-row :gutter="20">
+                    <div style="width: 100%; display: flex; flex-wrap: wrap" v-for="(group, index) in locationGroups" :key="index" class="location-group">
+                        <div style="width: 90%; display: flex; flex-wrap: wrap">
+                            <!-- Estado -->
+                            <el-col :xs="24" :sm="24" :md="12" :lg="8" class="register-input">
+                                <div><p>ESTADO</p></div>
+                                <div style="height:40px" v-if="group.carregandoEstados">
+                                    <c-loading size="30px" style="padding-left:5px"></c-loading>
+                                </div>
+                                <el-select v-else filterable v-model="group.selectedEstado" class="m-4" placeholder="Selecionar" size="large" style="width:100%" @change="(value) => { ObterCidades(value, index); group.enableFilterButton = true }">
+                                    <el-option v-for="item in opcoes.estados" :key="item.id" :label="item.label" :value="item.id"></el-option>
+                                </el-select>
+                            </el-col>
+
+                            <!-- Cidade -->
+                            <el-col :xs="24" :sm="24" :md="12" :lg="8" class="register-input">
+                                <div><p>CIDADE</p></div>
+                                <div style="height:40px" v-if="group.carregandoCidades">
+                                    <c-loading size="30px" style="padding-left:5px"></c-loading>
+                                </div>
+                                <el-select v-else v-model="group.selectedCities" filterable class="m-4" placeholder="Selecionar" size="large" style="width:100%" @change="(cities) => ObterBairros(cities, index)">
+                                    <el-option v-for="item in group.cidades" :key="item.id" :label="item.label" :value="item"></el-option>
+                                </el-select>
+                            </el-col>
+
+                            <!-- Bairro -->
+                            <el-col :xs="24" :sm="24" :md="12" :lg="8" class="register-input">
+                                <div><p>BAIRROS</p></div>
+                                <div style="height:40px" v-if="group.carregandoBairros">
+                                    <c-loading size="30px" style="padding-left:5px"></c-loading>
+                                </div>
+                                <el-select v-else v-model="group.selectedBairros" filterable class="m-4" placeholder="Selecionar" size="large" style="width:100%" @change="(selectedBairros) => handleBairrosChange(selectedBairros, group, index)">
+                                    <el-option v-for="item in group.bairros" :key="item.id" :label="item.label" :value="item"></el-option>
+                                </el-select>
+                            </el-col>
+                        </div>
+
+                        <!-- Botão Remover -->
+                        <div style="width: 10%; display: flex; align-items: center; justify-content: center;">
+                            <span style="cursor: pointer; width: 100%; color: var(--s-color-blue); display: flex; margin-top: 10px; align-items: center; justify-content: center;" @click="removeLocationGroup(index)">
+                                <i class="fa fa-trash" style="color: #0072ff; font-size: 1.2em;"></i>
+                            </span>
+                        </div>
+                    </div>
+                </el-row>
+
+                <el-row style="width: 100%; display: flex; justify-content: flex-end; align-items: center;">
+                    <el-divider style="margin-top: 20px"><!--resultado--></el-divider>
+                    <el-col :xs="24" :sm="12" :md="8" :lg="6" class="register-input" style="width: 100%; display: flex; justify-content: flex-end; align-items: center;">
+                        <div><span></span></div>
+                        <q-btn label="INTEGRAR" color="primary" @click="BuscarProprietario()"></q-btn>
+                    </el-col>
+                </el-row>
+
+                <el-row justify="center" v-if="onrequest">
+                    <el-col :md="24" style="color:var(--s-color-primary)">
+                        <el-divider style="margin:10px;"><!--resultado--></el-divider>
+                        <c-loading padding="20px"></c-loading>
+                    </el-col>
                 </el-row>
             </el-col>
         </el-row>
@@ -132,31 +128,39 @@
 <script>
     import { ref } from 'vue';
     module.exports = {
-
         name: 'Buscar',
-
         data() {
             return {
                 onrequest: false,
-                ontablequest: false,
                 busca: this.$models.busca(),
                 carregandoCidades: false,
-                data: null,
                 id: null,
-                selectedEstado: null,
                 estados: [],
                 cidades: [],
                 bairros: [],
+                crms: [],
+                unidades: [],
+                chaveApi: this.$root.perfilIntegracao?.integracao?.chaveApi || '',
                 selectedCities: [],
                 bairrosByCity: {},
+                group: [],
+                selectedEstado: null,
                 checkedBairros: {},
                 bairrosSelecionados: {},
                 bairrosIds: [],
+                locationGroups: [],
                 opcoes: {
                     estados: [],
                     cidades: [],
                     bairros: [],
+                    crm: [],
+                    unidades: [],
+                    integracao: [],
+                    plano: [],
+                    integracao: []
                 },
+                perfilIntegracaoCadastro: {},
+                planos: this.$root.perfilIntegracao?.plano || [],
                 integracao: {
                     id: 0,
                     idCliente: 60,
@@ -171,114 +175,183 @@
                     bairros: this.checkedBairros,
                     imoveis: null
                 }
+            };
+        },
+        created() {
+            this.$sdata.ObterEstados().then(res => {
+                this.opcoes.estados = res;
+            });
+
+            this.perfilIntegracaoCadastro = this.$root.perfilIntegracao || {};
+            this.opcoes.crm = this.perfilIntegracaoCadastro.crms || [];
+            this.opcoes.unidades = this.perfilIntegracaoCadastro.unidades || [];
+            this.chaveApi = (this.perfilIntegracaoCadastro.integracao && this.perfilIntegracaoCadastro.integracao.chaveApi) || "";
+
+            if (this.perfilIntegracaoCadastro.integracao?.bairros) {
+                this.initializeBairros(this.perfilIntegracaoCadastro.integracao.bairros);
             }
+
+            if (this.chaveApi) {
+                this.VerificarChaveApi(this.chaveApi);
+            }
+
+            console.log(this.perfilIntegracaoCadastro);
         },
         computed: {
-
-        },
-
-        props: {
-
-        },
-        watch: {
-
-        },
-        created: function () {
-            this.proprietario = this.$models.usuario();
-            this.$sdata.ObterEstados().then(res => { this.opcoes.estados = res; });
-        },
-        mounted() {
-            //this.$refs.nome.focus();
-            //this.Enviar();
+            totalSelectedBairros() {
+                if (!Array.isArray(this.locationGroups)) {
+                    return 0;
+                }
+                return this.locationGroups.reduce((total, group) => {
+                    var selectedBairros = Array.isArray(group.selectedBairros) ? group.selectedBairros : [];
+                    return total + selectedBairros.length;
+                }, 0);
+            }
         },
         methods: {
+            initializeBairros(bairrosJSON) {
+                const bairros = JSON.parse(bairrosJSON);
+                bairros.forEach(bairro => {
+                    if (!this.checkedBairros[bairro.idCidade]) {
+                        this.checkedBairros[bairro.idCidade] = [];
+                    }
+                    if (!this.bairrosByCity[bairro.idCidade]) {
+                        this.bairrosByCity[bairro.idCidade] = [];
+                    }
 
+                    this.checkedBairros[bairro.idCidade].push(bairro);
+                    this.bairrosByCity[bairro.idCidade].push(bairro);
+                });
+
+                this.locationGroups.push({
+                    selectedEstado: null,
+                    selectedCities: Object.keys(this.checkedBairros).map(id => ({ id, label: this.getCityLabel(id) })),
+                    carregandoEstados: false,
+                    carregandoCidades: false,
+                    enableFilterButton: false,
+                    checkedBairros: this.checkedBairros,
+                    bairros: this.bairrosByCity,
+                    cidades: []
+                });
+            },
+            getCityLabel(id) {
+                const cidade = this.opcoes.cidades.find(city => city.id === parseInt(id));
+                return cidade ? cidade.label : '';
+            },
             LimparFiltro() {
                 this.id = null;
                 this.busca.item = this.$models.proprietario();
                 this.Enviar();
             },
-
-            tableRowClassName(scope) {
-                if (!scope.row.ativo)
-                    return "deleted-row";
+            removeLocationGroup(index) {
+                this.locationGroups.splice(index, 1);
             },
-
-            Alterar(scope) {
-                this.$root.RouteTo('proprietario/' + scope.row.id)
-            },
-            ObterCidades(estado) {
-                this.selectedCities = [];
-                this.bairrosByCity = {};
-                this.checkedBairros = {};
-                this.carregandoCidades = true;
-                this.opcoes.cidades = [];
-
-                if (this.$validator.is(estado)) {
-                    const idEstado = this.opcoes.estados.find(e => e.value === estado).id;
-                    const url = this.$api.BuildURL("suporte/cidades/obter") + "/" + idEstado;
-
-                    axios.get(url).then(request => {
-                        if (request.data) {
-                            this.opcoes.cidades = request.data.result.map(item => ({
-                                id: item.id,
-                                value: item,
-                                label: item.label
-                            }));
-                        }
-                    }).catch(error => {
-                        console.error(error);
-                        if (error.response) console.error(error.response);
-                        console.error("Não foi possível obter cidades.");
-                    }).finally(() => {
-                        this.carregandoCidades = false;
-                    });
-                } else {
-                    this.carregandoCidades = false;
-                }
-            },
-            ObterBairros() {
-                this.bairrosByCity = {};
-                this.checkedBairros = {};
-                this.carregandoBairros = true;
-                
-                this.selectedCities.forEach(cidade => {
-                    const idCidade = cidade.id;
-                    if (this.$validator.is(idCidade)) {
-                        const url = `${this.$api.BuildURL("suporte/bairros/obter")}/${idCidade}`;
-
-                        axios.get(url).then(request => {
-                            if (request.data) {
-                                this.bairrosByCity[idCidade] = request.data.result.map(item => ({
-                                    id: item.id,
-                                    idCidade: cidade.id,
-                                    nome: item.label
-                                }));
-                                this.checkedBairros[idCidade] = [];
-                            }
-                        }).catch(error => {
-                            console.error(error);
-                            this.$tools.Alert("Não foi possível obter bairros.");
-                        }).finally(() => {
-                            this.carregandoBairros = false;
-                        });
-                    } else {
-                        this.carregandoBairros = false;
-                    }
+            addLocationGroup() {
+                this.locationGroups.push({
+                    selectedEstado: null,
+                    selectedCities: [],
+                    selectedBairros: [],
+                    carregandoEstados: false,
+                    carregandoCidades: false,
+                    enableFilterButton: false,
+                    checkedBairros: {},
+                    bairros: {},
+                    cidades: []
                 });
             },
+            ObterCidades(estadoId, groupIndex) {
+                this.locationGroups[groupIndex].carregandoCidades = true;
+                this.$sdata.ObterCidades(estadoId).then(res => {
+                    this.locationGroups[groupIndex].cidades = res;
+                    this.locationGroups[groupIndex].carregandoCidades = false;
+                });
+            },
+            ObterBairros(cidade, groupIndex) {
+                const group = this.locationGroups[groupIndex];
+                group.carregandoCidades = true; // Indicar carregamento
+
+                this.$sdata.ObterBairros(cidade.id).then(res => {
+                    group.bairros = res; // Atualizar a lista de bairros
+                    group.selectedBairros = []; // Limpar seleção anterior, se necessário
+                    group.carregandoCidades = false; // Finalizar carregamento
+                }).catch(error => {
+                    console.error("Erro ao obter bairros:", error);
+                    group.carregandoCidades = false; // Finalizar carregamento mesmo em caso de erro
+                });
+            },
+            handleBairrosChange(selectedBairros, group, index) {
+                this.locationGroups[index] = {
+                    ...group,
+                    selectedBairros: Array.isArray(selectedBairros) ? [...selectedBairros] : []
+                };
+            },
+            async VerificarChaveApi(chaveApi) {
+                if (!chaveApi) {
+                    return;
+                }
+                try {
+                    var chaveApiString = this.chaveApi;
+                    if (this.$validator.is(chaveApiString)) {
+                        var url = this.$api.BuildURL('api/imoview/validarchave');
+                        var request = await axios.post(url, chaveApiString, {
+                            headers: {
+                                'Content-Type': 'application/json'
+                            }
+                        }).then((request) => {
+                            if (request.data === true) {
+                                console.log("Chave API válida");
+                            } else {
+                                this.$tools.alarm("Chave API inválida");
+                            }
+                        }).catch((error) => {
+                            this.tools.HandleErrors(error);
+                            ce(error);
+                        }).finally(() => { });
+
+                        return request;
+                        this.onrequest = false;
+                    }
+                } catch (error) {
+                    console.error("Erro ao verificar a chave API:", error);
+                }
+            },
             handleCheckboxChange() {
-                this.bairrosSelecionados = Object.values(this.checkedBairros).flat();
-                this.bairrosIds = this.bairrosSelecionados.map(bairro => bairro);
-                this.integracao.bairros = this.bairrosIds;
-                console.log(this.integracao);
+                this.checkedBairros;
+                this.integracao.bairros = this.checkedBairros;
+            },
+            Buscar() {
+                this.onrequest = true;
+                this.$refs.id.blur();
+                this.$sdata.buscarProprietario(this.integracao).then(res => {
+                    this.proprietario = res;
+                    this.onrequest = false;
+                }).catch(error => {
+                    this.onrequest = false;
+                    console.error(error);
+                });
             }
         }
-    }
+    };
 </script>
 
 
 <style>
+    .fixed-bottom-row {
+        position: fixed;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        padding: 10px;
+        box-shadow: 0 -1px 5px rgba(0, 0, 0, 0.1); /* opcional, para um pouco de sombra */
+    }
+    .register-input {
+        width: 100%;
+        margin-bottom: 10px;
+        letter-spacing: 0.02em;
+        margin-top: 2px;
+        color: var(--s-color-primary);
+    }
+
     .container-checkbox {
         letter-spacing: 0.02em;
         color: #0072ff !important;
@@ -340,9 +413,9 @@
         border-radius: 6px;
     }
 
-        .custom-scrollbar::-webkit-scrollbar-thumb:hover {
-            background: #0056b3;
-        }
+    .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+        background: #0056b3;
+    }
 
     .custom-scrollbar::-webkit-scrollbar-track {
         background: #f1f1f1;

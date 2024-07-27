@@ -53,6 +53,7 @@ $(document).ready(function () {
                     isAuth          : false,
                     showLoginModal  : false,
                     autoLogin       : false,
+                    perfilIntegracao: {},
                     rememberMe      : false,
                     //test            : "root context ok",
                     title: {
@@ -186,9 +187,10 @@ $(document).ready(function () {
 
 				this.$models.data                   = request.data;
                 this.log                            = this.$models.log();
-                //this.usuario                        = this.$models.usuario();
+                //this.usuario                      = this.$models.usuario();
                 this.proprietario                   = this.$models.proprietario();
                 this.imovel                         = this.$models.imovel();
+                this.perfilIntegracao               = this.$models.usuarioIntegracao();
                 this.favorito                       = this.$models.favorito();
                 this.localidade                     = this.$models.localidade();
 
