@@ -76,9 +76,15 @@ public class ImoviewService : IDisposable
         return await GetCampos("Imovel/RetornarListaFinalidades");
     }
 
-    public async Task<CamposImoview?> GetUnidades()
+    public async Task<CamposImoview?> GetUnidades(string chave)
     {
-        return await GetCampos("Imovel/RetornarListaUnidades");
+        var client = _httpClientFactory.CreateClient("imoview");
+        client.DefaultRequestHeaders.Clear();
+        client.DefaultRequestHeaders.Add("chave", chave);
+
+        var res = await client.GetStringAsync("Imovel/RetornarListaUnidades");
+        var campos = Newtonsoft.Json.JsonConvert.DeserializeObject<CamposImoview>(res);
+        return campos;
     }
 
     public async Task<CamposImoview?> GetDestinacoes()
