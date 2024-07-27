@@ -15,18 +15,19 @@ using RepoDb;
 
 namespace ImportarImoviewAzureFunction;
 
-public class ImportarImoviewFunction
+public class ImportarImoviewFn
 {
-    private readonly ILogger<ImportarImoviewFunction> _logger;
+    private readonly ILogger<ImportarImoviewFn> _logger;
     private readonly ImoviewService _service;
 
-    public ImportarImoviewFunction(ILogger<ImportarImoviewFunction> logger, IHttpClientFactory httpClientFactory, DBcontext context, IMapper mapper)
+    public ImportarImoviewFn(ILogger<ImportarImoviewFn> logger, ImoviewService service)
     {
         _logger = logger;
-        _service = new ImoviewService(httpClientFactory, context, "", mapper);
+        //_service = new ImoviewService(httpClientFactory, context, "", mapper);
+        _service = service;
     }
 
-    [Function(nameof(ImportarImoviewFunction))]
+    [Function(nameof(ImportarImoviewFn))]
     public async Task Run(
         [ServiceBusTrigger("integracaocliente", Connection = "AzureMQ")]
         ServiceBusReceivedMessage message,

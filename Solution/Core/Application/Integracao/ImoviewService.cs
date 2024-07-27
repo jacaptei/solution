@@ -9,10 +9,13 @@ using MassTransit;
 using MassTransit.Initializers;
 using MassTransit.Transports;
 
+using Microsoft.Extensions.Logging;
+
 using Polly;
 using Polly.Contrib.WaitAndRetry;
 using Polly.Retry;
 
+using System;
 using System.ComponentModel;
 using System.Net;
 using System.Net.Http.Headers;
@@ -26,8 +29,22 @@ public class ImoviewService : IDisposable
     private readonly ImoviewDAO _imoviewDAO;
     private string _chave;
     private readonly IMapper _mapper;
-    private readonly ISendEndpointProvider _bus;
+    private readonly ILogger? _logger;
+    private readonly ISendEndpointProvider? _bus;
     private readonly AsyncRetryPolicy _retryPolicy;
+
+    public ImoviewService(IHttpClientFactory httpClientFactory, DBcontext context, IMapper mapper, ILogger logger, ImoviewDAO imoviewDAO)
+    {
+        _httpClientFactory = httpClientFactory;
+        _context = context;
+        _mapper = mapper;
+        _logger = logger;
+        _retryPolicy = Policy
+            .Handle<Exception>()
+            .WaitAndRetryAsync(Backoff.DecorrelatedJitterBackoffV2(TimeSpan.FromSeconds(2), 3));
+        _imoviewDAO = imoviewDAO;
+        _chave = "";
+    }
 
     public ImoviewService(IHttpClientFactory httpClientFactory, DBcontext context, string chave, IMapper mapper, ISendEndpointProvider? bus = null)
     {
@@ -186,6 +203,14 @@ public class ImoviewService : IDisposable
                 Status = "Inválido",
                 Mensagem = $"Quantidade de bairros {bairros.Count} maior que o permitido pelo plano: {plano.totalBairros}"
             };
+        if (_bus == null)
+        {
+            return new IntegrarClienteResponse()
+            {
+                Status = "Inválido",
+                Mensagem = $"Problemas para comunicar com Service Bus"
+            };
+        }
         await _retryPolicy.ExecuteAsync(() => _imoviewDAO.SaveIntegracao(integracao));
         var integracaoEvent = new IntegracaoEvent()
         {
@@ -205,11 +230,20 @@ public class ImoviewService : IDisposable
 
     public async Task<bool> ImportarIntegracao(IntegracaoEvent integracaoEvent)
     {
+        _logger?.LogInformation("Iniciando importação service...");
         var integracao = await _retryPolicy.ExecuteAsync(() => _imoviewDAO.GetIntegracao(integracaoEvent.IdCliente));
-        if (integracao == null) return false;
+        if (integracao == null) 
+        {
+            _logger?.LogWarning("Integração na fila não cadastrada! {integracaoEvent}", integracaoEvent);
+            return false; 
+        }
         try
         {
-            if (!CanProcessIntegracao(integracao)) return false;
+            if (!CanProcessIntegracao(integracao))
+            {
+                _logger?.LogWarning("Integração ja esta em processamento!");
+                return false;
+            }
 
             await UpdateIntegracaoStatus(integracao);
 
@@ -225,6 +259,7 @@ public class ImoviewService : IDisposable
         }
         catch (Exception ex)
         {
+            _logger?.LogError("Erro na importação: {ex}", ex);
             integracao.Status = StatusIntegracao.Erro.GetDescription();
             integracao.DataAtualizacao = DateTime.UtcNow;
             await _retryPolicy.ExecuteAsync(() => _imoviewDAO.SaveIntegracao(integracao));
@@ -356,8 +391,8 @@ public class ImoviewService : IDisposable
                 else qtdErro++;
             }
         }
-        Console.WriteLine($"{qtdSucesso} imoveis importados com sucesso!");
-        Console.WriteLine($"{qtdErro} imoveis importados com erro!");
+        _logger?.LogInformation("{qtdSucesso} imoveis importados com sucesso!", qtdSucesso);
+        _logger?.LogInformation("{qtdErro} imoveis importados com erro!", qtdErro);
         return true;
     }
 
@@ -412,6 +447,7 @@ public class ImoviewService : IDisposable
         }
         catch (Exception ex)
         {
+            _logger?.LogError("Erro ao importar imovel: {imovelId}, erro: {ex}", imovelId, ex);
             importacaoImovel!.ImoviewResponse = Newtonsoft.Json.JsonConvert.SerializeObject(new { mensagem = ex.Message, erro = true, stack = ex.StackTrace });
             importacaoImovel.Status = StatusIntegracao.Erro.ToString();
             await _retryPolicy.ExecuteAsync(() => _imoviewDAO.SaveImportacaoImovel(importacaoImovel));
