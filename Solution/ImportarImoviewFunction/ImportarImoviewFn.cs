@@ -23,7 +23,6 @@ public class ImportarImoviewFn
     public ImportarImoviewFn(ILogger<ImportarImoviewFn> logger, ImoviewService service)
     {
         _logger = logger;
-        //_service = new ImoviewService(httpClientFactory, context, "", mapper);
         _service = service;
     }
 
@@ -43,7 +42,6 @@ public class ImportarImoviewFn
             IdIntegracao = eventMsg.message.idIntegracao,
             IdOperador = eventMsg.message.idOperador,
         };
-        await messageActions.CompleteMessageAsync(message);
         try
         {
             await _service.ImportarIntegracao(req);
@@ -52,6 +50,7 @@ public class ImportarImoviewFn
         {
             await messageActions.DeadLetterMessageAsync(message);
         }
+        await messageActions.CompleteMessageAsync(message);
     }
 }
 

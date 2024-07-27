@@ -70,7 +70,7 @@ public class ImoviewDAO: IDisposable {
         if (importacaoBairro.Id > 0)
         {
             var fields = Field.Parse<ImportacaoBairroImoview>(e => new { e.Status });
-            await _conn.UpdateAsync<ImportacaoBairroImoview>(importacaoBairro);
+            await _conn.UpdateAsync<ImportacaoBairroImoview>(importacaoBairro, fields);
             return true;
         }
         await _conn.InsertAsync<ImportacaoBairroImoview>(importacaoBairro);
@@ -133,7 +133,7 @@ public class ImoviewDAO: IDisposable {
     public async Task<List<ImportacaoBairroImoview>> GetImportacaoBairrosPendentes(int idIntegracao)
     {
         var integracoesPendentes = await _conn.QueryAsync<IntegracaoBairroImoview>
-            (i => i.IdIntegracao == idIntegracao && i.Status != StatusIntegracao.Concluido.GetDescription());
+            (i => i.IdIntegracao == idIntegracao);
         List<ImportacaoBairroImoview> importacoes = [];
         foreach(var integracao in  integracoesPendentes)
         {
@@ -159,7 +159,10 @@ public class ImoviewDAO: IDisposable {
     internal async Task<bool> SaveImportacaoImovel(ImportacaoImovelImoview importacaoImovel)
     {
         if (importacaoImovel.Id > 0)
-            await _conn.UpdateAsync<ImportacaoImovelImoview>(importacaoImovel);
+        {
+            var fields = Field.Parse<ImportacaoImovelImoview>(e => new { e.Status, e.ImoviewResponse, e.DataAtualizacao });
+            await _conn.UpdateAsync<ImportacaoImovelImoview>(importacaoImovel, fields);
+        }
         else
             await _conn.InsertAsync<ImportacaoImovelImoview>(importacaoImovel);
         return true;
