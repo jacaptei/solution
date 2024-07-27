@@ -1,9 +1,15 @@
+using AutoMapper;
+
+using ImportarImoviewAzureFunction;
+
 using JaCaptei.Application.DAL;
+using JaCaptei.Application.Integracao;
 using JaCaptei.Model;
 
 using Microsoft.Azure.Functions.Worker;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 
 using Polly;
@@ -41,6 +47,15 @@ var builder = new HostBuilder()
     new ConfigureFromConfigurationOptions<AppSettingsRecord>(ctx.Configuration.GetSection(EnvironmentSettings)).Configure(settings);
     settings.CopyToStaticSettings();
     GlobalConfiguration.Setup().UsePostgreSql();
+    services.AddScoped<ImoviewService>(provider =>
+    {
+        var httpClientFactory = provider.GetRequiredService<IHttpClientFactory>();
+        var context = provider.GetRequiredService<DBcontext>();
+        var mapper = provider.GetRequiredService<IMapper>();
+        var logger = provider.GetRequiredService<ILogger<ImportarImoviewFn>>();
+        var imoviewDAO = new ImoviewDAO(context.GetConn());
+        return new ImoviewService(httpClientFactory, context, mapper, logger, imoviewDAO);
+    });
 });
 
 var host = builder.Build();

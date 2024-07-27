@@ -39,10 +39,10 @@ public class ImoviewController : ControllerBase
     }
 
     [HttpGet("Unidades")]
-    public async Task<ActionResult<List<CampoImoview>>> GetUnidades()
+    public async Task<ActionResult<List<ComboDTO>>> GetUnidades([FromBody] string chave)
     {
-        var res = await _service.GetUnidades();
-        return Ok(res?.lista);
+        var res = await _service.GetUnidades(chave);
+        return Ok(res?.lista.ConvertAll(x => new ComboDTO(x.codigo, x.nome)));
     }
 
     [HttpPost("ValidarChave")]
@@ -107,7 +107,7 @@ public class ImoviewController : ControllerBase
             Cliente = new ComboDTO(cliente.id, cliente.nome),
             Plano = new ComboPlanoDTO(plano.id, plano.nome, plano.totalBairros),
             Integracao = integracao, 
-            Unidades = (await _service.GetUnidades())!.lista!.ConvertAll(x => new ComboDTO(x.codigo, x.nome)),
+            Unidades = [],
             Crms = [new(1, "Imoview"), new (2,"VistaSoft")]
         };
         return Ok(res);
