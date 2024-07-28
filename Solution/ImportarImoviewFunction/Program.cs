@@ -46,6 +46,7 @@ var builder = new HostBuilder()
     .AddTransientHttpErrorPolicy(policyBuilder => policyBuilder.WaitAndRetryAsync(Backoff.DecorrelatedJitterBackoffV2(TimeSpan.FromSeconds(1), 5)));
     new ConfigureFromConfigurationOptions<AppSettingsRecord>(ctx.Configuration.GetSection(EnvironmentSettings)).Configure(settings);
     settings.CopyToStaticSettings();
+
     GlobalConfiguration.Setup().UsePostgreSql();
     services.AddScoped<ImoviewService>(provider =>
     {

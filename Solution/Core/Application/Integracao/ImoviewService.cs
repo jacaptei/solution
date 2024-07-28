@@ -7,7 +7,6 @@ using JaCaptei.Model.Entities;
 
 using MassTransit;
 using MassTransit.Initializers;
-using MassTransit.Transports;
 
 using Microsoft.Extensions.Logging;
 
@@ -250,16 +249,16 @@ public class ImoviewService : IDisposable
                 _logger?.LogWarning("Integração ja esta em processamento!");
                 return false;
             }
-
+            _logger?.LogInformation("Atualizando status integração");
             await UpdateIntegracaoStatus(integracao);
 
             var bairros = Newtonsoft.Json.JsonConvert.DeserializeObject<List<BairroDTO>>(integracao.Bairros);
             await ProcessBairros(integracao, integracaoEvent, bairros!);
-
+            _logger?.LogInformation("Processado bairros integração...");
             await ProcessImportacaoBairros(integracao, integracaoEvent);
-
+            _logger?.LogInformation("Processado imóveis integração...");
             await ProcessImportacaoImoveis(integracao);
-
+            _logger?.LogInformation("Finalizando importação...");
             await FinalizeIntegracaoFull(integracao);
             return true;
         }
@@ -275,13 +274,6 @@ public class ImoviewService : IDisposable
 
     private async Task<bool> FinalizeIntegracaoFull(IntegracaoImoview integracao)
     {
-        var importacaoBairros = await _retryPolicy.ExecuteAsync(() => _imoviewDAO.GetImportacaoBairrosPendentes(integracao.Id));
-        foreach (var importacaoBairro in importacaoBairros)
-        {
-            importacaoBairro.Status = StatusIntegracao.Concluido.GetDescription();
-            await _retryPolicy.ExecuteAsync(() => _imoviewDAO.SaveImportacaoBairro(importacaoBairro));
-        }
-
         var integracaoBairros = await _retryPolicy.ExecuteAsync(() => _imoviewDAO.GetIntegracaoBairroPendetes(integracao.Id));
         foreach (var integracaoBairro in integracaoBairros)
         {
@@ -310,15 +302,30 @@ public class ImoviewService : IDisposable
             .WithDegreeOfParallelism(6)
             .WithMergeOptions(ParallelMergeOptions.FullyBuffered))
         {
-            var arquivo = await client.GetByteArrayAsync(item.UrlMedium);
-            var dto = new ImagemDTO()
+            try
             {
-                Arquivo = arquivo,
-                Nome = item.Nome,
-                Tipo = item.Tipo,
-                Url = item.UrlMedium
-            };
-            list.Add(dto);
+                Uri validatedUri;
+                var valid = Uri.TryCreate(item.UrlMedium, UriKind.RelativeOrAbsolute, out validatedUri);
+                if(!valid)
+                {
+                    _logger?.LogError("Url invalida! imagem id: {Id}, url: {UrlMedium}", item.Id, item.UrlMedium);
+                    continue;
+                }
+                var arquivo = await client.GetByteArrayAsync(validatedUri);
+                var dto = new ImagemDTO()
+                {
+                    Arquivo = arquivo,
+                    Nome = item.Nome,
+                    Tipo = item.Tipo,
+                    Url = item.UrlMedium
+                };
+                list.Add(dto);
+            }
+            catch (Exception ex)
+            {
+                _logger?.LogError("Erro: {ex} ao baixar imagem id: {Id}, url: {UrlMedium}", ex, item.Id, item.UrlMedium);
+                continue;
+            }
         }
 
         return list;
@@ -386,19 +393,24 @@ public class ImoviewService : IDisposable
     private async Task<bool> ProcessImportacaoImoveis(IntegracaoImoview integracao)
     {
         var importacaoBairros = await _retryPolicy.ExecuteAsync(() => _imoviewDAO.GetImportacaoBairrosPendentes(integracao.Id));
-        int qtdSucesso = 0, qtdErro = 0;
         foreach (var importacaoBairro in importacaoBairros)
         {
+            int qtdSucesso = 0, qtdErro = 0;
             var imoveisIds = Newtonsoft.Json.JsonConvert.DeserializeObject<List<ImovelListDTO>>(importacaoBairro.Imoveis) ?? [];
             foreach (var imovelId in imoveisIds)
             {
                 var res = await ProcessSingleImportacaoImovel(integracao, importacaoBairro, imovelId);
-                if (res) qtdSucesso++;
+                if (res == null) continue;
+                if (res.Value) qtdSucesso++;
                 else qtdErro++;
             }
+            importacaoBairro.Status = qtdErro > 0 ? StatusIntegracao.ConcluidoErro.GetDescription() :
+                 StatusIntegracao.Concluido.GetDescription();
+            await _retryPolicy.ExecuteAsync(() => _imoviewDAO.SaveImportacaoBairro(importacaoBairro));
+            _logger?.LogInformation("Integração Bairro: {IdIntegracaoBairro}", importacaoBairro.IdIntegracaoBairro);
+            _logger?.LogInformation("{qtdSucesso} imoveis importados com sucesso!", qtdSucesso);
+            _logger?.LogInformation("{qtdErro} imoveis importados com erro!", qtdErro);
         }
-        _logger?.LogInformation("{qtdSucesso} imoveis importados com sucesso!", qtdSucesso);
-        _logger?.LogInformation("{qtdErro} imoveis importados com erro!", qtdErro);
         return true;
     }
 
@@ -406,7 +418,8 @@ public class ImoviewService : IDisposable
     {
         return await _imoviewDAO.GetFullImovel(id);
     }
-    private async Task<bool> ProcessSingleImportacaoImovel(IntegracaoImoview integracao, ImportacaoBairroImoview importacaoBairro, ImovelListDTO imovelId)
+
+    private async Task<bool?> ProcessSingleImportacaoImovel(IntegracaoImoview integracao, ImportacaoBairroImoview importacaoBairro, ImovelListDTO imovelId)
     {
         ImportacaoImovelImoview? importacaoImovel = await _retryPolicy.ExecuteAsync(() => _imoviewDAO.GetImportacaoImovel(importacaoBairro.Id, imovelId.idImovel));
         ImoviewAddImovelRequest? request = null;
@@ -437,9 +450,10 @@ public class ImoviewService : IDisposable
         else
         {
             if (importacaoImovel.Status == StatusIntegracao.Concluido.GetDescription())
-                return true;
+                return null;
             request = Newtonsoft.Json.JsonConvert.DeserializeObject<ImoviewAddImovelRequest>(importacaoImovel.RequestBody);
             images = await GetImageFiles(imovelId.idImovel);
+            importacaoImovel.DataAtualizacao = DateTime.UtcNow;
         }
 
         try
@@ -543,5 +557,7 @@ public record ImovelListDTO
     [Description("Erro")]
     Erro,
     [Description("Concluido")]
-    Concluido
- }
+    Concluido,
+    [Description("Concluido com Erro")]
+    ConcluidoErro
+}

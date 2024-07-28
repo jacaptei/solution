@@ -34,4 +34,7 @@ public class ImportacaoImovelImoview
     [Map("imoviewResponse")]
     [NpgsqlDbType(NpgsqlDbType.Jsonb)]
     public string ImoviewResponse { get; set; }
+
+    [Map("dataAtualizacao")]
+    public DateTime DataAtualizacao { get; set; }
 }
