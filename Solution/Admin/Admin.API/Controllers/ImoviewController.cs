@@ -38,15 +38,15 @@ public class ImoviewController : ControllerBase
         _parceiroService = new ParceiroService(context);
     }
 
-    [HttpGet("Unidades")]
-    public async Task<ActionResult<List<ComboDTO>>> GetUnidades([FromBody] string chave)
+    [HttpGet("Unidades/{chave}")]
+    public async Task<ActionResult<List<ComboDTO>>> GetUnidades([FromQuery] string chave)
     {
         var res = await _service.GetUnidades(chave);
         return Ok(res?.lista.ConvertAll(x => new ComboDTO(x.codigo, x.nome)));
     }
 
-    [HttpPost("ValidarChave")]
-    public async Task<ActionResult<bool>> ValidarChave([FromBody] string chave)
+    [HttpPost("ValidarChave*/{chave}")]
+    public async Task<ActionResult<bool>> ValidarChave([FromQuery] string chave)
     {
         var res = await _service.ValidarChave(chave);
         return Ok(res);
