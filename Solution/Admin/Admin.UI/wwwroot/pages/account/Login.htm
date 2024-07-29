@@ -1,0 +1,150 @@
+﻿<template>
+    <div>
+        <el-row justify="center" v-if="$root.loading">
+            <el-col :md="24" style="max-width:360px;margin-top:60px">
+                <c-loading size="60px" padding="0px"></c-loading>
+            </el-col>
+        </el-row>
+        <el-row v-else justify="center" @keyup.enter="Login()">
+            <el-col :md="24" style="max-width:360px;">
+                <div class="s-input-login" style="text-align:left">
+                    <div><i class="fa fa-user"></i> CPF, CNPJ ou E-MAIL  <span></span> </div>
+                    <el-input v-model="usuario.username" placeholder="" ref="username" maxlength="140"></el-input>
+                </div>
+                <div class="s-input-login" style="margin-top:20px;text-align:left">
+                    <div><i class="fa fa-key"></i> SENHA </div>
+                    <el-input v-model="usuario.senha" type="password" maxlength="40" show-password></el-input>
+                </div>
+                <div class="s-input-login" style="margin-top:30px;text-align:center">
+                    <q-btn color="primary" @click="Login()">ENVIAR</q-btn>
+                </div>
+            </el-col>
+        </el-row>
+    </div>
+</template>
+
+
+
+
+<script>
+	module.exports = {
+
+		name: 'Login',
+
+		components: {
+
+		},
+
+		data: function () {
+			return {
+                usuario: {id:0,username:"",senha:"", nome:"",apelido:""}
+			}
+		}, computed: {
+
+		},
+
+		props: {
+
+		},
+		watch: {
+
+		},
+		created: function () {
+            this.$root.SetTitle("", "", null);
+		},
+		mounted() {
+            this.$refs.username.focus();
+
+            this.usuario.username = "28249525809";
+            this.usuario.senha = "28249525809";
+            //this.usuario.senha = "28249525809"; // prod
+            //this.Login();
+            //this.usuario.senha = "18109654000113";
+
+		},
+		methods: {
+
+
+			async Login(){
+
+                this.$root.usuario = this.usuario;
+
+                var msg = "";
+
+                if (!this.$validator.is(this.$root.usuario.username))
+                    msg += "- Necessário preencher o <b>CPF ou CNPJ ou E-Mail</b>.<br>";
+			   
+                if (!this.$validator.is(this.$root.usuario.senha))
+                    msg += "- Necessário preencher a <b>SENHA</b>.<br>";
+			   
+                if (this.$validator.is(msg))
+                    this.$tools.Alert(msg);
+
+				else{
+
+                    this.$root.loading = true;
+
+                    var request = await this.$api.Post("usuario/autenticar", this.$root.usuario);
+
+                    if(this.$validator.is(request))
+                        this.$root.SignIn(request.result);
+
+					this.$root.loading = false;
+						
+
+					/*
+					axios.post(this.$api.BuildURL("usuario/autenticar"),this.$root.usuario).then((request) => {
+							//c2("request.data",request.data);
+							if(request.data.status.success)
+                                this.$root.SignIn(request.data.result);
+							else
+                                this.$tools.Alert("Não foi possível autenticar.");
+                        //alert("Não foi possível atender a requisição");
+						}).catch((error) => {
+                            this.$root.loading = false;
+                            this.$tools.HandleErrors(error);
+						}).finally(() => {
+                            window.setTimeout(() => { this.$root.loading = false;},400);
+						});
+						*/
+				}
+
+			}
+
+
+
+
+		}
+
+	}
+
+
+</script>
+
+
+<style scoped>
+.s-input-login{
+    /*max-width:240px !important;*/
+    letter-spacing: 0.02em;
+    color: var(--s-color-accent);
+    margin-top:30px;
+}
+    .s-input-login > div:first-child {
+        color: var(--s-color-accent);
+        font-size: 0.9em;
+        line-height: 24px;
+        font-weight: 600;
+        text-decoration: inherit;
+        padding-left: 2px;
+    }
+.s-input-login > div:first-child > span{
+    color: var(--s-color-accent);
+    font-weight: 400;
+    font-size:0.9em;
+}
+.s-input-login > div:first-child > i{
+    padding-right:2px;
+}
+</style>
+
+
