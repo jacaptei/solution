@@ -271,15 +271,15 @@ $(document).ready(function () {
                 },
 
                 // AUTH --------------------------------
-                async SignIn(){
+            async SignIn(_usuario){
 
                     this.admins = (await this.$api.Get("admin/obter/todos")).result;
 
-                    //this.usuario = _usuario;
+                    this.usuario = _usuario;
                     this.usuario.autenticado = true;
                     this.isAuth = this.isAuth = true;
-                    //this.$sdata.Storage.Set("utk"    , this.usuario.token);
-                    axios.defaults.headers.common["Authorization"] = "Bearer " + this.usuario.tokenJWT; 
+                //this.$sdata.Storage.Set("utk"    , this.usuario.token);
+                axios.defaults.headers.common["Authorization"] = "Bearer " + this.usuario.tokenJWT; 
                     //c2("user",this.usuario);
 
                     //c2("GetAdmin", this.GetAdmin(this.admins[0].id));
