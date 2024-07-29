@@ -46,7 +46,7 @@ public class ImoviewController : ControllerBase
     }
 
     [HttpPost("ValidarChave*/{chave}")]
-    public async Task<ActionResult<bool>> ValidarChave([FromQuery] string chave)
+    public async Task<ActionResult<bool>> ValidarChave([FromRoute] string chave)
     {
         var res = await _service.ValidarChave(chave);
         return Ok(res);
