@@ -134,7 +134,7 @@ public class ImoviewController : ControllerBase
             IdCliente = dto.IdCliente,
             IdOperador = dto.IdOperador,
             IdPlano = dto.IdPlano,
-            Bairros = Newtonsoft.Json.JsonConvert.SerializeObject(dto.Bairros),
+            Bairros = Newtonsoft.Json.JsonConvert.SerializeObject(bairros),
         };
         var res = await _service.IntegrarCliente(integracao);
         return Ok(res);
