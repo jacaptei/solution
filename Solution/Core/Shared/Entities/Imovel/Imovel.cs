@@ -42,6 +42,8 @@ namespace JaCaptei.Model {
              //finalidade
             public bool                 venda              {get;set;} = true;
             public bool                 locacao            {get;set;}
+            public bool                 residencial        {get;set;}
+            public bool                 comercial          {get;set;}
 
             public string               urlImagemPrincipal{get;set;}  = "https://jacaptei.com.br/resources/images/logo.png";
             public string               urlVideo          {get;set;}  = "";

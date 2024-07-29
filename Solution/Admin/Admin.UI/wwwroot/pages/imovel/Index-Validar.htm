@@ -6,7 +6,7 @@
                 <div class="row" style="width:100%;margin-bottom:40px;display:block">
 
                     <div class="col-12" v-if="onrequest">
-                        <c-loading ></c-loading>
+                        <c-loading-page ></c-loading-page>
                     </div>
                     <div class="col-12" style="width:100%" v-else>
 
@@ -17,101 +17,42 @@
                         <div v-if="imoveisBuscaResult.length == 0" style="margin:20px">
                             não há imóveis pendentes de validação
                         </div>
-                        <div v-else class="col-12" v-for="(item,index) in imoveisBuscaResult" style="margin:20px">
+                        <div v-else class="col-12" v-for="(item,index) in imoveisBuscaResult" style="margin-bottom:20px">
 
 
+                            
                             <q-card style="width:100%;color:#fff;margin-bottom:5px">
                                 <q-card-section :class="item.validado? 'bg-teal': 'bg-orange'">
                                     <div class="text-h10">
                                         <span class="text-h10">
-                                            <b style="margin-right:10px;">{{item.nome}}</b> <span style="opacity:0.88;padding-right:20px">{{$tools.FormatDateHour(item.data)}}</span>
+                                            <b style="margin-right:10px;"> {{item.nome}}</b> <span style="opacity:0.88;padding-right:20px">{{$tools.FormatDateHour(item.data)}}</span>
                                         </span>
                                         <span class="text-h10">
                                             <span style="float:right;font-weight:700;padding-right:5px">
                                                 <span v-if="item.validado">Validado</span>
-                                                <span v-else>Não validado</span>
+                                                <span v-else>Não validado <i class="fa fa-warning"></i></span>
                                             </span>
                                         </span>
                                     </div>
                                 </q-card-section>
 
-                                <q-card-section style="margin-bottom:15px">
-
-                                    <div>
-
-
-                                        <div style="font-weight:500;color:#000">
-                                            <div>
-                                                <q-card>
-                                                    <q-card-section>
-                                                        <el-row :gutter="20">
-                                                            <el-col :md="11" :sm="24">
-
-
-                                                                <table>
-                                                                    <tr>
-                                                                        <td>
-                                                                            <el-image style="width: 100px;cursor:pointer; height: 100px" :src="item.imagens[0].urlThumb" fit="fill"  @click="$root.RouteTo('imovel/'+item.id)"></el-image>
-                                                                        </td>
-                                                                        <td>
-                                                                            <div style="color:var(--s-color-primary);cursor:pointer"  @click="$root.RouteTo('imovel/'+item.id)">
-                                                                                <b><span v-html="item.nome.replaceAll('COD','<br />COD').replaceAll('ID','<br />ID').replaceAll(',','')" ></span></b>
-                                                                            </div>
-                                                                            <div style="color:var(--s-color-primary);">
-                                                                                    {{item.proprietario.nome}}<br />
-                                                                                    <a :href="$tools.BuildWhatsappLink(item.proprietario.telefone,'Olá '+item.proprietario.apelido)" target="_blank" style="color:var(--s-color-green);text-decoration:none"><i class="fab fa-whatsapp" style="padding-right:3px;"></i> {{item.proprietario.telefone}}</a>
-                                                                                    <br />
-                                                                                    <a :href="'mailto:'+item.proprietario.email" target="_blank" style="color:var(--el-color-primary);text-decoration:none"><i class="fa fa-envelope"></i>&nbsp; {{item.proprietario.email}}</a>
-                                                                            </div>
-                                                                            <div>
-                                                                                <a v-if="$validator.is(item.endereco.logradouro)" href="javascript:void(0)" @click="$tools.Copy((item.endereco.logradouro+','+item.endereco.numero+','+($validator.is(item.endereco.complemento)? item.endereco.complemento+',':'')+item.endereco.bairro+','+item.endereco.cidade+','+item.endereco.estado))" style="text-decoration:none;color:var(--s-color-primary);margin-right:10px"><i class="fa fa-copy" style="padding-right:3px;text-decoration:none"></i></a>
-                                                                                <a :href="$tools.BuildMapUrl(item.endereco)" target="_blank" style="color:var(--s-text-color);text-decoration:none;margin-right:6px">
-                                                                                    <i style="color:var(--s-color-primary);margin-right:6px" class="fa fa-location-dot"></i>
-                                                                                    <div style="color:var(--s-color-text);">
-                                                                                        {{item.endereco.logradouro}}, {{item.endereco.numero}}
-                                                                                        <span v-if="$validator.is(item.complemento)"> , {{item.endereco.complemento}}</span>,
-                                                                                        {{item.endereco.bairro}},
-                                                                                        {{item.endereco.cidade}}, {{item.endereco.estado}}, CEP: {{item.endereco.cep}}
-                                                                                    </div>
-                                                                                </a>
-                                                                            </div>
-                                                                            <div>
-                                                                                <a v-if="$validator.is(item.obs)" href="javascript:void(0)" @click="$tools.Alert(item.obs,'OBSERVAÇÕES')" style="color:var(--s-color-primary);text-decoration:none"><i class="fa fa-message"></i></a>
-                                                                                <a v-else href="javascript:void(0)" @click="$tools.Message('sem observações')" style="color:var(--s-color-grey);text-decoration:none"><i class="fa fa-message"></i></a>
-                                                                            </div>
-                                                                            <div>
-                                                                                 {{$tools.FormatDateToBR(new Date(item.data))}}
-                                                                            </div>
-                                                                        </td>
-                                                                    </tr>
-                                                                </table>
-
-                                                            </el-col>
-                                                        </el-row>
-                                                    </q-card-section>
-
-
-                                                    <q-card-section>
-                                                        <el-row :gutter="20">
-                                                            <el-col :md="24" style="width:100%;text-align:left;margin-bottom:4px;font-weight:800;color:var(--s-color-green)" v-if="item.validado">
-                                                              <i class="fa fa-check-circle"></i>  VALIDADO
-                                                            </el-col>
-                                                            <el-col :md="24" style="width:100%;text-align:center;margin-bottom:4px" v-else>
-                                                                <c-loading v-if="requests[index]"></c-loading>
-                                                                <q-btn v-else label="Validar" color="orange" @click="Validar(item,index)" style="width:200px;height:20px"></q-btn>
-                                                            </el-col>
-                                                        </el-row>
-                                                    </q-card-section>
-
-
-                                                </q-card>
-                                            </div>
-                                        </div>
-
-                                    </div>
-
+                                <q-card-section>
+                                    <c-imovel-card :imovel="item"></c-imovel-card>
                                 </q-card-section>
-                            </q-card>
+
+
+                                <q-card-section>
+                                    <el-row >
+                                        <el-col :md="24" style="width:100%;text-align:left;margin-bottom:4px;font-weight:800;color:var(--s-color-green)" v-if="item.validado">
+                                            <i class="fa fa-check-circle"></i>  VALIDADO
+                                        </el-col>
+                                        <el-col :md="24" style="width:100%;text-align:center;margin-bottom:4px" v-else>
+                                            <c-loading v-if="requests[index]"></c-loading>
+                                            <q-btn v-else label="Validar" :color="item.validado? 'teal':'orange'" @click="Validar(item,index)" style="width:200px;height:20px"></q-btn>
+                                        </el-col>
+                                    </el-row>
+                                </q-card-section>
+
 
                         </div>
 
@@ -170,25 +111,12 @@
         methods: {
 
 
-            OpenMap(item) {
-                var res = "";
-                res += this.$validator.is(item.logradouro) ? item.logradouro + "," : "";
-                res += this.$validator.is(item.numero) ? item.numero + "," : "";
-                res += this.$validator.is(item.bairro) ? item.bairro + "," : "";
-                res += this.$validator.is(item.cidade) ? item.cidade + "," : "";
-                res += this.$validator.is(item.estado) ? item.estado + "" : "";
-                res = res.replaceAll(" ", "%20");
-                res = "https://maps.google.com/maps?q=" + res + "+()&amp;t=&amp;z=12&amp;ie=UTF8&amp;iwloc=B&amp;output=embed";
-                //c(res)
-                window.open(res, "_blank");
-            },
-
 
             async BuscarPendentes() {
 
-                this.ontablequest  = true;
+                this.onrequest  = true;
                 var request = await this.$api.Get("imovel/pendentes");
-                this.ontablequest  = false;
+                this.onrequest  = false;
 
                 if (request?.status?.success){
                     this.buscaImovel        =  request.result;

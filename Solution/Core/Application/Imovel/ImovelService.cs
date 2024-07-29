@@ -27,6 +27,10 @@ namespace JaCaptei.Application{
            //     appReturn.AddException("Valor não informado.");
            // if(entity.area.total <= 0)
            //     appReturn.AddException("Área não informada.");
+           if(entity.endereco.idTipoComplemento == 0)
+               appReturn.AddException("Tipo de complemento não selecionado.");
+           else if(entity.endereco.idTipoComplemento == 2 && Utils.Validator.Not(entity.endereco.complementoTipo))
+               appReturn.AddException("Outro complemento não informado.");
 
             if(!appReturn.status.success)
                 return appReturn;
@@ -55,15 +59,20 @@ namespace JaCaptei.Application{
             if(entity.idProprietario <= 0)
                 appReturn.AddException("Proprietário não identificado.");
 
-            if(entity.imagens is null)
-                entity.imagens = new List<ImovelImagem>();
-            else if(entity.imagens.Count > 0) {
-                entity.imagens.ForEach(i => i.principal = false);
-                entity.imagens[0].principal = true;
-            }
+            if(entity.endereco.idTipoComplemento == 0)
+                appReturn.AddException("Tipo de complemento não selecionado.");
+            else if(entity.endereco.idTipoComplemento == 2 && Utils.Validator.Not(entity.endereco.complementoTipo))
+                appReturn.AddException("Outro complemento não informado.");
 
             if(!appReturn.status.success)
                 return appReturn;
+
+            //if(entity.imagens is null)
+            //    entity.imagens = new List<ImovelImagem>();
+            //else if(entity.imagens.Count > 0) {
+                entity.imagens.ForEach(i => i.principal = false);
+                entity.imagens[0].principal = true;
+           // }
 
             try {
                 LocalidadeService localidade = new LocalidadeService();
@@ -125,11 +134,10 @@ namespace JaCaptei.Application{
 
 
         public AppReturn Buscar(ImovelBusca busca) {
+            //busca.somenteValidados = true;
             busca.imovelJC = BLO.Normalizar(busca.imovelJC);
             return DAO.Buscar(busca);
         }
-
-
 
 
         public string GetImageShackResize(string url,string resol = "640x480") {

@@ -1,0 +1,342 @@
+<template>
+
+    <div class="row">
+
+        <div class="col-12" id="imovel-card" :style="(!imovel.ativo)? 'border:4px solid var(--s-color-red)' : (!imovel.validado)? 'border:4px solid orange' : ''">
+
+            <div id="carousel-thumbs">
+                <el-carousel :interval="0" arrow="always" style="border-radius:14px 0px 0px 14px;" v-if="imovel.imagens.length > 0">
+                    <el-carousel-item v-for="(item,index) in imovel.imagens" :key="index" @click="OpenModalImages(index)" style="cursor:pointer;">
+                        <img :src="item.urlThumb" />
+                        <div>{{index+1}} / {{imovel.imagens.length}}</div> <div><i class="fa-solid fa-up-right-and-down-left-from-center"></i></div>
+                    </el-carousel-item>
+                </el-carousel>
+                <el-carousel :interval="0" arrow="never" style="border-radius:14px 0px 0px 14px;" v-else>
+                    <el-carousel-item style="cursor:pointer;">
+                        <img src="/resources/images/noimages.jpg" />
+                    </el-carousel-item>
+                </el-carousel>
+
+            </div>
+
+            <el-row id="imovel-body">
+                <div>
+
+                    <el-col id="caracteristicas">
+
+                        <el-row>
+                            <el-col :span=17 style="border-right:1px solid #e9e9e9">
+                                <el-row>
+                                    <el-col :span=24>
+                                            <div style="padding-top:12px;padding-right:12px;cursor:pointer" @click="Open(imovel.id)" @click.middle="Open('_blank')">
+                                                <div style="cursor:pointer;display:flow-root;">
+                                                    <div id="title" style="float:left">
+                                                        {{imovel.tipo.label}} 
+                                                        <span style="font-size:11px;margin-left:4px">
+                                                            <span v-if="!imovel.ativo"          style="border-radius:10px;background-color:var(--s-color-red);margin-right:10px;color:#fff;padding:4px">INATIVO</span>
+                                                            <span v-else-if="!imovel.validado"  style="border-radius:10px;background-color:orange;color:#fff ;margin-right:10px;padding:4px;">NÃO VALIDADO</span>
+                                                            <span style="font-weight:600;color:#353535"><i class="fa fa-up-right-from-square"></i></span>
+                                                        </span>
+                                                    </div>
+                                                    <div style="display:inline-block;float:right;">
+                                                        <span style="font-weight:600;font-size:11pt;padding-left:10px;color:black"><span style="color:var(--s-accent-color);"><span style="opacity:0.7">ID </span>#</span><span style="color:var(--s-alt-accent-color);font-size:12pt">{{imovel.id}}</span></span>
+                                                        <span style="font-weight:600;font-size:11pt;padding-left:10px;color:black"><span style="color:var(--s-accent-color);"><span style="opacity:0.7">CÓD </span> </span><span style="color:var(--s-alt-accent-color);font-size:12pt">{{imovel.cod}}</span></span>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div>
+                                                <div id="subtitle">
+                                                    <span v-if="$validator.is(imovel.endereco.bairro)">{{imovel.endereco.bairro}}, </span>
+                                                    <span v-if="$validator.is(imovel.endereco.cidade)">{{imovel.endereco.cidade}}, </span>
+                                                    <span v-if="$validator.is(imovel.endereco.estado)">{{imovel.endereco.estado}}, </span>
+                                                    <span v-if="$validator.is(imovel.endereco.cep)"  @click="$tools.Copy(imovel.endereco.cep)" >CEP: {{imovel.endereco.cep}}  <i class="fa fa-copy" style="padding-left:10px;color:#666;text-decoration:none;cursor:pointer"></i></span>
+                                                </div>
+                                            </div>
+                                            <div id="location" style="cursor:pointer;">
+                                                <span @click="$tools.OpenMapImovel(imovel)">
+                                                    <i class="icons fa fa-map-marker-alt"></i>
+                                                    <span v-if="$validator.is(imovel.endereco.logradouro)">{{imovel.endereco.logradouro}}, </span>
+                                                    <span v-if="$validator.is(imovel.endereco.numero)">{{imovel.endereco.numero}}, </span>
+                                                    <span v-if="$validator.is(imovel.endereco.complementoTipo)" style="padding-right:3px">{{imovel.endereco.complementoTipo}} </span>
+                                                    <span v-if="$validator.is(imovel.endereco.complemento)"> {{imovel.endereco.complemento}} </span>
+                                                    <span v-if="$validator.is(imovel.endereco.andar && imovel.endereco.andar > 0)">, {{imovel.endereco.andar}}º andar  </span>
+                                                    <!--<span v-if="$validator.is(imovel.endereco.bairro)">{{imovel.endereco.bairro}}, </span>
+                                                    <span v-if="$validator.is(imovel.endereco.cidade)">{{imovel.endereco.cidade}}, </span>
+                                                    <span v-if="$validator.is(imovel.endereco.estado)">{{imovel.endereco.estado}}  </span>-->
+                                                </span>
+                                                <span>
+                                                    <i class="fa fa-copy" style="padding-left:10px;color:#666;text-decoration:none" @click="$tools.Copy($tools.BuildAddressImovel(imovel))"></i>
+                                                </span>
+
+                                            </div>
+                                    </el-col>
+                                </el-row>
+                                <el-row style="line-height:20px">
+                                    <el-col :span=5> <i class="icons mdi mdi-bed-king"></i>     quartos     <div style="font-size: 17px;font-weight: 700;text-align:center;max-width:100px;margin-top:-4px">{{imovel.interno.totalQuartos}}</div></el-col>
+                                    <el-col :span=5> <i class="icons fa fa-bath"></i>           suítes      <div style="font-size: 17px;font-weight: 700;text-align:center;max-width:100px;margin-top:-4px">{{imovel.interno.totalSuites}}</div></el-col>
+                                    <el-col :span=5> <i class="icons fa fa-shower"></i>         banheiros   <div style="font-size: 17px;font-weight: 700;text-align:center;max-width:100px;margin-top:-4px">{{imovel.interno.totalBanheiros}}</div></el-col>
+                                    <el-col :span=4> <i class="icons fa fa-car "></i>           vagas       <div style="font-size: 17px;font-weight: 700;text-align:center;max-width:100px;margin-top:-4px">{{imovel.externo.totalVagas}}</div></el-col>
+                                    <el-col :span=5> <i class="icons fa fa-building "></i>      elevadores  <div style="font-size: 17px;font-weight: 700;text-align:center;max-width:100px;margin-top:-4px">{{imovel.externo.totalElevadores}}</div></el-col>
+                                </el-row>
+                                <el-row style="line-height:20px">
+                                    <el-col :span=5> <i class="icons mdi mdi-set-square " style="margin-right:-4px"></i>Área Total  <div style="font-size: 15px;font-weight: 700;text-align:center;max-width:110px;margin-top:-4px">{{imovel.area.total}} m&#178;</div></el-col>
+                                    <el-col :span=5> <i class="icons mdi mdi-set-square " style="margin-right:-4px"></i>Área Interna<div style="font-size: 15px;font-weight: 700;text-align:center;max-width:110px;margin-top:-4px">{{imovel.area.interna}} m&#178;</div></el-col>
+                                    <el-col :span=5> <i class="icons mdi mdi-set-square " style="margin-right:-4px"></i>Área Externa<div style="font-size: 15px;font-weight: 700;text-align:center;max-width:110px;margin-top:-4px">{{imovel.area.externa}} m&#178;</div></el-col>
+                                </el-row>
+                            </el-col>
+                            <el-col :span=1></el-col>
+                            <el-col :span=6>
+                                <el-row>
+                                    <el-col :span=24 style="padding-top:12px"> <div style="color:#01cb25;font-size: 20px;font-weight:700;display:inline-block">{{$tools.FormatMoneyBR(imovel.valor.venda)}}</div></el-col>
+                                    <el-col :span=24 style="padding-top:6px">Condomínio:     <div style="font-size: 15px;font-weight:700;display:inline-block">{{$tools.FormatMoneyBR(imovel.valor.condominio)}}</div></el-col>
+                                    <el-col :span=24 style="padding-top:3px">IPTU mensal:    <div style="font-size: 15px;font-weight:700;display:inline-block">{{$tools.FormatMoneyBR(imovel.valor.iptuMensal)}}</div></el-col>
+                                    <el-col :span=24 style="padding-top:12px">Atualização    <div style="font-size: 12px;font-weight:700">{{$tools.FormatDateHourToBR(imovel.dataAtualizacao)}} <span style="font-weight:normal;color:#555555">{{$tools.GetHours(imovel.dataAtualizacao)}}h por</span><br />{{imovel.atualizadoPorNome}} <span v-if="imovel.atualizadoPorId > 0" style="font-weight:normal">ID #{{imovel.atualizadoPorId}}</span></div></el-col>
+                                    <!--<el-col :span=24 style="padding-top:12px">Atualizado por  ID #{{imovel.atualizadoPorId}}   <div style="font-size: 13px;font-weight:700">{{imovel.atualizadoPorNome}}</div></el-col>-->
+                                    <el-col :span=24 style="padding-top:12px" v-if="$validator.is(imovel.captador)">Captado por    <div style="font-size: 12px;font-weight:700">{{imovel.captador}}  <span v-if="imovel.idAdminCaptador > 0" style="font-weight:normal">ID #{{imovel.idAdminCaptador}}</span></div></el-col>
+                                </el-row>
+                            </el-col>
+                        </el-row>
+                    </el-col>
+                </div>
+
+
+        </div>
+
+
+        <el-dialog v-model="showModalImages" :title="imovel.titulo" :id="'caroussel'+id">
+
+            <q-carousel v-model="imageIndex"
+                        arrows
+                        navigation
+                        swipeable
+                        animated
+                        infinite>
+                <template v-slot:navigation-icon="{ active, btnProps, onClick }">
+                    <q-btn v-if="active" size="5px" color="orange"></q-btn>
+                    <q-btn v-else size="4px" color="white" @click="onClick"></q-btn>
+                </template>
+
+                <q-carousel-slide v-for="(item,index) in imovel.imagens" :name="index" :img-src="item.url"></q-carousel-slide>
+
+            </q-carousel>
+
+        </el-dialog>
+
+
+
+    </div>
+
+</template>
+
+<script>
+module.exports = {
+
+    components: {
+
+	},
+
+        data: function () {
+            return {
+                showModalImages  : false,
+                imageIndex       : 0,
+                favoritando      : false
+            }
+        }, computed: {
+
+        },
+
+        props: {
+            id:		{ type: Number, required: false, default: 0 },
+            imovel:	{ type: Object, required: false, default: {}},
+        },
+        watch: {
+        },
+        created: function () {
+
+	    },
+	    mounted(){
+
+	    },
+	    methods: {
+
+            OpenModalImages(index){
+                this.imageIndex=index;
+                //window.setTimeout(()=>this.showModalImages=true,2000)
+                this.showModalImages=true;
+
+            },
+
+
+            Open(id,target="_blank"){
+                this.$root.RouteTo('imovel/'+id);
+            },
+
+
+
+	    }
+
+}
+
+</script>
+
+
+<!--<script setup>
+const isCollapse = ref(true);
+const handleOpen = function(key, keyPath){
+  c(key, keyPath);
+}
+const handleClose = function(key, keyPath){
+  c(key, keyPath);
+}
+</script>-->
+
+<style scoped>
+
+    img {
+        display: flex;
+        justify-content: center;
+        width: 100%;
+        height: 100%;
+    }
+
+
+    #imovel-card {
+        min-height:198px;
+        width: 100%;
+        border-radius: 20px;
+        margin-left: 0px;
+        /*border:solid 2px #efefef;*/
+        box-shadow: rgba(99, 99, 99, 0.1) 0px 2px 8px 0px;
+        box-shadow: rgba(0, 0, 0, 0.16) 0px 1px 4px;
+        box-shadow: rgb(0 0 0 / 0.14) 1px 1px 6px 2px;
+    }
+
+    #imovel-card-xs {
+        width: auto;
+        height: auto;
+        border-radius: 14px;
+        padding: 10px;
+        /*border:solid 2px #efefef;*/
+        box-shadow: rgba(99, 99, 99, 0.1) 0px 2px 8px 0px;
+        box-shadow: rgba(0, 0, 0, 0.16) 0px 1px 4px;
+    }
+
+
+    #carousel-thumbs {
+        /*height:240px;*/
+        display: inline-block;
+        padding: 0px;
+        max-width: 250px;
+        width: inherit;
+        float: left;
+    }
+
+
+
+    #carousel-thumbs-xs {
+        display: block;
+        padding: 0px;
+        width: 100%;
+    }
+
+    #imovel-body {
+        display: inline-block;
+        padding-left:12px;
+        width: 75%;
+    }
+
+    #imovel-body-xs {
+        display: block;
+        padding: 10px;
+        /*width: calc(100% - 20px);*/
+    }
+
+    #title {
+        font-size: 18px;
+        /*line-height: 24px;*/
+        font-weight: 600;
+        color: var(--s-color-primary);
+    }
+
+    #subtitle {
+        font-size: 16px;
+        padding-top: 6px;
+        font-weight: 700;
+        color: var(--s-color-text);
+    }
+
+
+    .icons {
+        width: 28px;
+        display: inline-block;
+        text-align: center;
+        line-height: 32px;
+        color: var(--s-accent-color);
+    }
+
+
+    #location {
+        font-size: 15px;
+        line-height: 28px;
+        font-weight: 500;
+        color: #131A2E;
+        color: #6a728a;
+        padding: 6px 0px 4px 0px;
+    }
+
+
+    #caracteristicas {
+        font-size: 15px;
+        line-height: 16px;
+        font-weight: 500;
+        color: #131A2E;
+        color: #6a728a;
+        padding: 0px;
+    }
+
+
+    #value {
+        font-size: 22px;
+        font-weight: 700;
+        color: var(--s-accent-color);
+        padding: 14px 0px 14px 0px;
+    }
+
+
+
+
+
+
+    .el-carousel__item {
+        background-color: #d3dce6;
+    }
+
+        .el-carousel__item div:nth-child(2) {
+            z-index: 100000;
+            color: #fff;
+            text-shadow: -1px -1px 0 #353535, 1px -1px 0 #353535, -1px 1px 0 #353535, 1px 1px 0 #353535;
+            margin-top: -26px;
+            text-align: left;
+            padding-left: 10px;
+        }
+
+        .el-carousel__item div:nth-child(3) {
+            z-index: 100000;
+            color: #fff;
+            text-shadow: -1px -1px 0 #353535, 1px -1px 0 #353535, -1px 1px 0 #353535, 1px 1px 0 #353535;
+            margin-top: -26px;
+            text-align: right;
+            padding-right: 10px;
+        }
+
+
+
+        .el-carousel__item span {
+            color: #475669;
+            opacity: 0.75;
+            margin: 0;
+            text-align: center;
+        }
+</style>
+
+

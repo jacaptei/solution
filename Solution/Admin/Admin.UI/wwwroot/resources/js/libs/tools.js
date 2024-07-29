@@ -34,6 +34,20 @@ export default class Tools {
         res += this.validator.is(item.estado) ? item.estado + "" : "";
         return res;
     }
+    
+    BuildAddressImovel(item) {
+        var res = "";
+        res += this.validator.is(item.endereco.endereco )               ? item.endereco.endereco     + ", " : "";
+        res += this.validator.is(item.endereco.logradouro )             ? item.endereco.logradouro   + ", " : "";
+        res += this.validator.is(item.endereco.numero     )             ? item.endereco.numero       +", ":"";
+        res += this.validator.is(item.endereco.complementoTipo)         ? item.endereco.complementoTipo  +" ":"";
+        res += this.validator.is(item.endereco.complemento)             ? item.endereco.complemento  +", ":"";
+        res += this.validator.is(item.endereco.andar && item.andar > 0) ? item.endereco.andar   +"º andar, ":"";
+        res += this.validator.is(item.endereco.bairro)                  ? item.endereco.bairro + ", " : "";
+        res += this.validator.is(item.endereco.cidade)                  ? item.endereco.cidade + ", " : "";
+        res += this.validator.is(item.endereco.estado)                  ? item.endereco.estado + "" : "";
+        return res;
+    }
 
     BuildMapUrl(item) {
         var res = "";
@@ -58,7 +72,21 @@ export default class Tools {
         res += this.validator.is(item.cidade) ? item.cidade + "," : "";
         res += this.validator.is(item.estado) ? item.estado + "" : "";
         res = res.replaceAll(" ", "%20");
-        res = "https://maps.google.com/maps?q="+res+"+()&amp;t=&amp;z=12&amp;ie=UTF8&amp;iwloc=B&amp;output=embed";
+        res = "https://maps.google.com/maps?q="+res+"+&amp;t=&amp;z=12&amp;ie=UTF8&amp;iwloc=B&amp;output=embed";
+        //c(res)
+        this.OpenLink(res);
+    }
+
+    
+    OpenMapImovel(item) {
+        var res = "";
+        res += this.validator.is(item.endereco.logradouro ) ? item.endereco.logradouro + "," : "";
+        res += this.validator.is(item.endereco.numero    )  ? item.endereco.numero   +",":"";
+        res += this.validator.is(item.endereco.bairro)      ? item.endereco.bairro + "," : "";
+        res += this.validator.is(item.endereco.cidade)      ? item.endereco.cidade + "," : "";
+        res += this.validator.is(item.endereco.estado)      ? item.endereco.estado + "" : "";
+        res = res.replaceAll(" ", "%20");
+        res = "https://maps.google.com/maps?q="+res+"+&amp;t=&amp;z=12&amp;ie=UTF8&amp;iwloc=B&amp;output=embed";
         //c(res)
         this.OpenLink(res);
     }

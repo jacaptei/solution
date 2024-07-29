@@ -438,7 +438,7 @@ $(document).ready(function () {
 	App.component("c-header"            , c_header              );
 	App.component("c-title"             , c_title               );
 	App.component("c-building-card"     , c_building_card       );
-	App.component("c-building-mini-card", c_building_mini_card  );
+	App.component("c-imovel-card"       , c_imovel_card         );
 	App.component("c-menu"              , c_menu                );
 	App.component("c-menu-header"       , c_menu_header         );
 	App.component("c-card"              , c_card                );
