@@ -199,6 +199,7 @@
         },
         computed: {
             totalSelectedBairros() {
+                console.log(this.group.selectedBairros);
                 if (!Array.isArray(this.locationGroups)) {
                     return 0;
                 }
@@ -267,23 +268,20 @@
                 });
             },
             ObterBairros(cidade, groupIndex) {
-                const group = this.locationGroups[groupIndex];
-                group.carregandoCidades = true; // Indicar carregamento
+                this.group = this.locationGroups[groupIndex];
+                this.group.carregandoCidades = true; // Indicar carregamento
 
                 this.$sdata.ObterBairros(cidade.id).then(res => {
-                    group.bairros = res; // Atualizar a lista de bairros
-                    group.selectedBairros = []; // Limpar seleção anterior, se necessário
-                    group.carregandoCidades = false; // Finalizar carregamento
+                    this.group.bairros = res; // Atualizar a lista de bairros
+                    this.group.carregandoCidades = false; // Finalizar carregamento
                 }).catch(error => {
                     console.error("Erro ao obter bairros:", error);
-                    group.carregandoCidades = false; // Finalizar carregamento mesmo em caso de erro
+                    this.group.carregandoCidades = false; // Finalizar carregamento mesmo em caso de erro
                 });
             },
             handleBairrosChange(selectedBairros, group, index) {
-                this.locationGroups[index] = {
-                    ...group,
-                    selectedBairros: Array.isArray(selectedBairros) ? [...selectedBairros] : []
-                };
+                this.locationGroups[index].selectedBairros = selectedBairros;
+                this.handleCheckboxChange();
             },
             async VerificarChaveApi(chaveApi) {
                 if (!chaveApi) {
@@ -342,7 +340,7 @@
         left: 0;
         right: 0;
         padding: 10px;
-        box-shadow: 0 -1px 5px rgba(0, 0, 0, 0.1); /* opcional, para um pouco de sombra */
+        box-shadow: 0 -1px 5px rgba(0, 0, 0, 0.1);
     }
     .register-input {
         width: 100%;
