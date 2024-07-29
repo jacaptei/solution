@@ -19,13 +19,19 @@ namespace JaCaptei.Model.DTO
     {
         public int IdCliente { get; set; }
         public int IdOperador { get; set; }
-        public DateTime DataInclusao { get; set; }
-        public DateTime DataAtualizacao { get; set; }
         public string CodUsuario { get; set; }
         public string CodUnidade { get; set; }
         public string ChaveApi { get; set; }
         public int IdPlano { get; set; }
-        public string Status { get; set; }
-        public List<Bairro> Bairros { get; set; }
+        public List<BairroIntegracaoDTO> Bairros { get; set; }
+    }
+
+    public record BairroIntegracaoDTO
+    {
+        public int Id { get; set; }
+        public string Value { get; set; }
+        public string Label { get; set; }
+        public int IdCidade { get; set; }
+        public int IdEstado { get; set; }
     }
 }

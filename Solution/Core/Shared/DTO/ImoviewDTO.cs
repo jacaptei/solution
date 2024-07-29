@@ -161,6 +161,20 @@ public class ImagemDTO
     public byte[] Arquivo { get; set; }
 }
 
+/*/
+ "id": 0,
+    "idCliente": 60,
+    "idOperador": 3,
+    "dataInclusao": "2024-07-03T22:57:46.920624",
+    "dataAtualizacao": null,
+    "codUsuario": "4907",
+    "codUnidade": "6151",
+    "chaveApi": "qnnYE4Fev/v2kRbZ5F9PgEGCkJI3Ixflcl0FADcTGyA=",
+    "idPlano": 4,
+    "status": "",
+    "bairros": "[{\"id\": 3278, \"nome\": \"Belvedere\", \"idCidade\": 2754, \"idEstado\":11}]",
+    "imoveis": null
+ * */
 
 public static class ImoviewCampos
 {

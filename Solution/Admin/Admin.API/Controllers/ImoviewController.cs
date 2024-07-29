@@ -9,11 +9,13 @@ using JaCaptei.Model.Entities;
 
 using MassTransit;
 
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 namespace JaCaptei.Administrativo.API.Controllers;
 
 [Route("api/[controller]")]
 [ApiController]
+[Authorize(Roles = "ADMIN_GOD,ADMIN_GESTOR,ADMIN_PADRAO")]
 public class ImoviewController : ControllerBase
 {
     //private readonly IHttpClientFactory _httpClientFactory;
@@ -114,8 +116,26 @@ public class ImoviewController : ControllerBase
     }
  
     [HttpPost("integracao/cliente/integrar")]
-    public async Task<ActionResult<IntegrarClienteResponse>> IntegrarCliente([FromBody] IntegracaoImoview integracao)
+    public async Task<ActionResult<IntegrarClienteResponse>> IntegrarCliente([FromBody] IntegracaoImoviewDTO dto)
     {
+        List<BairroDTO> bairros = dto.Bairros.ConvertAll(b => new BairroDTO()
+        {
+            Id = b.Id,
+            IdCidade = b.IdCidade,
+            IdEstado = b.IdEstado,
+            Nome = b.Value
+        });
+        var integracao = new IntegracaoImoview()
+        {
+            Id = 0,
+            ChaveApi = dto.ChaveApi,
+            CodUnidade = dto.CodUnidade,
+            CodUsuario = dto.CodUsuario,
+            IdCliente = dto.IdCliente,
+            IdOperador = dto.IdOperador,
+            IdPlano = dto.IdPlano,
+            Bairros = Newtonsoft.Json.JsonConvert.SerializeObject(dto.Bairros),
+        };
         var res = await _service.IntegrarCliente(integracao);
         return Ok(res);
     }
