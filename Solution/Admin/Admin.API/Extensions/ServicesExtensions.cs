@@ -1,5 +1,4 @@
-﻿using JaCaptei.Admin.API.Consumers;
-using JaCaptei.Application.DAL;
+﻿using JaCaptei.Application.DAL;
 
 using MassTransit;
 
@@ -16,40 +15,15 @@ internal static class ServicesExtensions
     {
         services.AddMassTransit(busConfig =>
         {
-            busConfig.AddConsumer<IntegracaoClienteConsumer>(c =>
-            {
-                c.ConcurrentMessageLimit = 1;
-            });
-            //busConfig.UsingRabbitMq((context, cfg) =>
-            //{
-            //    //cfg.Host("rabbitmq", 5672, "/", h =>
-            //    //{
-            //    //    h.Username("guest");
-            //    //    h.Password("guest");
-            //    //});
-            //    cfg.Host(new Uri("amqp://localhost:5672"), h =>
-            //    {
-            //        h.Username("guest");
-            //        h.Password("guest");
-            //    });
-            //    cfg.ConfigureEndpoints(context);
-            //});
             services.AddMassTransit(x =>
             {
                 x.UsingAzureServiceBus((context, cfg) =>
                 {
                     var azureMQConn = settings.AzureMQ;
                     cfg.Host(azureMQConn);
-                    x.AddConsumer<IntegracaoClienteConsumer>();
-                    cfg.ReceiveEndpoint("integracaocliente", e =>
-                    {
-                        e.ConfigureConsumer<IntegracaoClienteConsumer>(context);
-                    });
                     cfg.ConfigureEndpoints(context);
                 });
             });
-
-
         });
         services.AddMassTransitHostedService();
 

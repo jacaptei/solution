@@ -143,7 +143,6 @@ builder.Services.AddAuthentication(x => {
 
 });
 
-//builder.Services.AddHostedService<ImoviewWorkerService>();
 builder.Services.AddServices(settings);
 
 
