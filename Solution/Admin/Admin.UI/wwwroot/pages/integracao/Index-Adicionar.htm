@@ -1,160 +1,143 @@
 ﻿<template>
     <div>
         <el-row @keyup.enter="Buscar()">
-            <el-row @keyup.enter="Buscar()">
-                <el-col :md="24">
-                    <el-col :span="24">
-                        <el-row :gutter="20">
-                            <el-col :xs="24" :sm="12" :md="8" :lg="8" class="register-input">
-                                <div>CPF/CNPJ<span></span></div>
-                                <el-input style="width:100%"
-                                          v-model="documento"
-                                          :placeholder="placeholderText"
-                                          @input="applyMask"
-                                          @change="VerificarInformacoesCliente()"
-                                          ></el-input>
-                            </el-col>
-                            <el-col :xs="24" :sm="24" :md="16" :lg="8" class="register-input">
-                                <div>SELECIONE O PLANO</div>
-                                <el-select filterable v-model="integracao.idPlano" style="width: 100%" :disabled="disableFieldsForPartnerValidation" placeholder="SELECIONAR">
-                                    <el-option v-for="item in [
+            <el-col :md="24">
+                <el-row :gutter="20">
+                    <el-col :xs="24" :sm="12" :md="8" :lg="8" class="register-input">
+                        <div>CPF/CNPJ<span></span></div>
+                        <el-input style="width:100%"
+                                  v-model="documento"
+                                  :placeholder="placeholderText"
+                                  @input="applyMask"
+                                  @change="VerificarInformacoesCliente()"></el-input>
+                    </el-col>
+                    <el-col :xs="24" :sm="24" :md="16" :lg="8" class="register-input">
+                        <div>SELECIONE O PLANO</div>
+                        <el-select filterable v-model="integracao.idPlano" style="width: 100%" :disabled="disableFieldsForPartnerValidation" placeholder="SELECIONE O PLANO">
+                            <el-option v-for="item in [
                                              {nome: 'CORRETOR AUTÔNOMO ESSENCIAL por R$387/mês',  id: 2 },
                                              {nome: 'IMOBILIÁRIA ATÉ 03 USUÁRIOS por R$499/mês',  id: 3 },
                                              {nome: 'IMOBILIÁRIA ATÉ 05 USUÁRIOS por R$699/mês',  id: 4 }
                                              ]"
-                                               :key="item.id"
-                                               :label="item.nome"
-                                               :value="item.id">
-                                    </el-option>
-                                </el-select>
-                            </el-col>
-                            <el-col :xs="24" :sm="12" :md="8" :lg="8" class="register-input">
-                                <div>CHAVE API<span></span></div>
-                                <el-input style="width:100%"
-                                          :disabled="disableFieldsForPartnerValidation"
-                                          @keyup.enter="Enviar()"
-                                          v-model="integracao.chaveApi"
-                                          placeholder="Insira sua Chave API"
-                                          ref="id"
-                                          @input="(value) => BuscarUnidades(value)"
-                                          :controls="false"></el-input>
-                            </el-col>
-                            <el-col :xs="24" :sm="12" :md="8" :lg="8" class="register-input">
-                                <div>CRM<span></span></div>
-                                <el-select v-model="crm" filterable :disabled="disableFieldsForPartnerValidation" :clearable="true" :value-key="'id'" class="m-4" size="large" style="width: 100%">
-                                    <el-option v-for="item in [{nome: 'IMOVIEW',  id: 1 }]"
-                                               :key="item.id"
-                                               :label="item.nome"
-                                               :value="item.id">
-                                    </el-option>
-                                </el-select>
-                            </el-col>
-                            <el-col :xs="24" :sm="12" :md="8" :lg="8" class="register-input">
-                                <div>CÓDIGO USUÁRIO IMOVIEW<span></span></div>
-                                <el-input style="width:100%"
-                                          :disabled="disableFieldsForPartnerValidation"
-                                          v-model="integracao.codUsuario"
-                                          :placeholder="placeholderText"
-                                          @input="applyMask"></el-input>
-                            </el-col>
-                            <el-col :xs="24" :sm="12" :md="8" :lg="8" class="register-input">
-                                <div>UNIDADE<span></span></div>
-                                <el-select v-else v-model="unidades" filterable :disabled="disableFieldsForPartnerValidation" :clearable="true" class="m-4" placeholder="qualquer" size="large" style="width:100%">
-                                    <el-option v-for="item in opcoes.unidades" :key="item.id" :label="item.nome" :value="item.id"></el-option>
-                                </el-select>
-                            </el-col>
-                        </el-row>
-
-                        <el-row style="width: 100%; display: flex; justify-content: flex-end; align-items: flex-end; margin-top: 20px">
-                            <el-col :xs="24" :sm="12" :md="8" :lg="6" class="register-input" :disabled="disableFieldsForPartnerValidation" style="width: 100%; display: flex; justify-content: flex-end; align-items: center;">
-                                <p>Total de bairros selecionados: {{ totalSelectedBairros }}</p>
-                                <div style="display: flex; width: 100%; align-items: flex-end;">
-                                    <span style="cursor:pointer; padding-left:20px; color:var(--s-color-green)" :disabled="disableFieldsForPartnerValidation" @click="addLocationGroup">
-                                        <i class="fa fa-plus-circle"></i> ADICIONAR BAIRROS PARA INTEGRAÇÃO
-                                    </span>
-                                </div>
-                            </el-col>
-                            <el-divider style=""><!--resultado--></el-divider>
-                        </el-row>
-
-                        <el-row :gutter="20" v-if ="QuantidadeBairros">
-                            <div style="width: 100%; display: flex; flex-wrap: wrap" v-for="(group, index) in locationGroups" :key="group.id" class="location-group">
-                                <div style="width: 90%; display: flex; flex-wrap: wrap">
-                                    <!-- Estado -->
-                                    <el-col :xs="24" :sm="24" :md="12" :lg="8" class="register-input">
-                                        <div><p>ESTADO</p></div>
-                                        <div style="height:40px" v-if="group.carregandoEstados">
-                                            <c-loading size="30px" style="padding-left:5px"></c-loading>
-                                        </div>
-                                        <el-select v-else filterable v-model="group.selectedEstado" class="m-4" placeholder="Selecionar" size="large" style="width:100%" @change="(value) => { ObterCidades(value, index); group.enableFilterButton = true }">
-                                            <el-option v-for="item in opcoes.estados" :key="item.id" :label="item.label" :value="item.id"></el-option>
-                                        </el-select>
-                                    </el-col>
-
-                                    <!-- Cidade -->
-                                    <el-col :xs="24" :sm="24" :md="12" :lg="8" class="register-input">
-                                        <div><p>CIDADE</p></div>
-                                        <div style="height:40px" v-if="group.carregandoCidades">
-                                            <c-loading size="30px" style="padding-left:5px"></c-loading>
-                                        </div>
-                                        <el-select v-else v-model="group.selectedCities" filterable class="m-4" placeholder="Selecionar" size="large" style="width:100%" @change="(cities) => ObterBairros(cities, index)">
-                                            <el-option v-for="item in group.cidades" :key="item.id" :label="item.label" :value="item"></el-option>
-                                        </el-select>
-                                    </el-col>
-
-                                    <!-- Bairro -->
-                                    <el-col :xs="24" :sm="24" :md="12" :lg="8" class="register-input">
-                                        <div><p>BAIRROS</p></div>
-                                        <div style="height:40px" v-if="group.carregandoBairros">
-                                            <c-loading size="30px" style="padding-left:5px"></c-loading>
-                                        </div>
-                                        <el-select v-else v-model="this.locationGroups[index].selectedBairros" filterable class="m-4" placeholder="Selecionar" size="large" style="width:100%" @change="(selectedBairros) => handleBairrosChange(selectedBairros, group, index)">
-                                            <el-option v-for="item in this.locationGroups[index].bairros" :key="item.id" :label="item.label" :value="item"></el-option>
-                                        </el-select>
-                                    </el-col>
-                                </div>
-
-                                <!-- Botão Remover -->
-                                <div style="width: 10%; display: flex; align-items: center; justify-content: center;">
-                                    <span style="cursor: pointer; width: 100%; color: var(--s-color-blue); display: flex; margin-top: 10px; align-items: center; justify-content: center;" @click="removeLocationGroup(index)">
-                                        <i class="fa fa-trash" style="color: #0072ff; font-size: 1.2em;"></i>
-                                    </span>
-                                </div>
-                            </div>
-                        </el-row>
-
-                        <el-row style="width: 100%; display: flex; justify-content: flex-end; align-items: center;">
-                            <el-divider style="margin-top: 20px"><!--resultado--></el-divider>
-                            <el-col :xs="24" :sm="12" :md="8" :lg="6" class="register-input" style="width: 100%; display: flex; justify-content: flex-end; align-items: center;">
-                                <div><span></span></div>
-                                <q-btn label="INTEGRAR" color="primary" @click="Integrar()"></q-btn>
-                            </el-col>
-                        </el-row>
-
-                        <el-row justify="center" v-if="onrequest">
-                            <el-col :md="24" style="color:var(--s-color-primary)">
-                                <el-divider style="margin:10px;"><!--resultado--></el-divider>
-                                <c-loading padding="20px"></c-loading>
-                            </el-col>
-                        </el-row>
-
-                        <el-tour v-model="open">
-                            <el-tour-step title="Center"
-                                          description="Displayed in the center of screen." />
-                            <el-tour-step title="Right"
-                                          description="On the right of target."
-                                          placement="right"
-                                          :target="btnRef?.$el" />
-                            <el-tour-step title="Top"
-                                          description="On the top of target."
-                                          placement="top"
-                                          :target="btnRef?.$el" />
-                        </el-tour>
+                                       :key="item.id"
+                                       :label="item.nome"
+                                       :value="item.id">
+                            </el-option>
+                        </el-select>
                     </el-col>
-            </el-row>
+                    <el-col :xs="24" :sm="12" :md="8" :lg="8" class="register-input">
+                        <div>CHAVE API<span></span></div>
+                        <el-input style="width:100%"
+                                  :disabled="disableFieldsForPartnerValidation"
+                                  @keyup.enter="Enviar()"
+                                  v-model="integracao.chaveApi"
+                                  placeholder="Insira sua Chave API"
+                                  ref="id"
+                                  @input="(value) => BuscarUnidades(value)"
+                                  :controls="false"></el-input>
+                    </el-col>
+                    <el-col :xs="24" :sm="12" :md="8" :lg="8" class="register-input">
+                        <div>CRM<span></span></div>
+                        <el-select v-model="crm" filterable :disabled="disableFieldsForPartnerValidation" placeholder="SELECIONE O CRM" :clearable="true" :value-key="'id'" class="m-4" size="large" style="width: 100%">
+                            <el-option v-for="item in [{nome: 'IMOVIEW',  id: 1 }]"
+                                       :key="item.id"
+                                       :label="item.nome"
+                                       :value="item.id">
+                            </el-option>
+                        </el-select>
+                    </el-col>
+                    <el-col :xs="24" :sm="12" :md="8" :lg="8" class="register-input">
+                        <div>CÓDIGO USUÁRIO IMOVIEW<span></span></div>
+                        <el-input style="width:100%"
+                                  :disabled="disableFieldsForPartnerValidation"
+                                  v-model="integracao.codUsuario"
+                                  :placeholder="placeholderUsuarioText"
+                                  @input="applyMask"></el-input>
+                    </el-col>
+                    <el-col :xs="24" :sm="12" :md="8" :lg="8" class="register-input">
+                        <div>UNIDADE<span></span></div>
+                        <el-select v-else v-model="unidades" filterable :disabled="disableFieldsForPartnerValidation" :clearable="true" class="m-4" placeholder="INFORME A UNIDADE" size="large" style="width:100%">
+                            <el-option v-for="item in opcoes.unidades" :key="item.id" :label="item.nome" :value="item.id"></el-option>
+                        </el-select>
+                    </el-col>
+                </el-row>
+
+                    <el-row style="width: 100%; display: flex; justify-content: flex-end; align-items: flex-end; margin-top: 20px">
+                        <el-col :xs="24" :sm="12" :md="8" :lg="6" class="register-input" :disabled="disableFieldsForPartnerValidation" style="width: 100%; display: flex; justify-content: flex-end; align-items: center;">
+                            <p>Total de bairros selecionados: {{ totalSelectedBairros }}</p>
+                            <div style="display: flex; width: 100%; align-items: flex-end;">
+                                <span style="cursor:pointer; padding-left:20px; color:var(--s-color-green)" :disabled="disableFieldsForPartnerValidation" @click="addLocationGroup">
+                                    <i class="fa fa-plus-circle"></i> ADICIONAR BAIRROS PARA INTEGRAÇÃO
+                                </span>
+                            </div>
+                        </el-col>
+                        <el-divider style=""><!--resultado--></el-divider>
+                    </el-row>
+
+                    <el-row :gutter="20" v-if="QuantidadeBairros">
+                        <div style="width: 100%; display: flex; flex-wrap: wrap" v-for="(group, index) in locationGroups" :key="group.id" class="location-group">
+                            <div style="width: 90%; display: flex; flex-wrap: wrap">
+                                <!-- Estado -->
+                                <el-col :xs="24" :sm="24" :md="12" :lg="8" class="register-input">
+                                    <div><p>ESTADO</p></div>
+                                    <div style="height:40px" v-if="group.carregandoEstados">
+                                        <c-loading size="30px" style="padding-left:5px"></c-loading>
+                                    </div>
+                                    <el-select v-else filterable v-model="group.selectedEstado" class="m-4" placeholder="Selecionar" size="large" style="width:100%" @change="(value) => { ObterCidades(value, index); group.enableFilterButton = true }">
+                                        <el-option v-for="item in opcoes.estados" :key="item.id" :label="item.label" :value="item.id"></el-option>
+                                    </el-select>
+                                </el-col>
+
+                                <!-- Cidade -->
+                                <el-col :xs="24" :sm="24" :md="12" :lg="8" class="register-input">
+                                    <div><p>CIDADE</p></div>
+                                    <div style="height:40px" v-if="group.carregandoCidades">
+                                        <c-loading size="30px" style="padding-left:5px"></c-loading>
+                                    </div>
+                                    <el-select v-else v-model="group.selectedCities" filterable class="m-4" placeholder="Selecionar" size="large" style="width:100%" @change="(cities) => ObterBairros(cities, index)">
+                                        <el-option v-for="item in group.cidades" :key="item.id" :label="item.label" :value="item"></el-option>
+                                    </el-select>
+                                </el-col>
+
+                                <!-- Bairro -->
+                                <el-col :xs="24" :sm="24" :md="12" :lg="8" class="register-input">
+                                    <div><p>BAIRROS</p></div>
+                                    <div style="height:40px" v-if="group.carregandoBairros">
+                                        <c-loading size="30px" style="padding-left:5px"></c-loading>
+                                    </div>
+                                    <el-select v-else v-model="this.locationGroups[index].selectedBairros" filterable class="m-4" placeholder="Selecionar" size="large" style="width:100%" @change="(selectedBairros) => handleBairrosChange(selectedBairros, group, index)">
+                                        <el-option v-for="item in this.locationGroups[index].bairros" :key="item.id" :label="item.label" :value="item"></el-option>
+                                    </el-select>
+                                </el-col>
+                            </div>
+
+                            <!-- Botão Remover -->
+                            <div style="width: 10%; display: flex; align-items: center; justify-content: center;">
+                                <span style="cursor: pointer; width: 100%; color: var(--s-color-blue); display: flex; margin-top: 10px; align-items: center; justify-content: center;" @click="removeLocationGroup(index)">
+                                    <i class="fa fa-trash" style="color: #0072ff; font-size: 1.2em;"></i>
+                                </span>
+                            </div>
+                        </div>
+                    </el-row>
+
+                    <el-row style="width: 100%; display: flex; justify-content: flex-end; align-items: center;">
+                        <el-divider style="margin-top: 20px"><!--resultado--></el-divider>
+                        <el-col :xs="24" :sm="12" :md="8" :lg="6" class="register-input" style="width: 100%; display: flex; justify-content: flex-end; align-items: center;">
+                            <div><span></span></div>
+                            <q-btn label="INTEGRAR" color="primary" @click="Integrar()"></q-btn>
+                        </el-col>
+                    </el-row>
+
+                    <el-row justify="center" v-if="onrequest">
+                        <el-col :md="24" style="color:var(--s-color-primary)">
+                            <el-divider style="margin:10px;"><!--resultado--></el-divider>
+                            <c-loading padding="20px"></c-loading>
+                        </el-col>
+                    </el-row>
+            </el-col>
+        </el-row>
     </div>
 </template>
-
 
 <script>
     import { ref } from 'vue';
@@ -171,6 +154,7 @@
                 documento: "",
                 maxlength: 22,
                 placeholderText: 'Digite o CPF ou CNPJ',
+                placeholderUsuarioText: 'DIGITE O CODIGO DE USUARIO DO CRM',
                 id: null,
                 estados: [],
                 cidades: [],
@@ -214,22 +198,7 @@
             };
         },
         created() {
-            this.$sdata.ObterEstados().then(res => {
-                this.opcoes.estados = res;
-            });
-
-            this.perfilIntegracaoCadastro = this.$root.perfilIntegracao || {};
-            this.opcoes.crm = this.perfilIntegracaoCadastro.crms || [];
-            this.opcoes.unidades = this.perfilIntegracaoCadastro.unidades || [];
-            this.chaveApi = (this.perfilIntegracaoCadastro.integracao && this.perfilIntegracaoCadastro.integracao.chaveApi) || "";
-
-            if (this.perfilIntegracaoCadastro.integracao?.bairros) {
-                this.initializeBairros(this.perfilIntegracaoCadastro.integracao.bairros);
-            }
-
-            if (this.chaveApi) {
-                this.VerificarChaveApi(this.chaveApi);
-            }
+            this.inicializarEstados();
         },
         computed: {
             totalSelectedBairros() {
@@ -237,6 +206,17 @@
             }
         },
         methods: {
+            inicializarEstados() {
+                this.$sdata.ObterEstados().then(res => {
+                    this.opcoes.estados = res;
+                })
+            },
+            carregarDadosIniciais() {
+                const { bairros } = this.perfilIntegracaoCadastro.integracao || {};
+                if (bairros) {
+                    this.initializeBairros(JSON.parse(bairros));
+                }
+            },
             initializeBairros(bairros) {
                 this.locationGroups = bairros.map(bairro => ({
                     id: this.generateUniqueId(),
@@ -262,10 +242,15 @@
             generateUniqueId() {
                 return '_' + Math.random().toString(36).substr(2, 9);
             },
-            LimparFiltro() {
-                this.id = null;
-                this.busca.item = this.$models.proprietario();
-                this.Enviar();
+            LimparCamposIntegracao() {
+                this.crm = [];
+                this.unidades = [];
+                this.qntdBairros = 0;
+                this.integracao.idPlano = [];
+                this.integracao.idCliente = 0;
+                this.integracao.chaveApi = "";
+                this.integracao.codUsuario = "";
+                this.locationGroups = [];
             },
             removeLocationGroup(index) {
                 this.locationGroups.splice(index, 1);
@@ -284,14 +269,14 @@
                         enableFilterButton: false
                     });
                 } else {
-                    //this.$tools.alarm("Quantidade máxima de bairros atingida.");
+                    this.$tools.MessageAlert("Quantidade máxima de bairros atingida.");
                 }
             },
             generateUniqueId() {
                 return '_' + Math.random().toString(36).substr(2, 9);
             },
             ObterCidades(estadoId, groupIndex) {
-                this.estadoId = estadoId;
+                this.idEstado = estadoId;
                 this.locationGroups[groupIndex].carregandoCidades = true;
                 this.$sdata.ObterCidades(estadoId).then(res => {
                     this.locationGroups[groupIndex].cidades = res;
@@ -309,7 +294,7 @@
                         idCidade: cidade.id,
                         idEstado: this.idEstado
                     }));
-
+                    console.log(this.idEstado)
                     this.group.carregandoCidades = false;
                 }).catch(error => {
                     console.error("Erro ao obter bairros:", error);
@@ -330,13 +315,10 @@
                                 if (response.data) {
                                     this.opcoes.unidades = response.data;
                                     this.unidades = response.data[0].id;
-                                    console.log("Chave API válida");
-                                } else {
-                                    this.$tools.alarm("Chave API inválida");
                                 }
                             })
                             .catch((error) => {
-                                this.tools.HandleErrors(error);
+                                this.$tools.MessageAlert("Chave API inválida");
                             });
 
                         return response;
@@ -378,6 +360,7 @@
                     }
                 } else {
                     this.disableFieldsForPartnerValidation = true;
+                    this.LimparCamposIntegracao();
                 }
             },
             AtualizarCamposCadastro(perfilIntegracaoCadastro) {
@@ -393,14 +376,25 @@
                     this.integracao.chaveApi = "";
                     this.unidades = [];
                 }
-
             },
-            Integrar() {
-                //if (this.integracao.bairros) {
-                //    this.integracao.bairros = JSON.stringify(this.integracao.bairros);
-                //}
+            async Integrar() {
                 this.integracao.codUnidade = JSON.stringify(this.unidades);
                 console.log(this.integracao);
+
+                //if (this.$validator.is(this.documento)) {
+                //    try {
+                //        var url = this.$api.BuildURL('api/imoview/integracao/cliente/integrar');
+                //        var request = await axios.post(url, this.integracao);
+                //        if (request.data && request.status === 200) {
+                //            console.log(request.data);
+                //        }
+                //    } catch (error) {
+                //        this.$tools.MessageAlert("Parceiro não encontrado!", 100);
+                //        console.error(error);
+                //    }
+                //} else {
+                //    this.disableFieldsForPartnerValidation = true;
+                //}
             }
         }
     };
@@ -416,6 +410,7 @@
         padding: 10px;
         box-shadow: 0 -1px 5px rgba(0, 0, 0, 0.1);
     }
+
     .register-input {
         width: 100%;
         margin-bottom: 10px;
@@ -485,9 +480,9 @@
         border-radius: 6px;
     }
 
-    .custom-scrollbar::-webkit-scrollbar-thumb:hover {
-        background: #0056b3;
-    }
+        .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+            background: #0056b3;
+        }
 
     .custom-scrollbar::-webkit-scrollbar-track {
         background: #f1f1f1;
