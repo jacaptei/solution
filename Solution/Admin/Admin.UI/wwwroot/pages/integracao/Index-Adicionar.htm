@@ -420,23 +420,21 @@
             },
             async Integrar() {
                 this.integracao.codUnidade = JSON.stringify(this.unidades);
-                console.log(this.integracao);
-
-                //if (this.$validator.is(this.documento)) {
-                //    try {
-                //        var url = this.$api.BuildURL('api/imoview/integracao/cliente/integrar');
-                //        var request = await axios.post(url, this.integracao);
-                //        if (request.data && request.status === 200) {
-                //            this.$tools.MessageAlert("Integração em fila de processamento!", 100);
-                //            console.log(request.data);
-                //        }
-                //    } catch (error) {
-                //        this.$tools.MessageAlert("Parceiro não encontrado!", 100);
-                //        console.error(error);
-                //    }
-                //} else {
-                //    this.disableFieldsForPartnerValidation = true;
-                //}
+                if (this.$validator.is(this.documento)) {
+                    try {
+                        var url = this.$api.BuildURL('api/imoview/integracao/cliente/integrar');
+                        var request = await axios.post(url, this.integracao);
+                        if (request.data && request.status === 200) {
+                            this.$tools.MessageAlert("Integração em fila de processamento!", 100);
+                            console.log(request.data);
+                        }
+                    } catch (error) {
+                        this.$tools.MessageAlert("Parceiro não encontrado!", 100);
+                        console.error(error);
+                    }
+                } else {
+                    this.disableFieldsForPartnerValidation = true;
+                }
             }
         }
     };
