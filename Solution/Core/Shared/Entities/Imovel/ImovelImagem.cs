@@ -11,8 +11,10 @@ namespace JaCaptei.Model {
 
             public int          id                  {get;set;}=0;
             public int          idImovel            {get;set;}=0;
+            public string       codImovel           {get;set;}="";
             public string       cod                 {get;set;}="";
             public string       nome                {get;set;}="";
+            public string       ambiente            {get;set;}="";
             public string       arquivo             {get;set;}="";
             public string       arquivoOriginal     {get;set;}="";
             

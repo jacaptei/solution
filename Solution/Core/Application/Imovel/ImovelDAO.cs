@@ -297,11 +297,13 @@ namespace JaCaptei.Application {
                         +" JOIN \"ImovelCaracteristicasExternas\"     externo         ON (externo.\"idImovel\"        = imovel.id)  "
                         +" JOIN \"ImovelDisposicao\"                  disposicao      ON (disposicao.\"idImovel\"     = imovel.id)  "
                         +" JOIN \"ImovelDocumentacao\"                documentacao    ON (documentacao.\"idImovel\"   = imovel.id)  "
-                        +" JOIN \"Proprietario\"                      proprietario    ON (proprietario.id             = imovel.\"idProprietario\")  "
                         +" JOIN \"ImovelTipo\"                        tipo            ON (tipo.id                     = imovel.\"idTipo\")  "
                     ;
 
-            string  filter   = ObterQueryBuscaImovel(busca);
+            if(busca.usuarioGod || busca.usuarioGestor)
+                from += " JOIN \"Proprietario\"                      proprietario    ON (proprietario.id             = imovel.\"idProprietario\")  ";
+
+                string  filter   = ObterQueryBuscaImovel(busca);
 
 
 
@@ -309,19 +311,20 @@ namespace JaCaptei.Application {
                         + " FROM " + from
                         + " WHERE " + filter;
 
-            string  sql      = " SELECT JSON_AGG(res) FROM( SELECT    imovel.* ,                                                                                                       "
-                        +"                                            (SELECT json_agg(img.*) FROM \"ImovelImagem\" img where img.\"idImovel\" = imovel.id)  as imagens ,           "
-                        +"                                            to_json(endereco.*)      as endereco                                                                 ,        "
-                        +"                                            to_json(valor.*)         as valor                                                                    ,        "
-                        +"                                            to_json(area.*)          as area                                                                     ,        "
-                        +"                                            to_json(lazer.*)         as lazer                                                                    ,        "
-                        +"                                            to_json(interno.*)       as interno                                                                  ,        "
-                        +"                                            to_json(externo.*)       as externo                                                                  ,        "
-                        +"                                            to_json(disposicao.*)    as disposicao                                                               ,        "
-                        +"                                            to_json(documentacao.*)  as documentacao                                                             ,        "
-                        +"                                            to_json(proprietario.*)  as proprietario                                                             ,        "
-                        +"                                            to_json(tipo.*)          as tipo                                                                      "
-                        + " FROM " + from
+            string  sql      = " SELECT JSON_AGG(res) FROM( SELECT      imovel.*                                                                                            "
+                        +"                                            , (SELECT json_agg(img.*) FROM \"ImovelImagem\" img where img.\"idImovel\" = imovel.id)  as imagens   "
+                        +"                                            , to_json(endereco.*)      as endereco                                                                "
+                        +"                                            , to_json(valor.*)         as valor                                                                   "
+                        +"                                            , to_json(area.*)          as area                                                                    "
+                        +"                                            , to_json(lazer.*)         as lazer                                                                   "
+                        +"                                            , to_json(interno.*)       as interno                                                                 "
+                        +"                                            , to_json(externo.*)       as externo                                                                 "
+                        +"                                            , to_json(disposicao.*)    as disposicao                                                              "
+                        +"                                            , to_json(documentacao.*)  as documentacao                                                            "
+                        +"                                            , to_json(tipo.*)          as tipo                                                                    ";
+                        if(busca.usuarioGod || busca.usuarioGestor)
+                            sql+=",    to_json(proprietario.*)  as proprietario                                                                     ";
+                        sql+= " FROM " + from
                         +"  WHERE  "            + Utils.Validator.ParseSafeSQL(filter)          + " "
                         +"  ORDER BY imovel."   + Utils.Validator.ParseSafeSQL(busca.orderBy)   + " "
                         +"  " + Utils.Validator.ParseSafeSQL(busca.limit)     + " "
