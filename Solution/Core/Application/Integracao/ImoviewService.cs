@@ -423,7 +423,7 @@ public class ImoviewService : IDisposable
 
     private async Task<bool?> ProcessSingleImportacaoImovel(IntegracaoImoview integracao, ImportacaoBairroImoview importacaoBairro, ImovelListDTO imovelId)
     {
-        ImportacaoImovelImoview? importacaoImovel = await _retryPolicy.ExecuteAsync(() => _imoviewDAO.GetImportacaoImovel(importacaoBairro.Id, imovelId.idImovel));
+        ImportacaoImovelImoview? importacaoImovel = await _retryPolicy.ExecuteAsync(() => _imoviewDAO.GetImportacaoImovel(importacaoBairro.Id, imovelId.codImovel));
         ImoviewAddImovelRequest? request = null;
         List<ImagemDTO> images = [];
 
@@ -441,6 +441,7 @@ public class ImoviewService : IDisposable
                 {
                     Id = 0,
                     IdImovel = imovelId.idImovel,
+                    CodImovel = imovelId.codImovel,
                     IdImportacaoBairro = importacaoBairro.Id,
                     RequestBody = requestBody,
                     DataInclusao = DateTime.UtcNow,
@@ -484,7 +485,7 @@ public class ImoviewService : IDisposable
         {
             var importacoesImoveis = await _retryPolicy.ExecuteAsync(() => _imoviewDAO.GetImportacaoImoveis(importacaoBairro.Id));
             var imoveisBairro = await _retryPolicy.ExecuteAsync(() => _imoviewDAO.GetImoveisBairro(bairroIntegrado.IdBairro));
-            imoveisNovos.AddRange(imoveisBairro.Where(imovel => !importacoesImoveis.Any(importacao => importacao.IdImovel == imovel.idImovel)));
+            imoveisNovos.AddRange(imoveisBairro.Where(imovel => !importacoesImoveis.Any(importacao => importacao.CodImovel == imovel.codImovel)));
         }
         return imoveisNovos;
     }
@@ -515,7 +516,7 @@ public class ImoviewService : IDisposable
             IdPlano = integracao!.IdPlano!.Value,
             DataInclusao = DateTime.UtcNow,
             Status = StatusIntegracao.Aguardando.GetDescription(),
-            Imoveis = Newtonsoft.Json.JsonConvert.SerializeObject(imoveisNovos.Select(i => new { i.idImovel }))
+            Imoveis = Newtonsoft.Json.JsonConvert.SerializeObject(imoveisNovos.Select(i => new { i.idImovel, i.codImovel }))
         };
         await _retryPolicy.ExecuteAsync(() => _imoviewDAO.SaveImportacaoBairro(importacaoBairro));
     }
@@ -548,6 +549,7 @@ public record IntegrarClienteResponse
 public record ImovelListDTO
 {
     public int idImovel { get; set; }
+    public string codImovel { get; set; }
 }
 
  public enum StatusIntegracao 

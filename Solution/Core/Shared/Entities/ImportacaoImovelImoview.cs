@@ -16,6 +16,8 @@ public class ImportacaoImovelImoview
 
     [Map("idImovel")]
     public int IdImovel { get; set; }
+    [Map("codImovel")]
+    public string CodImovel { get; set; }
 
     [Map("requestBody")]
     [NpgsqlDbType(NpgsqlDbType.Jsonb)]

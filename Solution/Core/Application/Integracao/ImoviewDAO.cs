@@ -144,9 +144,9 @@ public class ImoviewDAO: IDisposable {
         return importacoes;
     }
 
-    public async Task<ImportacaoImovelImoview?> GetImportacaoImovel(int idImportacao, int idImovel)
+    public async Task<ImportacaoImovelImoview?> GetImportacaoImovel(int idImportacao, string codImovel)
     {
-        var res = await _conn.QueryAsync<ImportacaoImovelImoview>(i => i.IdImportacaoBairro == idImportacao && i.IdImovel == idImovel);
+        var res = await _conn.QueryAsync<ImportacaoImovelImoview>(i => i.IdImportacaoBairro == idImportacao && i.CodImovel == codImovel);
         return res.FirstOrDefault();
     }
 
