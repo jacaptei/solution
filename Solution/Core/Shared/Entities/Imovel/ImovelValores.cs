@@ -15,7 +15,6 @@ namespace JaCaptei.Model {
 
             public bool     sobConsulta       {get;set;}
 
-            public double   atual             {get;set;} = 0d;
             public double   venda             {get;set;} = 0d;
             public double   vendaAnterior     {get;set;} = 0d;
             public double   aluguel           {get;set;} = 0d;

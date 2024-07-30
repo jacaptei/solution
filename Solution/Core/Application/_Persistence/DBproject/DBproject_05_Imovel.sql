@@ -68,7 +68,6 @@ INSERT INTO "ImovelTipo" (nome,label) VALUES ('STUDIO'                          
 INSERT INTO "ImovelTipo" (nome,label) VALUES ('TERRENO/AREA'                     ,'Terreno/Área'                    );
 
 
-DROP TABLE  IF EXISTS "ImovelTipoComplemento";
 CREATE	TABLE "ImovelTipoComplemento"(
 	id      					    SMALLSERIAL	    NOT NULL,
 	nome				 	        VARCHAR(40)		UNIQUE DEFAULT '',
@@ -93,7 +92,7 @@ INSERT INTO "ImovelTipoComplemento" (ordem, nome,label) VALUES (50,'UNIDADE','Un
 CREATE	TABLE "Imovel"(
 
 	id      					    SERIAL 				NOT NULL,
-	cod				 	            VARCHAR(20)		    DEFAULT '',
+	cod				 	            VARCHAR(20)		    UNIQUE NOT NULL,
 	"idCRM"				 	        VARCHAR(20)		    DEFAULT '',
 	"codCRM"		 	            VARCHAR(20)		    DEFAULT '',
 	"idChaves"		 	            VARCHAR(20)		    DEFAULT '',
@@ -143,12 +142,12 @@ CREATE	TABLE "Imovel"(
     ------------------- */
 
 
+	"possuiImagens"                 BOOLEAN			    DEFAULT FALSE,
 	status							VARCHAR(40)			DEFAULT 'PENDENTE' ,
 	ativo	                    	BOOLEAN			    DEFAULT FALSE,
-	visivel	                    	BOOLEAN			    DEFAULT TRUE,
+	visivel	                    	BOOLEAN			    DEFAULT FALSE,
 	validado                    	BOOLEAN			    DEFAULT FALSE,
 	"ativoCRM"                   	BOOLEAN			    DEFAULT FALSE,
-	"possuiImagens"                 BOOLEAN			    DEFAULT FALSE,
 	
 	"possuiToken"                   BOOLEAN			    DEFAULT TRUE,
 	token 						 	VARCHAR(200)		UNIQUE NOT NULL,
@@ -182,6 +181,7 @@ CREATE	TABLE "ImovelImagem"(
 	arquivo     		 	        VARCHAR(120)        DEFAULT '',
 	"arquivoOriginal" 	            VARCHAR(120)        DEFAULT '',
 	nome				 	        VARCHAR(120)        DEFAULT '',
+	ambiente		 	            VARCHAR(40)		    DEFAULT '',
 	tipo				 	        VARCHAR(10)		    DEFAULT '',
     "contentType"                   VARCHAR(40)         ,
     index			 	            SMALLINT            DEFAULT 0,
@@ -222,6 +222,7 @@ CREATE	TABLE "ImovelEndereco"(
 
 	id      					    SERIAL 				NOT NULL,
 	"idImovel"			 	        INTEGER             ,
+	"codImovel" 	 	            VARCHAR(20)		    DEFAULT '',
 
 	cep                 			VARCHAR(16) 		DEFAULT '',
 	"cepNorm"           			VARCHAR(16)			DEFAULT '',
@@ -340,8 +341,8 @@ ALTER TABLE "ImovelCaracteristicasExternas"	ADD CONSTRAINT fk_ImovelCaracExterna
 
 CREATE	TABLE "ImovelValores"(
 
-	id      					    SERIAL 				NOT NULL,
-	"idImovel"			            INTEGER,
+	id      			SERIAL 				NOT NULL,
+	"idImovel"			INTEGER,
 
     "sobConsulta"       BOOLEAN             DEFAULT FALSE,
 
