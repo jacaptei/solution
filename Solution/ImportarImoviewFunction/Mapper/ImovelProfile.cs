@@ -90,7 +90,7 @@ public class ImovelDTOProfile : Profile
             .ForMember(dest => dest.naplanta, opt => opt.MapFrom(src => src.ImovelDisposicao.naPlanta))
             .ForMember(dest => dest.placa, opt => opt.MapFrom(src => src.ImovelDisposicao.placa))
             .ForMember(dest => dest.rlvideo, opt => opt.MapFrom(src => src.Imovel.urlVideo))
-            .ForMember(dest => dest.urlpublica, opt => opt.MapFrom(src => src.Imovel.urlPublica))
+            .ForMember(dest => dest.urlpublica, opt => opt.MapFrom(src => src.Imovel.urlPublica.Substring(100)))
 
             //.ForMember(dest => dest.identificadorchave,   opt => opt.MapFrom(src => src.Imovel.IdChave))
             //.ForMember(dest => dest.exclusivo,            opt => opt.MapFrom(src => src.ImovelDisposicao.exclusivo))

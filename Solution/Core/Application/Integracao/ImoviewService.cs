@@ -10,11 +10,14 @@ using MassTransit.Initializers;
 
 using Microsoft.Extensions.Logging;
 
+using MimeKit;
+
 using Polly;
 using Polly.Contrib.WaitAndRetry;
 using Polly.Retry;
 
 using System;
+using System.Collections;
 using System.ComponentModel;
 using System.Net;
 using System.Net.Http.Headers;
@@ -119,13 +122,12 @@ public class ImoviewService : IDisposable
             var fileContent = new ByteArrayContent(imagem.Arquivo);
             fileContent.Headers.ContentDisposition = new ContentDispositionHeaderValue("form-data")
             {
-                Name = "\"fotos\"",
-                FileName = "\"" + imagem.Nome + "\""
+                FileName = $"{imagem.Nome}.{imagem.Tipo}",
+                Name = $"{imagem.Nome}.{imagem.Tipo}"
             };
             fileContent.Headers.ContentType = new MediaTypeHeaderValue($"image/{imagem.Tipo}");
-            content.Add(fileContent);
+            content.Add(fileContent, "fotos");
         }
-        var response = await client.PostAsync(uriWithQuery, content);
         var res = await client.PostAsync(uriWithQuery, content);
 
         var resStr = await res.Content.ReadAsStringAsync();
