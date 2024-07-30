@@ -265,7 +265,7 @@ public class ImovelDTOProfile : Profile
     {
         return new Valores()
         {
-            valor = (decimal)src.ImovelValores.atual,
+            valor = (decimal)src.ImovelValores.venda,
             valorcondominio = (decimal)src.ImovelValores.condominio,
             valoriptu = (decimal)src.ImovelValores.iptuMensal,
             comissao = (decimal)src.ImovelValores.comissao

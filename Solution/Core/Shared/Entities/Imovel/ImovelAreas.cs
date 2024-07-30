@@ -15,17 +15,17 @@ namespace JaCaptei.Model
 
         [Map("maxima")]
         public float maxima { get; set; } = 0;
-        public double   terreno                     {get;set;}
-        public double   frente                      {get;set;}
-        public double   fundo                       {get;set;}
-        public double   direito                     {get;set;}
-        public double   esquerdo                    {get;set;}
-        public double   confrontacaoFrente          {get;set;}
-        public double   confrontacaoFundo           {get;set;}
-        public double   confrontacaoDireito         {get;set;}
-        public double   confrontacaoEsquerdo        {get;set;}
-        public double   zonaUso                     {get;set;}
-        public double   coeficienteAproveitamento   {get;set;}
+        public float   terreno                     {get;set;} = 0;
+        public float   frente                      {get;set;} = 0;
+        public float   fundo                       {get;set;} = 0;
+        public float   direito                     {get;set;} = 0;
+        public float   esquerdo                    {get;set;} = 0;
+        public float   confrontacaoFrente          {get;set;} = 0;
+        public float   confrontacaoFundo           {get;set;} = 0;
+        public float   confrontacaoDireito         {get;set;} = 0;
+        public float   confrontacaoEsquerdo        {get;set;} = 0;
+        public float   zonaUso                     {get;set;} = 0;
+        public float coeficienteAproveitamento { get; set; } = 0;
 
         
         [Map("interna")]
@@ -37,7 +37,7 @@ namespace JaCaptei.Model
         [Map("total")]
         public float total { get; set; } = 0;
 
-        public double zona { get; set; }
+        public float zona { get; set; } = 0;
     }
 
 }

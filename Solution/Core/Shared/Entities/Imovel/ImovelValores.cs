@@ -15,19 +15,19 @@ namespace JaCaptei.Model {
 
             public bool     sobConsulta       {get;set;}
 
-            public double   venda             {get;set;} = 0d;
-            public double   vendaAnterior     {get;set;} = 0d;
-            public double   aluguel           {get;set;} = 0d;
-            public double   aluguelAnterior   {get;set;} = 0d;
-            public double   condominio        {get;set;} = 0d;
-            public double   consulta          {get;set;} = 0d;
-            public double   iptuAnual         {get;set;} = 0d;
-            public double   iptuMensal        {get;set;} = 0d;
-            public double   iptuIndice        {get;set;} = 0d;
-            public double   comissao          {get;set;} = 0d; // %
-            public double   rentabilidade     {get;set;} = 0d; // %
-            public double   maximo            {get;set;} = 0d;
-            public double   minimo            {get;set;} = 0d;
+            public float   venda             {get;set;} = 0;
+            public float   vendaAnterior     {get;set;} = 0;
+            public float   aluguel           {get;set;} = 0;
+            public float   aluguelAnterior   {get;set;} = 0;
+            public float   condominio        {get;set;} = 0;
+            public float   consulta          {get;set;} = 0;
+            public float   iptuAnual         {get;set;} = 0;
+            public float   iptuMensal        {get;set;} = 0;
+            public float   iptuIndice        {get;set;} = 0;
+            public float   comissao          {get;set;} = 0; // %
+            public float   rentabilidade     {get;set;} = 0; // %
+            public float   maximo            {get;set;} = 0;
+            public float   minimo            {get;set;} = 0;
 
     }
 
