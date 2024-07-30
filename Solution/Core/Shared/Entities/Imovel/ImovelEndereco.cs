@@ -11,8 +11,9 @@ namespace JaCaptei.Model {
 
             public int						id						{get;set;}=0;
             public int						idImovel				{get;set;}=0;
+			public string					codImovel               {get;set;} = "";
 
-	        public string					cep                     {get;set;} = "";
+			public string					cep                     {get;set;} = "";
 	        public string					cepNorm                 {get;set;} = "";
 											                                   
  	        public string					logradouro			    {get;set;} = "";

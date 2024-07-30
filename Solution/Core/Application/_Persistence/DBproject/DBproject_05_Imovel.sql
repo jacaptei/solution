@@ -232,7 +232,7 @@ CREATE	TABLE "ImovelEndereco"(
 	bloco             	            VARCHAR(24)			DEFAULT '',
 	andar          	                VARCHAR(40)			DEFAULT '',
 	unidade                         VARCHAR(40)		    DEFAULT '',
-	"idTipoComplemento"             SMALLINT            DEFAULT 1,
+	"idTipoComplemento"             SMALLINT            DEFAULT 0,
 	"complementoTipo"               VARCHAR(40)		    DEFAULT '',
 	complemento                     VARCHAR(200)		DEFAULT '',
 	referencia                      VARCHAR(220)		DEFAULT '',	

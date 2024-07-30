@@ -42,6 +42,10 @@ namespace JaCaptei.Administrativo.API.Controllers {
             if(busca is null)
                 busca = new ImovelBusca();
 
+            Usuario logado          = ObterUsuarioAutenticado();
+            busca.usuarioGod        = (logado.roles == "ADMIN_GOD");
+            busca.usuarioGestor     = (logado.roles == "ADMIN_GESTOR");
+
             appReturn = service.Buscar(busca);
             return Result(appReturn);
 
