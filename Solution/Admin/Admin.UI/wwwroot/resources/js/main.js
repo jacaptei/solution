@@ -77,8 +77,8 @@ $(document).ready(function () {
                         menuIndex   :null,
                     },
 
-                    admins:[],
-                    usuario:{id:0, username:"",senha:"",nome:"",apelido:"",},
+                admins: [],
+                usuario: { id: 0, username: "", senha: "", nome: "", apelido: "", autenticado:false },
                     events:["click","mousemove","mousedown","scroll","keypress","load"],
                     timeOutSession: (20 * 60 * 1000), // 20min
                     //timeOutSession: (10 * 1000), 
