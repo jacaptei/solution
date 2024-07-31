@@ -23,7 +23,6 @@
   <ItemGroup>
     <ProjectReference Include="..\..\Core\Application\JaCaptei.Application.csproj" />
     <ProjectReference Include="..\..\Core\Shared\JaCaptei.Model.csproj" />
-    <ProjectReference Include="..\..\ImoviewWorkerService\ImoviewWorkerService.csproj" />
   </ItemGroup>
 
   <ItemGroup>

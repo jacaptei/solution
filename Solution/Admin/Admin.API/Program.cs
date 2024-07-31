@@ -7,7 +7,6 @@ using System.Text;
 using Microsoft.IdentityModel.Tokens;
 using JaCaptei.Admin.API;
 using MassTransit;
-using ImoviewWorker;
 using Microsoft.Extensions.DependencyInjection;
 
 //var builder = WebApplication.CreateBuilder(new WebApplicationOptions {
