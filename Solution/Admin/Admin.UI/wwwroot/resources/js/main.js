@@ -53,7 +53,6 @@ $(document).ready(function () {
                     isAuth          : false,
                     showLoginModal  : false,
                     autoLogin       : false,
-                    perfilIntegracao: {},
                     rememberMe      : false,
                     //test            : "root context ok",
                     title: {
@@ -190,7 +189,6 @@ $(document).ready(function () {
                 //this.usuario                      = this.$models.usuario();
                 this.proprietario                   = this.$models.proprietario();
                 this.imovel                         = this.$models.imovel();
-                this.perfilIntegracao               = this.$models.usuarioIntegracao();
                 this.favorito                       = this.$models.favorito();
                 this.localidade                     = this.$models.localidade();
 
@@ -275,7 +273,7 @@ $(document).ready(function () {
 
                     this.admins = (await this.$api.Get("admin/obter/todos")).result;
 
-                    this.usuario = _usuario;
+                this.usuario = _usuario;
                     this.usuario.autenticado = true;
                     this.isAuth = this.isAuth = true;
                 //this.$sdata.Storage.Set("utk"    , this.usuario.token);
