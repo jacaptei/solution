@@ -414,7 +414,7 @@
                 }
             },
             AtualizarCamposCadastro(perfilIntegracaoCadastro) {
-                this.integracao.codUsuario = this.perfilIntegracaoCadastro.integracao.codUsuario;
+                this.integracao.codUsuario = this.perfilIntegracaoCadastro.integracao?.codUsuario;
                 var imoviewCrm = this.perfilIntegracaoCadastro.crms.filter(crm => crm.nome === 'Imoview');
                 this.integracao.idCliente = this.perfilIntegracaoCadastro.cliente.id
                 this.integracao.idPlano = perfilIntegracaoCadastro.plano.id;
