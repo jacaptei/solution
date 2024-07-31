@@ -1,7 +1,5 @@
 ﻿using JaCaptei.Application.DAL;
 
-using MassTransit;
-
 using Polly;
 using Polly.Contrib.WaitAndRetry;
 
@@ -13,20 +11,6 @@ internal static class ServicesExtensions
 {
     public static IServiceCollection AddServices(this IServiceCollection services, Model.AppSettingsRecord settings)
     {
-        services.AddMassTransit(busConfig =>
-        {
-            services.AddMassTransit(x =>
-            {
-                x.UsingAzureServiceBus((context, cfg) =>
-                {
-                    var azureMQConn = settings.AzureMQ;
-                    cfg.Host(azureMQConn);
-                    cfg.ConfigureEndpoints(context);
-                });
-            });
-        });
-        services.AddMassTransitHostedService();
-
         services.AddHttpClient("crm", client =>
         {
             client.BaseAddress = new Uri(settings.crmEndpoint);

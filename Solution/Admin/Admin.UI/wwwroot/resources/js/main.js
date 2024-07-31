@@ -180,41 +180,39 @@ $(document).ready(function () {
 
 
             // --------------------- SETUP
-			this.setupok = axios.get(this.$api.BuildURL("suporte/modelos/obter")).then((request) => {
-
-                this.status.mainLoading = this.status.loading = true;
-
-				this.$models.data                   = request.data;
-                this.log                            = this.$models.log();
-                //this.usuario                      = this.$models.usuario();
-                this.proprietario                   = this.$models.proprietario();
-                this.imovel                         = this.$models.imovel();
-                this.favorito                       = this.$models.favorito();
-                this.localidade                     = this.$models.localidade();
-
-                return true;
-
-
-                //this.$sdata.ObterEstados().then(res => {console.log(res); } );
-                //this.$sdata.ObterCidades(12).then(res => {console.log(res); } );
-                //this.$sdata.ObterBairros(9668).then(res => {console.log(res); } );
-
-			}).catch((error) => {
-                ce(error);
-                return false;
-			}).finally(() => {
-                this.status.mainLoading = this.status.loading = false;
-			});  
-
-            if(!this.setupok)
-                window.Alert("Não foi possível iniciar o site corretamente");
-
-
+			this.setupok = false;
+            this.SetUp();
 
             
 		},
 		methods: {  
 
+                SetUp(){
+                        axios.get(this.$api.BuildURL("suporte/modelos/obter")).then((request) => {
+
+                            this.status.mainLoading = this.status.loading = true;
+
+				            this.$models.data                   = request.data;
+                            this.log                            = this.$models.log();
+                            //this.usuario                      = this.$models.usuario();
+                            this.proprietario                   = this.$models.proprietario();
+                            this.imovel                         = this.$models.imovel();
+                            this.favorito                       = this.$models.favorito();
+                            this.localidade                     = this.$models.localidade();
+
+                            this.setupok = true;
+
+                            //this.$sdata.ObterEstados().then(res => {console.log(res); } );
+                            //this.$sdata.ObterCidades(12).then(res => {console.log(res); } );
+                            //this.$sdata.ObterBairros(9668).then(res => {console.log(res); } );
+
+			            }).catch((error) => {
+                            ce(error);
+                            this.$tools.Alert("Não foi possível iniciar o site corretamente");
+			            }).finally(() => {
+                            this.status.mainLoading = this.status.loading = false;
+			            });  
+                },
 
                 SetTimeOutSession(){
                         this.timeSession = setTimeout(() => this.SignOut(), this.timeOutSession);

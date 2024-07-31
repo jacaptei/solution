@@ -1,6 +1,6 @@
 ﻿<template>
     <div>
-        <el-row justify="center" v-if="$root.loading">
+        <el-row justify="center" v-if="$root.loading || !$root.setupok">
             <el-col :md="24" style="max-width:360px;margin-top:60px">
                 <c-loading size="60px" padding="0px"></c-loading>
             </el-col>
@@ -53,10 +53,10 @@
             this.$root.SetTitle("", "", null);
 		},
 		mounted() {
-            this.$refs.username.focus();
+            //this.$refs.username.focus();
 
-            this.usuario.username = "28249525809";
-            this.usuario.senha = "28249525809";
+            this.usuario.username = "desenvolvimento@jacaptei.com.br";
+            this.usuario.senha = "18109654000113";
             //this.usuario.senha = "28249525809"; // prod
             //this.Login();
             //this.usuario.senha = "18109654000113";

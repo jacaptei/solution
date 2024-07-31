@@ -1,23 +1,19 @@
 ﻿using AutoMapper;
 
+using Azure.Messaging.ServiceBus;
+
 using JaCaptei.Application.DAL;
 using JaCaptei.Model;
 using JaCaptei.Model.DTO;
 using JaCaptei.Model.Entities;
 
-using MassTransit;
-using MassTransit.Initializers;
-
 using Microsoft.Extensions.Logging;
-
-using MimeKit;
 
 using Polly;
 using Polly.Contrib.WaitAndRetry;
 using Polly.Retry;
+using Polly.Timeout;
 
-using System;
-using System.Collections;
 using System.ComponentModel;
 using System.Net;
 using System.Net.Http.Headers;
@@ -32,8 +28,8 @@ public class ImoviewService : IDisposable
     private string _chave;
     private readonly IMapper _mapper;
     private readonly ILogger? _logger;
-    private readonly ISendEndpointProvider? _bus;
     private readonly AsyncRetryPolicy _retryPolicy;
+    private readonly AsyncPolicy _busPolicy;
 
     public ImoviewService(IHttpClientFactory httpClientFactory, DBcontext context, IMapper mapper, ILogger logger, ImoviewDAO imoviewDAO)
     {
@@ -48,17 +44,20 @@ public class ImoviewService : IDisposable
         _chave = "";
     }
 
-    public ImoviewService(IHttpClientFactory httpClientFactory, DBcontext context, string chave, IMapper mapper, ISendEndpointProvider? bus = null)
+    public ImoviewService(IHttpClientFactory httpClientFactory, DBcontext context, string chave, IMapper mapper)
     {
         _httpClientFactory = httpClientFactory;
         _context = context;
         _chave = chave;
         _mapper = mapper;
-        _bus = bus;
         _imoviewDAO = new ImoviewDAO(_context.GetConn());
         _retryPolicy = Policy
             .Handle<Exception>()
             .WaitAndRetryAsync(Backoff.DecorrelatedJitterBackoffV2(TimeSpan.FromSeconds(2), 3));
+        _busPolicy = Policy
+        .Handle<Exception>()
+        .WaitAndRetryAsync(1, retryAttempt => TimeSpan.FromSeconds(retryAttempt))
+        .WrapAsync(Policy.TimeoutAsync(TimeSpan.FromSeconds(3)));
     }
 
     public string Chave { get => _chave; set => _chave = value; }
@@ -210,7 +209,7 @@ public class ImoviewService : IDisposable
                 Status = "Inválido",
                 Mensagem = $"Quantidade de bairros {bairros.Count} maior que o permitido pelo plano: {plano.totalBairros}"
             };
-        if (_bus == null)
+        if (string.IsNullOrWhiteSpace(Config.settings.AzureMQ))
         {
             return new IntegrarClienteResponse()
             {
@@ -226,8 +225,27 @@ public class ImoviewService : IDisposable
             IdOperador = integracao.IdOperador
         };
 
-        var endpoint = await _bus.GetSendEndpoint(new Uri("queue:integracaocliente"));
-        await endpoint.Send(integracaoEvent);
+        try
+        {
+            await _busPolicy.ExecuteAsync(async () =>
+            {
+                var body = Newtonsoft.Json.JsonConvert.SerializeObject(integracaoEvent);
+                var message = new ServiceBusMessage(body);
+                string connectionString = Config.settings.AzureMQ;
+                string queueName = "integracaocliente";
+                await using var client = new ServiceBusClient(connectionString);
+                ServiceBusSender sender = client.CreateSender(queueName);
+                await sender.SendMessageAsync(message);
+            });
+        }
+        catch
+        {
+            return new IntegrarClienteResponse()
+            {
+                Status = "Inválido",
+                Mensagem = "Problemas para comunicar com Service Bus"
+            };
+        }
         return new IntegrarClienteResponse()
         {
             Status = "Sucesso",
@@ -434,8 +452,10 @@ public class ImoviewService : IDisposable
             if (imovelFull != null)
             {
                 request = _mapper.Map<ImoviewAddImovelRequest>(imovelFull);
-                request.codigousuario = Convert.ToInt32(integracao.CodUsuario);
-                request.codigounidade = Convert.ToInt32(integracao.CodUnidade);
+                int.TryParse(integracao.CodUsuario, out int codusuario);
+                int.TryParse(integracao.CodUnidade, out int codunidade);
+                request.codigousuario = codusuario;
+                request.codigounidade = codunidade;
                 var requestBody = Newtonsoft.Json.JsonConvert.SerializeObject(request);
                 importacaoImovel = new ImportacaoImovelImoview
                 {
