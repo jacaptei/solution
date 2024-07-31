@@ -292,3 +292,4 @@ __pycache__/
 /Solution/Admin/Admin.API/appsettings.Development.json
 /Solution/Site/Site.UI/wwwroot/resources/js/libs/api.js
 /Solution/ImportarImoviewFunction/local.settings.json
+/Solution/Admin/Admin.UI/wwwroot/resources/js/libs/api.js
