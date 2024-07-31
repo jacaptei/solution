@@ -39,6 +39,7 @@ namespace JaCaptei.Application {
                                 entity.endereco.complementoTipo     = entity.endereco.tipoComplemento.label;
                         }
 
+                        entity.cod      = entity.tokenNum.ToString();
                         entity.validado = false;
 
                         entity.id   = conn.Insert<Imovel,int>(entity);
@@ -401,6 +402,9 @@ namespace JaCaptei.Application {
 
                 if(!System.String.IsNullOrWhiteSpace(busca.imovelJC.endereco.logradouroNorm))
                     filter += " AND endereco.\"logradouroNorm\" LIKE '%" + busca.imovelJC.endereco.logradouroNorm + "%' ";
+
+                if(!System.String.IsNullOrWhiteSpace(busca.imovelJC.endereco.numero))
+                    filter += " AND endereco.numero = '" + busca.imovelJC.endereco.numero + "' ";
 
                 if(!System.String.IsNullOrWhiteSpace(busca.imovelJC.endereco.complementoTipo))
                     filter += " AND endereco.\"complementoTipo\" = '" + busca.imovelJC.endereco.complementoTipo + "' ";

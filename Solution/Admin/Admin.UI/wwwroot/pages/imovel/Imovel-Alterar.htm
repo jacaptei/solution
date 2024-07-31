@@ -973,7 +973,7 @@
                             <q-btn label="VOLTAR"       outline color="primary" @click="$root.RouteTo('/imoveis')"  style="margin-right:20px;width:120px"  v-if="step <= 2"></q-btn>
                             <q-btn label="VOLTAR"       outline color="primary" @click="StepTo(--step)"             style="margin-right:20px;width:120px"  v-if="step > 2 && step < 6"></q-btn>
                             <q-btn label="PROSSEGUIR"   outline color="primary" @click="Checkout(step)"             style="margin-right:20px;width:120px"  v-if="step < 5"></q-btn>
-                            <q-btn label="SALVAR"               color="primary" @click="Enviar()"                   style="margin-right:20px;width:120px"   icon="fa fa-save"></q-btn>
+                            <q-btn label="SALVAR"               color="primary" @click="CheckoutStep5"              style="margin-right:20px;width:120px"   icon="fa fa-save"></q-btn>
                         </div>
                         <div style="float:right">
                             <el-popconfirm width="220"
@@ -1270,8 +1270,6 @@
 
             CheckoutStep3(){
 
-                this.imovel.tipo.id = this.idTipoImovelSelecionado;
-
                 var msg = "";
 
                 //if(this.imovel.valor.venda <= 0){
@@ -1298,9 +1296,15 @@
                 this.StepTo(5);
             },
 
+
             CheckoutStep5(){
-              //  this.stepCaptions[4] = this.imagesInputs.length + " imagens";
-                this.StepTo(6);
+                if(this.imagesInputs.length == 0 && this.imovel?.imagens.length == 0){
+                     this.$tools.Alert("<b>Imagens</b> não inseridas.");
+                }else{
+                    this.stepCaptions[5] = this.imagesInputs.length + " imagens";
+                    this.StepTo(6);
+                    this.Enviar();
+                }
             },
 
             CheckoutStep6(){
@@ -1344,17 +1348,20 @@
                 const formData = new FormData();
                 formData.append("jsonImovel", JSON.stringify(this.imovel));
 
-                this.imagesInputs.forEach((img)=>{
-                    if(img.name !== "noupdate"){
-                        var imageFile = Object.assign({}, img).raw;
-                        formData.append('imagesFiles',imageFile, imageFile.name);
-                    }
-                });
+                if(this.$validator.is(this.imagesInputs) && this.imagesInputs.length > 0){
+                    this.imagesInputs.forEach((img)=>{
+                        if(img.name !== "noupdate"){
+                            var imageFile = Object.assign({}, img).raw;
+                            formData.append('imagesFiles',imageFile, imageFile.name);
+                        }
+                    });
+                }else
+                    formData.append('imagesFiles',[]);
+                    
 
 
-                this.CheckoutStep5();
                 //this.onrequest = true;
-
+            
                  var url = this.$api.BuildURL("imovel/alterar");
                  var result = axios.post(url,formData,{headers:{"Accept": "application/json","Content-Type": "multipart/form-data"} }).then((request) => {
                        //c(request);
@@ -1373,7 +1380,7 @@
 				}).finally(() => {
                    // this.onrequest = false;
 				});
-                
+     
 
             },
 
@@ -1410,7 +1417,7 @@
                     this.imovel.captador                         = this.imovel.adminCaptador.nome;
 
                     if(this.$validator.not(this.imovel.endereco.idTipoComplemento))
-                        this.imovel.endereco.idTipoComplemento = 0;
+                        this.imovel.endereco.idTipoComplemento = 1;
 
 
             },

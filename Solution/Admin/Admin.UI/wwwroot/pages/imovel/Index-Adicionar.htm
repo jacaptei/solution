@@ -427,7 +427,7 @@
                     <div>verificando imóveis...</div>
                     <div style="margin:10px;margin-top:20px"><c-loading></c-loading></div>
                 </el-col>
-                <el-col  :md="24" style="color:var(--s-color-primary);font-weight:700" v-if="$validator.is(imoveisBuscaResult) && imoveisBuscaResult.length > 0">
+                <el-col  :md="24" style="color:var(--s-color-primary);font-weight:700" v-if="$validator.is(imoveisBuscaResult) && imoveisBuscaResult?.length > 0">
                         <div>
                           <el-alert title="Já consta imóvel cadastrado com essas características." description="Verifique se não há erro no índice cadastral e endereço ou se o mesmo já foi cadastrado." type="warning" show-icon />
                         </div>
@@ -597,11 +597,11 @@
                                     <el-row :gutter="20">
                                         <el-col  :md="4" :sm="8" :xs="12" style="margin-top:10px">
                                             IPTU mensal<br />
-                                            <el-input input-style="color:var(--s-accent-color);max-width:200px" v-model="imovel.valor.iptuMensal" maxlength="20"  @keyup.enter="CheckoutStep3()"    :formatter="(value) => `R$ ${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, '.')"    :parser="(value) => value.replace(/\R\$\s?|(\.*)/g, '').replace(/[a-zA-Z]/g, '')"><template #prepend>R$</template></el-input>
+                                            <el-input input-style="color:var(--s-accent-color);max-width:200px" v-model="imovel.valor.iptuMensal" maxlength="20"  @keyup.enter="CheckoutStep3()"    :formatter="(value) => `${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, '.')"    :parser="(value) => value.replace(/\R\$\s?|(\.*)/g, '').replace(/[a-zA-Z]/g, '')"><template #prepend>R$</template></el-input>
                                         </el-col>
                                         <el-col  :md="4" :sm="8" :xs="12" style="margin-top:10px">
                                             IPTU anual<br />
-                                            <el-input input-style="color:var(--s-accent-color);max-width:200px" v-model="imovel.valor.iptuAnual" maxlength="20"  @keyup.enter="CheckoutStep3()"    :formatter="(value) => `R$ ${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, '.')"    :parser="(value) => value.replace(/\R\$\s?|(\.*)/g, '').replace(/[a-zA-Z]/g, '')"><template #prepend>R$</template></el-input>
+                                            <el-input input-style="color:var(--s-accent-color);max-width:200px" v-model="imovel.valor.iptuAnual" maxlength="20"  @keyup.enter="CheckoutStep3()"    :formatter="(value) => `${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, '.')"    :parser="(value) => value.replace(/\R\$\s?|(\.*)/g, '').replace(/[a-zA-Z]/g, '')"><template #prepend>R$</template></el-input>
                                         </el-col>
                                         <!--<el-col  :md="4" :sm="8" :xs="12" style="margin-top:10px">
                                             IPTU índice<br />
@@ -934,7 +934,7 @@
                 <input type="hidden" id="imovelFormData" />
                 <q-btn label="VOLTAR" outline color="primary" @click="StepTo(--step)" style="margin-right:20px" v-if="step > 1 && step < 6"></q-btn>
                 <q-btn label="PROSSEGUIR" color="primary" @click="Checkout(step)" :loading="onrequest" v-if="step < 5"></q-btn>
-                <q-btn label="CONCLUIR"  color="primary" @click="Enviar()" :loading="onrequest" icon="fa fa-save" v-if="step == 5"></q-btn>
+                <q-btn label="CONCLUIR"  color="primary" @click="CheckoutStep5" :loading="onrequest" icon="fa fa-save" v-if="step == 5"></q-btn>
             </el-col>
             <!--<el-col :md="12" class="s-input">
                 <div><i class="fa fa-square"></i> campos necessários</div>
@@ -1141,7 +1141,7 @@
 
                     await this.BuscarImoveisNaRegiao();
 
-                    if(imoveisBuscaResult.length == 0){
+                    if(this.imoveisBuscaResult?.length == 0){
                         this.stepCaptions[2] = this.imovel.endereco.bairro + ', ' + this.imovel.endereco.cidade ;
                         this.StepTo(3);
                     }
@@ -1179,12 +1179,16 @@
             },
 
             CheckoutStep5(){
-                this.stepCaptions[4] = this.imagesInputs.length + " imagens";
-                this.StepTo(6);
+                if(this.imagesInputs.length == 0){
+                     this.$tools.Alert("<b>Imagens</b> não inseridas.");
+                }else{
+                    this.stepCaptions[5] = this.imagesInputs.length + " imagens";
+                    this.StepTo(6);
+                    this.Enviar();
+                }
             },
 
             CheckoutStep6(){
-                this.stepCaptions[4] = this.imagesInputs.length + " imagens";
                 this.StepTo(7);
             },
 
@@ -1224,7 +1228,6 @@
                     formData.append('imagesFiles',imageFile, imageFile.name);
                 });
 
-                this.CheckoutStep5();
                 this.onrequest = true;
 
                  var url = this.$api.BuildURL("imovel/adicionar");
@@ -1299,9 +1302,12 @@
                     this.imovel.area.maxima                      = this.$tools.ParseFloat( this.imovel.area.maxima                     );
                     this.imovel.area.total                       = this.$tools.ParseFloat( this.imovel.area.total                      ); 
 
-                    this.imovel.idTipo                           =  this.idTipoImovelSelecionado;
-                    this.imovel.tipo                             =  this.opcoes.tiposImoveis.filter(t => t.id == this.idTipoImovelSelecionado)[0];
-                    //c2("imovel.tipo",this.imovel.tipo)
+                    this.imovel.idTipo                           = this.idTipoImovelSelecionado;
+                    this.imovel.tipo                             = this.opcoes.tiposImoveis.filter(t => t.id == this.idTipoImovelSelecionado)[0];
+                    this.imovel.captador                         = this.imovel.adminCaptador.nome;
+
+                    if(this.$validator.not(this.imovel.endereco.idTipoComplemento))
+                        this.imovel.endereco.idTipoComplemento = 1;
 
             },
 
@@ -1447,7 +1453,7 @@
                             this.buscaImovel.imovelJC.endereco.complemento = this.imovel.endereco.complemento;
 
                         if(this.cep.numero)
-                        this.buscaImovel.cepBase = this.$validator.is(this.buscaImovel.imovelJC.endereco.cep )? this.imovel.endereco.cep.split("-")[0]   : ""       ;
+                            this.buscaImovel.cepBase = this.$validator.is(this.buscaImovel.imovelJC.endereco.cep )? this.imovel.endereco.cep.split("-")[0]   : ""       ;
 
                         this.buscaImovel.page = 0;
                         this.buscaImovel.result.imoveisJC = [];
