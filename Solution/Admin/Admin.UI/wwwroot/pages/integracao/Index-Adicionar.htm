@@ -13,7 +13,7 @@
                     </el-col>
                     <el-col :xs="24" :sm="12" :md="8" :lg="8" class="register-input">
                         <div>SELECIONE O PLANO</div>
-                        <el-select filterable v-model="integracao.idPlano" style="width: 100%" :disabled="disableFieldsForPartnerValidation" placeholder="SELECIONE O PLANO">
+                        <el-select filterable v-model="integracao.idPlano" style="width: 100%" :disabled="true" placeholder="SELECIONE O PLANO">
                             <el-option v-for="item in [
                                              {nome: 'CORRETOR AUTÔNOMO ESSENCIAL por R$387/mês',  id: 2 },
                                              {nome: 'IMOBILIÁRIA ATÉ 03 USUÁRIOS por R$499/mês',  id: 3 },
@@ -56,7 +56,7 @@
                     </el-col>
                     <el-col :xs="24" :sm="12" :md="8" :lg="8" class="register-input">
                         <div>UNIDADE<span></span></div>
-                        <el-select v-else v-model="unidades" filterable :disabled="disableFieldsForPartnerValidation" :clearable="true" class="m-4" placeholder="INFORME A UNIDADE" size="large" style="width:100%">
+                        <el-select v-else v-model="unidades" filterable :disabled="ValidarCampoUnidades()" :clearable="true" class="m-4" placeholder="INFORME A UNIDADE" size="large" style="width:100%">
                             <el-option v-for="item in opcoes.unidades" :key="item.id" :label="item.nome" :value="item.id"></el-option>
                         </el-select>
                     </el-col>
@@ -143,8 +143,8 @@
                 busca: this.$models.busca(),
                 carregandoCidades: false,
                 disableFieldsForPartnerValidation: true,
+                disabledUnidade: true,
                 totalBairrosPermitidos: 0,
-                usuarioIntegracao: this.$models.usuarioIntegracao,
                 documento: "",
                 maxlength: 22,
                 placeholderText: 'Digite o CPF ou CNPJ',
@@ -315,6 +315,14 @@
                     this.locationGroups[groupIndex].carregandoCidades = false;
                 });
             },
+            ValidarCampoUnidades() {
+                if (this.disabledUnidade || this.disableFieldsForPartnerValidation) {
+                    return true
+                } else {
+                    return false
+                }
+
+            },
             ObterBairros(cidade, groupIndex) {
                 this.group = this.locationGroups[groupIndex];
                 this.group.carregandoCidades = true;
@@ -348,6 +356,7 @@
                                 if (response.data) {
                                     this.opcoes.unidades = response.data;
                                     this.unidades = response.data[0].id;
+                                    this.disabledUnidade = false;
                                 }
                             })
                             .catch((error) => {
