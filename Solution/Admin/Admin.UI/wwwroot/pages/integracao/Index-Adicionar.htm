@@ -91,15 +91,21 @@
                                 <!-- Cidade -->
                                 <el-col :xs="24" :sm="24" :md="12" :lg="8" class="register-input">
                                     <div><p>CIDADE</p></div>
-                                    <el-select :disabled="this.locationGroups[index].bairrosExistentesIntegracao" v-model="this.locationGroups[index].selectedCities" filterable class="m-4" placeholder="Selecionar" size="large" style="width:100%" @change="(cities) => ObterBairros(cities, index)">
+                                    <div style="height:40px" v-if="this.locationGroups[index].carregandoEstados">
+                                        <c-loading size="30px" style="padding-left:5px"></c-loading>
+                                    </div>
+                                    <el-select v-else :disabled="this.locationGroups[index].bairrosExistentesIntegracao" v-model="this.locationGroups[index].selectedCities" filterable class="m-4" placeholder="Selecionar" size="large" style="width:100%" @change="(cities) => ObterBairros(cities, index)">
                                         <el-option v-for="item in group.cidades" :key="item.id" :label="item.label" :value="item.id"></el-option>
                                     </el-select>
                                 </el-col>
 
                                 <!-- Bairro -->
                                 <el-col :xs="24" :sm="24" :md="12" :lg="8" class="register-input">
+                                    <div style="height:40px" v-if="this.locationGroups[index].carregandoBairros">
+                                        <c-loading size="30px" style="padding-left:5px"></c-loading>
+                                    </div>
                                     <div><p>BAIRROS</p></div>
-                                    <el-select :disabled="this.locationGroups[index].bairrosExistentesIntegracao" v-model="this.locationGroups[index].selectedBairros" filterable class="m-4" placeholder="Selecionar" size="large" style="width:100%" @change="(selectedBairros) => handleBairrosChange(selectedBairros, group, index)">
+                                    <el-select v-else :disabled="this.locationGroups[index].bairrosExistentesIntegracao" v-model="this.locationGroups[index].selectedBairros" filterable class="m-4" placeholder="Selecionar" size="large" style="width:100%" @change="(selectedBairros) => handleBairrosChange(selectedBairros, group, index)">
                                         <el-option v-for="item in this.locationGroups[index].bairros" :key="item.id" :label="item.label" :value="this.locationGroups[index].bairrosExistentesIntegracao ? item.id : item"></el-option>
                                     </el-select>
                                 </el-col>
@@ -182,7 +188,7 @@
                 },
                 perfilIntegracaoCadastro: {},
                 integracao: {
-                    idCliente: 60,
+                    idCliente: "",
                     idOperador: this.$root.usuario.id,
                     codUsuario: "",
                     codUnidade: "",
@@ -198,6 +204,7 @@
                     await this.ObterCidades(group.selectedEstado, index);
                     await new Promise(resolve => setTimeout(resolve, 400));
                     await this.ObterBairros(group.selectedCities, index);
+                    await new Promise(resolve => setTimeout(resolve, 400));
                     this.locationGroups[index].enableFilterButton = true;
                 }
             }
@@ -407,6 +414,7 @@
                 }
             },
             AtualizarCamposCadastro(perfilIntegracaoCadastro) {
+                this.integracao.codUsuario = this.perfilIntegracaoCadastro.integracao.codUsuario;
                 var imoviewCrm = this.perfilIntegracaoCadastro.crms.filter(crm => crm.nome === 'Imoview');
                 this.integracao.idCliente = this.perfilIntegracaoCadastro.cliente.id
                 this.integracao.idPlano = perfilIntegracaoCadastro.plano.id;
@@ -416,8 +424,6 @@
                 if (perfilIntegracaoCadastro && perfilIntegracaoCadastro.integracao?.bairros) {
                     this.integracao.bairros = JSON.parse(perfilIntegracaoCadastro.integracao?.bairros);
                     this.carregarDadosIniciais(this.integracao.bairros);
-                    this.integracao.bairros.forEach(bairros => {
-                    });
                 }
                 if (perfilIntegracaoCadastro && perfilIntegracaoCadastro.integracao) {
                     this.integracao.chaveApi = perfilIntegracaoCadastro.integracao.chaveApi || "";
