@@ -6,9 +6,6 @@ using JaCaptei.Application.Integracao;
 using JaCaptei.Model;
 using JaCaptei.Model.DTO;
 using JaCaptei.Model.Entities;
-
-using MassTransit;
-
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 namespace JaCaptei.Administrativo.API.Controllers;
@@ -28,10 +25,10 @@ public class ImoviewController : ControllerBase
     private readonly IMapper _mapper;
     private readonly ParceiroService _parceiroService;
 
-    public ImoviewController(IHttpClientFactory httpClientFactory, DBcontext context, IMapper mapper, ISendEndpointProvider bus)
+    public ImoviewController(IHttpClientFactory httpClientFactory, DBcontext context, IMapper mapper)
     {
         //_httpClientFactory = httpClientFactory;
-        _service = new ImoviewService(httpClientFactory, context, _apiKey, mapper, bus);
+        _service = new ImoviewService(httpClientFactory, context, _apiKey, mapper);
         _httpClientFactory = httpClientFactory;
         _context = context;
         _mapper = mapper;

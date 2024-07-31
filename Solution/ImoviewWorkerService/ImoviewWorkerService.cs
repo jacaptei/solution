@@ -6,6 +6,9 @@ using JaCaptei.Application.DAL;
 using JaCaptei.Application.Integracao;
 using JaCaptei.Model;
 
+using System.Diagnostics;
+using System.Threading;
+
 namespace ImoviewWorker;
 
 public class ImoviewWorkerService : BackgroundService
@@ -33,7 +36,16 @@ public class ImoviewWorkerService : BackgroundService
             string connectionString = Config.settings.AzureMQ;
             string queueName = "integracaocliente";
             await using var client = new ServiceBusClient(connectionString);
-
+            ServiceBusSender sender = client.CreateSender(queueName);
+            var req1 = new JaCaptei.Model.IntegracaoEvent()
+            {
+                IdCliente = 1,
+                IdIntegracao = 10,
+                IdOperador = 5,
+            };
+            var body1 = Newtonsoft.Json.JsonConvert.SerializeObject(req1);
+            var message = new ServiceBusMessage(body1);
+            await sender.SendMessageAsync(message, stoppingToken);
             ServiceBusReceiver receiver = client.CreateReceiver(queueName);
 
             ServiceBusReceivedMessage receivedMessage = await receiver.ReceiveMessageAsync(cancellationToken: stoppingToken);
