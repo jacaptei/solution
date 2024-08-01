@@ -25,7 +25,6 @@ public class ImoviewService : IDisposable
     private readonly IHttpClientFactory _httpClientFactory;
     private readonly DBcontext _context;
     private readonly ImoviewDAO _imoviewDAO;
-    private string _chave;
     private readonly IMapper _mapper;
     private readonly ILogger? _logger;
     private readonly AsyncRetryPolicy _retryPolicy;
@@ -41,14 +40,16 @@ public class ImoviewService : IDisposable
             .Handle<Exception>()
             .WaitAndRetryAsync(Backoff.DecorrelatedJitterBackoffV2(TimeSpan.FromSeconds(2), 3));
         _imoviewDAO = imoviewDAO;
-        _chave = "";
+        _busPolicy = Policy
+        .Handle<Exception>()
+        .WaitAndRetryAsync(1, retryAttempt => TimeSpan.FromSeconds(retryAttempt))
+        .WrapAsync(Policy.TimeoutAsync(TimeSpan.FromSeconds(3)));
     }
 
-    public ImoviewService(IHttpClientFactory httpClientFactory, DBcontext context, string chave, IMapper mapper)
+    public ImoviewService(IHttpClientFactory httpClientFactory, DBcontext context, IMapper mapper)
     {
         _httpClientFactory = httpClientFactory;
         _context = context;
-        _chave = chave;
         _mapper = mapper;
         _imoviewDAO = new ImoviewDAO(_context.GetConn());
         _retryPolicy = Policy
@@ -60,21 +61,21 @@ public class ImoviewService : IDisposable
         .WrapAsync(Policy.TimeoutAsync(TimeSpan.FromSeconds(3)));
     }
 
-    public string Chave { get => _chave; set => _chave = value; }
-    private async Task<CamposImoview?> GetCampos(string url)
+    //public string Chave { get => _chave; set => _chave = value; }
+    private async Task<CamposImoview?> GetCampos(string url, string chave)
     {
         var client = _httpClientFactory.CreateClient("imoview");
         client.DefaultRequestHeaders.Clear();
-        client.DefaultRequestHeaders.Add("chave", _chave);
+        client.DefaultRequestHeaders.Add("chave", chave);
 
         var res = await client.GetStringAsync(url);
         var campos = Newtonsoft.Json.JsonConvert.DeserializeObject<CamposImoview>(res);
         return campos;
     }
 
-    public async Task<CamposImoview?> GetFinalidades()
+    public async Task<CamposImoview?> GetFinalidades(string chave)
     {
-        return await GetCampos("Imovel/RetornarListaFinalidades");
+        return await GetCampos("Imovel/RetornarListaFinalidades", chave);
     }
 
     public async Task<CamposImoview?> GetUnidades(string chave)
@@ -88,26 +89,26 @@ public class ImoviewService : IDisposable
         return campos;
     }
 
-    public async Task<CamposImoview?> GetDestinacoes()
+    public async Task<CamposImoview?> GetDestinacoes(string chave)
     {
-        return await GetCampos("Imovel/RetornarListaDestinacoes");
+        return await GetCampos("Imovel/RetornarListaDestinacoes", chave);
     }
 
-    public async Task<CamposImoview?> GetTipos()
+    public async Task<CamposImoview?> GetTipos(string chave)
     {
-        return await GetCampos("Imovel/RetornarTiposImoveisDisponiveis");
+        return await GetCampos("Imovel/RetornarTiposImoveisDisponiveis", chave);
     }
 
-    public async Task<CamposImoview?> GetLocalChaves()
+    public async Task<CamposImoview?> GetLocalChaves(string chave)
     {
-        return await GetCampos("Imovel/RetornarListaLocalChaves");
+        return await GetCampos("Imovel/RetornarListaLocalChaves", chave);
     }
 
-    public async Task<ImoviewIncluirResponse?> IncluirImovel(ImoviewAddImovelRequest req, List<ImagemDTO> imagens)
+    public async Task<ImoviewIncluirResponse?> IncluirImovel(ImoviewAddImovelRequest req, List<ImagemDTO> imagens, string chave)
     {
         var client = _httpClientFactory.CreateClient("imoview");
         client.DefaultRequestHeaders.Clear();
-        client.DefaultRequestHeaders.Add("chave", _chave);
+        client.DefaultRequestHeaders.Add("chave", chave);
         using var content = new MultipartFormDataContent();
         var jsonParameters = Newtonsoft.Json.JsonConvert.SerializeObject(req);
         var builder = new UriBuilder(client.BaseAddress+"Imovel/IncluirImovel")
@@ -145,7 +146,6 @@ public class ImoviewService : IDisposable
         client.DefaultRequestHeaders.Add("chave", chave);
         var res = await client.GetAsync("Imovel/RetornarListaFinalidades");
         var chaveOk = !(res.StatusCode == HttpStatusCode.Unauthorized || res.StatusCode == HttpStatusCode.Forbidden);
-        if (chaveOk) this.Chave = chave;
         return chaveOk;
     }
 
@@ -481,8 +481,8 @@ public class ImoviewService : IDisposable
 
         try
         {
-            Chave = integracao.ChaveApi;
-            var res = await IncluirImovel(request!, images);
+            var chave = integracao.ChaveApi;
+            var res = await IncluirImovel(request!, images, chave);
             importacaoImovel!.Status = res!.erro ? StatusIntegracao.Erro.GetDescription() : StatusIntegracao.Concluido.GetDescription();
             importacaoImovel.ImoviewResponse = Newtonsoft.Json.JsonConvert.SerializeObject(res);
             await _retryPolicy.ExecuteAsync(() => _imoviewDAO.SaveImportacaoImovel(importacaoImovel));

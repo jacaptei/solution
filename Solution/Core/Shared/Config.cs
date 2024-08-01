@@ -43,6 +43,8 @@
 
         public string AzureMQ                       { get; set; }
 
+        public string IntegracaoAzureUrl            { get; set; }
+
         public void CopyToStaticSettings() {
             Config.settings = this;
             Config.settings.environment = this.environment.ToUpper();

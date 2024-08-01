@@ -6,9 +6,6 @@ using JaCaptei.Application.DAL;
 using JaCaptei.Application.Integracao;
 using JaCaptei.Model;
 
-using System.Diagnostics;
-using System.Threading;
-
 namespace ImoviewWorker;
 
 public class ImoviewWorkerService : BackgroundService
@@ -21,7 +18,7 @@ public class ImoviewWorkerService : BackgroundService
     {
         _logger = logger;
         _config = config;
-        _service = new ImoviewService(httpClientFactory, context, "", mapper);
+        _service = new ImoviewService(httpClientFactory, context, mapper);
     }
 
     protected override async Task ExecuteAsync(CancellationToken stoppingToken)
