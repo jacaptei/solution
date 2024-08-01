@@ -476,7 +476,7 @@
                         console.log('Erro de validação');
                     }
                 } catch (error) {
-                    this.$tools.MessageAlert("Preencha Todos Os Campos Obrigatorios!", 100);
+                    this.$tools.MessageAlert(request.data.mensagem || "Preencha Todos Os Campos Obrigatorios!", 100);
                     console.error(error);
                 } finally {
                     this.loading = false;
