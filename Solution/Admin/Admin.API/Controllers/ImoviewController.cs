@@ -81,6 +81,15 @@ public class ImoviewController : ControllerBase
         return list;
     }
 
+    [HttpGet("TesteMQ")]
+    public async Task<ActionResult<string>> GetMQ()
+    {
+        var url = "https://jacaptei-integracao.servicebus.windows.net/;SharedAccessKeyName=RootAccess;SharedAccessKey=8G2K3RLn4L5GgAtPWOfTKLIvdRIlPwv5V+ASbF/gGQ8=;EntityPath=integracaocliente";
+        var client = _httpClientFactory.CreateClient("");
+        var res = await client.GetStringAsync(url);
+        return Ok(res);
+    }
+
     [HttpPost("ObterImovel")]
     public async Task<ActionResult<ImoviewAddImovelRequest>> GetFullImovel([FromBody] int id)
     {
