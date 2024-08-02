@@ -31,7 +31,10 @@ namespace MockImoviewIncluirAzureFunction
             var imagens = new List<ImagemDTO>();
             foreach (var file in req.Form.Files)
             {
-                _logger.LogInformation($"imagem: {file.FileName}");
+                var bytesCount = file.Length;
+                var tipo = file.ContentType;
+                var r = file.Name;
+                _logger.LogInformation($"imagem: {file.FileName}, tipo: {tipo} tamanho: {bytesCount}");
             }
 
             // Simulate processing and return a mock response
