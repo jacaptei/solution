@@ -1,7 +1,6 @@
 ﻿<template>
-    <div>
+    <div v-loading.fullscreen.lock="fullscreenLoading" element-loading-background="rgba(0, 0, 0, 0.7)">
         <el-form :model="integracao" :rules="rules" ref="integracao">
-            <!-- Form rules and ref -->
             <el-col :md="24">
                 <el-row :gutter="20">
                     <el-col :xs="24" :sm="12" :md="8" :lg="8" class="register-input">
@@ -134,13 +133,6 @@
                         <q-btn v-if="disableButtonIntegration" label="INTEGRAR" color="primary" @click="Integrar()"></q-btn>
                     </el-col>
                 </el-row>
-
-                <el-row justify="center" v-if="onrequest">
-                    <el-col :md="24" style="color:var(--s-color-primary)">
-                        <el-divider style="margin:10px;"><!--resultado--></el-divider>
-                        <c-loading padding="20px"></c-loading>
-                    </el-col>
-                </el-row>
             </el-col>
         </el-form>
     </div>
@@ -161,7 +153,7 @@
                 totalBairrosPermitidos: 0,
                 documento: "",
                 maxlength: 22,
-                placeholderText: 'Digite o CPF ou CNPJ',
+                placeholderText: ref('Digite o CPF ou CNPJ'),
                 placeholderUsuarioText: 'DIGITE O CODIGO DE USUARIO DO CRM',
                 id: null,
                 estados: [],
@@ -209,6 +201,7 @@
                     codUsuario: [{ required: true, message: 'Por favor, insira o Código de Usuário', trigger: 'blur' }],
                     codUnidade: [{ required: true, message: 'Por favor, selecione a Unidade', trigger: 'change' }]
                 },
+                fullscreenLoading: ref(false),
             };
         },
         watch: {
@@ -376,6 +369,7 @@
             },
             async BuscarUnidades(chaveApi) {
                 try {
+                    this.fullscreenLoading = true;
                     var chaveApiString = this.integracao.chaveApi;
                     if (this.$validator.is(chaveApiString)) {
                         var url = this.$api.BuildURL(`api/imoview/unidades?chave=${chaveApiString}`);
@@ -385,16 +379,18 @@
                                     this.opcoes.unidades = response.data;
                                     this.integracao.codUnidade = response.data[0].id;
                                     this.disabledUnidade = false;
+                                    this.fullscreenLoading = false;
                                 }
                             })
                             .catch((error) => {
                                 this.$tools.MessageAlert("Chave API inválida");
+                                this.fullscreenLoading = false;
                             });
-
                         return response;
                     }
                 } catch (error) {
                     console.error("Erro ao verificar a chave API:", error);
+                    this.fullscreenLoading = false;
                 }
             },
             applyMask() {
@@ -412,6 +408,7 @@
             },
             async VerificarInformacoesCliente() {
                 if (this.$validator.is(this.documento)) {
+                    this.fullscreenLoading = true;
                     try {
                         this.LimparCamposIntegracao();
                         var url = this.$api.BuildURL('api/imoview/integracao/cliente');
@@ -423,11 +420,13 @@
                         }
                     } catch (error) {
                         this.$tools.MessageAlert("Parceiro não encontrado!", 100);
+                        this.fullscreenLoading = false;
                         console.error(error);
                     }
                 } else {
                     this.disableFieldsForPartnerValidation = true;
                     this.LimparCamposIntegracao();
+                    this.fullscreenLoading = false;
                 }
             },
             AtualizarCamposCadastro(perfilIntegracaoCadastro) {
@@ -452,12 +451,12 @@
             },
             async Integrar() {
                 try {
+                    this.fullscreenLoading = true;
                     const valid = await this.$refs.integracao.validate();
                     this.integracao.codUnidade = JSON.stringify(this.integracao.codUnidade);
 
                     if (valid) {
                         this.loading = true;
-
                         if (this.$validator.is(this.documento)) {
                             var url = this.$api.BuildURL('api/imoview/integracao/cliente/integrar');
 
@@ -465,21 +464,26 @@
 
                             if (request.data && request.data.status === 'Sucesso') {
                                 this.$tools.MessageAlert("Integração em fila de processamento!", 100);
+                                this.fullscreenLoading = false;
                             } else {
                                 console.error(request.data.mensagem);
                                 throw new Error(request.data.mensagem || 'Erro desconhecido');
+                                this.fullscreenLoading = false;
                             }
                         } else {
                             this.disableFieldsForPartnerValidation = true;
+                            this.fullscreenLoading = false; 
                         }
                     } else {
                         console.log('Erro de validação');
+                        this.fullscreenLoading = false;
                     }
                 } catch (error) {
                     this.$tools.MessageAlert(request.data.mensagem || "Preencha Todos Os Campos Obrigatorios!", 100);
+                    this.fullscreenLoading = false;
                     console.error(error);
                 } finally {
-                    this.loading = false;
+                    this.fullscreenLoading = false;
                 }
             }
         }
