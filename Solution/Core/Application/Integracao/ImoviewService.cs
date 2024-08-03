@@ -501,6 +501,7 @@ public class ImoviewService : IDisposable
 
     public async Task<bool> ImportarImovel(ImportacaoImovelEvent import)
     {
+        if (_imagesSendLimit > 0) _logger?.LogWarning("Importação com limite de {limit} imagens", _imagesSendLimit);
         ImportacaoImovelImoview? importacaoImovel = await _retryPolicy.ExecuteAsync(() => _imoviewDAO.GetImportacaoImovel(import.IdImportacaoBairro, import.CodImovel));
         ImoviewAddImovelRequest? request = null;
         List<ImagemDTO> images = [];
@@ -526,7 +527,7 @@ public class ImoviewService : IDisposable
                         IdImportacaoBairro = import.IdImportacaoBairro,
                         RequestBody = requestBody,
                         DataInclusao = DateTime.UtcNow,
-                        Status = StatusIntegracao.Aguardando.GetDescription(),
+                        Status = StatusIntegracao.Processando.GetDescription(),
                         Imagens = Newtonsoft.Json.JsonConvert.SerializeObject(images.Select(i => new { i.Nome, i.Url }))
                     };
                 }
@@ -535,9 +536,24 @@ public class ImoviewService : IDisposable
             {
                 if (importacaoImovel.Status == StatusIntegracao.Concluido.GetDescription())
                     return false;
+                if (importacaoImovel.Status == StatusIntegracao.Processando.GetDescription())
+                    return false;
+                importacaoImovel.DataAtualizacao = DateTime.UtcNow;
+                importacaoImovel.Status = StatusIntegracao.Processando.GetDescription();
+                await _retryPolicy.ExecuteAsync(() => _imoviewDAO.SaveImportacaoImovel(importacaoImovel));
+                if (importacaoImovel.RequestBody == null)
+                {
+                    var imovelFull = await _retryPolicy.ExecuteAsync(() => _imoviewDAO.GetFullImovel(import.IdImovel));
+                    request = _mapper.Map<ImoviewAddImovelRequest>(imovelFull);
+                    var requestBody = Newtonsoft.Json.JsonConvert.SerializeObject(request);
+                    importacaoImovel.RequestBody = requestBody;
+                }
                 request = Newtonsoft.Json.JsonConvert.DeserializeObject<ImoviewAddImovelRequest>(importacaoImovel.RequestBody);
                 images = await GetImageFiles(import.IdImovel);
-                importacaoImovel.DataAtualizacao = DateTime.UtcNow;
+                if(importacaoImovel.Imagens == null)
+                {
+                    importacaoImovel.Imagens = Newtonsoft.Json.JsonConvert.SerializeObject(images.Select(i => new { i.Nome, i.Url }));
+                }
             }
             var chave = import.ChaveApi;
             var res = await IncluirImovel(request!, images, chave);
@@ -579,6 +595,18 @@ public class ImoviewService : IDisposable
                 IdIntegracao = integracao.Id
             };
             var res = await SendImportQueue(sender, import);
+            importacaoImovel = new ImportacaoImovelImoview
+            {
+                Id = 0,
+                IdImovel = import.IdImovel,
+                CodImovel = import.CodImovel,
+                IdImportacaoBairro = import.IdImportacaoBairro,
+                RequestBody = null,
+                DataInclusao = DateTime.UtcNow,
+                Status = StatusIntegracao.Aguardando.GetDescription(),
+                Imagens = null
+            };
+            await _retryPolicy.ExecuteAsync(() => _imoviewDAO.SaveImportacaoImovel(importacaoImovel));
             return res;
         }
         catch (Exception ex)

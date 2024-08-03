@@ -49,12 +49,15 @@ var builder = new HostBuilder()
     GlobalConfiguration.Setup().UsePostgreSql();
     services.AddScoped<ImoviewService>(provider =>
     {
+        var r = ctx.Configuration.GetSection("ImagesSendLimit").Value;
+        int imageLimit = -1;
+        if(int.TryParse(r, out int limit)) { imageLimit = limit; }
         var httpClientFactory = provider.GetRequiredService<IHttpClientFactory>();
         var context = provider.GetRequiredService<DBcontext>();
         var mapper = provider.GetRequiredService<IMapper>();
         var logger = provider.GetRequiredService<ILogger<ImportarImovelImoviewFn>>();
         var imoviewDAO = new ImoviewDAO(context.GetConn());
-        return new ImoviewService(httpClientFactory, context, mapper, logger, imoviewDAO);
+        return new ImoviewService(httpClientFactory, context, mapper, logger, imoviewDAO, imageLimit);
     });
 });
 
