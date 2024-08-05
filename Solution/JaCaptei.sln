@@ -31,6 +31,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MockImoviewIncluirFunction"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "IntegrarImoviewFunction", "IntegrarImoviewFunction\IntegrarImoviewFunction.csproj", "{B37F2D77-D496-4245-AD7E-81EB5B7AFFD4}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ImpotarImovelImoviewFunction", "ImpotarImovelImoviewFunction\ImpotarImovelImoviewFunction.csproj", "{1D51A8EB-D0E7-447F-AC29-B114B3B31B3A}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -98,6 +100,12 @@ Global
 		{B37F2D77-D496-4245-AD7E-81EB5B7AFFD4}.Release|Any CPU.Build.0 = Release|Any CPU
 		{B37F2D77-D496-4245-AD7E-81EB5B7AFFD4}.SITE|Any CPU.ActiveCfg = Debug|Any CPU
 		{B37F2D77-D496-4245-AD7E-81EB5B7AFFD4}.SITE|Any CPU.Build.0 = Debug|Any CPU
+		{1D51A8EB-D0E7-447F-AC29-B114B3B31B3A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{1D51A8EB-D0E7-447F-AC29-B114B3B31B3A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{1D51A8EB-D0E7-447F-AC29-B114B3B31B3A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{1D51A8EB-D0E7-447F-AC29-B114B3B31B3A}.Release|Any CPU.Build.0 = Release|Any CPU
+		{1D51A8EB-D0E7-447F-AC29-B114B3B31B3A}.SITE|Any CPU.ActiveCfg = Debug|Any CPU
+		{1D51A8EB-D0E7-447F-AC29-B114B3B31B3A}.SITE|Any CPU.Build.0 = Debug|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -113,6 +121,7 @@ Global
 		{C9988AB4-F6EA-4503-870C-4847E607B2B3} = {A6CFBE72-06D5-4D9E-95E8-5E6A6D215AC9}
 		{129146E6-495E-461D-8DDA-A1C009831881} = {A6CFBE72-06D5-4D9E-95E8-5E6A6D215AC9}
 		{B37F2D77-D496-4245-AD7E-81EB5B7AFFD4} = {A6CFBE72-06D5-4D9E-95E8-5E6A6D215AC9}
+		{1D51A8EB-D0E7-447F-AC29-B114B3B31B3A} = {A6CFBE72-06D5-4D9E-95E8-5E6A6D215AC9}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {DAE772A6-FB90-42A9-AF93-1D2C7C58AC0A}

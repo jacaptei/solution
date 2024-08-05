@@ -12,7 +12,6 @@ using Microsoft.Extensions.Logging;
 using Polly;
 using Polly.Contrib.WaitAndRetry;
 using Polly.Retry;
-using Polly.Timeout;
 
 using System.ComponentModel;
 using System.Net;
@@ -25,12 +24,13 @@ public class ImoviewService : IDisposable
     private readonly IHttpClientFactory _httpClientFactory;
     private readonly DBcontext _context;
     private readonly ImoviewDAO _imoviewDAO;
+    private readonly int _imagesSendLimit;
     private readonly IMapper _mapper;
     private readonly ILogger? _logger;
     private readonly AsyncRetryPolicy _retryPolicy;
     private readonly AsyncPolicy _busPolicy;
 
-    public ImoviewService(IHttpClientFactory httpClientFactory, DBcontext context, IMapper mapper, ILogger logger, ImoviewDAO imoviewDAO)
+    public ImoviewService(IHttpClientFactory httpClientFactory, DBcontext context, IMapper mapper, ILogger logger, ImoviewDAO imoviewDAO, int imagesSendLimit = -1)
     {
         _httpClientFactory = httpClientFactory;
         _context = context;
@@ -40,6 +40,7 @@ public class ImoviewService : IDisposable
             .Handle<Exception>()
             .WaitAndRetryAsync(Backoff.DecorrelatedJitterBackoffV2(TimeSpan.FromSeconds(2), 3));
         _imoviewDAO = imoviewDAO;
+        _imagesSendLimit = imagesSendLimit;
         _busPolicy = Policy
         .Handle<Exception>()
         .WaitAndRetryAsync(1, retryAttempt => TimeSpan.FromSeconds(retryAttempt))
@@ -116,8 +117,8 @@ public class ImoviewService : IDisposable
             Query = "parametros=" + Uri.EscapeDataString(jsonParameters)
         };
         var uriWithQuery = builder.Uri;
-
-        foreach (var imagem in imagens)
+        var imgQtd = _imagesSendLimit == -1 ? imagens.Count : _imagesSendLimit;
+        foreach (var imagem in imagens.Take(imgQtd))
         {
             var fileContent = new ByteArrayContent(imagem.Arquivo);
             fileContent.Headers.ContentDisposition = new ContentDispositionHeaderValue("form-data")
@@ -318,15 +319,28 @@ public class ImoviewService : IDisposable
         var res = await _imoviewDAO.ObterImagensImovel(id);
         var list = new List<ImagemDTO>();
         var client = _httpClientFactory.CreateClient();
-        foreach (var item in res.AsParallel()
-            .WithDegreeOfParallelism(6)
-            .WithMergeOptions(ParallelMergeOptions.FullyBuffered))
+
+        if (_imagesSendLimit > 0)
+        {
+            await DownloadImages(res, list, client);
+        }
+        else
+        {
+            await DownloadAllImages(res, list, client);
+        }
+
+        return list;
+    }
+
+    private async Task DownloadImages(List<Model.Entities.ImovelImagem> res, List<ImagemDTO> list, HttpClient client)
+    {
+        foreach (var item in res.Take(_imagesSendLimit))
         {
             try
             {
                 Uri validatedUri;
                 var valid = Uri.TryCreate(item.UrlMedium, UriKind.RelativeOrAbsolute, out validatedUri);
-                if(!valid)
+                if (!valid)
                 {
                     _logger?.LogError("Url invalida! imagem id: {Id}, url: {UrlMedium}", item.Id, item.UrlMedium);
                     continue;
@@ -347,8 +361,39 @@ public class ImoviewService : IDisposable
                 continue;
             }
         }
+    }
 
-        return list;
+    private async Task DownloadAllImages(List<Model.Entities.ImovelImagem> res, List<ImagemDTO> list, HttpClient client)
+    {
+        foreach (var item in res.AsParallel()
+            .WithDegreeOfParallelism(6)
+            .WithMergeOptions(ParallelMergeOptions.FullyBuffered))
+        {
+            try
+            {
+                Uri validatedUri;
+                var valid = Uri.TryCreate(item.UrlMedium, UriKind.RelativeOrAbsolute, out validatedUri);
+                if (!valid)
+                {
+                    _logger?.LogError("Url invalida! imagem id: {Id}, url: {UrlMedium}", item.Id, item.UrlMedium);
+                    continue;
+                }
+                var arquivo = await client.GetByteArrayAsync(validatedUri);
+                var dto = new ImagemDTO()
+                {
+                    Arquivo = arquivo,
+                    Nome = item.Nome,
+                    Tipo = item.Tipo,
+                    Url = item.UrlMedium
+                };
+                list.Add(dto);
+            }
+            catch (Exception ex)
+            {
+                _logger?.LogError("Erro: {ex} ao baixar imagem id: {Id}, url: {UrlMedium}", ex, item.Id, item.UrlMedium);
+                continue;
+            }
+        }
     }
 
     private bool CanProcessIntegracao(IntegracaoImoview integracao)
@@ -417,9 +462,13 @@ public class ImoviewService : IDisposable
         {
             int qtdSucesso = 0, qtdErro = 0;
             var imoveisIds = Newtonsoft.Json.JsonConvert.DeserializeObject<List<ImovelListDTO>>(importacaoBairro.Imoveis) ?? [];
-            foreach (var imovelId in imoveisIds)
+            string connectionString = Config.settings.AzureMQ;
+            string queueName = "importacaoimovel";
+            await using var client = new ServiceBusClient(connectionString);
+            ServiceBusSender sender = client.CreateSender(queueName);
+            foreach (var imovelId in imoveisIds.DistinctBy(i => i.codImovel))
             {
-                var res = await ProcessSingleImportacaoImovel(integracao, importacaoBairro, imovelId);
+                var res = await ProcessSingleImportacaoImovel(integracao, importacaoBairro, imovelId, sender);
                 if (res == null) continue;
                 if (res.Value) qtdSucesso++;
                 else qtdErro++;
@@ -428,8 +477,8 @@ public class ImoviewService : IDisposable
                  StatusIntegracao.Concluido.GetDescription();
             await _retryPolicy.ExecuteAsync(() => _imoviewDAO.SaveImportacaoBairro(importacaoBairro));
             _logger?.LogInformation("Integração Bairro: {IdIntegracaoBairro}", importacaoBairro.IdIntegracaoBairro);
-            _logger?.LogInformation("{qtdSucesso} imoveis importados com sucesso!", qtdSucesso);
-            _logger?.LogInformation("{qtdErro} imoveis importados com erro!", qtdErro);
+            _logger?.LogInformation("{qtdSucesso} imoveis enviados para fila com sucesso!", qtdSucesso);
+            _logger?.LogInformation("{qtdErro} imoveis não enviados!", qtdErro);
         }
         return true;
     }
@@ -439,49 +488,74 @@ public class ImoviewService : IDisposable
         return await _imoviewDAO.GetFullImovel(id);
     }
 
-    private async Task<bool?> ProcessSingleImportacaoImovel(IntegracaoImoview integracao, ImportacaoBairroImoview importacaoBairro, ImovelListDTO imovelId)
+    private async Task<bool> SendImportQueue(ServiceBusSender sender, ImportacaoImovelEvent importacaoImovelEvent)
     {
-        ImportacaoImovelImoview? importacaoImovel = await _retryPolicy.ExecuteAsync(() => _imoviewDAO.GetImportacaoImovel(importacaoBairro.Id, imovelId.codImovel));
+        await _busPolicy.ExecuteAsync(async () =>
+        {
+            var body = Newtonsoft.Json.JsonConvert.SerializeObject(importacaoImovelEvent);
+            var message = new ServiceBusMessage(body);
+            await sender.SendMessageAsync(message);
+        });
+        return true;
+    }
+
+    public async Task<bool> ImportarImovel(ImportacaoImovelEvent import)
+    {
+        if (_imagesSendLimit > 0) _logger?.LogWarning("Importação com limite de {limit} imagens", _imagesSendLimit);
+        ImportacaoImovelImoview? importacaoImovel = await _retryPolicy.ExecuteAsync(() => _imoviewDAO.GetImportacaoImovel(import.IdImportacaoBairro, import.CodImovel));
         ImoviewAddImovelRequest? request = null;
         List<ImagemDTO> images = [];
-
-        if (importacaoImovel == null)
-        {
-            var imovelFull = await _retryPolicy.ExecuteAsync(() => _imoviewDAO.GetFullImovel(imovelId.idImovel));
-            images = await GetImageFiles(imovelId.idImovel);
-            if (imovelFull != null)
-            {
-                request = _mapper.Map<ImoviewAddImovelRequest>(imovelFull);
-                int.TryParse(integracao.CodUsuario, out int codusuario);
-                int.TryParse(integracao.CodUnidade, out int codunidade);
-                request.codigousuario = codusuario;
-                request.codigounidade = codunidade;
-                var requestBody = Newtonsoft.Json.JsonConvert.SerializeObject(request);
-                importacaoImovel = new ImportacaoImovelImoview
-                {
-                    Id = 0,
-                    IdImovel = imovelId.idImovel,
-                    CodImovel = imovelId.codImovel,
-                    IdImportacaoBairro = importacaoBairro.Id,
-                    RequestBody = requestBody,
-                    DataInclusao = DateTime.UtcNow,
-                    Status = StatusIntegracao.Aguardando.GetDescription(),
-                    Imagens = Newtonsoft.Json.JsonConvert.SerializeObject(images.Select(i => new { i.Nome, i.Url }))
-                };
-            }
-        }
-        else
-        {
-            if (importacaoImovel.Status == StatusIntegracao.Concluido.GetDescription())
-                return null;
-            request = Newtonsoft.Json.JsonConvert.DeserializeObject<ImoviewAddImovelRequest>(importacaoImovel.RequestBody);
-            images = await GetImageFiles(imovelId.idImovel);
-            importacaoImovel.DataAtualizacao = DateTime.UtcNow;
-        }
-
         try
         {
-            var chave = integracao.ChaveApi;
+            if (importacaoImovel == null)
+            {
+                var imovelFull = await _retryPolicy.ExecuteAsync(() => _imoviewDAO.GetFullImovel(import.IdImovel));
+                images = await GetImageFiles(import.IdImovel);
+                if (imovelFull != null)
+                {
+                    request = _mapper.Map<ImoviewAddImovelRequest>(imovelFull);
+                    int.TryParse(import.CodUsuario, out int codusuario);
+                    int.TryParse(import.CodUnidade, out int codunidade);
+                    request.codigousuario = codusuario;
+                    request.codigounidade = codunidade;
+                    var requestBody = Newtonsoft.Json.JsonConvert.SerializeObject(request);
+                    importacaoImovel = new ImportacaoImovelImoview
+                    {
+                        Id = 0,
+                        IdImovel = import.IdImovel,
+                        CodImovel = import.CodImovel,
+                        IdImportacaoBairro = import.IdImportacaoBairro,
+                        RequestBody = requestBody,
+                        DataInclusao = DateTime.UtcNow,
+                        Status = StatusIntegracao.Processando.GetDescription(),
+                        Imagens = Newtonsoft.Json.JsonConvert.SerializeObject(images.Select(i => new { i.Nome, i.Url }))
+                    };
+                }
+            }
+            else
+            {
+                if (importacaoImovel.Status == StatusIntegracao.Concluido.GetDescription())
+                    return false;
+                if (importacaoImovel.Status == StatusIntegracao.Processando.GetDescription())
+                    return false;
+                importacaoImovel.DataAtualizacao = DateTime.UtcNow;
+                importacaoImovel.Status = StatusIntegracao.Processando.GetDescription();
+                await _retryPolicy.ExecuteAsync(() => _imoviewDAO.SaveImportacaoImovel(importacaoImovel));
+                if (importacaoImovel.RequestBody == null)
+                {
+                    var imovelFull = await _retryPolicy.ExecuteAsync(() => _imoviewDAO.GetFullImovel(import.IdImovel));
+                    request = _mapper.Map<ImoviewAddImovelRequest>(imovelFull);
+                    var requestBody = Newtonsoft.Json.JsonConvert.SerializeObject(request);
+                    importacaoImovel.RequestBody = requestBody;
+                }
+                request = Newtonsoft.Json.JsonConvert.DeserializeObject<ImoviewAddImovelRequest>(importacaoImovel.RequestBody);
+                images = await GetImageFiles(import.IdImovel);
+                if(importacaoImovel.Imagens == null)
+                {
+                    importacaoImovel.Imagens = Newtonsoft.Json.JsonConvert.SerializeObject(images.Select(i => new { i.Nome, i.Url }));
+                }
+            }
+            var chave = import.ChaveApi;
             var res = await IncluirImovel(request!, images, chave);
             importacaoImovel!.Status = res!.erro ? StatusIntegracao.Erro.GetDescription() : StatusIntegracao.Concluido.GetDescription();
             importacaoImovel.ImoviewResponse = Newtonsoft.Json.JsonConvert.SerializeObject(res);
@@ -490,7 +564,54 @@ public class ImoviewService : IDisposable
         }
         catch (Exception ex)
         {
-            _logger?.LogError("Erro ao importar imovel: {imovelId}, erro: {ex}", imovelId, ex);
+            _logger?.LogError("Erro ao importar imovel: {CodImovel}, erro: {ex}", import.CodImovel, ex);
+            importacaoImovel!.ImoviewResponse = Newtonsoft.Json.JsonConvert.SerializeObject(new { mensagem = ex.Message, erro = true, stack = ex.StackTrace });
+            importacaoImovel.Status = StatusIntegracao.Erro.ToString();
+            await _retryPolicy.ExecuteAsync(() => _imoviewDAO.SaveImportacaoImovel(importacaoImovel));
+            throw;
+        }
+    }
+
+    private async Task<bool?> ProcessSingleImportacaoImovel(IntegracaoImoview integracao, ImportacaoBairroImoview importacaoBairro, ImovelListDTO imovelId, ServiceBusSender sender)
+    {
+        ImportacaoImovelImoview? importacaoImovel = await _retryPolicy.ExecuteAsync(() => _imoviewDAO.GetImportacaoImovel(importacaoBairro.Id, imovelId.codImovel));
+
+        if (importacaoImovel != null)
+        {
+            if (importacaoImovel.Status == StatusIntegracao.Concluido.GetDescription())
+                return null;
+        }
+        try
+        {
+            var import = new ImportacaoImovelEvent()
+            {
+                ChaveApi = integracao.ChaveApi,
+                CodImovel = imovelId.codImovel,
+                CodUnidade = integracao.CodUnidade,
+                CodUsuario = integracao.CodUsuario,
+                IdCliente = integracao.IdCliente,
+                IdImovel = imovelId.idImovel,
+                IdImportacaoBairro = importacaoBairro.Id,
+                IdIntegracao = integracao.Id
+            };
+            var res = await SendImportQueue(sender, import);
+            importacaoImovel = new ImportacaoImovelImoview
+            {
+                Id = 0,
+                IdImovel = import.IdImovel,
+                CodImovel = import.CodImovel,
+                IdImportacaoBairro = import.IdImportacaoBairro,
+                RequestBody = null,
+                DataInclusao = DateTime.UtcNow,
+                Status = StatusIntegracao.Aguardando.GetDescription(),
+                Imagens = null
+            };
+            await _retryPolicy.ExecuteAsync(() => _imoviewDAO.SaveImportacaoImovel(importacaoImovel));
+            return res;
+        }
+        catch (Exception ex)
+        {
+            _logger?.LogError("Erro ao enviar fila de importação imovel: {imovelId}, erro: {ex}", imovelId, ex);
             importacaoImovel!.ImoviewResponse = Newtonsoft.Json.JsonConvert.SerializeObject(new { mensagem = ex.Message, erro = true, stack = ex.StackTrace });
             importacaoImovel.Status = StatusIntegracao.Erro.ToString();
             await _retryPolicy.ExecuteAsync(() => _imoviewDAO.SaveImportacaoImovel(importacaoImovel));
