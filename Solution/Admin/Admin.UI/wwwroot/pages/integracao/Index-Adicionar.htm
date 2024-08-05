@@ -384,9 +384,13 @@
                             })
                             .catch((error) => {
                                 this.$tools.MessageAlert("Chave API inválida");
+                                this.integracao.codUnidade = "";
                                 this.fullscreenLoading = false;
                             });
                         return response;
+                    } else {
+                        this.integracao.codUnidade = "";
+                        this.fullscreenLoading = false;
                     }
                 } catch (error) {
                     console.error("Erro ao verificar a chave API:", error);
@@ -416,6 +420,7 @@
                         if (request.data && request.status === 200) {
                             this.disableFieldsForPartnerValidation = false;
                             this.perfilIntegracaoCadastro = request.data;
+                            this.fullscreenLoading = false;
                             this.AtualizarCamposCadastro(this.perfilIntegracaoCadastro);
                         }
                     } catch (error) {
@@ -472,7 +477,7 @@
                             }
                         } else {
                             this.disableFieldsForPartnerValidation = true;
-                            this.fullscreenLoading = false; 
+                            this.fullscreenLoading = false;
                         }
                     } else {
                         console.log('Erro de validação');
