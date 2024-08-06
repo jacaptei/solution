@@ -527,40 +527,40 @@ namespace JaCaptei.Administrativo.API.Controllers
                 string filter = "WHERE discontinued = 1"; // discontinued <> 1
 
 
-                if(!System.String.IsNullOrWhiteSpace(busca.imovel.id))
-                    filter += " AND id = '" + busca.imovel.id + "' ";
-                else if(!System.String.IsNullOrWhiteSpace(busca.imovel.cod))
-                    filter += " AND productcode = '" + busca.imovel.cod + "' ";
+                if(!System.String.IsNullOrWhiteSpace(busca.imovelCRM.id))
+                    filter += " AND id = '" + busca.imovelCRM.id + "' ";
+                else if(!System.String.IsNullOrWhiteSpace(busca.imovelCRM.cod))
+                    filter += " AND productcode = '" + busca.imovelCRM.cod + "' ";
                 else {
 
-                    if(busca.imovel.vagas > 0)
-                        filter += " AND cf_1097 >= " + busca.imovel.vagas.ToString();
+                    if(busca.imovelCRM.vagas > 0)
+                        filter += " AND cf_1097 >= " + busca.imovelCRM.vagas.ToString();
 
-                    if(busca.imovel.quartos > 0)
-                        filter += " AND cf_1041 >= " + busca.imovel.quartos.ToString();
+                    if(busca.imovelCRM.quartos > 0)
+                        filter += " AND cf_1041 >= " + busca.imovelCRM.quartos.ToString();
 
-                    if(busca.imovel.banheiros > 0)
-                        filter += " AND cf_1035 >= " + busca.imovel.banheiros.ToString();
+                    if(busca.imovelCRM.banheiros > 0)
+                        filter += " AND cf_1035 >= " + busca.imovelCRM.banheiros.ToString();
 
-                    if(busca.imovel.suites > 0)
-                        filter += " AND cf_1045 >= " + busca.imovel.suites.ToString();
+                    if(busca.imovelCRM.suites > 0)
+                        filter += " AND cf_1045 >= " + busca.imovelCRM.suites.ToString();
 
-                    if(!System.String.IsNullOrWhiteSpace(busca.imovel.estado))
-                        filter += " AND cf_1021 = '" + busca.imovel.estado + "' ";
+                    if(!System.String.IsNullOrWhiteSpace(busca.imovelCRM.estado))
+                        filter += " AND cf_1021 = '" + busca.imovelCRM.estado + "' ";
 
-                    if(!System.String.IsNullOrWhiteSpace(busca.imovel.cidade))
-                        filter += " AND cf_1019 = '" + busca.imovel.cidade + "' ";
+                    if(!System.String.IsNullOrWhiteSpace(busca.imovelCRM.cidade))
+                        filter += " AND cf_1019 = '" + busca.imovelCRM.cidade + "' ";
 
-                    if(!System.String.IsNullOrWhiteSpace(busca.imovel.cod))
-                        filter += " AND productcode = '" + busca.imovel.cod + "' ";
+                    if(!System.String.IsNullOrWhiteSpace(busca.imovelCRM.cod))
+                        filter += " AND productcode = '" + busca.imovelCRM.cod + "' ";
 
-                    if(!System.String.IsNullOrWhiteSpace(busca.imovel.tipo))
-                        filter += " AND productcategory = '" + busca.imovel.tipo + "' ";
+                    if(!System.String.IsNullOrWhiteSpace(busca.imovelCRM.tipo))
+                        filter += " AND productcategory = '" + busca.imovelCRM.tipo + "' ";
 
-                    if(busca.imovel.bairros.Count > 0) {
+                    if(busca.imovelCRM.bairros.Count > 0) {
                         //filter += " AND cf_1011 IN('" + string.Join(",",busca.imovel.bairros).Replace("(",",").Replace(")","").Replace(",","','") + "') ";
                         string items = "";
-                        busca.imovel.bairros.ForEach(item => {
+                        busca.imovelCRM.bairros.ForEach(item => {
                             items += "'" + item.Replace("(","','").Replace(")","").Trim().Replace(" '","'") + "',";
                         });
                         items = " AND cf_1011 IN(" + items + ") ";
@@ -581,38 +581,38 @@ namespace JaCaptei.Administrativo.API.Controllers
                     //else if(busca.imovel.areaMaxima > 0)
                     //    filter += " AND cf_1203  <=  " + busca.imovel.areaMaxima.ToString();
 
-                    if(busca.imovel.valorMinimo > 0)
-                        filter += " AND unit_price  >=  " + busca.imovel.valorMinimo.ToString();
-                    if(busca.imovel.valorMaximo > 0)
-                        filter += " AND unit_price  <=  " + busca.imovel.valorMaximo.ToString();
+                    if(busca.imovelCRM.valorMinimo > 0)
+                        filter += " AND unit_price  >=  " + busca.imovelCRM.valorMinimo.ToString();
+                    if(busca.imovelCRM.valorMaximo > 0)
+                        filter += " AND unit_price  <=  " + busca.imovelCRM.valorMaximo.ToString();
 
 
-                    if(busca.imovel.areaMinima > 0)
-                        filter += " AND cf_1203  >=  " + busca.imovel.areaMinima.ToString();
-                    if(busca.imovel.areaMaxima > 0)
-                        filter += " AND cf_1203  <=  " + busca.imovel.areaMaxima.ToString();
+                    if(busca.imovelCRM.areaMinima > 0)
+                        filter += " AND cf_1203  >=  " + busca.imovelCRM.areaMinima.ToString();
+                    if(busca.imovelCRM.areaMaxima > 0)
+                        filter += " AND cf_1203  <=  " + busca.imovelCRM.areaMaxima.ToString();
 
-                    if(busca.imovel.areaServico)        { filter += " AND cf_1053 = 1 "; }
-                    if(busca.imovel.closet)             { filter += " AND cf_1063 = 1 "; }
-                    if(busca.imovel.churrasqueira)      { filter += " AND cf_1147 = 1 "; }
-                    if(busca.imovel.salas)              { filter += " AND cf_1043 = 1 "; }
-                    if(busca.imovel.armarioBanheiro)    { filter += " AND cf_1055 = 1 "; }
-                    if(busca.imovel.armarioQuarto)      { filter += " AND cf_1059 = 1 "; }
-                    if(busca.imovel.boxDespejo)         { filter += " AND cf_1121 = 1 "; }
-                    if(busca.imovel.lavabo)             { filter += " AND cf_1071 = 1 "; }
-                    if(busca.imovel.hidromassagem)      { filter += " AND cf_1149 = 1 "; }
-                    if(busca.imovel.piscina)            { filter += " AND cf_1153 = 1 "; }
-                    if(busca.imovel.quadraEsportiva)    { filter += " AND cf_1157 = 1 "; }
-                    if(busca.imovel.salaoFestas)        { filter += " AND cf_1163 = 1 "; }
-                    if(busca.imovel.dce)                { filter += " AND cf_1065 = 1 "; }
-                    if(busca.imovel.cercaEletrica)      { filter += " AND cf_1123 = 1 "; }
-                    if(busca.imovel.jardim)             { filter += " AND cf_1131 = 1 "; }
-                    if(busca.imovel.interfone)          { filter += " AND cf_1129 = 1 "; }
-                    if(busca.imovel.armarioCozinha)     { filter += " AND cf_1057 = 1 "; }
-                    if(busca.imovel.portaoEletronico)   { filter += " AND cf_1135 = 1 "; }
-                    if(busca.imovel.alarme)             { filter += " AND cf_1113 = 1 "; }
-                    if(busca.imovel.aguaIndividual)     { filter += " AND cf_1111 = 1 "; }
-                    if(busca.imovel.gasCanalizado)      { filter += " AND cf_1127 = 1 "; }
+                    if(busca.imovelCRM.areaServico)        { filter += " AND cf_1053 = 1 "; }
+                    if(busca.imovelCRM.closet)             { filter += " AND cf_1063 = 1 "; }
+                    if(busca.imovelCRM.churrasqueira)      { filter += " AND cf_1147 = 1 "; }
+                    if(busca.imovelCRM.salas)              { filter += " AND cf_1043 = 1 "; }
+                    if(busca.imovelCRM.armarioBanheiro)    { filter += " AND cf_1055 = 1 "; }
+                    if(busca.imovelCRM.armarioQuarto)      { filter += " AND cf_1059 = 1 "; }
+                    if(busca.imovelCRM.boxDespejo)         { filter += " AND cf_1121 = 1 "; }
+                    if(busca.imovelCRM.lavabo)             { filter += " AND cf_1071 = 1 "; }
+                    if(busca.imovelCRM.hidromassagem)      { filter += " AND cf_1149 = 1 "; }
+                    if(busca.imovelCRM.piscina)            { filter += " AND cf_1153 = 1 "; }
+                    if(busca.imovelCRM.quadraEsportiva)    { filter += " AND cf_1157 = 1 "; }
+                    if(busca.imovelCRM.salaoFestas)        { filter += " AND cf_1163 = 1 "; }
+                    if(busca.imovelCRM.dce)                { filter += " AND cf_1065 = 1 "; }
+                    if(busca.imovelCRM.cercaEletrica)      { filter += " AND cf_1123 = 1 "; }
+                    if(busca.imovelCRM.jardim)             { filter += " AND cf_1131 = 1 "; }
+                    if(busca.imovelCRM.interfone)          { filter += " AND cf_1129 = 1 "; }
+                    if(busca.imovelCRM.armarioCozinha)     { filter += " AND cf_1057 = 1 "; }
+                    if(busca.imovelCRM.portaoEletronico)   { filter += " AND cf_1135 = 1 "; }
+                    if(busca.imovelCRM.alarme)             { filter += " AND cf_1113 = 1 "; }
+                    if(busca.imovelCRM.aguaIndividual)     { filter += " AND cf_1111 = 1 "; }
+                    if(busca.imovelCRM.gasCanalizado)      { filter += " AND cf_1127 = 1 "; }
                 }
 
 

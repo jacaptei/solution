@@ -53,7 +53,7 @@ namespace JaCaptei.API.Controllers {
                 entity              = appReturn.result;
                 entity.roles        = "PARCEIRO";
                 entity.tokenJWT     = JWTokenService.GenerateToken(entity);
-                appReturn.result    = await CRM.Autenticar(entity);
+                appReturn.result    = entity;
                 //appReturn.result    = entity;
             }
 

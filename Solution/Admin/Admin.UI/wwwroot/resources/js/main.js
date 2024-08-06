@@ -280,8 +280,8 @@ $(document).ready(function () {
 
                     //c2("GetAdmin", this.GetAdmin(this.admins[0].id));
 
-					//this.RouteTo("/imoveis");
-                    this.RouteTo("/home");
+					this.RouteTo("/imoveis");
+                    //this.RouteTo("/home");
 
                 },
 
@@ -305,10 +305,11 @@ $(document).ready(function () {
                     this.isAuth     = false;
                     this.log        = this.$models.log();
                     this.usuario    = this.$models.usuario();
-                    this.RouteTo("/login");
                     this.$sdata.Storage.Set("utk", null);
                     this.$sdata.Storage.Set("usuario", null);
                     axios.defaults.headers.common["Authorization"] = "";
+                    window.location.reload();
+                    this.RouteTo("/login");
                 },
 
                 Exit(){
@@ -435,6 +436,7 @@ $(document).ready(function () {
 	App.component("c-title"             , c_title               );
 	App.component("c-building-card"     , c_building_card       );
 	App.component("c-imovel-card"       , c_imovel_card         );
+	App.component("c-imovel-view"       , c_imovel_view         );
 	App.component("c-menu"              , c_menu                );
 	App.component("c-menu-header"       , c_menu_header         );
 	App.component("c-card"              , c_card                );

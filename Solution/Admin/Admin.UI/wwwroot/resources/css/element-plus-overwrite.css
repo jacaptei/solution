@@ -167,6 +167,16 @@
 
     --el-messagebox-content-color:#444444;
 
+    --el-card-border-color:#99c6ff;
+    --el-border-color-light:#b1d3ff;
+}
+
+.el-card__header {
+    padding:10px;
+    color: var(--s-color-primary);
+    border-bottom: 1px solid var(--el-card-border-color);
+    box-sizing: border-box;
+    font-weight:600;
 }
 
 .el-collapse {

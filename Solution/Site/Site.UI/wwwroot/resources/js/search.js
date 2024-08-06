@@ -31,7 +31,7 @@ export default class Search{
                         this.tipoOperacaoSelecionada    =   {};
                         this.tipoOperacao               =   {};
                         this.tipoImovel                 =   {};
-                        this.imovelBusca                =   {};
+                        this.buscaImovel                =   {};
                         this.localEstado                =   "";
 
                         this.onRequest                  =   false;
@@ -47,8 +47,8 @@ export default class Search{
 
                                 this.tipoOperacao                          = this.opcoes.tiposOperacoes[0];
                                 this.tipoOperacaoSelecionada               = this.opcoes.tiposOperacoes[0].value;
-                                //this.imovelBusca.building.tipoOperacao  = this.opcoes.tipoOperacaos[0].value;
-                                //this.imovelBusca.building.Type           = this.opcoes.tipoImovels[0];
+                                //this.buscaImovel.building.tipoOperacao  = this.opcoes.tipoOperacaos[0].value;
+                                //this.buscaImovel.building.Type           = this.opcoes.tipoImovels[0];
 
                                 for(var i=0;i<=20;i++){
                                     var item = {id:i,label:(i==0)? "qualquer" : (i < 10? "0"+i : i),complement: (i == 0? "" : "ou +"),value:(i==0)? null : i};
@@ -62,7 +62,7 @@ export default class Search{
                                 var localEstado = this.opcoes.estados[0];
                                 
                                 //c2("localEstado",localEstado)
-                                this.imovelBusca.imovel.estado = this.localEstado.uf;
+                                this.buscaImovel.imovel.estado = this.localEstado.uf;
                                 this.estado = this.localEstado;
                                
 
@@ -90,7 +90,7 @@ export default class Search{
                         this.estadoSelecionado = estado;
                         this.estado = estado;
                         
-                        this.imovelBusca.estado = this.estado.uf;
+                        this.buscaImovel.estado = this.estado.uf;
 
                         this.carregandoBairros  = true;
                         this.carregandoCidades = true;
@@ -156,7 +156,7 @@ export default class Search{
                         //c(cidade)    
                         this.cidade             = cidade;
                         this.cidadeSelecionada  = cidade;
-                        this.imovelBusca.cidade = cidade.label;
+                        this.buscaImovel.cidade = cidade.label;
                         this.carregandoCidades  = false;
 
                         this.bairro                     =   null;

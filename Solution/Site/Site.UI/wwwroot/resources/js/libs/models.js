@@ -16,6 +16,7 @@
     //GetUser(){          return this.Unbind(this.data.user);      }
     //GetClient(){        return this.Unbind(this.data.client);    }
     //GetOS(){            return this.Unbind(this.data.os);        }
+    //busca(){            return this.Unbind(this.data.busca);     }
 
     log(){                  return this.Unbind(this.data.log);              }
     pessoa(){               return this.Unbind(this.data.pessoa);           }
@@ -26,7 +27,10 @@
     tiposImoveis(){         return this.Unbind(this.data.tiposImoveis);     }
     imovelBusca(){          return this.Unbind(this.data.imovelBusca);      }
     favorito(){             return this.Unbind(this.data.favorito);         }
-    
+
+    tiposComplementos(){    return this.Unbind(this.data.tiposComplementos);}
+    buscaImovel(){          return this.Unbind(this.data.imovelBusca);      }
+  
 
 }
 

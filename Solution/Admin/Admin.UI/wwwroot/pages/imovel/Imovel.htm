@@ -18,11 +18,11 @@
                 <q-tab-panels v-model="view" animated>
 
                     <q-tab-panel name="visualizar">
-                        <page_visualizar :id="$route.params.id" />
+                        <page_visualizar :id="id" />
                     </q-tab-panel>
 
                     <q-tab-panel name="alterar">
-                        <page_alterar :id="$route.params.id" />
+                        <page_alterar :id="id" />
                     </q-tab-panel>
 
                 </q-tab-panels>
@@ -45,7 +45,7 @@
 
 		data: function () {
             return {
-                view: "alterar",
+                view: "visualizar",
                 id:0
 			}
 		}, computed: {

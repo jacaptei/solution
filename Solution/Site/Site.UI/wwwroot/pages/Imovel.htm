@@ -710,7 +710,8 @@
 
             CopiarLink() {
                 
-                var link = this.$imovelHandler.BuildLink(this.imovel, this.image?.url, (this.$root.isAuth? this.$root.usuario : null));
+                //var link = this.$imovelHandler.BuildLink(this.imovel, this.image?.url, (this.$root.isAuth? this.$root.usuario : null));
+                var link = window.location.href;
                 
                 navigator.clipboard.writeText(link);
 

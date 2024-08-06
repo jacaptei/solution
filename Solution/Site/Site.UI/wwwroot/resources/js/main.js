@@ -64,6 +64,7 @@ $(document).ready(function () {
                     showTermsAndPolicyModal: false,
                     autoLogin       : false,
                     rememberMe      : false,
+                    onRequest       : false,
                     //test            : "root context ok",
                     title: {
                         label       : "HOME",
@@ -89,7 +90,7 @@ $(document).ready(function () {
                     headBannerImagesShuffled:[],
                     exception:null,
 
-                    search              : SEARCH,
+                    buscaImovel         : {},
                     log                 : {},
                     usuario             : {},
                     imovel              : {},
@@ -162,20 +163,18 @@ $(document).ready(function () {
             // SETUP
 			axios.get(this.$api.BuildURL("suporte/modelos/obter")).then((request) => {
 
-                            this.status.loading = true;
+                            this.status.loading         = true;
 
-							this.$models.data                   = request.data;
-                            this.log                            = this.$models.log();
-                            this.usuario                        = this.$models.usuario();
-                            this.localidade                     = this.$models.localidade();
-                            this.imovel                         = this.$models.imovel();
-                            this.favorito                       = this.$models.favorito();
-                            this.search.imovelBusca             = this.$models.imovelBusca();
+							this.$models.data           = request.data;
+                            this.log                    = this.$models.log();
+                            this.usuario                = this.$models.usuario();
+                            this.localidade             = this.$models.localidade();
+                            this.imovel                 = this.$models.imovel();
+                            this.favorito               = this.$models.favorito();
+                            this.buscaImovel            = this.$models.buscaImovel();
+                            this.buscaImovel.imovel     = this.$models.imovel();
 
-                            var tiposImoveis = this.$models.tiposImoveis();
-                            this.search.opcoes.tiposImoveis = [];
-                            for (var i = 0; i < tiposImoveis.length; i++)
-                                this.search.opcoes.tiposImoveis.push({ 'label': tiposImoveis[i], 'value': tiposImoveis[i] });
+                            var tiposImoveis            = this.$models.tiposImoveis();
 
                             this.usuario.nome           = "";
                             this.usuario.razao          = "";
@@ -190,13 +189,6 @@ $(document).ready(function () {
                                                 
                             content.localidade = this.localidade;
                             
-                            //this.$sdata.ObterEstados().then(res => {console.log(res); } );
-                            //this.$sdata.ObterCidades(12).then(res => {console.log(res); } );
-                            //this.$sdata.ObterBairros(9668).then(res => {console.log(res); } );
-                            
-                            this.search.SetUp(content);
-
-
                             return true;
 
 					}).catch((error) => {
@@ -263,7 +255,7 @@ $(document).ready(function () {
             // this.RouteTo("/home");
             
             //window.setInterval(()=>this.KeepCRMsession(),600000);
-            window.setInterval(()=>this.UpdateCRMsession(),90000);
+            //window.setInterval(()=>this.UpdateCRMsession(),90000);
 
             //window.onbeforeunload(()=>{    this.Exit();        });
 		},
@@ -407,14 +399,14 @@ $(document).ready(function () {
 
                 // AUTH --------------------------------
                 SignIn(){
-                    this.isAuth = true;
                     if (this.usuario.aceitouPoliticaPrivacidade === false || this.usuario.aceitouTermos === false) {
                         this.OpenLoginTermsAndPolicyModal();
                     }
                     //this.$sdata.Storage.Set("utk"    , this.usuario.token);
                     //this.$sdata.Storage.Set("usuario", this.usuario);
-					//this.RouteTo("/home");
+                    this.isAuth = true;
                     axios.defaults.headers.common["Authorization"] = "Bearer " + this.usuario.tokenJWT; 
+					this.RouteTo("/home");
                 },
 
                 SignOut(){
@@ -598,8 +590,8 @@ $(document).ready(function () {
     App.component("c-policy-terms"      , c_policy_terms        );
 	App.component("c-header"            , c_header              );
 	App.component("c-title"             , c_title               );
-	App.component("c-search-form"       , c_search_form         );
-	App.component("c-building-card"     , c_building_card       );
+	App.component("c-imovel-busca-form" , c_imovel_busca_form   );
+	App.component("c-imovel-card"       , c_imovel_card         );
 	App.component("c-building-mini-card", c_building_mini_card  );
 	App.component("c-menu"              , c_menu                );
 	App.component("c-card"              , c_card                );

@@ -16,7 +16,7 @@
                         <el-input v-model="cep.numero" placeholder="" ref="postalCode" v-maska data-maska="#####-###" @keyup="()=>{  if(cep.numero.length>=9){BuscarEndereco();} }">
                             <template #append>
                                 <c-loading size="20px" v-if="carregandoCEP"></c-loading>
-                                <i class="fa fa-search" v-else-if="(cep.numero.length < 9)" style="color:var(--s-accent-color)" @click="$tools.Alert('Preencha todo o CEP para poder realizar a busca.')"></i>
+                                <i class="fa fa-search" v-else-if="(cep.numero.length < 9)" style="color:var(--s-accent-color)" @click="$tools.Alert('Preencha todo o CEP para poder realizar a buscaImovel.')"></i>
                                 <i class="fa fa-search" v-else style="color:var(--s-accent-color);cursor:pointer" @click="BuscarEndereco"></i>
                             </template>
                         </el-input>
@@ -26,12 +26,11 @@
                         <div style="height:40px" v-if="carregandoEstados">
                             <c-loading size="30px" style="padding-left:5px"></c-loading>
                         </div>
-                        <el-select v-else filterable v-model="buscaImovel.imovel.endereco.estado" class="m-4" placeholder="qualquer" size="large" style="width:100%" @change="(item)=>{ObterCidades(item);enableFilterButton = true;}">
+                        <el-select v-else filterable v-model="buscaImovel.imovelJC.endereco.estado" class="m-4" placeholder="qualquer" size="large" style="width:100%" @change="(item)=>{ObterCidades(item);enableFilterButton = true;}">
                             <el-option v-for="item in opcoes.estados"
                                         :key="item.id"
                                         :label="item.label"
-                                        :value="item.value">
-                            </el-option>
+                                        :value="item.value"></el-option>
                         </el-select>
                     </el-col>
                     <el-col :xs="24" :sm="12" :md="8" :lg="6" class="s-input">
@@ -39,12 +38,11 @@
                         <div style="height:40px" v-if="carregandoCidades">
                             <c-loading size="30px" style="padding-left:5px"></c-loading>
                         </div>
-                        <el-select v-else v-model="buscaImovel.imovel.endereco.cidade" filterable class="m-4" placeholder="qualquer" size="large" style="width:100%" @click="()=>{ if($validator.not(buscaImovel.imovel.endereco.estado)){ $tools.Alert('Selecione um <b>Estado</b> antes');} }" @change="(item)=>{ObterBairros(item);enableFilterButton = true;}">
+                        <el-select v-else v-model="buscaImovel.imovelJC.endereco.cidade" filterable class="m-4" placeholder="qualquer" size="large" style="width:100%" @click="()=>{ if($validator.not(buscaImovel.imovelJC.endereco.estado)){ $tools.Alert('Selecione um <b>Estado</b> antes');} }" @change="(item)=>{ObterBairros(item);enableFilterButton = true;}">
                             <el-option v-for="item in opcoes.cidades"
                                         :key="item.id"
                                         :label="item.label"
-                                        :value="item.value">
-                            </el-option>
+                                        :value="item.value"></el-option>
                         </el-select>
                     </el-col>
                     <el-col :xs="24" :sm="12" :md="8" :lg="6" class="s-input">
@@ -52,17 +50,16 @@
                         <div style="height:40px" v-if="carregandoBairros">
                             <c-loading size="30px" style="padding-left:5px"></c-loading>
                         </div>
-                        <el-select v-else v-model="buscaImovel.imovel.endereco.bairro" filterable :clearable="true" class="m-4" placeholder="qualquer" size="large" style="width:100%;" @click="()=>{ if($validator.not(buscaImovel.imovel.endereco.estado)){ $tools.Alert('Selecione <b>Estado</b> e <b>Cidade</b> antes');} }" @change="(item)=>{DefinirBairro(item);enableFilterButton = true;}">
+                        <el-select v-else v-model="buscaImovel.imovelJC.endereco.bairro" filterable :clearable="true" class="m-4" placeholder="qualquer" size="large" style="width:100%;" @click="()=>{ if($validator.not(buscaImovel.imovelJC.endereco.estado)){ $tools.Alert('Selecione <b>Estado</b> e <b>Cidade</b> antes');} }" @change="(item)=>{DefinirBairro(item);enableFilterButton = true;}">
                             <el-option v-for="item in opcoes.bairros"
                                         :key="item.id"
                                         :label="item.label"
-                                        :value="item.value">
-                            </el-option>
+                                        :value="item.value"></el-option>
                         </el-select>
                     </el-col>
                     <el-col :xs="24" :sm="12" :md="8" :lg="6" class="s-input">
                         <div>LOGRADOURO<span style="color:#808080">&nbsp;rua, avenida, praça, etc</span></div>
-                        <el-input @keyup.enter="Enviar()" v-model="buscaImovel.imovel.endereco.logradouro" placeholder="qualquer" ref="logradouro" maxlength="80" input-style="text-transform:uppercase;"></el-input>
+                        <el-input @keyup.enter="Enviar()" v-model="buscaImovel.imovelJC.endereco.logradouro" placeholder="qualquer" ref="logradouro" maxlength="80" input-style="text-transform:uppercase;"></el-input>
                     </el-col>
                     <el-col :xs="24" :sm="12" :md="8" :lg="6" class="s-input">
                         <div>TIPO DE IMÓVEL<span></span></div>
@@ -130,25 +127,25 @@
                         <!--<div @click="exibirCaracteristicas = !exibirCaracteristicas" style="cursor:pointer">CARACTERÍSTICAS<span></span> <span  v-if="exibirCaracteristicas">ocultar</span> <span  v-else>exibir</span> </div>-->
 
                         <el-row v-if="exibirCaracteristicas">
-                            <el-col :md="4" :sm="8" :xs="12"><el-checkbox label="Água individual     " v-model="buscaImovel.imovel.interno.aguaIndividual    " size="large"></el-checkbox></el-col>
-                            <el-col :md="4" :sm="8" :xs="12"><el-checkbox label="Área servico        " v-model="buscaImovel.imovel.interno.areaServico       " size="large"></el-checkbox></el-col>
-                            <el-col :md="4" :sm="8" :xs="12"><el-checkbox label="Armário cozinha     " v-model="buscaImovel.imovel.interno.armarioCozinha    " size="large"></el-checkbox></el-col>
-                            <el-col :md="4" :sm="8" :xs="12"><el-checkbox label="Armário quarto      " v-model="buscaImovel.imovel.interno.armarioQuarto     " size="large"></el-checkbox></el-col>
-                            <el-col :md="4" :sm="8" :xs="12"><el-checkbox label="Banheiro            " v-model="buscaImovel.imovel.interno.banheiro          " size="large"></el-checkbox></el-col>
-                            <el-col :md="4" :sm="8" :xs="12"><el-checkbox label="Box despejo         " v-model="buscaImovel.imovel.interno.boxDespejo        " size="large"></el-checkbox></el-col>
-                            <el-col :md="4" :sm="8" :xs="12"><el-checkbox label="Churrasqueira       " v-model="buscaImovel.imovel.interno.churrasqueira     " size="large"></el-checkbox></el-col>
-                            <el-col :md="4" :sm="8" :xs="12"><el-checkbox label="Dce                 " v-model="buscaImovel.imovel.interno.dce               " size="large"></el-checkbox></el-col>
-                            <el-col :md="4" :sm="8" :xs="12"><el-checkbox label="Gás canalizado      " v-model="buscaImovel.imovel.interno.gasCanalizado     " size="large"></el-checkbox></el-col>
-                            <el-col :md="4" :sm="8" :xs="12"><el-checkbox label="Sala                " v-model="buscaImovel.imovel.interno.sala              " size="large"></el-checkbox></el-col>
-                            <el-col :md="4" :sm="8" :xs="12"><el-checkbox label="Lavabo              " v-model="buscaImovel.imovel.interno.lavabo            " size="large"></el-checkbox></el-col>
-                            <el-col :md="4" :sm="8" :xs="12"><el-checkbox label="Alarme              " v-model="buscaImovel.imovel.externo.alarme            " size="large"></el-checkbox></el-col>
-                            <el-col :md="4" :sm="8" :xs="12"><el-checkbox label="Cerca elétrica      " v-model="buscaImovel.imovel.externo.cercaEletrica     " size="large"></el-checkbox></el-col>
-                            <el-col :md="4" :sm="8" :xs="12"><el-checkbox label="Elevador            " v-model="buscaImovel.imovel.externo.elevador          " size="large"></el-checkbox></el-col>
-                            <el-col :md="4" :sm="8" :xs="12"><el-checkbox label="Portão eletrônico   " v-model="buscaImovel.imovel.externo.portaoEletronico  " size="large"></el-checkbox></el-col>
-                            <el-col :md="4" :sm="8" :xs="12"><el-checkbox label="Hidromassagem       " v-model="buscaImovel.imovel.lazer.hidromassagem       " size="large"></el-checkbox></el-col>
-                            <el-col :md="4" :sm="8" :xs="12"><el-checkbox label="Piscina             " v-model="buscaImovel.imovel.lazer.piscina             " size="large"></el-checkbox></el-col>
-                            <el-col :md="4" :sm="8" :xs="12"><el-checkbox label="Quadra poliesportiva" v-model="buscaImovel.imovel.lazer.quadraPoliesportiva " size="large"></el-checkbox></el-col>
-                            <el-col :md="4" :sm="8" :xs="12"><el-checkbox label="Salão de festas     " v-model="buscaImovel.imovel.lazer.salaoFestas         " size="large"></el-checkbox></el-col>
+                            <el-col :md="4" :sm="8" :xs="12"><el-checkbox label="Água individual     " v-model="buscaImovel.imovelJC.interno.aguaIndividual    " size="large"></el-checkbox></el-col>
+                            <el-col :md="4" :sm="8" :xs="12"><el-checkbox label="Área servico        " v-model="buscaImovel.imovelJC.interno.areaServico       " size="large"></el-checkbox></el-col>
+                            <el-col :md="4" :sm="8" :xs="12"><el-checkbox label="Armário cozinha     " v-model="buscaImovel.imovelJC.interno.armarioCozinha    " size="large"></el-checkbox></el-col>
+                            <el-col :md="4" :sm="8" :xs="12"><el-checkbox label="Armário quarto      " v-model="buscaImovel.imovelJC.interno.armarioQuarto     " size="large"></el-checkbox></el-col>
+                            <el-col :md="4" :sm="8" :xs="12"><el-checkbox label="Banheiro            " v-model="buscaImovel.imovelJC.interno.banheiro          " size="large"></el-checkbox></el-col>
+                            <el-col :md="4" :sm="8" :xs="12"><el-checkbox label="Box despejo         " v-model="buscaImovel.imovelJC.interno.boxDespejo        " size="large"></el-checkbox></el-col>
+                            <el-col :md="4" :sm="8" :xs="12"><el-checkbox label="Churrasqueira       " v-model="buscaImovel.imovelJC.interno.churrasqueira     " size="large"></el-checkbox></el-col>
+                            <el-col :md="4" :sm="8" :xs="12"><el-checkbox label="Dce                 " v-model="buscaImovel.imovelJC.interno.dce               " size="large"></el-checkbox></el-col>
+                            <el-col :md="4" :sm="8" :xs="12"><el-checkbox label="Gás canalizado      " v-model="buscaImovel.imovelJC.interno.gasCanalizado     " size="large"></el-checkbox></el-col>
+                            <el-col :md="4" :sm="8" :xs="12"><el-checkbox label="Sala                " v-model="buscaImovel.imovelJC.interno.sala              " size="large"></el-checkbox></el-col>
+                            <el-col :md="4" :sm="8" :xs="12"><el-checkbox label="Lavabo              " v-model="buscaImovel.imovelJC.interno.lavabo            " size="large"></el-checkbox></el-col>
+                            <el-col :md="4" :sm="8" :xs="12"><el-checkbox label="Alarme              " v-model="buscaImovel.imovelJC.externo.alarme            " size="large"></el-checkbox></el-col>
+                            <el-col :md="4" :sm="8" :xs="12"><el-checkbox label="Cerca elétrica      " v-model="buscaImovel.imovelJC.externo.cercaEletrica     " size="large"></el-checkbox></el-col>
+                            <el-col :md="4" :sm="8" :xs="12"><el-checkbox label="Elevador            " v-model="buscaImovel.imovelJC.externo.elevador          " size="large"></el-checkbox></el-col>
+                            <el-col :md="4" :sm="8" :xs="12"><el-checkbox label="Portão eletrônico   " v-model="buscaImovel.imovelJC.externo.portaoEletronico  " size="large"></el-checkbox></el-col>
+                            <el-col :md="4" :sm="8" :xs="12"><el-checkbox label="Hidromassagem       " v-model="buscaImovel.imovelJC.lazer.hidromassagem       " size="large"></el-checkbox></el-col>
+                            <el-col :md="4" :sm="8" :xs="12"><el-checkbox label="Piscina             " v-model="buscaImovel.imovelJC.lazer.piscina             " size="large"></el-checkbox></el-col>
+                            <el-col :md="4" :sm="8" :xs="12"><el-checkbox label="Quadra poliesportiva" v-model="buscaImovel.imovelJC.lazer.quadraPoliesportiva " size="large"></el-checkbox></el-col>
+                            <el-col :md="4" :sm="8" :xs="12"><el-checkbox label="Salão de festas     " v-model="buscaImovel.imovelJC.lazer.salaoFestas         " size="large"></el-checkbox></el-col>
                         </el-row>
                     </el-col>
 
@@ -174,7 +171,7 @@
 
                         <el-row>
                             <el-col :md="24">
-                                <el-divider style="margin:10px;margin-left:0px"><!--resultado--></el-divider>
+                                <el-divider style="margin:10px"><!--resultado--></el-divider>
 
                                 <el-row style="padding-left:20px;padding-right:20px;">
                                     <el-col :md="24">
@@ -189,17 +186,30 @@
                                     </el-col>
                                 </el-row>
 
-                                <el-divider style="margin:10px;margin-left:0px"></el-divider>
+                                <el-divider style="margin:10px"></el-divider>
                             </el-col>
                         </el-row>
 
                 <el-row>
 
+
+
                 <el-col  :md="24" style="color:var(--s-color-primary);font-weight:700" v-if="$validator.is(imoveisBuscaResult) && imoveisBuscaResult.length > 0">
+                     <div class="col-12" style="margin-bottom:20px">
+                                    <c-imovel-view :imovel="imoveisBuscaResult[0]"></c-imovel-view>
+                     </div>
+                </el-col>
+
+
+
+                <!--<el-col  :md="24" style="color:var(--s-color-primary);font-weight:700" v-if="$validator.is(imoveisBuscaResult) && imoveisBuscaResult.length > 0">
                      <div class="col-12" v-for="(item,index) in imoveisBuscaResult" style="margin-bottom:20px">
                                     <c-imovel-card :imovel="item"></c-imovel-card>
                      </div>
-                </el-col>
+                </el-col>-->
+
+
+
 
                 </el-row>
 
@@ -322,7 +332,7 @@
                 this.totalSuites             = null;
                 this.totalVagas              = null;
 
-                this.buscaImovel.imovel= this.$models.imovel();
+                this.buscaImovel.imovelJC= this.$models.imovel();
 
                 this.Enviar();
             },
@@ -361,7 +371,7 @@
                 this.ParseImovel();
 
                 this.buscaImovel.page = page;
-                this.buscaImovel.result.imoveis = [];
+                this.buscaImovel.result.imoveisJC = [];
 
                 this.onrequest  = true;
                 var request     = await this.$api.Post("imovel/buscar",this.buscaImovel);
@@ -369,7 +379,7 @@
 
                 if (request?.status?.success){
                     this.buscaImovel        =  request.result;
-                    this.imoveisBuscaResult =  this.buscaImovel.result.imoveis;
+                    this.imoveisBuscaResult =  this.buscaImovel.result.imoveisJC;
                 }else
                     this.$tools.Alert("Não foi possível realizar a busca");
 
@@ -381,52 +391,52 @@
             ParseImovel(){
 
 
-                    this.buscaImovel.imovel.id                     = (this.$validator.is(this.id            ))? this.id             : 0;
-                    this.buscaImovel.imovel.cod                    = (this.$validator.is(this.cod           ))? this.cod            : "";
+                    this.buscaImovel.imovelJC.id                     = (this.$validator.is(this.id            ))? this.id             : 0;
+                    this.buscaImovel.imovelJC.cod                    = (this.$validator.is(this.cod           ))? this.cod            : "";
                     this.buscaImovel.valorMinimo                     = (this.$validator.is(this.valorMinimo   ))? this.valorMinimo    : 0;
                     this.buscaImovel.valorMaximo                     = (this.$validator.is(this.valorMaximo   ))? this.valorMaximo    : 0;
                     this.buscaImovel.areaMinima                      = (this.$validator.is(this.areaMinima    ))? this.areaMinima     : 0;
                     this.buscaImovel.areaMaxima                      = (this.$validator.is(this.areaMaxima    ))? this.areaMaxima     : 0;
 
-                    this.buscaImovel.imovel.interno.totalQuartos   = (this.$validator.is(this.totalQuartos  ))? this.totalQuartos   : 0;
-                    this.buscaImovel.imovel.interno.totalBanheiros = (this.$validator.is(this.totalBanheiros))? this.totalBanheiros : 0;
-                    this.buscaImovel.imovel.interno.totalSuites    = (this.$validator.is(this.totalSuites   ))? this.totalSuites    : 0;
-                    this.buscaImovel.imovel.externo.totalVagas     = (this.$validator.is(this.totalVagas    ))? this.totalVagas     : 0;
+                    this.buscaImovel.imovelJC.interno.totalQuartos   = (this.$validator.is(this.totalQuartos  ))? this.totalQuartos   : 0;
+                    this.buscaImovel.imovelJC.interno.totalBanheiros = (this.$validator.is(this.totalBanheiros))? this.totalBanheiros : 0;
+                    this.buscaImovel.imovelJC.interno.totalSuites    = (this.$validator.is(this.totalSuites   ))? this.totalSuites    : 0;
+                    this.buscaImovel.imovelJC.externo.totalVagas     = (this.$validator.is(this.totalVagas    ))? this.totalVagas     : 0;
 
-                    this.buscaImovel.valorMinimo                              = this.$tools.ParseFloat( this.buscaImovel.imovel.valor.valorMinimo   );
-                    this.buscaImovel.valorMaximo                              = this.$tools.ParseFloat( this.buscaImovel.imovel.valor.valorMaximo   );
-                    this.buscaImovel.areaMinima                               = this.$tools.ParseFloat( this.buscaImovel.imovel.valor.areaMinima    );
-                    this.buscaImovel.areaMaxima                               = this.$tools.ParseFloat( this.buscaImovel.imovel.valor.areaMaxima    );
+                    this.buscaImovel.valorMinimo                              = this.$tools.ParseFloat( this.buscaImovel.imovelJC.valor.valorMinimo   );
+                    this.buscaImovel.valorMaximo                              = this.$tools.ParseFloat( this.buscaImovel.imovelJC.valor.valorMaximo   );
+                    this.buscaImovel.areaMinima                               = this.$tools.ParseFloat( this.buscaImovel.imovelJC.valor.areaMinima    );
+                    this.buscaImovel.areaMaxima                               = this.$tools.ParseFloat( this.buscaImovel.imovelJC.valor.areaMaxima    );
 
-                    this.buscaImovel.imovel.valor.venda                     = this.$tools.ParseFloat( this.buscaImovel.imovel.valor.venda         );
-                    this.buscaImovel.imovel.valor.condominio                = this.$tools.ParseFloat( this.buscaImovel.imovel.valor.condominio    );
-                    this.buscaImovel.imovel.valor.iptuAnual                 = this.$tools.ParseFloat( this.buscaImovel.imovel.valor.iptuAnual     );
-                    this.buscaImovel.imovel.valor.iptuMensal                = this.$tools.ParseFloat( this.buscaImovel.imovel.valor.iptuMensal    );
-                    this.buscaImovel.imovel.valor.iptuIndice                = this.$tools.ParseFloat( this.buscaImovel.imovel.valor.iptuIndice    );
-                    this.buscaImovel.imovel.valor.consulta                  = this.$tools.ParseFloat( this.buscaImovel.imovel.valor.consulta      );
-                    this.buscaImovel.imovel.valor.rentabilidade             = this.$tools.ParseFloat( this.buscaImovel.imovel.valor.rentabilidade );
-                    this.buscaImovel.imovel.valor.comissao                  = this.$tools.ParseFloat( this.buscaImovel.imovel.valor.comissao      );
+                    this.buscaImovel.imovelJC.valor.venda                     = this.$tools.ParseFloat( this.buscaImovel.imovelJC.valor.venda         );
+                    this.buscaImovel.imovelJC.valor.condominio                = this.$tools.ParseFloat( this.buscaImovel.imovelJC.valor.condominio    );
+                    this.buscaImovel.imovelJC.valor.iptuAnual                 = this.$tools.ParseFloat( this.buscaImovel.imovelJC.valor.iptuAnual     );
+                    this.buscaImovel.imovelJC.valor.iptuMensal                = this.$tools.ParseFloat( this.buscaImovel.imovelJC.valor.iptuMensal    );
+                    this.buscaImovel.imovelJC.valor.iptuIndice                = this.$tools.ParseFloat( this.buscaImovel.imovelJC.valor.iptuIndice    );
+                    this.buscaImovel.imovelJC.valor.consulta                  = this.$tools.ParseFloat( this.buscaImovel.imovelJC.valor.consulta      );
+                    this.buscaImovel.imovelJC.valor.rentabilidade             = this.$tools.ParseFloat( this.buscaImovel.imovelJC.valor.rentabilidade );
+                    this.buscaImovel.imovelJC.valor.comissao                  = this.$tools.ParseFloat( this.buscaImovel.imovelJC.valor.comissao      );
 
-                    this.buscaImovel.imovel.area.interna                     = this.$tools.ParseFloat( this.buscaImovel.imovel.area.interna                    );
-                    this.buscaImovel.imovel.area.externa                     = this.$tools.ParseFloat( this.buscaImovel.imovel.area.externa                    );
-                    this.buscaImovel.imovel.area.terreno                     = this.$tools.ParseFloat( this.buscaImovel.imovel.area.terreno                    );
-                    this.buscaImovel.imovel.area.frente                      = this.$tools.ParseFloat( this.buscaImovel.imovel.area.frente                     );
-                    this.buscaImovel.imovel.area.fundo                       = this.$tools.ParseFloat( this.buscaImovel.imovel.area.fundo                      );
-                    this.buscaImovel.imovel.area.direito                     = this.$tools.ParseFloat( this.buscaImovel.imovel.area.direito                    );
-                    this.buscaImovel.imovel.area.esquerdo                    = this.$tools.ParseFloat( this.buscaImovel.imovel.area.esquerdo                   );
-                    this.buscaImovel.imovel.area.confrontacaoFrente          = this.$tools.ParseFloat( this.buscaImovel.imovel.area.confrontacaoFrente         );
-                    this.buscaImovel.imovel.area.confrontacaoFundo           = this.$tools.ParseFloat( this.buscaImovel.imovel.area.confrontacaoFundo          );
-                    this.buscaImovel.imovel.area.confrontacaoDireito         = this.$tools.ParseFloat( this.buscaImovel.imovel.area.confrontacaoDireito        );
-                    this.buscaImovel.imovel.area.confrontacaoEsquerdo        = this.$tools.ParseFloat( this.buscaImovel.imovel.area.confrontacaoEsquerdo       );
-                    this.buscaImovel.imovel.area.coeficienteAproveitamento   = this.$tools.ParseFloat( this.buscaImovel.imovel.area.coeficienteAproveitamento  );
-                    this.buscaImovel.imovel.area.zonaUso                     = this.$tools.ParseFloat( this.buscaImovel.imovel.area.zonaUso                    );
-                    this.buscaImovel.imovel.area.minima                      = this.$tools.ParseFloat( this.buscaImovel.imovel.area.minima                     );
-                    this.buscaImovel.imovel.area.maxima                      = this.$tools.ParseFloat( this.buscaImovel.imovel.area.maxima                     );
-                    this.buscaImovel.imovel.area.total                       = this.$tools.ParseFloat( this.buscaImovel.imovel.area.total                      ); 
+                    this.buscaImovel.imovelJC.area.interna                     = this.$tools.ParseFloat( this.buscaImovel.imovelJC.area.interna                    );
+                    this.buscaImovel.imovelJC.area.externa                     = this.$tools.ParseFloat( this.buscaImovel.imovelJC.area.externa                    );
+                    this.buscaImovel.imovelJC.area.terreno                     = this.$tools.ParseFloat( this.buscaImovel.imovelJC.area.terreno                    );
+                    this.buscaImovel.imovelJC.area.frente                      = this.$tools.ParseFloat( this.buscaImovel.imovelJC.area.frente                     );
+                    this.buscaImovel.imovelJC.area.fundo                       = this.$tools.ParseFloat( this.buscaImovel.imovelJC.area.fundo                      );
+                    this.buscaImovel.imovelJC.area.direito                     = this.$tools.ParseFloat( this.buscaImovel.imovelJC.area.direito                    );
+                    this.buscaImovel.imovelJC.area.esquerdo                    = this.$tools.ParseFloat( this.buscaImovel.imovelJC.area.esquerdo                   );
+                    this.buscaImovel.imovelJC.area.confrontacaoFrente          = this.$tools.ParseFloat( this.buscaImovel.imovelJC.area.confrontacaoFrente         );
+                    this.buscaImovel.imovelJC.area.confrontacaoFundo           = this.$tools.ParseFloat( this.buscaImovel.imovelJC.area.confrontacaoFundo          );
+                    this.buscaImovel.imovelJC.area.confrontacaoDireito         = this.$tools.ParseFloat( this.buscaImovel.imovelJC.area.confrontacaoDireito        );
+                    this.buscaImovel.imovelJC.area.confrontacaoEsquerdo        = this.$tools.ParseFloat( this.buscaImovel.imovelJC.area.confrontacaoEsquerdo       );
+                    this.buscaImovel.imovelJC.area.coeficienteAproveitamento   = this.$tools.ParseFloat( this.buscaImovel.imovelJC.area.coeficienteAproveitamento  );
+                    this.buscaImovel.imovelJC.area.zonaUso                     = this.$tools.ParseFloat( this.buscaImovel.imovelJC.area.zonaUso                    );
+                    this.buscaImovel.imovelJC.area.minima                      = this.$tools.ParseFloat( this.buscaImovel.imovelJC.area.minima                     );
+                    this.buscaImovel.imovelJC.area.maxima                      = this.$tools.ParseFloat( this.buscaImovel.imovelJC.area.maxima                     );
+                    this.buscaImovel.imovelJC.area.total                       = this.$tools.ParseFloat( this.buscaImovel.imovelJC.area.total                      ); 
 
-                    this.buscaImovel.imovel.idTipo                           =  (this.$validator.is(this.idTipoImovelSelecionado            ))? this.idTipoImovelSelecionado             : 0;
-                    this.buscaImovel.imovel.tipo                             =  this.opcoes.tiposImoveis.filter(t => t.id == this.idTipoImovelSelecionado)[0];
-                    //c2("imovel.tipo",this.buscaImovel.imovel.tipo)
+                    this.buscaImovel.imovelJC.idTipo                           =  (this.$validator.is(this.idTipoImovelSelecionado            ))? this.idTipoImovelSelecionado             : 0;
+                    this.buscaImovel.imovelJC.tipo                             =  this.opcoes.tiposImoveis.filter(t => t.id == this.idTipoImovelSelecionado)[0];
+                    //c2("imovel.tipo",this.buscaImovel.imovelJC.tipo)
 
             },
 
@@ -439,27 +449,27 @@
 
             async BuscarEndereco() {
 
-                if (this.cep.numero !== this.buscaImovel.imovel.cep) {
+                if (this.cep.numero !== this.buscaImovel.imovelJC.cep) {
 
                     this.carregandoCEP      = true;
                     this.carregandoEstados  = true;
                     this.carregandoCidades  = true;
                     this.carregandoBairros  = true;
 
-                    this.cep.cidade         = this.buscaImovel.imovel.endereco.cidade     = "";
-                    this.cep.logradouro     = this.buscaImovel.imovel.endereco.logradouro = "";
-                    this.cep.bairro         = this.buscaImovel.imovel.endereco.bairro     = "";
-                    this.cep.estado         = this.buscaImovel.imovel.endereco.estado     = "";
+                    this.cep.cidade         = this.buscaImovel.imovelJC.endereco.cidade     = "";
+                    this.cep.logradouro     = this.buscaImovel.imovelJC.endereco.logradouro = "";
+                    this.cep.bairro         = this.buscaImovel.imovelJC.endereco.bairro     = "";
+                    this.cep.estado         = this.buscaImovel.imovelJC.endereco.estado     = "";
 
-                    this.buscaImovel.imovel.cep = this.cep.numero;
+                    this.buscaImovel.imovelJC.cep = this.cep.numero;
                     
                     let res = await this.$sdata.BuscarEndereco(this.cep.numero);
 
                     if (this.$validator.is(res?.city)) {
-                        this.cep.cidade         = this.buscaImovel.imovel.endereco.cidade     = res.city;
-                        this.cep.logradouro     = this.buscaImovel.imovel.endereco.logradouro = res.address;
-                        this.cep.bairro         = this.buscaImovel.imovel.endereco.bairro     = res.neighborhood;
-                        this.cep.estado         = this.buscaImovel.imovel.endereco.estado     = res.state;
+                        this.cep.cidade         = this.buscaImovel.imovelJC.endereco.cidade     = res.city;
+                        this.cep.logradouro     = this.buscaImovel.imovelJC.endereco.logradouro = res.address;
+                        this.cep.bairro         = this.buscaImovel.imovelJC.endereco.bairro     = res.neighborhood;
+                        this.cep.estado         = this.buscaImovel.imovelJC.endereco.estado     = res.state;
 
                         this.$refs.logradouro.focus();
 
@@ -473,7 +483,7 @@
             },
 
             async BuscarCep() {
-                var endereco = this.buscaImovel.imovel.endereco.estado + "/" + this.buscaImovel.imovel.endereco.cidade.replaceAll(" ", "%20") + "/" + this.buscaImovel.imovel.endereco.logradouro.replaceAll(" ", "%20")
+                var endereco = this.buscaImovel.imovelJC.endereco.estado + "/" + this.buscaImovel.imovelJC.endereco.cidade.replaceAll(" ", "%20") + "/" + this.buscaImovel.imovelJC.endereco.logradouro.replaceAll(" ", "%20")
                 let res = await this.$sdata.BuscarCep(endereco);
                 return res.cep;
             },
@@ -481,8 +491,8 @@
 
             ObterCidades(estado) {
 
-                this.buscaImovel.imovel.endereco.cidade   =   this.buscaImovel.imovel.endereco.bairro   = "";
-                this.buscaImovel.imovel.endereco.idCidade =   this.buscaImovel.imovel.endereco.idBairro = 0;
+                this.buscaImovel.imovelJC.endereco.cidade   =   this.buscaImovel.imovelJC.endereco.bairro   = "";
+                this.buscaImovel.imovelJC.endereco.idCidade =   this.buscaImovel.imovelJC.endereco.idBairro = 0;
 
                 this.carregandoCidades = true;
                 this.opcoes.bairros = [];
@@ -490,8 +500,8 @@
                 var cidades = [];
 
                 if (this.$validator.is(estado)) {
-                    this.buscaImovel.imovel.endereco.idEstado = this.opcoes.estados.filter((e) => e.value == estado)[0].id;
-                    this.$sdata.ObterCidades(this.buscaImovel.imovel.endereco.idEstado).then(res => { this.opcoes.cidades = res; this.carregandoCidades = false; });
+                    this.buscaImovel.imovelJC.endereco.idEstado = this.opcoes.estados.filter((e) => e.value == estado)[0].id;
+                    this.$sdata.ObterCidades(this.buscaImovel.imovelJC.endereco.idEstado).then(res => { this.opcoes.cidades = res; this.carregandoCidades = false; });
                 }
 
             },
@@ -499,23 +509,23 @@
 
             ObterBairros(cidade) {
 
-                this.buscaImovel.imovel.endereco.bairro   = "";
-                this.buscaImovel.imovel.endereco.idBairro = 0;
+                this.buscaImovel.imovelJC.endereco.bairro   = "";
+                this.buscaImovel.imovelJC.endereco.idBairro = 0;
                 
                 this.carregandoBairros = true;
                 this.opcoes.bairros = [];
                 var bairros = [];
 
                 if (this.$validator.is(cidade)) {
-                    this.buscaImovel.imovel.endereco.idCidade = this.opcoes.cidades.filter((c) => c.value == cidade)[0].id;
-                    this.$sdata.ObterBairros(this.buscaImovel.imovel.endereco.idCidade).then(res => { this.opcoes.bairros = res; this.carregandoBairros = false; });
+                    this.buscaImovel.imovelJC.endereco.idCidade = this.opcoes.cidades.filter((c) => c.value == cidade)[0].id;
+                    this.$sdata.ObterBairros(this.buscaImovel.imovelJC.endereco.idCidade).then(res => { this.opcoes.bairros = res; this.carregandoBairros = false; });
                 } 
 
             },
 
             DefinirBairro(bairro) {
-                this.buscaImovel.imovel.endereco.idBairro = this.opcoes.bairros.filter((c) => c.value == bairro)[0].id;
-                //this.buscaImovel.imovel.bairro = bairro.label;
+                this.buscaImovel.imovelJC.endereco.idBairro = this.opcoes.bairros.filter((c) => c.value == bairro)[0].id;
+                //this.buscaImovel.imovelJC.bairro = bairro.label;
                 //c2("this.proprietario", this.proprietario)
             },
 

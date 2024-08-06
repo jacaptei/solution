@@ -135,7 +135,15 @@ namespace JaCaptei.Application{
 
         public AppReturn Buscar(ImovelBusca busca) {
             //busca.somenteValidados = true;
-            busca.imovelJC = BLO.Normalizar(busca.imovelJC);
+            busca.imovel = BLO.Normalizar(busca.imovel);
+            return DAO.Buscar(busca);
+        }
+
+
+        public AppReturn BuscarParaSite(ImovelBusca busca) {
+            //busca.somenteValidados = true;
+            busca.imovel = BLO.Normalizar(busca.imovel);
+            busca.usuarioGod = busca.usuarioGestor = false;
             return DAO.Buscar(busca);
         }
 

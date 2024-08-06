@@ -498,6 +498,18 @@
             </el-row>
                     
             <el-row :gutter="20" style="margin-top:10px">
+                    <el-col :md="6" :sm="12" :xs="24">
+                        Local das chaves<br />
+                        <span v-if="!exibirCampoAbertoOutroLocalChaves">
+                                <el-select v-model="imovel.localChaves"  value-key="id" placeholder="selecionar" filterable class="m-4" size="large" style="width:100%" @change="()=>{ if(imovel.localChaves == 'Outro'){imovel.localChaves = '';exibirCampoAbertoOutroLocalChaves = true;FocusOutroLocalChaves();} } ">
+                                <el-option v-for="item in opcoes.locaisChaves" :key="item.id" :label="item.label" :value="item.label"></el-option>
+                            </el-select>
+                        </span>
+                        <span v-else>
+                            <el-input @keyup.enter="CheckoutStep3()" v-model="imovel.localChaves" placeholder=""  maxlength="75" ref="CampoAbertoOutroLocalChaves" style="width:calc(100% - 40px)"></el-input>
+                            <i class="fa fa-close" @click="()=>{imovel.localChaves='';exibirCampoAbertoOutroLocalChaves = false; }" style="margin-left:5px;color:var(--s-color-red);cursor:pointer"></i>
+                        </span>
+                    </el-col>
                     <el-col :md="4" :sm="8" :xs="12"><el-checkbox label="Ocupado             " v-model="imovel.disposicao.ocupado             " size="large"></el-checkbox></el-col>
                     <el-col :md="4" :sm="8" :xs="12"><el-checkbox label="Aceita financiamento" v-model="imovel.disposicao.aceitaFinanciamento " size="large"></el-checkbox></el-col>
                     <el-col :md="4" :sm="8" :xs="12"><el-checkbox label="Aceita permuta      " v-model="imovel.disposicao.aceitaPermuta       " size="large"></el-checkbox></el-col>
@@ -545,7 +557,7 @@
                             </el-col>-->
                             <el-col :md="6" :sm="12" :xs="24" style="margin-top:10px">
                                 Construtora<br />
-                                <el-input @keyup.enter="CheckoutStep3()" v-model="imovel.obs" placeholder="" maxlength="55" ></el-input>
+                                <el-input @keyup.enter="CheckoutStep3()" v-model="imovel.construtora" placeholder="" maxlength="55" ></el-input>
                             </el-col>
                             <el-col :md="6" :sm="12" :xs="24" style="margin-top:10px">
                                 Ano de construção<br />
@@ -556,18 +568,6 @@
                             <el-col :md="6" :sm="12" :xs="24" style="margin-top:10px">
                                 Identificador das chaves<br />
                                 <el-input @keyup.enter="CheckoutStep3()" v-model="imovel.idChaves" placeholder="" maxlength="55" ></el-input>
-                            </el-col>
-                            <el-col :md="6" :sm="12" :xs="24" style="margin-top:10px">
-                                Local das chaves<br />
-                                <span v-if="!exibirCampoAbertoOutroLocalChaves">
-                                        <el-select v-model="imovel.localChaves"  value-key="id" placeholder="selecionar" filterable class="m-4" size="large" style="width:100%" @change="()=>{ if(imovel.localChaves == 'Outro'){imovel.localChaves = '';exibirCampoAbertoOutroLocalChaves = true;FocusOutroLocalChaves();} } ">
-                                        <el-option v-for="item in opcoes.locaisChaves" :key="item.id" :label="item.label" :value="item.label"></el-option>
-                                    </el-select>
-                                </span>
-                                <span v-else>
-                                    <el-input @keyup.enter="CheckoutStep3()" v-model="imovel.localChaves" placeholder=""  maxlength="75" ref="CampoAbertoOutroLocalChaves" style="width:calc(100% - 40px)"></el-input>
-                                    <i class="fa fa-close" @click="()=>{imovel.localChaves='';exibirCampoAbertoOutroLocalChaves = false; }" style="margin-left:5px;color:var(--s-color-red);cursor:pointer"></i>
-                                </span>
                             </el-col>
 
 
@@ -1084,7 +1084,7 @@
 
 			async Obter(id){
 
-                this.buscaImovel.imovelJC.id = id;
+                this.buscaImovel.imovel.id = id;
 
                 this.onrequest  = true;
                 var request     = await this.$api.Post("imovel/buscar",this.buscaImovel);
@@ -1092,9 +1092,9 @@
                 // c2("request",request);
                 if (request?.status?.success){
                     this.buscaImovel        =  request.result;
-                    if(this.$validator.is(this.buscaImovel.result.imoveisJC)){
-                        this.imoveisBuscaResult =  this.buscaImovel.result.imoveisJC;
-                        this.imovel             =  this.buscaImovel.result.imoveisJC[0];
+                    if(this.$validator.is(this.buscaImovel.result.imoveis)){
+                        this.imoveisBuscaResult =  this.buscaImovel.result.imoveis;
+                        this.imovel             =  this.buscaImovel.result.imoveis[0];
                         this.cep.numero         = this.imovel.endereco.cep;
                         if(this.imovel.imagens?.length > 0 ){
                             this.imovel.imagens.forEach(i => this.imagesInputs.push({name:"noupdate",url:i.urlFull,}));
@@ -1540,7 +1540,7 @@
             async BuscarImoveisNaRegiao(){
 
                 var busca = this.$models.buscaImovel();
-                busca.result.imoveisJC = this.imoveisRegiaoBuscaResult = [];
+                busca.result.imoveis = this.imoveisRegiaoBuscaResult = [];
                 
                 if(
                     this.$validator.is(this.cep.numero ) ||
@@ -1552,25 +1552,25 @@
                     )
                 ){
 
-                        busca.imovelJC.endereco.cep        = this.imovel.endereco.cep        = this.cep.numero;
-                        busca.imovelJC.endereco.logradouro = this.imovel.endereco.logradouro ;
-                        busca.imovelJC.endereco.numero     = this.imovel.endereco.numero     ;
-                        busca.imovelJC.endereco.complemento= this.imovel.endereco.complemento;
-                        busca.imovelJC.endereco.cidade     = this.imovel.endereco.cidade     ;
-                        busca.imovelJC.endereco.bairro     = this.imovel.endereco.bairro     ;
-                        busca.imovelJC.endereco.estado     = this.imovel.endereco.estado     ;
+                        busca.imovel.endereco.cep        = this.imovel.endereco.cep        = this.cep.numero;
+                        busca.imovel.endereco.logradouro = this.imovel.endereco.logradouro ;
+                        busca.imovel.endereco.numero     = this.imovel.endereco.numero     ;
+                        busca.imovel.endereco.complemento= this.imovel.endereco.complemento;
+                        busca.imovel.endereco.cidade     = this.imovel.endereco.cidade     ;
+                        busca.imovel.endereco.bairro     = this.imovel.endereco.bairro     ;
+                        busca.imovel.endereco.estado     = this.imovel.endereco.estado     ;
                         
                         if(this.$validator.is( this.imovel.endereco.complementoTtipo))
-                            busca.imovelJC.endereco.complementoTtipo     = this.imovel.endereco.complementoTtipo     ;
+                            busca.imovel.endereco.complementoTtipo     = this.imovel.endereco.complementoTtipo     ;
                         if(this.$validator.is( this.imovel.endereco.complemento))
-                            busca.imovelJC.endereco.complemento = this.imovel.endereco.complemento;
+                            busca.imovel.endereco.complemento = this.imovel.endereco.complemento;
 
                         if(this.cep.numero)
-                            busca.cepBase = this.$validator.is(busca.imovelJC.endereco.cep )? this.imovel.endereco.cep.split("-")[0]   : ""       ;
+                            busca.cepBase = this.$validator.is(busca.imovel.endereco.cep )? this.imovel.endereco.cep.split("-")[0]   : ""       ;
 
-                        busca.imovelJC.id = this.imovel.id;
+                        busca.imovel.id = this.imovel.id;
                         busca.somenteOutroID = true;
-                        busca.result.imoveisJC = [];
+                        busca.result.imoveis = [];
                         busca.page = 1;
                         this.ontablequest  = true;
                         var request     = await this.$api.Post("imovel/buscar",busca);
@@ -1578,7 +1578,7 @@
 
                         if (request?.status?.success){
                             busca =  request.result;
-                            this.imoveisRegiaoBuscaResult =  busca.result.imoveisJC;
+                            this.imoveisRegiaoBuscaResult =  busca.result.imoveis;
                         } 
                     }else
                         this.$tools.Alert("Necessário informar o CEP ou endereço (estado, cidade, bairro e logradouro)");

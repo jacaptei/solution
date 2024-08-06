@@ -286,7 +286,7 @@ namespace JaCaptei.Application {
 
             List<Imovel> entities = new List<Imovel>();
 
-            if(busca is null || busca.imovelJC is null)
+            if(busca is null || busca.imovel is null)
                 appReturn.AddException("Busca não identificada");
 
             string from =" \"Imovel\" imovel                                                                                           "
@@ -341,7 +341,7 @@ namespace JaCaptei.Application {
                     if(res?.json_agg is not null)
                         entities    = JsonConvert.DeserializeObject<List<Imovel>>(res.json_agg);
 
-                    busca.result.imoveisJC = entities;
+                    busca.result.imoveis = entities;
                     appReturn.result = busca;
 
                 } catch(Exception ex) {
@@ -374,11 +374,11 @@ namespace JaCaptei.Application {
                      filter += " AND imovel.visivel = FALSE ";
 
                 if(busca.somenteOutroID)
-                     filter += " AND imovel.id <> " +busca.imovelJC.id.ToString() + " " ;
-                else if(busca.imovelJC.id > 0)
-                    filter += " AND imovel.id = " + busca.imovelJC.id.ToString() + " ";
-                else if(Utils.Validator.Is(busca.imovelJC.cod))
-                    filter += " AND imovel.cod = '" + busca.imovelJC.cod + "' ";
+                     filter += " AND imovel.id <> " +busca.imovel.id.ToString() + " " ;
+                else if(busca.imovel.id > 0)
+                    filter += " AND imovel.id = " + busca.imovel.id.ToString() + " ";
+                else if(Utils.Validator.Is(busca.imovel.cod))
+                    filter += " AND imovel.cod = '" + busca.imovel.cod + "' ";
            
 
                 //if(!System.String.IsNullOrWhiteSpace(busca.imovelJC.endereco.cep))
@@ -387,48 +387,48 @@ namespace JaCaptei.Application {
                 //    filter += " AND endereco.\"cepNorm\" LIKE '%" + busca.cepBase + "%' ";
 
 
-                if(!System.String.IsNullOrWhiteSpace(busca.imovelJC.documentacao.indiceCadastral))
-                    filter += " AND documentacao.\"indiceCadastral\" = '" + busca.imovelJC.documentacao.indiceCadastral + "' ";
+                if(!System.String.IsNullOrWhiteSpace(busca.imovel.documentacao.indiceCadastral))
+                    filter += " AND documentacao.\"indiceCadastral\" = '" + busca.imovel.documentacao.indiceCadastral + "' ";
 
 
-                if(!System.String.IsNullOrWhiteSpace(busca.imovelJC.endereco.cepNorm))
-                        filter += " AND endereco.\"cepNorm\" LIKE '%" +busca.imovelJC.endereco.cepNorm + "%' ";
+                if(!System.String.IsNullOrWhiteSpace(busca.imovel.endereco.cepNorm))
+                        filter += " AND endereco.\"cepNorm\" LIKE '%" +busca.imovel.endereco.cepNorm + "%' ";
 
-                if(!System.String.IsNullOrWhiteSpace(busca.imovelJC.endereco.estadoNorm))
-                    filter += " AND endereco.\"estadoNorm\" = '" + busca.imovelJC.endereco.estadoNorm + "' ";
+                if(!System.String.IsNullOrWhiteSpace(busca.imovel.endereco.estadoNorm))
+                    filter += " AND endereco.\"estadoNorm\" = '" + busca.imovel.endereco.estadoNorm + "' ";
 
-                if(!System.String.IsNullOrWhiteSpace(busca.imovelJC.endereco.cidadeNorm))
-                    filter += " AND endereco.\"cidadeNorm\" = '" + busca.imovelJC.endereco.cidadeNorm + "' ";
+                if(!System.String.IsNullOrWhiteSpace(busca.imovel.endereco.cidadeNorm))
+                    filter += " AND endereco.\"cidadeNorm\" = '" + busca.imovel.endereco.cidadeNorm + "' ";
 
-                if(!System.String.IsNullOrWhiteSpace(busca.imovelJC.endereco.logradouroNorm))
-                    filter += " AND endereco.\"logradouroNorm\" LIKE '%" + busca.imovelJC.endereco.logradouroNorm + "%' ";
+                if(!System.String.IsNullOrWhiteSpace(busca.imovel.endereco.logradouroNorm))
+                    filter += " AND endereco.\"logradouroNorm\" LIKE '%" + busca.imovel.endereco.logradouroNorm + "%' ";
 
-                if(!System.String.IsNullOrWhiteSpace(busca.imovelJC.endereco.numero))
-                    filter += " AND endereco.numero = '" + busca.imovelJC.endereco.numero + "' ";
+                if(!System.String.IsNullOrWhiteSpace(busca.imovel.endereco.numero))
+                    filter += " AND endereco.numero = '" + busca.imovel.endereco.numero + "' ";
 
-                if(!System.String.IsNullOrWhiteSpace(busca.imovelJC.endereco.complementoTipo))
-                    filter += " AND endereco.\"complementoTipo\" = '" + busca.imovelJC.endereco.complementoTipo + "' ";
+                if(!System.String.IsNullOrWhiteSpace(busca.imovel.endereco.complementoTipo))
+                    filter += " AND endereco.\"complementoTipo\" = '" + busca.imovel.endereco.complementoTipo + "' ";
 
-                if(!System.String.IsNullOrWhiteSpace(busca.imovelJC.endereco.complemento))
-                    filter += " AND endereco.complemento LIKE '%" + busca.imovelJC.endereco.complemento + "%' ";
+                if(!System.String.IsNullOrWhiteSpace(busca.imovel.endereco.complemento))
+                    filter += " AND endereco.complemento LIKE '%" + busca.imovel.endereco.complemento + "%' ";
 
 
-                if(busca.imovelJC.externo.totalVagas > 0)
-                    filter += " AND externo.\"totalVagas\" >= " + busca.imovelJC.externo.totalVagas.ToString();
+                if(busca.imovel.externo.totalVagas > 0)
+                    filter += " AND externo.\"totalVagas\" >= " + busca.imovel.externo.totalVagas.ToString();
 
-                if(busca.imovelJC.interno.totalQuartos > 0)
-                    filter += " AND interno.\"totalQuartos\" >= " + busca.imovelJC.interno.totalQuartos.ToString();
+                if(busca.imovel.interno.totalQuartos > 0)
+                    filter += " AND interno.\"totalQuartos\" >= " + busca.imovel.interno.totalQuartos.ToString();
 
-                if(busca.imovelJC.interno.totalBanheiros > 0)
-                    filter += " AND interno.\"totalBanheiros\" >= " + busca.imovelJC.interno.totalBanheiros.ToString();
+                if(busca.imovel.interno.totalBanheiros > 0)
+                    filter += " AND interno.\"totalBanheiros\" >= " + busca.imovel.interno.totalBanheiros.ToString();
 
-                if(busca.imovelJC.interno.totalSuites > 0)
-                    filter += " AND interno.\"totalSuites\" >= " + busca.imovelJC.interno.totalSuites.ToString();
+                if(busca.imovel.interno.totalSuites > 0)
+                    filter += " AND interno.\"totalSuites\" >= " + busca.imovel.interno.totalSuites.ToString();
                 //if(!System.String.IsNullOrWhiteSpace(busca.imovelMigrado.tipo))
                 //    filter += " AND tipo = '" + busca.imovelMigrado.tipo + "' ";
 
-                if(busca.imovelJC.tipo.id > 0)
-                    filter += " AND imovel.\"idTipo\" = '" + busca.imovelJC.idTipo.ToString() + "' ";
+                if(busca.imovel.tipo.id > 0)
+                    filter += " AND imovel.\"idTipo\" = '" + busca.imovel.idTipo.ToString() + "' ";
 
                 if(busca.bairros.Count > 0) {
                     //filter += " AND cf_1011 IN('" + string.Join(",",busca.imovelMigrado.bairros).Replace("(",",").Replace(")","").Replace(",","','") + "') ";
@@ -437,45 +437,45 @@ namespace JaCaptei.Application {
                         items += "'" + item.Replace("(","','").Replace(")","").Trim().Replace(" '","'") + "',";
                     });
                     filter += " AND ( endereco.bairro IN (" + items + ") OR endereco.\"bairroNorm\" IN (" + items + ") ) ";
-                }else if(!System.String.IsNullOrWhiteSpace(busca.imovelJC.endereco.bairroNorm))
-                    filter += " AND endereco.\"bairroNorm\" = '" + busca.imovelJC.endereco.bairroNorm + "' ";
+                }else if(!System.String.IsNullOrWhiteSpace(busca.imovel.endereco.bairroNorm))
+                    filter += " AND endereco.\"bairroNorm\" = '" + busca.imovel.endereco.bairroNorm + "' ";
 
 
-                if(busca.imovelJC.valor.minimo > 0)
-                    filter += " AND valor.minimo  >=  " + busca.imovelJC.valor.minimo.ToString();
-                if(busca.imovelJC.valor.maximo > 0)
-                    filter += " AND valor.maximo  <=  " + busca.imovelJC.valor.maximo.ToString();
+                if(busca.imovel.valor.minimo > 0)
+                    filter += " AND valor.minimo  >=  " + busca.imovel.valor.minimo.ToString();
+                if(busca.imovel.valor.maximo > 0)
+                    filter += " AND valor.maximo  <=  " + busca.imovel.valor.maximo.ToString();
 
 
-                if(busca.imovelJC.area.minima > 0)
-                    filter += " AND area.minima  >=  " + busca.imovelJC.area.minima.ToString();
-                if(busca.imovelJC.area.maxima > 0)
-                    filter += " AND area.maxima  <=  " + busca.imovelJC.area.maxima.ToString();
+                if(busca.imovel.area.minima > 0)
+                    filter += " AND area.minima  >=  " + busca.imovel.area.minima.ToString();
+                if(busca.imovel.area.maxima > 0)
+                    filter += " AND area.maxima  <=  " + busca.imovel.area.maxima.ToString();
 
-                if(busca.imovelJC.interno.areaServico)         { filter += "AND interno.\"areaServico\"        = TRUE ";  }
-                if(busca.imovelJC.interno.closet)              { filter += "AND interno.closet                 = TRUE ";  }
-                if(busca.imovelJC.interno.churrasqueira)       { filter += "AND interno.churrasqueira          = TRUE ";  }
-                if(busca.imovelJC.interno.sala )               { filter += "AND interno.sala                   = TRUE ";  }
-                if(busca.imovelJC.interno.armarioBanheiro)     { filter += "AND interno.\"armarioBanheiro\"    = TRUE ";  }
-                if(busca.imovelJC.interno.armarioQuarto)       { filter += "AND interno.\"armarioQuarto\"      = TRUE ";  }
-                if(busca.imovelJC.interno.boxDespejo)          { filter += "AND interno.\"boxDespejo\"         = TRUE ";  }
-                if(busca.imovelJC.interno.lavabo)              { filter += "AND interno.lavabo                 = TRUE ";  }
-                if(busca.imovelJC.interno.dce)                 { filter += "AND interno.dce                    = TRUE ";  }
-                if(busca.imovelJC.interno.aguaIndividual)      { filter += "AND interno.\"aguaIndividual\"     = TRUE ";  }
-                if(busca.imovelJC.interno.gasCanalizado)       { filter += "AND interno.\"gasCanalizado\"      = TRUE ";  }
-                if(busca.imovelJC.interno.armarioCozinha)      { filter += "AND interno.\"armarioCozinha\"     = TRUE ";  }
+                if(busca.imovel.interno.areaServico)         { filter += "AND interno.\"areaServico\"        = TRUE ";  }
+                if(busca.imovel.interno.closet)              { filter += "AND interno.closet                 = TRUE ";  }
+                if(busca.imovel.interno.churrasqueira)       { filter += "AND interno.churrasqueira          = TRUE ";  }
+                if(busca.imovel.interno.sala )               { filter += "AND interno.sala                   = TRUE ";  }
+                if(busca.imovel.interno.armarioBanheiro)     { filter += "AND interno.\"armarioBanheiro\"    = TRUE ";  }
+                if(busca.imovel.interno.armarioQuarto)       { filter += "AND interno.\"armarioQuarto\"      = TRUE ";  }
+                if(busca.imovel.interno.boxDespejo)          { filter += "AND interno.\"boxDespejo\"         = TRUE ";  }
+                if(busca.imovel.interno.lavabo)              { filter += "AND interno.lavabo                 = TRUE ";  }
+                if(busca.imovel.interno.dce)                 { filter += "AND interno.dce                    = TRUE ";  }
+                if(busca.imovel.interno.aguaIndividual)      { filter += "AND interno.\"aguaIndividual\"     = TRUE ";  }
+                if(busca.imovel.interno.gasCanalizado)       { filter += "AND interno.\"gasCanalizado\"      = TRUE ";  }
+                if(busca.imovel.interno.armarioCozinha)      { filter += "AND interno.\"armarioCozinha\"     = TRUE ";  }
 
-                if(busca.imovelJC.externo.cercaEletrica)       { filter += "AND externo.\"cercaEletrica\"      = TRUE ";  }
-                if(busca.imovelJC.externo.jardim)              { filter += "AND externo.jardim                 = TRUE ";  }
-                if(busca.imovelJC.externo.interfone)           { filter += "AND externo.interfone              = TRUE ";  }
-                if(busca.imovelJC.externo.portaoEletronico)    { filter += "AND externo.\"portaoEletronico\"   = TRUE ";  }
-                if(busca.imovelJC.externo.alarme)              { filter += "AND externo.alarme                 = TRUE ";  }
-                if(busca.imovelJC.externo.elevador)            { filter += "AND externo.elevador               = TRUE ";  }
+                if(busca.imovel.externo.cercaEletrica)       { filter += "AND externo.\"cercaEletrica\"      = TRUE ";  }
+                if(busca.imovel.externo.jardim)              { filter += "AND externo.jardim                 = TRUE ";  }
+                if(busca.imovel.externo.interfone)           { filter += "AND externo.interfone              = TRUE ";  }
+                if(busca.imovel.externo.portaoEletronico)    { filter += "AND externo.\"portaoEletronico\"   = TRUE ";  }
+                if(busca.imovel.externo.alarme)              { filter += "AND externo.alarme                 = TRUE ";  }
+                if(busca.imovel.externo.elevador)            { filter += "AND externo.elevador               = TRUE ";  }
 
-                if(busca.imovelJC.lazer.hidromassagem)         { filter += "AND lazer.hidromassagem          = TRUE ";  }
-                if(busca.imovelJC.lazer.piscina)               { filter += "AND lazer.piscina                = TRUE ";  }
-                if(busca.imovelJC.lazer.quadraPoliesportiva)   { filter += "AND lazer.\"quadraPoliesportiva\"= TRUE ";  }
-                if(busca.imovelJC.lazer.salaoFestas)           { filter += "AND lazer.\"salaoFestas\"        = TRUE ";  }
+                if(busca.imovel.lazer.hidromassagem)         { filter += "AND lazer.hidromassagem          = TRUE ";  }
+                if(busca.imovel.lazer.piscina)               { filter += "AND lazer.piscina                = TRUE ";  }
+                if(busca.imovel.lazer.quadraPoliesportiva)   { filter += "AND lazer.\"quadraPoliesportiva\"= TRUE ";  }
+                if(busca.imovel.lazer.salaoFestas)           { filter += "AND lazer.\"salaoFestas\"        = TRUE ";  }
 
                 filter = Utils.Validator.ParseSafeSQL(filter);
 

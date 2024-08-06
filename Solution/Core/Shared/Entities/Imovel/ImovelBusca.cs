@@ -23,8 +23,9 @@ namespace JaCaptei.Model {
             public bool             usuarioGestor       {get;set;}  = false;
             public bool             usuarioGod          {get;set;}  = false;
 
+            public Imovel           imovel              {get;set;} = new Imovel();
             public Imovel           imovelJC            {get;set;} = new Imovel();
-            public ImovelCRM        imovel              {get;set;} = new ImovelCRM();
+            public ImovelCRM        imovelCRM           {get;set;} = new ImovelCRM();
             public BuscaRetorno     result              {get;set;} = new BuscaRetorno();
             public dynamic          crmResult           {get;set;}
 
@@ -52,11 +53,11 @@ namespace JaCaptei.Model {
 
 
     public class BuscaRetorno{
-            public int              totalResults        {get;set;} = 0;
-            public List<Imovel>     imoveisJC           {get;set;} = new List<Imovel>();
-            public List<ImovelCRM>  imoveis             {get;set;} = new List<ImovelCRM>();
-            public List<CrmImage>   imagens             {get;set;} = new List<CrmImage>();
-            public string           imagensJson         {get;set;} = "";
+            public int              totalResults      {get;set;} = 0;
+            public List<Imovel>     imoveis           {get;set;} = new List<Imovel>();
+            public List<ImovelCRM>  imoveisCRM        {get;set;} = new List<ImovelCRM>();
+            public List<CrmImage>   imagens           {get;set;} = new List<CrmImage>();
+            public string           imagensJson       {get;set;} = "";
     }
 
     public class CrmImage{

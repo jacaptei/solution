@@ -1,113 +1,28 @@
 ﻿<template>
 
-    <div class="row">
+    <div>
 
 
 		    <el-row justify="center" v-if="onrequest">
                 <el-col :md="24" style="color:var(--s-color-primary)">
-                    <el-divider style="margin:10px;"><!--resultado--></el-divider>
                     <c-loading padding="20px"></c-loading>
                 </el-col>
 		    </el-row>
 
 
 		    <el-row v-else>
-
-                    <el-col :md="24">
-                        <el-divider style="margin:10px"><!--resultado--></el-divider>
-
-                        <el-row style="padding-left:20px;padding-right:20px;">
-                            <el-col :md="24">
-                                <div style="float:left">
-                                    <span style="color:var(--s-color-primary)">encontrados</span><br />
-                                        <span v-if="buscaImovel.total > 0">{{buscaImovel.total}}</span>
-                                        <span v-else style="color:var(--s-color-orange)">nada encontrado</span>
-                                </div>
-                                <div style="float:right">
-                                    <q-input v-model.number="buscaImovel.resultsPerPage" type="number" style="max-width:140px" label="RESULTADOS POR PÁGINA" stack-label :min="1" :dense="true" @keyup="()=>{ if(!onrequest){ Enviar(1);}}" @change="()=>{ if(!onrequest){ Enviar(1);}}"></q-input>
-                                </div>
-                            </el-col>
-                        </el-row>
-
-                        <el-divider style="margin:10px"></el-divider>
+                    <el-col :span="24" v-if="buscaImovel.total == 0">
+                        <el-divider style=""></el-divider>
+                          <span style="margin:10px;color:var(--s-color-orange)">imóvel não encontrado ou excluído</span>
+                        <el-divider></el-divider>
+                    </el-col>
+                    <el-col :span="24" style="color:var(--s-color-primary);font-weight:700" v-else-if="$validator.is(imoveisBuscaResult) && imoveisBuscaResult.length > 0">
+                            <c-imovel-view :imovel="imovel"></c-imovel-view>
                     </el-col>
                 </el-row>
 
                 <el-row>
 
-                <el-col  :md="24" style="color:var(--s-color-primary);font-weight:700" v-if="$validator.is(imoveisBuscaResult) && imoveisBuscaResult.length > 0">
-                        <!-- TABLE IMOVEIS  -->
-
-                        <el-table :data="imoveisBuscaResult" style="width: 100%" max-height="380" v-loading="ontablequest" :table-layout="auto" :row-class-name="tableRowClassName">
-
-                            <el-table-column fixed="left" label="" width="120" style="color:orange">
-                                    <template #default="scope" style="border-right:1px solid #000">
-                                          <el-image style="width: 100px;cursor:pointer; height: 100px" :src="scope.row.urlImagemPrincipal" fit="fill"  @click="$root.RouteTo('imovel/'+scope.row.id)"></el-image>
-                                    </template>
-                            </el-table-column>
-
-
-                                <!--<el-table-column prop="id" label="ID" width="60">
-                                    <template #default="scope">
-                                         <b>{{scope.row.id}}</b>
-                                    </template>
-                                </el-table-column>
-                                <el-table-column prop="id" label="COD" width="60">
-                                    <template #default="scope">
-                                         <b>{{scope.row.cod}}</b>
-                                    </template>
-                                </el-table-column>-->
-
-                                <el-table-column label="" width="200">
-                                    <template #default="scope">
-                                        <div style="color:var(--s-color-primary);cursor:pointer"  @click="$root.RouteTo('imovel/'+scope.row.id)">
-                                            <b><span v-html="scope.row.nome.replaceAll(',','<br>')" ></span></b>
-                                        </div>
-                                    </template>
-                                </el-table-column>
-
-                            <!--</el-table-column>-->
-                            <!--<el-table-column label="CONTATO">-->
-                                <el-table-column label="" width="300">
-                                    <template #default="scope">
-                                        <div style="color:var(--s-color-primary);">
-                                                {{scope.row.proprietario.nome}}<br />
-                                                <a :href="$tools.BuildWhatsappLink(scope.row.proprietario.telefone,'Olá '+scope.row.proprietario.apelido)" target="_blank" style="color:var(--s-color-green);text-decoration:none"><i class="fab fa-whatsapp" style="padding-right:3px;"></i> {{scope.row.proprietario.telefone}}</a>
-                                                <br />
-                                                <a :href="'mailto:'+scope.row.proprietario.email" target="_blank" style="color:var(--el-color-primary);text-decoration:none"><i class="fa fa-envelope"></i>&nbsp; {{scope.row.proprietario.email}}</a>
-                                        </div>
-                                    </template>
-                                </el-table-column>
-                                <el-table-column label="" width="400">
-                                    <template #default="scope">
-                                        <div>
-                                            <a v-if="$validator.is(scope.row.endereco.logradouro)" href="javascript:void(0)" @click="$tools.Copy((scope.row.endereco.logradouro+','+scope.row.endereco.numero+','+($validator.is(scope.row.endereco.complemento)? scope.row.endereco.complemento+',':'')+scope.row.endereco.bairro+','+scope.row.endereco.cidade+','+scope.row.endereco.estado))" style="text-decoration:none;color:var(--s-color-primary);margin-right:10px"><i class="fa fa-copy" style="padding-right:3px;text-decoration:none"></i></a>
-                                            <a :href="$tools.BuildMapUrl(scope.row.endereco)" target="_blank" style="color:var(--s-text-color);text-decoration:none;margin-right:6px">
-                                                <i style="color:var(--s-color-primary);margin-right:6px" class="fa fa-location-dot"></i>
-                                                <div style="color:var(--s-color-text);">
-                                                    {{scope.row.endereco.logradouro}}, {{scope.row.endereco.numero}}
-                                                    <span v-if="$validator.is(scope.row.complemento)"> , {{scope.row.endereco.complemento}}</span>,
-                                                    {{scope.row.endereco.bairro}},
-                                                    {{scope.row.endereco.cidade}}, {{scope.row.endereco.estado}}, CEP: {{scope.row.endereco.cep}}
-                                                </div>
-                                            </a>
-                                        </div>
-                                    </template>
-                                </el-table-column>
-                            <el-table-column prop="data" label="" width="140">
-                                <template #default="scope">
-                                    {{$tools.FormatDateToBR(new Date(scope.row.data))}}
-                                </template>
-                            </el-table-column>
-                            <el-table-column label="" width="60">
-                                <template #default="scope">
-                                    <a v-if="$validator.is(scope.row.obs)" href="javascript:void(0)" @click="$tools.Alert(scope.row.obs,'OBSERVAÇÕES')" style="color:var(--s-color-primary);text-decoration:none"><i class="fa fa-message"></i></a>
-                                    <a v-else href="javascript:void(0)" @click="$tools.Message('sem observações')" style="color:var(--s-color-grey);text-decoration:none"><i class="fa fa-message"></i></a>
-                                </template>
-                            </el-table-column>
-                        </el-table>
-
-                </el-col>
 
 
 		    </el-row>
@@ -130,16 +45,16 @@
 
         data: function () {
             return {
+                onrequest               : true,
                 busca                   : this.$models.busca(),
                 buscaImovel             : this.$models.buscaImovel(),
                 imovel                  : this.$models.imovel(),
-                id                      : 0,
                 admins                  : this.$root.admins,
             }
         },
 
 		props: {
-            id: { type: Number, required: true, default: 0 },
+            id:     { type: Number, required: true, default: 1 }
 		},
         
         computed: {
@@ -170,17 +85,19 @@
 			async Enviar(page){
 
                 this.buscaImovel.page = page;
-                this.buscaImovel.imovelJC.id = 1;
+                this.buscaImovel.imovel.id = this.id;
 
                 this.onrequest  = true;
                 var request     = await this.$api.Post("imovel/buscar",this.buscaImovel);
 
-                // c2("request",request);
-
                 if (request?.status?.success){
-                    if(this.$validator.is(request.result.imoveisJC))
-                            this.imoveisBuscaResult =  request.result.imoveisJC;
-                } 
+                    c2("request.result",request.result)
+                    if(this.$validator.is(request.result.total > 0)){
+                            this.buscaImovel        =  request.result;
+                            this.imoveisBuscaResult =  this.buscaImovel.result.imoveis;
+                            this.imovel             =  this.imoveisBuscaResult[0];
+                    }
+                }   
 
                 this.onrequest  = false;
 

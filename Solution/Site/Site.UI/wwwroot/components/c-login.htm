@@ -180,8 +180,8 @@ module.exports = {
 	mounted(){
 		//this.ApiTest();
 		window.setTimeout(() => { 
-			this.$root.usuario.username	="28249525809";
-			this.$root.usuario.senha = "123456";
+			this.$root.usuario.username	="37462380722";
+			this.$root.usuario.senha = "1234";
 			//this.Login();
         }, 2000);
 	},		  
@@ -228,31 +228,17 @@ module.exports = {
 						this.ShowView("sending");
 
 						axios.post(this.$api.BuildURL("parceiro/autenticar"),this.$root.usuario).then((request) => {
-								//c2("request.data",request.data);
 								if(request.data.status.success){
-										
 									this.$root.usuario = request.data.result;
-
-									if(this.$validator.not(this.$root.usuario.idCRM))
-										cw("não logado no CRM");
-									
-
-									this.$root.search.imovelBusca.sessaoCRM = this.$root.usuario.sessaoCRMsystem;
-
-                                    //this.$root.usuario.autenticado = true;
-                                    //this.$root.isAuth = true;
-									//this.api.status.success=true;
-									//c2("this.$root.usuario.tokenJWT", this.$root.usuario.tokenJWT)
 									this.$root.SignIn();
 									this.ShowView("success");
-
 								}else{
                                     this.Alert("Não foi possível autenticar.");
 								}
 							}).catch((error) => {
 								//ce(error);
                                 if (error.response) {
-                                    //ce(error);
+                                    ce(error);
                                     if (error.response.data.status.code == 404)
                                         this.messageFail = "Usuário não encontrado, verifique CPF ou CNPJ ou E-Mail e Senha";
                                 } else
