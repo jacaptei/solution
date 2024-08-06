@@ -35,16 +35,10 @@ public class ImportarImoviewFn
         _logger.LogInformation("Message ID: {id}", message.MessageId);
         _logger.LogInformation("Message Body: {body}", message.Body);
         _logger.LogInformation("Message Content-Type: {contentType}", message.ContentType);
-        var eventMsg = Newtonsoft.Json.JsonConvert.DeserializeObject<MqMessage>(message.Body.ToString()) ?? new MqMessage();
-        var req = new JaCaptei.Model.IntegracaoEvent()
-        {
-            IdCliente = eventMsg.message.idCliente,
-            IdIntegracao = eventMsg.message.idIntegracao,
-            IdOperador = eventMsg.message.idOperador,
-        };
+        var eventMsg = Newtonsoft.Json.JsonConvert.DeserializeObject<JaCaptei.Model.IntegracaoEvent> (message.Body.ToString()) ?? new JaCaptei.Model.IntegracaoEvent();
         try
         {
-            await _service.ImportarIntegracao(req);
+            await _service.ImportarIntegracao(eventMsg);
         }
         catch (Exception)
         {

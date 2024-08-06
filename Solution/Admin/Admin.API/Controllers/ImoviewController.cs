@@ -6,11 +6,10 @@ using JaCaptei.Application.Integracao;
 using JaCaptei.Model;
 using JaCaptei.Model.DTO;
 using JaCaptei.Model.Entities;
-
-using MassTransit;
-
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+
+using System.Text;
 namespace JaCaptei.Administrativo.API.Controllers;
 
 [Route("api/[controller]")]
@@ -18,25 +17,20 @@ namespace JaCaptei.Administrativo.API.Controllers;
 [Authorize(Roles = "ADMIN_GOD,ADMIN_GESTOR,ADMIN_PADRAO")]
 public class ImoviewController : ControllerBase
 {
-    //private readonly IHttpClientFactory _httpClientFactory;
     private readonly ImoviewService _service;
-    private readonly ImovelImagemService _imagemService;
-    private readonly ImovelService _imovelService;
     private readonly string _apiKey = "qnnYE4Fev/v2kRbZ5F9PgEGCkJI3Ixflcl0FADcTGyA=";
     private readonly IHttpClientFactory _httpClientFactory;
     private readonly DBcontext _context;
     private readonly IMapper _mapper;
     private readonly ParceiroService _parceiroService;
 
-    public ImoviewController(IHttpClientFactory httpClientFactory, DBcontext context, IMapper mapper, ISendEndpointProvider bus)
+    public ImoviewController(IHttpClientFactory httpClientFactory, DBcontext context, IMapper mapper)
     {
-        //_httpClientFactory = httpClientFactory;
-        _service = new ImoviewService(httpClientFactory, context, _apiKey, mapper, bus);
+        _httpClientFactory = httpClientFactory;
+        _service = new ImoviewService(httpClientFactory, context, mapper);
         _httpClientFactory = httpClientFactory;
         _context = context;
         _mapper = mapper;
-        _imagemService = new ImovelImagemService(context);
-        _imovelService = new ImovelService();
         _parceiroService = new ParceiroService(context);
     }
 
@@ -52,36 +46,6 @@ public class ImoviewController : ControllerBase
     {
         var res = await _service.ValidarChave(chave);
         return Ok(res);
-    }
-
-    [HttpPost("ObterImagens")]
-    public async Task<ActionResult<List<Model.ImovelImagem>>> GetImages([FromBody] int id)
-    {
-        List<ImagemDTO> list = await GetImageFiles(id);
-        return Ok(list);
-    }
-
-    private async Task<List<ImagemDTO>> GetImageFiles(int id)
-    {
-        var res = await _imagemService.ObterImagensImovel(id);
-        var list = new List<ImagemDTO>();
-        var client = _httpClientFactory.CreateClient();
-        foreach (var item in res.AsParallel()
-            .WithDegreeOfParallelism(6)
-            .WithMergeOptions(ParallelMergeOptions.FullyBuffered))
-        {
-            var arquivo = await client.GetByteArrayAsync(item.UrlMedium);
-            var dto = new ImagemDTO()
-            {
-                Arquivo = arquivo,
-                Nome = item.Nome,
-                Tipo = item.Tipo,
-                Url = item.UrlMedium
-            };
-            list.Add(dto);
-        }
-
-        return list;
     }
 
     [HttpPost("ObterImovel")]
@@ -118,25 +82,33 @@ public class ImoviewController : ControllerBase
     [HttpPost("integracao/cliente/integrar")]
     public async Task<ActionResult<IntegrarClienteResponse>> IntegrarCliente([FromBody] IntegracaoImoviewDTO dto)
     {
-        List<BairroDTO> bairros = dto.Bairros.ConvertAll(b => new BairroDTO()
-        {
-            Id = b.Id,
-            IdCidade = b.IdCidade,
-            IdEstado = b.IdEstado,
-            Nome = b.Value
-        });
-        var integracao = new IntegracaoImoview()
-        {
-            Id = 0,
-            ChaveApi = dto.ChaveApi,
-            CodUnidade = dto.CodUnidade,
-            CodUsuario = dto.CodUsuario,
-            IdCliente = dto.IdCliente,
-            IdOperador = dto.IdOperador,
-            IdPlano = dto.IdPlano,
-            Bairros = Newtonsoft.Json.JsonConvert.SerializeObject(bairros),
-        };
-        var res = await _service.IntegrarCliente(integracao);
+        //List<BairroDTO> bairros = dto.Bairros.ConvertAll(b => new BairroDTO()
+        //{
+        //    Id = b.Id,
+        //    IdCidade = b.IdCidade,
+        //    IdEstado = b.IdEstado,
+        //    Nome = b.Value
+        //});
+        //var integracao = new IntegracaoImoview()
+        //{
+        //    Id = 0,
+        //    ChaveApi = dto.ChaveApi,
+        //    CodUnidade = dto.CodUnidade,
+        //    CodUsuario = dto.CodUsuario,
+        //    IdCliente = dto.IdCliente,
+        //    IdOperador = dto.IdOperador,
+        //    IdPlano = dto.IdPlano,
+        //    Bairros = Newtonsoft.Json.JsonConvert.SerializeObject(bairros),
+        //};
+        //var res = await _service.IntegrarCliente(integracao);
+        var jsonInString = Newtonsoft.Json.JsonConvert.SerializeObject(dto);
+        var content = new StringContent(jsonInString, Encoding.UTF8, "application/json");
+        var client = _httpClientFactory.CreateClient("");
+        client.DefaultRequestHeaders.Add("Accept","application/json");
+        //var url = "https://integrarimoviewfunction20240801090029.azurewebsites.net/api/integracao/cliente/integrar";
+        var url = Config.settings.IntegracaoAzureUrl;
+        var result = await client.PostAsync(url, content);
+        var res = await result.Content.ReadAsStringAsync();
         return Ok(res);
     }
 

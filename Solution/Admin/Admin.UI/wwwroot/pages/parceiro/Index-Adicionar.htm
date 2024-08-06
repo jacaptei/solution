@@ -2,7 +2,7 @@
     <div v-loading.fullscreen.lock="fullscreenLoading"
          element-loading-background="rgba(12, 8, 8, 0.56)">
         <el-row :gutter="20">
-            <el-col :span="24" class="register-input">
+            <el-col :xs="24" :sm="24" :md="24" :lg="24" class="register-input">
                 <div>SELECIONE O PLANO</div>
                 <el-select filterable v-model="parceiro.idPlano" style="width: 100%" placeholder="SELECIONAR">
                     <el-option v-for="item in [
@@ -16,10 +16,8 @@
                     </el-option>
                 </el-select>
             </el-col>
-        </el-row>
 
-        <el-row :gutter="20">
-            <el-col :span="8" style="width: 100%" class="register-input">
+            <el-col :xs="24" :sm="12" :md="8" :lg="8" class="register-input">
                 <div>TIPO DE PESSOA<span></span></div>
                 <q-btn-toggle v-model="parceiro.tipoPessoa"
                               maxlength="80"
@@ -32,22 +30,22 @@
                 </q-btn-toggle>
             </el-col>
 
-            <el-col :span="8" class="register-input" v-if="parceiro.tipoPessoa == 'PF'">
+            <el-col :xs="24" :sm="12" :md="8" :lg="8" class="register-input" v-if="parceiro.tipoPessoa == 'PF'">
                 <div>CPF<span></span></div>
                 <el-input @keyup.enter="Send()" v-model="parceiro.cpf" maxlength="22" v-maska data-maska="###.###.###-##" @blur="CheckDoc" ref="documento"></el-input>
             </el-col>
 
-            <el-col :span="8" class="register-input" v-else>
+            <el-col :xs="24" :sm="12" :md="8" :lg="8" class="register-input" v-else>
                 <div>CNPJ<span></span></div>
                 <el-input @keyup.enter="Send()" v-model="parceiro.cnpj" maxlength="22" v-maska data-maska="##.###.###/####-##" @blur="CheckDoc" ref="documento"></el-input>
             </el-col>
 
-            <el-col :span="8" class="register-input" v-if="parceiro.tipoPessoa == 'PJ'">
+            <el-col :xs="24" :sm="12" :md="8" :lg="8" class="register-input" v-if="parceiro.tipoPessoa == 'PJ'">
                 <div>RAZÃO SOCIAL <span></span></div>
                 <el-input @keyup.enter="Send()" v-model="parceiro.razao" placeholder="" maxlength="80" input-style="text-transform:uppercase;"></el-input>
             </el-col>
 
-            <el-col :span="8" class="register-input">
+            <el-col :xs="24" :sm="12" :md="8" :lg="8" class="register-input">
                 <div>
                     <span></span><span></span>
                     <div v-if="parceiro.tipoPessoa == 'PF'">NOME COMPLETO</div><div v-else>NOME FANTASIA &nbsp;&nbsp;<span style="padding-left:10px;color:var(--s-accent-color);cursor:pointer" @click="()=>{parceiro.nome = parceiro.razao}"><i class="fa fa-copy" style="color:var(--s-accent-color)"></i> copiar razão</span></div>
@@ -55,48 +53,48 @@
                 <el-input @keyup.enter="Send()" v-model="parceiro.nome" placeholder="" maxlength="80" input-style="text-transform:uppercase;"></el-input>
             </el-col>
 
-            <el-col :span="8" class="register-input" v-if="parceiro.tipoPessoa == 'PJ'">
+            <el-col :xs="24" :sm="12" :md="8" :lg="8" class="register-input" v-if="parceiro.tipoPessoa == 'PJ'">
                 <div>NOME DO RESPONSÁVEL <span></span></div>
                 <el-input @keyup.enter="Send()" v-model="parceiro.responsavel" placeholder="" maxlength="80" input-style="text-transform:uppercase;"></el-input>
             </el-col>
 
-            <el-col :span="8" class="register-input">
+            <el-col :xs="24" :sm="12" :md="8" :lg="8" class="register-input">
                 <div>E-MAIL <span></span></div>
                 <el-input @keyup.enter="Send()" v-model="parceiro.email" placeholder="" maxlength="80" input-style="text-transform:lowercase;"></el-input>
             </el-col>
 
-            <el-col :span="8" class="register-input">
+            <el-col :xs="24" :sm="12" :md="8" :lg="8" class="register-input">
                 <div>TELEFONE <span></span></div>
                 <el-input @keyup.enter="Send()" v-model="parceiro.telefone" placeholder="(11) 11111-1111" maxlength="40" input-style="text-transform:lowercase;" v-maska data-maska="(##) #####-#### ********************"></el-input>
             </el-col>
 
-            <el-col :span="8" class="register-input" v-if="parceiro.tipoPessoa == 'PF'">
+            <el-col :xs="24" :sm="12" :md="8" :lg="8" class="register-input" v-if="parceiro.tipoPessoa == 'PF'">
                 <div>DATA DE NASCIMENTO<span></span></div>
-                <div style="height:50px">
-                    <div style="display:inline-block;width:135px;padding-right:10px">
-                        <el-select @change="()=>{ if(!ChecarDataNascimento()){ $tools.Alert('<b>DATA DE NASCIMENTO</b> inválida'); }}" v-model="DiaNascimento" filterable placeholder="DIA" size="medium">
-                            <el-option v-for="item in this.$sdata.opcoes.days" :key="item.value" :label="item.label" :value="item.value" style="height:40px">
+                <div class="birthdate-container">
+                    <el-col :xs="24" :sm="24" :md="8" :lg="7" class="birthdate-select">
+                        <el-select style="width:100%" @change="()=>{ if(!ChecarDataNascimento()){ $tools.Alert('<b>DATA DE NASCIMENTO</b> inválida'); }}" v-model="DiaNascimento" filterable placeholder="DIA" size="medium">
+                            <el-option v-for="item in this.$sdata.opcoes.days" :key="item.value" :label="item.label" :value="item.value" class="birthdate-option">
                             </el-option>
                         </el-select>
-                    </div>
+                    </el-col>
 
-                    <div style="display:inline-block;width:135px;padding-right:10px">
-                        <el-select @change="()=>{ if(!ChecarDataNascimento()){ $tools.Alert('<b>DATA DE NASCIMENTO</b> inválida'); } }" v-model="MesNascimento" filterable placeholder="MÊS" size="medium">
-                            <el-option v-for="item in this.$sdata.opcoes.months" :key="item.value" :label="item.label" :value="item.value" style="height:40px">
+                    <el-col :xs="24" :sm="24" :md="8" :lg="10" class="birthdate-select">
+                        <el-select style="width:100%" @change="()=>{ if(!ChecarDataNascimento()){ $tools.Alert('<b>DATA DE NASCIMENTO</b> inválida'); } }" v-model="MesNascimento" filterable placeholder="MÊS" size="medium">
+                            <el-option v-for="item in this.$sdata.opcoes.months" :key="item.value" :label="item.label" :value="item.value" class="birthdate-option">
                             </el-option>
                         </el-select>
-                    </div>
+                    </el-col>
 
-                    <div style="display:inline-block;width:135px;">
-                        <el-select @change="()=>{ if(!ChecarDataNascimento()){ $tools.Alert('<b>DATA DE NASCIMENTO</b> inválida'); } }" v-model="AnoNascimento" filterable placeholder="ANO" size="medium">
-                            <el-option v-for="item in this.$sdata.opcoes.years" :key="item.value" :label="item.label" :value="item.value" style="height:40px">
+                    <el-col :xs="24" :sm="24" :md="8" :lg="7" class="birthdate-select">
+                        <el-select style="width:100%" @change="()=>{ if(!ChecarDataNascimento()){ $tools.Alert('<b>DATA DE NASCIMENTO</b> inválida'); } }" v-model="AnoNascimento" filterable placeholder="ANO" size="medium">
+                            <el-option v-for="item in this.$sdata.opcoes.years" :key="item.value" :label="item.label" :value="item.value" class="birthdate-option">
                             </el-option>
                         </el-select>
-                    </div>
+                    </el-col>
                 </div>
             </el-col>
 
-            <el-col :span="8" class="register-input" v-if="parceiro.tipoPessoa == 'PF'">
+            <el-col :xs="24" :sm="12" :md="8" :lg="8" class="register-input" v-if="parceiro.tipoPessoa == 'PF'">
                 <div>SEXO <span></span></div>
 
                 <el-select filterable v-model="parceiro.sexo" class="m-4" placeholder="Selecionar" size="large" style="width:100%">
@@ -107,7 +105,7 @@
                 </el-select>
             </el-col>
 
-            <el-col :span="8" class="register-input">
+            <el-col :xs="24" :sm="12" :md="8" :lg="8" class="register-input">
                 <div>
                     <span></span><span></span>
                     <div v-if="parceiro.tipoPessoa == 'PF'">CRECI</div><div v-else>CRECI PJ</div>
@@ -115,7 +113,7 @@
                 <el-input @keyup.enter="Send()" v-model="parceiro.creci" style="width: 100%" placeholder="" maxlength="22"></el-input>
             </el-col>
 
-            <el-col :span="8" class="register-input">
+            <el-col :xs="24" :sm="12" :md="8" :lg="8" class="register-input">
                 <div><p>CRECI - ESTADO</p><span></span></div>
                 <div style="height:40px" v-if="carregandoEstadosCreci">
                     <c-loading size="30px" style="padding-left:5px"></c-loading>
@@ -130,7 +128,7 @@
         </el-row>
 
         <el-row :gutter="20">
-            <el-col :span="8" class="register-input">
+            <el-col :xs="24" :sm="12" :md="8" :lg="8" class="register-input">
                 <div><p>CEP</p><span></span></div>
                 <el-input v-model="this.cep.numero" placeholder="" ref="postalCode" v-maska data-maska="#####-###" @keyup="()=>{  if(cep.numero.length>=9){BuscarEndereco();} }">
                     <template #append>
@@ -141,7 +139,7 @@
                 </el-input>
             </el-col>
 
-            <el-col :span="8" class="register-input">
+            <el-col :xs="24" :sm="12" :md="8" :lg="8" class="register-input">
                 <div><p>ESTADO</p><span></span></div>
                 <div style="height:40px" v-if="carregandoEstados">
                     <c-loading size="30px" style="padding-left:5px"></c-loading>
@@ -155,7 +153,7 @@
                 </el-select>
             </el-col>
 
-            <el-col :span="8" class="register-input">
+            <el-col :xs="24" :sm="12" :md="8" :lg="8" class="register-input">
                 <div><p>CIDADE</p><span></span></div>
                 <div style="height:40px" v-if="carregandoCidades">
                     <c-loading size="30px" style="padding-left:5px"></c-loading>
@@ -170,7 +168,7 @@
         </el-row>
 
         <el-row :gutter="20">
-            <el-col :span="8" class="register-input">
+            <el-col :xs="24" :sm="12" :md="8" :lg="8" class="register-input">
                 <div><p>BAIRRO</p><span></span></div>
                 <div style="height:40px" v-if="carregandoBairros">
                     <c-loading size="30px" style="padding-left:5px"></c-loading>
@@ -183,29 +181,29 @@
                 </el-select>
             </el-col>
 
-            <el-col :span="8" class="register-input">
+            <el-col :xs="24" :sm="12" :md="8" :lg="8" class="register-input">
                 <div>LOGRADOURO<span style="color:#808080">&nbsp;rua, avenida, praça, etc</span></div>
                 <el-input @keyup.enter="Enviar()" v-model="this.parceiro.logradouro" placeholder="" maxlength="80" input-style="text-transform:uppercase;"></el-input>
             </el-col>
 
-            <el-col :span="8" class="register-input">
+            <el-col :xs="24" :sm="12" :md="8" :lg="8" class="register-input">
                 <div>NÚMERO<span style="color:#808080">&nbsp;informe <b>SN</b> se não houver</span></div>
                 <el-input @keyup.enter="Enviar()" v-model="this.parceiro.numero" placeholder="" maxlength="80" input-style="text-transform:uppercase;" ref="addressnumber"></el-input>
             </el-col>
         </el-row>
 
         <el-row :gutter="20">
-            <el-col :span="8" class="register-input">
+            <el-col :xs="24" :sm="12" :md="8" :lg="8" class="register-input">
                 <div>COMPLEMENTO<span></span></div>
                 <el-input @keyup.enter="Enviar()" v-model="opcoes.complemento" placeholder="" maxlength="80" input-style="text-transform:uppercase;"></el-input>
             </el-col>
 
-            <el-col :span="8" class="register-input" v-if="parceiro.idTipo != 2">
+            <el-col :xs="24" :sm="12" :md="8" :lg="8" class="register-input" v-if="parceiro.idTipo != 2">
                 <div>SENHA <span style="color:#808080">&nbsp;pelo menos 4 caracteres</span></div>
                 <el-input @keyup.enter="Send()" v-model="parceiro.senha" type="password" placeholder="" maxlength="20" show-password></el-input>
             </el-col>
 
-            <el-col :span="8" class="register-input" v-if="parceiro.idTipo != 2">
+            <el-col :xs="24" :sm="12" :md="8" :lg="8" class="register-input" v-if="parceiro.idTipo != 2">
                 <div>CONFIRMAR SENHA <span style="color:#808080">&nbsp;repetir senha</span></div>
                 <el-input @keyup.enter="Send()" v-model="senhaConfirma" type="password" placeholder="" maxlength="20" show-password></el-input>
             </el-col>
@@ -566,6 +564,23 @@
 <style>
     .el-row {
         width: 100% !important;
+    }
+
+    .birthdate-container {
+        display: flex;
+        flex-wrap: wrap;
+    }
+
+    .birthdate-option {
+        height: 40px;
+    }
+
+    .birthdate-select {
+        margin-bottom: 10px;
+        margin-top: 2px;
+        padding-left: 0px;
+        padding-right: 0px;
+        gap: 0px;
     }
 
     .register-input {
