@@ -35,11 +35,12 @@ INSERT INTO "AdminSettings" ("id", "idAdmin", "receberSolicitacaoAgendada", "rec
 	(8, 9, 'false', 'false'),
 	(5, 6, 'false', 'false'),
 	(11, 12, 'false', 'false');
+	(29, 1, 'false', 'false');
 
 select * from "AdminSettings" order by id DESC;
 
 ALTER TABLE "AdminSettings"	ADD CONSTRAINT pk_AdminSettings		    PRIMARY KEY (id);
-ALTER SEQUENCE "AdminSettings_id_seq" RESTART 29;
+ALTER SEQUENCE "AdminSettings_id_seq" RESTART 30;
 select * from "AdminSettings_id_seq" ;
 
 

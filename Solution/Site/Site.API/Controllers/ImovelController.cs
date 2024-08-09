@@ -39,8 +39,9 @@ namespace JaCaptei.API.Controllers {
                 appReturn.AddException("Necessário autenticação");
                 return Result(appReturn);
             }else{
-                busca.usuarioGod    = false;
-                busca.usuarioGestor = false;
+                busca.usuarioGod        = false;
+                busca.usuarioGestor     = false;
+                busca.somenteValidados  = true;
                 appReturn = service.Buscar(busca);
             }
 

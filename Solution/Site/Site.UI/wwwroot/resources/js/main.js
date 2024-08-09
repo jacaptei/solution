@@ -289,7 +289,7 @@ $(document).ready(function () {
 
                 RequestLogin(mensagem = "É necessário estar logado para acessar esta área") {
                     if (this.$route.name != '/home') {
-                        this.$tools.MessageAlert(mensagem, 100);
+                        //this.$tools.MessageAlert(mensagem, 100);
                         window.setTimeout(() => this.OpenLoginModal(), 500);
                     }
                 },

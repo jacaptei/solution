@@ -68,7 +68,7 @@
             </el-container>
         </div>
         <div v-else style="width:100%;text-align:center;margin-top:40px">
-            {{$root.RequestLogin()}}
+            <div style="color:var(--s-color-primary;font-weight:700;margin-bottom:10px">É necessário estar logado para acessar esta área</div>
             <q-btn label="Seja nosso parceiro para buscar imóveis" @click="$root.RouteTo('parceiros')" color="primary" style="padding:20px"></q-btn>
         </div>
     </div>
@@ -123,9 +123,10 @@
             //    this.results.push({name:"card"+i});
         },
         mounted() {
-
            if(this.$root.isAuth)
              this.Buscar();
+           else
+             this.$root.RequestLogin();
         },
         methods: {
 
