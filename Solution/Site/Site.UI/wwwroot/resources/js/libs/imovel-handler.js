@@ -187,21 +187,21 @@ export default class ImovelHandler{
 
     BuildTitle(imovel){
         var res = "";
-            res += this.validator.is(imovel.tipo   )?          imovel.tipo     : "";
-            res += this.validator.is(imovel.quartos)? ", " +   imovel.quartos + ( (imovel.quartos > 1 || imovel.quartos == 0)? " quartos":" quartos") : "";
-            res += this.validator.is(imovel.estado )? ", " +   imovel.suites  + ( (imovel.suites  > 1 || imovel.suites  == 0)? " suites" :" suites" ) : "";
-            res += this.validator.is(imovel.vagas  )? ", " +   imovel.vagas   + ( (imovel.vagas   > 1 || imovel.vagas   == 0)? " vagas"  :" vagas"  ) : "";
+            res += this.validator.is(imovel.tipo   )?          imovel.tipo.label   : "";
+            res += this.validator.is(imovel.interno.totalQuartos)? ", " +   imovel.interno.totalQuartos + ( (imovel.interno.totalQuartos > 1 || imovel.interno.totalQuartos == 0)? " quartos":" quartos") : "";
+            res += this.validator.is(imovel.interno.totalSuites )? ", " +   imovel.interno.totalSuites  + ( (imovel.interno.totalSuites  > 1 || imovel.interno.totalSuites  == 0)? " suites" :" suites" ) : "";
+            res += this.validator.is(imovel.externo.totalVagas  )? ", " +   imovel.externo.totalVagas   + ( (imovel.externo.totalVagas   > 1 || imovel.externo.totalVagas   == 0)? " vagas"  :" vagas"  ) : "";
         return res;
     }
 
 
     BuildMapAddress(imovel){
         var res = "";
-        res += this.validator.is(imovel.endereco  )? imovel.endereco +",":"";
+        res += this.validator.is(imovel.endereco.logradouro  )? imovel.endereco.logradouro +",":"";
         //res += this.validator.is(imovel.numero    )? imovel.numero   +",":"";
-        res += this.validator.is(imovel.bairro    )? imovel.bairro   +",":"";
-        res += this.validator.is(imovel.cidade    )? imovel.cidade   +",":"";
-        res += this.validator.is(imovel.estado    )? imovel.estado   +"":"";
+        res += this.validator.is(imovel.endereco.bairro    )? imovel.endereco.bairro   +",":"";
+        res += this.validator.is(imovel.endereco.cidade    )? imovel.endereco.cidade   +",":"";
+        res += this.validator.is(imovel.endereco.estado    )? imovel.endereco.estado   +"":"";
         res = res.replaceAll(" ","%20");
         return res;
     }

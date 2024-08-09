@@ -11,7 +11,7 @@
                         active-color="primary"
                         indicator-color="primary">
                     <q-tab name="visualizar" icon="fa fa-eye"   label="VISUALIZAR"   ></q-tab>
-                    <q-tab name="alterar"    icon="fa fa-edit"    label="EDITAR"   ></q-tab>
+                    <q-tab name="alterar"    icon="fa fa-edit"    label="EDITAR"     v-if="$root.usuario.gestor || $root.usuario.god " ></q-tab>
                     <q-btn label="VOLTAR" outline color="primary" @click="$root.RouteTo('/imoveis')" style="margin-left:20px"></q-btn>
                     <!--<q-tab name="imoveis"	icon="fa fa-user-plus"			label="IMÓVEIS"		style="width:115px"></q-tab>-->
                 </q-tabs>

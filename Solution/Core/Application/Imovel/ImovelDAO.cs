@@ -427,55 +427,53 @@ namespace JaCaptei.Application {
                 //if(!System.String.IsNullOrWhiteSpace(busca.imovelMigrado.tipo))
                 //    filter += " AND tipo = '" + busca.imovelMigrado.tipo + "' ";
 
-                if(busca.imovel.tipo.id > 0)
-                    filter += " AND imovel.\"idTipo\" = '" + busca.imovel.idTipo.ToString() + "' ";
+                if(busca.imovel.idTipo > 0)
+                    filter += " AND imovel.\"idTipo\" = " + busca.imovel.idTipo.ToString() + " ";
+                else if(busca.imovel.tipo.id > 0)
+                    filter += " AND imovel.\"idTipo\" = " + busca.imovel.tipo.id.ToString() + " ";
 
                 if(busca.bairros.Count > 0) {
-                    //filter += " AND cf_1011 IN('" + string.Join(",",busca.imovelMigrado.bairros).Replace("(",",").Replace(")","").Replace(",","','") + "') ";
-                    string items = "";
-                    busca.bairros.ForEach(item => {
-                        items += "'" + item.Replace("(","','").Replace(")","").Trim().Replace(" '","'") + "',";
-                    });
+                    string items = "'" + String.Join("','", busca.bairros) + "'";
                     filter += " AND ( endereco.bairro IN (" + items + ") OR endereco.\"bairroNorm\" IN (" + items + ") ) ";
                 }else if(!System.String.IsNullOrWhiteSpace(busca.imovel.endereco.bairroNorm))
                     filter += " AND endereco.\"bairroNorm\" = '" + busca.imovel.endereco.bairroNorm + "' ";
 
 
-                if(busca.imovel.valor.minimo > 0)
-                    filter += " AND valor.minimo  >=  " + busca.imovel.valor.minimo.ToString();
-                if(busca.imovel.valor.maximo > 0)
-                    filter += " AND valor.maximo  <=  " + busca.imovel.valor.maximo.ToString();
+                if(busca.valorMinimo > 0)
+                    filter += " AND valor.venda  >=  " + busca.valorMinimo.ToString();
+                if(busca.valorMaximo > 0)
+                    filter += " AND valor.venda  <=  " + busca.valorMaximo.ToString();
 
 
-                if(busca.imovel.area.minima > 0)
-                    filter += " AND area.minima  >=  " + busca.imovel.area.minima.ToString();
-                if(busca.imovel.area.maxima > 0)
-                    filter += " AND area.maxima  <=  " + busca.imovel.area.maxima.ToString();
+                if(busca.areaMinima > 0)
+                    filter += " AND area.total  >=  " + busca.areaMinima.ToString();
+                if(busca.areaMaxima > 0)
+                    filter += " AND area.total  <=  " + busca.areaMaxima.ToString();
 
-                if(busca.imovel.interno.areaServico)         { filter += "AND interno.\"areaServico\"        = TRUE ";  }
-                if(busca.imovel.interno.closet)              { filter += "AND interno.closet                 = TRUE ";  }
-                if(busca.imovel.interno.churrasqueira)       { filter += "AND interno.churrasqueira          = TRUE ";  }
-                if(busca.imovel.interno.sala )               { filter += "AND interno.sala                   = TRUE ";  }
-                if(busca.imovel.interno.armarioBanheiro)     { filter += "AND interno.\"armarioBanheiro\"    = TRUE ";  }
-                if(busca.imovel.interno.armarioQuarto)       { filter += "AND interno.\"armarioQuarto\"      = TRUE ";  }
-                if(busca.imovel.interno.boxDespejo)          { filter += "AND interno.\"boxDespejo\"         = TRUE ";  }
-                if(busca.imovel.interno.lavabo)              { filter += "AND interno.lavabo                 = TRUE ";  }
-                if(busca.imovel.interno.dce)                 { filter += "AND interno.dce                    = TRUE ";  }
-                if(busca.imovel.interno.aguaIndividual)      { filter += "AND interno.\"aguaIndividual\"     = TRUE ";  }
-                if(busca.imovel.interno.gasCanalizado)       { filter += "AND interno.\"gasCanalizado\"      = TRUE ";  }
-                if(busca.imovel.interno.armarioCozinha)      { filter += "AND interno.\"armarioCozinha\"     = TRUE ";  }
+                if(busca.imovel.interno.areaServico)         { filter += " AND interno.\"areaServico\"        = TRUE ";  }
+                if(busca.imovel.interno.closet)              { filter += " AND interno.closet                 = TRUE ";  }
+                if(busca.imovel.interno.churrasqueira)       { filter += " AND interno.churrasqueira          = TRUE ";  }
+                if(busca.imovel.interno.sala )               { filter += " AND interno.sala                   = TRUE ";  }
+                if(busca.imovel.interno.armarioBanheiro)     { filter += " AND interno.\"armarioBanheiro\"    = TRUE ";  }
+                if(busca.imovel.interno.armarioQuarto)       { filter += " AND interno.\"armarioQuarto\"      = TRUE ";  }
+                if(busca.imovel.interno.boxDespejo)          { filter += " AND interno.\"boxDespejo\"         = TRUE ";  }
+                if(busca.imovel.interno.lavabo)              { filter += " AND interno.lavabo                 = TRUE ";  }
+                if(busca.imovel.interno.dce)                 { filter += " AND interno.dce                    = TRUE ";  }
+                if(busca.imovel.interno.aguaIndividual)      { filter += " AND interno.\"aguaIndividual\"     = TRUE ";  }
+                if(busca.imovel.interno.gasCanalizado)       { filter += " AND interno.\"gasCanalizado\"      = TRUE ";  }
+                if(busca.imovel.interno.armarioCozinha)      { filter += " AND interno.\"armarioCozinha\"     = TRUE ";  }
 
-                if(busca.imovel.externo.cercaEletrica)       { filter += "AND externo.\"cercaEletrica\"      = TRUE ";  }
-                if(busca.imovel.externo.jardim)              { filter += "AND externo.jardim                 = TRUE ";  }
-                if(busca.imovel.externo.interfone)           { filter += "AND externo.interfone              = TRUE ";  }
-                if(busca.imovel.externo.portaoEletronico)    { filter += "AND externo.\"portaoEletronico\"   = TRUE ";  }
-                if(busca.imovel.externo.alarme)              { filter += "AND externo.alarme                 = TRUE ";  }
-                if(busca.imovel.externo.elevador)            { filter += "AND externo.elevador               = TRUE ";  }
-
-                if(busca.imovel.lazer.hidromassagem)         { filter += "AND lazer.hidromassagem          = TRUE ";  }
-                if(busca.imovel.lazer.piscina)               { filter += "AND lazer.piscina                = TRUE ";  }
-                if(busca.imovel.lazer.quadraPoliesportiva)   { filter += "AND lazer.\"quadraPoliesportiva\"= TRUE ";  }
-                if(busca.imovel.lazer.salaoFestas)           { filter += "AND lazer.\"salaoFestas\"        = TRUE ";  }
+                if(busca.imovel.externo.cercaEletrica)       { filter += " AND externo.\"cercaEletrica\"      = TRUE ";  }
+                if(busca.imovel.externo.jardim)              { filter += " AND externo.jardim                 = TRUE ";  }
+                if(busca.imovel.externo.interfone)           { filter += " AND externo.interfone              = TRUE ";  }
+                if(busca.imovel.externo.portaoEletronico)    { filter += " AND externo.\"portaoEletronico\"   = TRUE ";  }
+                if(busca.imovel.externo.alarme)              { filter += " AND externo.alarme                 = TRUE ";  }
+                if(busca.imovel.externo.elevador)            { filter += " AND externo.elevador               = TRUE ";  }
+                                                                           
+                if(busca.imovel.lazer.hidromassagem)         { filter += " AND lazer.hidromassagem          = TRUE ";  }
+                if(busca.imovel.lazer.piscina)               { filter += " AND lazer.piscina                = TRUE ";  }
+                if(busca.imovel.lazer.quadraPoliesportiva)   { filter += " AND lazer.\"quadraPoliesportiva\"= TRUE ";  }
+                if(busca.imovel.lazer.salaoFestas)           { filter += " AND lazer.\"salaoFestas\"        = TRUE ";  }
 
                 filter = Utils.Validator.ParseSafeSQL(filter);
 

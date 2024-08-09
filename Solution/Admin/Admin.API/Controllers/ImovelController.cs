@@ -70,6 +70,7 @@ namespace JaCaptei.Administrativo.API.Controllers
         
         [HttpPost]
         [Route("[action]")]
+        [Authorize(Roles = "ADMIN_GOD,ADMIN_GESTOR")]
         public async Task<IActionResult> Alterar([FromForm] string jsonImovel, List<IFormFile> imagesFiles) {
 
             Imovel imovel = JsonConvert.DeserializeObject<Imovel>(jsonImovel);

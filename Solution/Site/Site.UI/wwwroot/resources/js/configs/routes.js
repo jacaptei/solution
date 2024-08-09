@@ -2,6 +2,7 @@
 //                  PAGES
 // -------------------------------------------
 const Notfound        = httpVueLoader("/pages/_NotFound.htm");
+const Manutencao      = httpVueLoader("/pages/_Manutencao.htm");
 const Login           = httpVueLoader("/pages/account/Index.htm");
 const Home            = httpVueLoader("/pages/Home.htm");
 const Busca           = httpVueLoader("/pages/Busca.htm");
@@ -37,13 +38,14 @@ const routes = [
   {    name: "sobre",              path: "/sobre",              component: Sobre,                   meta: { area: "SOBRE" ,         label: "SOBRE"              ,  menuIndex: "06-00-00-00", keypath: "06-00-00-00" },  },
   {    name: "ajuda",              path: "/ajuda",              component: Ajuda,                   meta: { area: "AJUDA" ,         label: "AJUDA"              ,  menuIndex: "07-00-00-00", keypath: "07-00-00-00" },  },
   
-  {    name: "admin",           path: "/admin",             component: Admin,                   meta: { area: "ADMIN" ,         label: "ADMIN"              ,  menuIndex: "01-00-00-00", keypath: "01-00-00-00" },  },
-  {    name: "confirma",        path: "/confirma",          component: Confirma,                meta: { area: "CONFIRMA" ,      label: "CONFIRMA"           ,  menuIndex: "01-00-00-00", keypath: "01-00-00-00" },  },
-  {    name: "senha",           path: "/senha",             component: Senha,                   meta: { area: "SENHA" ,         label: "SENHA"              ,  menuIndex: "01-00-00-00", keypath: "01-00-00-00" },  },
-  {    name: "perfil",          path: "/perfil",            component: Perfil,                  meta: { area: "PERFIL" ,        label: "PERFIL"             ,  menuIndex: "01-00-00-00", keypath: "01-00-00-00" },  },
+  {    name: "admin",              path: "/admin",             component: Admin,                   meta: { area: "ADMIN" ,         label: "ADMIN"              ,  menuIndex: "01-00-00-00", keypath: "01-00-00-00" },  },
+  {    name: "confirma",           path: "/confirma",          component: Confirma,                meta: { area: "CONFIRMA" ,      label: "CONFIRMA"           ,  menuIndex: "01-00-00-00", keypath: "01-00-00-00" },  },
+  {    name: "senha",              path: "/senha",             component: Senha,                   meta: { area: "SENHA" ,         label: "SENHA"              ,  menuIndex: "01-00-00-00", keypath: "01-00-00-00" },  },
+  {    name: "perfil",             path: "/perfil",            component: Perfil,                  meta: { area: "PERFIL" ,        label: "PERFIL"             ,  menuIndex: "01-00-00-00", keypath: "01-00-00-00" },  },
 
-  {    name: "tests",           path: "/tests",             component: Tests,                   meta: { area: "TESTS"    ,      menuIndex: "----"           , keypath: "----"        },  },
+  {    name: "tests",              path: "/tests",             component: Tests,                   meta: { area: "TESTS"    ,      menuIndex: "----"           , keypath: "----"        },  },
 
-  {    name: "",                path: "/:notFound",         component: Notfound,                meta: { area: "404"  ,          label: "PÁGINA INEXISTENTE" ,  menuIndex: "00-00-00-00", keypath: "00-00-00-00" },  },
+  {    name: "manutencao",         path: "/manutencao",        component: Manutencao,              meta: { area: "MANUTENCAO",     label: "MANUTENÇÃO"         ,  menuIndex: "00-00-00-00", keypath: "00-00-00-00" },  },
+  {    name: "",                   path: "/:notFound",         component: Notfound,                meta: { area: "404"  ,          label: "PÁGINA INEXISTENTE" ,  menuIndex: "00-00-00-00", keypath: "00-00-00-00" },  },
 
 ];

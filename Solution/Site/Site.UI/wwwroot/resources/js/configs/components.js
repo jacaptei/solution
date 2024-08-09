@@ -11,6 +11,7 @@ const c_header_login            = LoadComponent(componentPath+"c-header-login.ht
 const c_policy_terms            = LoadComponent(componentPath+"c-policy-terms.htm");
 const c_header                  = LoadComponent(componentPath+"c-header.htm");
 const c_title                   = LoadComponent(componentPath+"c-title.htm");
+const c_imovel_busca_form_home  = LoadComponent(componentPath+"c-imovel-busca-form-home.htm");
 const c_imovel_busca_form       = LoadComponent(componentPath+"c-imovel-busca-form.htm");
 const c_imovel_card             = LoadComponent(componentPath+"c-imovel-card.htm");
 const c_building_mini_card      = LoadComponent(componentPath+"c-building-mini-card.htm");

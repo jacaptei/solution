@@ -84,8 +84,8 @@ namespace JaCaptei.Application {
                 entity.endereco.logradouro      =   Utils.String.Higienize(entity.endereco.logradouro);
                 entity.endereco.logradouroNorm  =   Utils.String.NormalizeToUpper(entity.endereco.logradouro);
 
-                entity.endereco.numero          =   Utils.String.HigienizeToUpper(entity.endereco.numero);
-                entity.endereco.complemento     =   Utils.String.HigienizeToUpper(entity.endereco.complemento);
+                entity.endereco.numero          =   Utils.String.Higienize(entity.endereco.numero);
+                entity.endereco.complemento     =   Utils.String.Higienize(entity.endereco.complemento);
                 entity.endereco.cep             =   entity.endereco.cep.Replace("-","");
                 entity.endereco.cepNorm         =   Utils.String.HigienizeToUpper(entity.endereco.cep);
                 entity.endereco.cep             =   Utils.Format.CEP(entity.endereco.cep);

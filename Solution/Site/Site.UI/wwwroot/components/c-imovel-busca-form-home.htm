@@ -1,0 +1,361 @@
+<template>
+
+
+            <div class="search-wrapper-home">
+
+
+                <div class="search-form">
+
+                    <el-row :gutter="20">
+                        <el-col :md="24">
+                            <div><p>Estado</p><span></span></div>
+                                <el-select v-else filterable v-model="$root.buscaImovel.imovel.endereco.estado" class="m-4" placeholder="qualquer" size="large" style="width:100%" @change="(item)=>{ObterCidades(item);enableFilterButton = true;}">
+                                <el-option v-for="item in opcoes.estados"
+                                            :key="item.id"
+                                            :label="item.label"
+                                            :value="item.value">
+                                </el-option>
+                            </el-select>
+                        </el-col>
+                    </el-row>
+
+                    <el-row :gutter="20">
+                        <el-col :md="24">
+                            <div><p>Cidade</p><span></span></div>
+                            <div style="height:40px" v-if="carregandoCidades">
+                                <c-loading size="30px" style="padding-left:5px" color="#fff"></c-loading>
+                            </div>
+                            <div v-else-if="opcoes.cidades.length==0">
+                                <span style="color:#fff;padding-left:10px">selecione um estado</span>
+                            </div>
+                            <el-select v-else v-model="$root.buscaImovel.imovel.endereco.cidade" filterable class="m-4" placeholder="qualquer" size="large" style="width:100%" @click="()=>{ if($validator.not($root.buscaImovel.imovel.endereco.estado)){ $tools.Alert('Selecione um <b>Estado</b> antes');} }" @change="(item)=>{ObterBairros(item);enableFilterButton = true;}">
+                                <el-option v-for="item in opcoes.cidades"
+                                            :key="item.id"
+                                            :label="item.label"
+                                            :value="item.value">
+                                </el-option>
+                            </el-select>
+                        </el-col>
+                    </el-row>
+
+
+                    <el-row :gutter="20">
+                        <el-col :md="24">
+                            <div><p v-if="bairrosSelecionados.length <= 1">Bairro</p><p v-else>Bairros</p><span></span></div>
+                            <div style="height:40px" v-if="carregandoBairros">
+                                <c-loading size="30px" style="padding-left:5px" color="#fff"></c-loading>
+                            </div>
+                            <div v-else-if="opcoes.bairros.length==0">
+                                <span style="color:#fff;padding-left:10px">selecione um estado</span>
+                            </div>
+                            <el-select v-else v-model="bairrosSelecionados" multiple filterable :clearable="true" class="m-4" placeholder="qualquer" size="large" style="width:100%">
+                                <el-option v-for="item in opcoes.bairros"
+                                            :key="item.id"
+                                            :label="item.label"
+                                            :value="item">
+                                </el-option>
+                            </el-select>
+                        </el-col>
+                    </el-row>
+
+
+                        <el-row :gutter="20">
+                            <el-col :md="12" :sm="12" :xs="12">
+                                <p>Valor até R$</p>
+                                <!--<el-input input-style="color:var(--s-accent-color)" @blur="CheckValues" @keyup.enter="Search()" v-model="valorMaximo" placeholder="qualquer" maxlength="20" :formatter="(value) => `R$ ${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, '.')" :parser="(value) => value.replace(/\R\$\s?|(\.*)/g, '').replace(/[a-zA-Z]/g, '')"></el-input>-->
+                                <el-input input-style="color:var(--s-accent-color)" @keyup.enter="Buscar()" v-model="valorMinimo" placeholder="qualquer" maxlength="20" :formatter="(value) => `R$ ${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, '.')" :parser="(value) => value.replace(/\R\$\s?|(\.*)/g, '').replace(/[a-zA-Z]/g, '')"></el-input>
+                            </el-col>
+                            <el-col :md="12" :sm="12" :xs="12">
+                                <p>Dormitórios</p>
+                                <el-select v-model="quartos" filterable class="m-4" placeholder="qualquer" size="large" input-style="color:var(--s-accent-color)" :teleported="false" @change="enableFilterButton = true">
+                                    <el-option v-for="item in opcoes.quantidades" :key="item.id" :label="item.label + item.complement.replace('ou','')" :value="item.value">
+                                        <span :style="(item.id > 0)? 'font-weight:bold;margin-right:6px':''">{{ item.label }}</span>
+                                        <span style="font-size:12px">{{ item.complement }}</span>
+                                    </el-option>
+                                </el-select>
+                            </el-col>
+                        </el-row>
+
+                        <el-row :gutter="20" style="padding:6px;padding-top:5px">
+                            <el-col :md="24">
+                                <q-btn label="Buscar" color="secondary" style="width:100%;height:40px;border-radius:20px" @click="Buscar"></q-btn>
+                            </el-col>
+                        </el-row>
+
+
+
+                    </div>
+
+
+                </div>
+
+
+</template>
+
+<script>
+    module.exports = {
+
+        components: {
+
+        },
+
+        data: function () {
+            return {
+                language: "PT-BR",
+                labels: [],
+                isMobile: window.screen.width < 1000,
+                showForm: window.screen.width > 1000,
+                offset: window.screen.height - 200,
+                model: "Aluguel",
+                isValidValues: true,
+                enableFilterButton: false,
+                currencyMask: {},
+
+                tipoImovel: "",
+                tipoOperacao: "",
+                estado: "",
+                cidade: "",
+                bairro: "",
+
+                valorMinimo: "",
+                valorMaximo: "",
+
+                areaMinima: "",
+                areaMaxima: "",
+
+                quartos: "",
+                vagas: "",
+                banheiros: "",
+                suites: "",
+
+                carregandoCEP       : false,
+                carregandoEstados   : false,
+                carregandoCidades   : false,
+                carregandoBairros   : false,
+    
+                idTipoImovelSelecionado : null,
+
+                opcoes: { estados: [], cidades: [], bairros: [],
+                    sexos: [],
+                    anos:[],
+                    quantidades:[],
+                    tiposImoveis:this.$models.tiposImoveis(),
+                    tiposComplementos:this.$models.tiposComplementos()
+                },
+
+                bairrosSelecionados:[]
+
+            }
+        }, computed: {
+
+        },
+
+        props: {
+            show: { type: Boolean, required: false, default: (window.screen.width > 1000) },
+        },
+        watch: {
+        },
+        created: function () {
+
+            this.$sdata.ObterEstados().then(res => { this.opcoes.estados = res; });
+            for(var i=0;i<=20;i++){
+                var item = {id:i,label:(i==0)? "qualquer" : (i < 10? "0"+i : i),complement: (i == 0? "" : "ou +"),value:(i==0)? null : i};
+                this.opcoes.quantidades.push(item);
+            }
+
+            this.opcoes.tiposImoveis.unshift({id:0,label:'qualquer',value:null});
+
+            if (this.$validator.is(this.$root.buscaImovel.valorMaximo) && this.$root.buscaImovel.valorMaximo > 0) {
+                this.valorMaximo = "R$ " + this.$root.buscaImovel.valorMaximo;
+            }
+            //if (this.$validator.is(this.$root.buscaImovel.imovel.quartos))
+            //    this.quartos = this.$root.buscaImovel.imovel.quartos;
+
+
+            this.showForm = this.show;
+
+        },
+        mounted() {
+            // cclear();
+            //this.isCollapse = this.$root.isMenuCollapse;
+        },
+        methods: {
+
+            ToggleShowForm() {
+                this.$tools.Top();
+                this.showForm = !this.showForm;
+                this.$emit("showform");
+            },
+
+            CheckValues() {
+
+                this.isValidValues = true;
+
+                this.$root.buscaImovel.valorMinimo = this.$validator.is(this.valorMinimo) ? parseInt(this.valorMinimo.replace("R$ ", "").replaceAll(".", "")) : 0;
+                this.$root.buscaImovel.valorMaximo = this.$validator.is(this.valorMaximo) ? parseInt(this.valorMaximo.replace("R$ ", "").replaceAll(".", "")) : 0;
+                this.$root.buscaImovel.areaMinima  = this.$validator.is(this.areaMinima)  ? parseInt(this.areaMinima.replace("m² " , "").replaceAll(".", "")) : 0;
+                this.$root.buscaImovel.areaMaxima  = this.$validator.is(this.areaMaxima)  ? parseInt(this.areaMaxima.replace("m² " , "").replaceAll(".", "")) : 0;
+
+                if (this.$root.buscaImovel.valorMaximo > 0 && (this.$root.buscaImovel.valorMaximo < this.$root.buscaImovel.valorMinimo)) {
+                    this.$tools.Alert("<b>Valor Máximo</b> deve ser maior ou igual ao <b>Valor Mínimo</b>")
+                    this.isValidValues = false;
+                }
+                if (this.$root.buscaImovel.areaMaxima > 0 && (this.$root.buscaImovel.areaMaxima < this.$root.buscaImovel.areaMinima)) {
+                    this.$tools.Alert("<b>Área Máxima</b> deve ser maior ou igual à <b>Área Mínima</b>");
+                    this.isValidValues = false;
+                }
+            },
+
+            Buscar() {
+
+                this.CheckValues();
+
+                if (this.isValidValues) {
+
+                    this.$root.buscaImovel.page = 0;
+
+
+                    this.$root.buscaImovel.imovel.interno.totalQuartos    = this.$validator.is(this.quartos    ) ? parseInt(this.quartos    )   : 0;
+                    this.$root.buscaImovel.imovel.interno.totalBanheiros  = this.$validator.is(this.banheiros  ) ? parseInt(this.banheiros  )   : 0;
+                    this.$root.buscaImovel.imovel.interno.totalSuites     = this.$validator.is(this.suites     ) ? parseInt(this.suites     )   : 0;
+                    this.$root.buscaImovel.imovel.externo.totalVagas      = this.$validator.is(this.vagas      ) ? parseInt(this.vagas      )   : 0;
+
+                    //c2("this.$root.buscaImovel.areaMaxima",this.$root.buscaImovel.areaMaxima)
+                    //if (this.$validator.is(this.$root.buscaImovel.tipoImovel))
+                    //    this.$root.buscaImovel.imovel.tipo = this.$root.buscaImovel.tipoImovel.label;
+
+                    this.$root.buscaImovel.imovel.idTipo = (this.$validator.is(this.idTipoImovelSelecionado            ))? this.idTipoImovelSelecionado             : 0;
+                    //c2("this.$root.buscaImovel.imovel.idTipo",this.$root.buscaImovel.imovel.idTipo)
+
+                    this.$root.buscaImovel.bairros = [];
+                    if (this.bairrosSelecionados.length > 0)
+                        this.bairrosSelecionados.forEach(item => this.$root.buscaImovel.bairros.push(item.label));
+
+                    this.$root.buscaImovel.imovel.venda = true;
+                    //console.table(this.$root.buscaImovel.imovel.bairros);
+                    //c(this.$root.buscaImovel.imovel);
+
+                    if (this.isMobile && this.showForm)
+                        this.ToggleShowForm();
+
+                    this.$root.RouteTo("busca");
+                    //this.$emit("buscarimoveis");
+
+                }
+
+
+            },
+
+
+            ClearFilter() {
+
+
+                this.$root.buscaImovel = this.$models.imovelBusca();
+                this.$root.buscaImovel.imovel = this.$models.imovel();
+                this.$root.buscaImovel.imovel.cod = "";
+
+                
+
+                this.opcoes.cidades = [];
+                this.opcoes.bairros = [];
+
+
+                this.idTipoImovelSelecionado = null;
+                this.tipoImovel = "";
+                this.tipoOperacao = "";
+                //this.estado        = "";
+                //this.cidade        = "";
+                //this.bairro        = "";
+                this.valorMinimo = "";
+                this.valorMaximo = "";
+                this.areaMinima = "";
+                this.areaMaxima = "";
+                this.quartos = "";
+                this.vagas = "";
+                this.banheiros = "";
+                this.suites = "";
+
+                //c("clear")
+
+            },
+
+
+
+
+
+            ObterCidades(estado) {
+
+                this.$root.buscaImovel.imovel.endereco.cidade   =   this.$root.buscaImovel.imovel.endereco.bairro   = "";
+                this.$root.buscaImovel.imovel.endereco.idCidade =   this.$root.buscaImovel.imovel.endereco.idBairro = 0;
+
+                this.opcoes.bairros = [];
+                this.opcoes.cidades = [];
+                var cidades = [];
+
+                if (this.$validator.is(estado)) {
+                    this.carregandoCidades = true;
+                    this.$root.buscaImovel.imovel.endereco.idEstado = this.opcoes.estados.filter((e) => e.value == estado)[0].id;
+                    this.$sdata.ObterCidades(this.$root.buscaImovel.imovel.endereco.idEstado).then(res => { this.opcoes.cidades = res; this.carregandoCidades = false; });
+                }
+
+            },
+
+
+            ObterBairros(cidade) {
+
+                this.$root.buscaImovel.imovel.endereco.bairro   = "";
+                this.$root.buscaImovel.imovel.endereco.idBairro = 0;
+                
+                this.opcoes.bairros = [];
+                this.bairrosSelecionados = [];
+
+                if (this.$validator.is(cidade)) {
+                    this.carregandoBairros = true;
+                    this.$root.buscaImovel.imovel.endereco.idCidade = this.opcoes.cidades.filter((c) => c.value == cidade)[0].id;
+                    this.$sdata.ObterBairros(this.$root.buscaImovel.imovel.endereco.idCidade).then(res => { this.opcoes.bairros = res; this.carregandoBairros = false; });
+                } 
+
+            },
+
+            DefinirBairro(bairro) {
+                this.$root.buscaImovel.imovel.endereco.idBairro = this.opcoes.bairros.filter((c) => c.value == bairro)[0].id;
+                //this.$root.buscaImovel.imovel.bairro = bairro.label;
+                //c2("this.proprietario", this.proprietario)
+            },
+
+
+
+
+
+
+
+
+        }
+
+    }
+
+</script>
+
+
+<!--<script setup>
+const isCollapse = ref(true);
+const handleOpen = function(key, keyPath){
+  c(key, keyPath);
+}
+const handleClose = function(key, keyPath){
+  c(key, keyPath);
+}
+</script>-->
+
+<style scoped>
+
+
+    #side-search {
+        transition: width 0.3s;
+        /*width: 320px;*/
+        /*max-width: 320px;*/
+        overflow-x: hidden;
+    }
+</style>
+
+

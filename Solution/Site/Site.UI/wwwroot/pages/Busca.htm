@@ -3,8 +3,8 @@
         <div v-if="$root.isAuth">
             <el-container :style="$root.onRequest? 'cursor:wait' : 'cursor:default'">
 
-                <c-busca-imovel-form :show="showForm" @showform="showForm = !showForm" @buscarimoveis="Buscar"  :style="$root.onRequest? 'pointer-events: none;opacity:0.4;cursor:wait' : ''"></c-busca-imovel-form>
-
+                <c-imovel-busca-form :show="showForm" @buscarimoveis="Buscar"  v-if="$validator.is($root.buscaImovel?.imovel)" :style="$root.onRequest? 'pointer-events: none;opacity:0.4;cursor:wait' : ''"></c-imovel-busca-form>
+                
                 <el-container style="cursor:default">
 
                     <div class="row" style="width:100%;margin-bottom:40px;display:block">
@@ -31,7 +31,7 @@
 
                             <div class="q-pa-lg flex flex-center">
                                 <!--<el-pagination layout="prev, pager, next" :total="totalNav" :page-count="Math.ceil(totalNav/20)" v-model:current-page="page" @current-change="Nav"></el-pagination>-->
-                                <el-pagination layout="prev, pager, next" :total="totalNav" :page-size="20" v-model:current-page="page" @current-change="Nav"></el-pagination>
+                                    <el-pagination layout="prev, pager, next" :total="$root.buscaImovel.total" :page-size="$root.buscaImovel.resultsPerPage" v-model:current-page="$root.buscaImovel.page" @current-change="Buscar"></el-pagination>
                             </div>
 
                             <!--
@@ -97,7 +97,16 @@
                 totalNav:0,
                 page:1,
                 buscaTitulo:"buscando...",
-            }
+ 
+                opcoes: { estados: [], cidades: [], bairros: [],
+                    sexos: [],
+                    anos:[],
+                    quantidades:[],
+                    tiposImoveis:this.$models.tiposImoveis(),
+                    tiposComplementos:this.$models.tiposComplementos()
+                },
+
+           }
         }, computed: {
 
         },
@@ -114,6 +123,7 @@
             //    this.results.push({name:"card"+i});
         },
         mounted() {
+
            if(this.$root.isAuth)
              this.Buscar();
         },
@@ -154,23 +164,26 @@
    
 
 
-            BuscarTitle(imovel){
+            SetBuscaTitulo(buscaImovel){
+
+                var imovel = buscaImovel.imovel;
 
                 this.buscaTitulo = "";
-                /*
-                this.buscaTitulo += this.$validator.is(imovel.tipo)? imovel.tipo+"s" : "Imóveis";
+               
                 
-                if(this.$validator.is(imovel.finalidade))
-                    this.buscaTitulo += (imovel.finalidade=="Venda")? " à venda" : "para alugar";
+                var tipo = this.$models.tiposImoveis().filter(i=>i.id == imovel.idTipo)[0];
+                this.buscaTitulo += this.$validator.is(tipo)? tipo.label : "Imóveis";
+                
+                this.buscaTitulo += " à venda" ;
 
-                this.buscaTitulo += (imovel.quartos > 0)? (", "+imovel.quartos + "+ quartos ") :"";
+                this.buscaTitulo += (imovel.interno.totalQuartos)? (", "+imovel.interno.totalQuartos + " quartos ") :"";
 
-                if(this.$validator.is(imovel.estado)){
+                if(this.$validator.is(imovel.endereco.estado)){
                     this.buscaTitulo += " em ";
-                    this.buscaTitulo += (this.$validator.is(imovel.bairros.length == 1))? (imovel.bairros[0]+", ") : (this.$validator.is(imovel.bairros.length > 1))? (imovel.bairros.length +" bairros de ") : "";
-                    this.buscaTitulo += this.$validator.is(imovel.cidade)? (imovel.cidade+", "+imovel.estado) : imovel.estado;
+                    this.buscaTitulo += (this.$validator.is(buscaImovel.bairros.length == 1))? (buscaImovel.bairros[0]+", ") : (this.$validator.is(buscaImovel.bairros.length > 1))? (buscaImovel.bairros.length +" bairros de ") : "";
+                    this.buscaTitulo +=  this.$validator.is(imovel.endereco.cidade)? (imovel.endereco.cidade+", "+imovel.endereco.estado) : imovel.endereco.estado;
                 }
-                */
+                
 
             },
 
@@ -179,22 +192,24 @@
                         this.buscaTitulo = "buscando...";
                         this.$tools.Top();
                         this.showNavigator   = false;
-                        this.$root.onRequest = true;
                         this.$root.buscaImovel.page = 1;
 
                         this.totalResults = 0;
                         this.results      = [];
 
+                        this.$root.onRequest = true;
                         var request = await this.$api.Post("imovel/buscar",this.$root.buscaImovel);
-                        c2("request",request);
-
+                       
                         if (request?.status?.success){
-                            this.buscaImovel =  request.result;
-                            this.results =  this.buscaImovel.result.imoveis;
+                            this.$root.buscaImovel =  request.result;
+                            this.results     =  this.$root.buscaImovel.result.imoveis;
                         }else
                             this.$tools.Alert("Não foi possível realizar a busca");
 
                         this.$root.onRequest = false;
+                        window.setTimeout(()=>this.showNavigator = true, 3000);
+
+                        this.SetBuscaTitulo(this.$root.buscaImovel);
 
 
 

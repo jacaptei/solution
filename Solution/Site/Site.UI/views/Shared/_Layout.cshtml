@@ -98,11 +98,11 @@
                     <c-login></c-login>
                     <c-policy-terms></c-policy-terms>
 
-                    <el-container style="min-height:100%" v-cloak >
+                    <el-container style="min-height:100%" v-cloak>
 
                         <el-main style="background-color:#fff;" class="content-height" id="content">
                             <div>
-                                    <div class="content" :style="status.loading? 'opacity:0':'opacity:1'">
+                                <div class="content" :style="$root.status.loading? 'opacity:0':'opacity:1'">
                                             <router-view v-slot="{ Component }">
                                               <div class="inner-content">
                                                    <Transition name="fade" mode="out-in">
@@ -112,7 +112,7 @@
                                             </router-view>
                                     </div>
                              </div>
-
+                            
                         </el-main>
 
                     </el-container>

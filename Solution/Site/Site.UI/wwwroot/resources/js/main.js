@@ -56,7 +56,7 @@ $(document).ready(function () {
 
 		data: function () {
 			return {
-                    status          : {loading:false, requesting:false, pageLoading:false, dataLoading:false, online:true, success:false},
+                    status          : {loading:true, requesting:false, pageLoading:false, dataLoading:false, online:true, success:false},
                     params          : null,
                     zoom            : 1,
                     isAuth          : false,
@@ -161,6 +161,7 @@ $(document).ready(function () {
 
 
             // SETUP
+
 			axios.get(this.$api.BuildURL("suporte/modelos/obter")).then((request) => {
 
                             this.status.loading         = true;
@@ -174,7 +175,24 @@ $(document).ready(function () {
                             this.buscaImovel            = this.$models.buscaImovel();
                             this.buscaImovel.imovel     = this.$models.imovel();
 
-                            var tiposImoveis            = this.$models.tiposImoveis();
+                            this.buscaImovel.opcoes = { 
+                                estados: [], 
+                                cidades: [], 
+                                bairros: [],
+                                quantidades:[],
+                                tiposImoveis:this.$models.tiposImoveis(),
+                                tiposComplementos:this.$models.tiposComplementos()
+                            }
+
+                            this.$sdata.ObterEstados().then(res => { this.buscaImovel.opcoes.estados = res; });
+
+                            for(var i=0;i<=20;i++){
+                                var item = {id:i,label:(i==0)? "qualquer" : (i < 10? "0"+i : i),complement: (i == 0? "" : "ou +"),value:(i==0)? null : i};
+                                this.buscaImovel.opcoes.quantidades.push(item);
+                            }
+
+                            this.buscaImovel.opcoes.tiposImoveis.unshift({id:0,label:'qualquer',value:null});
+
 
                             this.usuario.nome           = "";
                             this.usuario.razao          = "";
@@ -189,11 +207,11 @@ $(document).ready(function () {
                                                 
                             content.localidade = this.localidade;
                             
-                            return true;
+                            this.status.loading = false;
 
 					}).catch((error) => {
                         ce(error);
-                        return false;
+                       this.$tools.Alert("Não foi possível iniciar o site corretamente, favor tentar novamente");
 					}).finally(() => {
                         this.status.loading = false;
 					});  
@@ -272,7 +290,7 @@ $(document).ready(function () {
                 RequestLogin(mensagem = "É necessário estar logado para acessar esta área") {
                     if (this.$route.name != '/home') {
                         this.$tools.MessageAlert(mensagem, 100);
-                        window.setTimeout(() => this.OpenLoginModal(), 300);
+                        window.setTimeout(() => this.OpenLoginModal(), 500);
                     }
                 },
 
@@ -404,9 +422,9 @@ $(document).ready(function () {
                     }
                     //this.$sdata.Storage.Set("utk"    , this.usuario.token);
                     //this.$sdata.Storage.Set("usuario", this.usuario);
-                    this.isAuth = true;
                     axios.defaults.headers.common["Authorization"] = "Bearer " + this.usuario.tokenJWT; 
-					this.RouteTo("/home");
+                    this.isAuth = true;
+					//this.RouteTo("/home");
                 },
 
                 SignOut(){
@@ -585,28 +603,29 @@ $(document).ready(function () {
 
 
 	// --------- GLOBAL COMPONENTS
-	App.component("c-loading"           , c_loading             );
-    App.component("c-header-login"      , c_header_login        );
-    App.component("c-policy-terms"      , c_policy_terms        );
-	App.component("c-header"            , c_header              );
-	App.component("c-title"             , c_title               );
-	App.component("c-imovel-busca-form" , c_imovel_busca_form   );
-	App.component("c-imovel-card"       , c_imovel_card         );
-	App.component("c-building-mini-card", c_building_mini_card  );
-	App.component("c-menu"              , c_menu                );
-	App.component("c-card"              , c_card                );
-	App.component("c-box"               , c_box                 );
-	App.component("c-entrar"            , c_entrar              );
-	App.component("c-login"             , c_login               );
-	App.component("c-info"              , c_info                );
-	App.component("c-notes"             , c_notes               );
-	App.component("c-tip"               , c_tip                 );
-	App.component("c-footer"            , c_footer              );
-	App.component("c-schedule"          , c_schedule            );
-	App.component("c-schedules"         , c_schedules           );
-	App.component("c-favorites"         , c_favorites           );
-    App.component("c-cadastro-jaindica" , c_cadastro_jaindica   );
-    App.component("c-cadastro-parceiro" , c_cadastro_parceiro   );
+	App.component("c-loading"               , c_loading                 );
+    App.component("c-header-login"          , c_header_login            );
+    App.component("c-policy-terms"          , c_policy_terms            );
+	App.component("c-header"                , c_header                  );
+	App.component("c-title"                 , c_title                   );
+	App.component("c-imovel-busca-form-home", c_imovel_busca_form_home  );
+	App.component("c-imovel-busca-form"     , c_imovel_busca_form       );
+	App.component("c-imovel-card"           , c_imovel_card             );
+	App.component("c-building-mini-card"    , c_building_mini_card      );
+	App.component("c-menu"                  , c_menu                    );
+	App.component("c-card"                  , c_card                    );
+	App.component("c-box"                   , c_box                     );
+	App.component("c-entrar"                , c_entrar                  );
+	App.component("c-login"                 , c_login                   );
+	App.component("c-info"                  , c_info                    );
+	App.component("c-notes"                 , c_notes                   );
+	App.component("c-tip"                   , c_tip                     );
+	App.component("c-footer"                , c_footer                  );
+	App.component("c-schedule"              , c_schedule                );
+	App.component("c-schedules"             , c_schedules               );
+	App.component("c-favorites"             , c_favorites               );
+    App.component("c-cadastro-jaindica"     , c_cadastro_jaindica       );
+    App.component("c-cadastro-parceiro"     , c_cadastro_parceiro       );
 
 	// --------- MOUNT
 	App.mount("#app");

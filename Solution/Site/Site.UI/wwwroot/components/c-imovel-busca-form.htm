@@ -35,7 +35,7 @@
                     <el-row :gutter="20">
                         <el-col :md="24">
                             <div><p>Estado</p><span></span></div>
-                             <el-select v-else filterable v-model="buscaImovel.imovel.endereco.estado" class="m-4" placeholder="qualquer" size="large" style="width:100%" @change="(item)=>{ObterCidades(item);enableFilterButton = true;}">
+                             <el-select v-else filterable v-model="$root.buscaImovel.imovel.endereco.estado" class="m-4" placeholder="qualquer" size="large" style="width:100%" @change="(item)=>{ObterCidades(item);enableFilterButton = true;}">
                                 <el-option v-for="item in opcoes.estados"
                                             :key="item.id"
                                             :label="item.label"
@@ -66,14 +66,14 @@
 
                     <el-row :gutter="20">
                         <el-col :md="24">
-                            <div><p v-if="$root.buscaImovel.bairros.length <= 1">Bairro</p><p v-else>Bairros</p><span></span></div>
+                            <div><p v-if="bairrosSelecionados.length <= 1">Bairro</p><p v-else>Bairros</p><span></span></div>
                             <div style="height:40px" v-if="carregandoBairros">
                                 <c-loading size="30px" style="padding-left:5px"></c-loading>
                             </div>
                             <div v-else-if="opcoes.bairros.length==0">
                                 <span style="color:#7d7d7d;padding-left:10px">selecione um estado</span>
                             </div>
-                            <el-select v-else v-model="$root.buscaImovel.bairros" multiple filterable :clearable="true" class="m-4" placeholder="qualquer" size="large" style="width:100%">
+                            <el-select v-else v-model="bairrosSelecionados" multiple filterable :clearable="true" class="m-4" placeholder="qualquer" size="large" style="width:100%">
                                 <el-option v-for="item in opcoes.bairros"
                                             :key="item.id"
                                             :label="item.label"
@@ -86,11 +86,8 @@
                     <el-row :gutter="20">
                         <el-col :md="24">
                             <div><p>Tipo de imóvel</p><span></span></div>
-                            <el-select v-model="$root.buscaImovel.imovel.tipo" filterable class="m-4" placeholder="qualquer" size="large" style="width:100%" @change="enableFilterButton = true">
-                                <el-option v-for="item in opcoes.tiposImoveis"
-                                           :key="item.id"
-                                           :label="item.label"
-                                           :value="item"></el-option>
+                            <el-select v-model="idTipoImovelSelecionado"  value-key="id" filterable class="m-4" size="large" placeholder="qualquer"  style="width:100%" >
+                                <el-option v-for="item in opcoes.tiposImoveis" :key="item.nome" :label="item.label":value="item.id"></el-option>
                             </el-select>
                         </el-col>
                     </el-row>
@@ -189,7 +186,7 @@
                             <el-col :md="4" :sm="8" :xs="12"><el-checkbox label="Portão eletrônico   " v-model="$root.buscaImovel.imovel.externo.portaoEletronico  " size="large"></el-checkbox></el-col>
                             <el-col :md="4" :sm="8" :xs="12"><el-checkbox label="Hidromassagem       " v-model="$root.buscaImovel.imovel.lazer.hidromassagem       " size="large"></el-checkbox></el-col>
                             <el-col :md="4" :sm="8" :xs="12"><el-checkbox label="Piscina             " v-model="$root.buscaImovel.imovel.lazer.piscina             " size="large"></el-checkbox></el-col>
-                            <el-col :md="4" :sm="8" :xs="12"><el-checkbox label="Quadra poliesportiva" v-model="$root.buscaImovel.imovel.lazer.quadraPoliesportiva " size="large"></el-checkbox></el-col>
+                            <el-col :md="4" :sm="8" :xs="12"><el-checkbox label="Quadra esportes     " v-model="$root.buscaImovel.imovel.lazer.quadraPoliesportiva " size="large"></el-checkbox></el-col>
                             <el-col :md="4" :sm="8" :xs="12"><el-checkbox label="Salão de festas     " v-model="$root.buscaImovel.imovel.lazer.salaoFestas         " size="large"></el-checkbox></el-col>
                         </el-col>
                     </el-row>
@@ -207,7 +204,7 @@
                 </el-row>
             </div>
 
-            <el-affix position="bottom" :offset="60" :style="showForm? 'width:280px':'width:0px'">
+            <el-affix position="bottom" :offset="60" :style="showForm? 'width:280px;opacity:1':'width:280px;opacity:0'">
                 <q-btn label="Aplicar filtro" color="primary" style="width:100%;height:40px" @click="Buscar"></q-btn>
             </el-affix>
 
@@ -257,6 +254,8 @@
                 carregandoEstados   : false,
                 carregandoCidades   : false,
                 carregandoBairros   : false,
+    
+                idTipoImovelSelecionado : null,
 
                 opcoes: { estados: [], cidades: [], bairros: [],
                     sexos: [],
@@ -266,7 +265,7 @@
                     tiposComplementos:this.$models.tiposComplementos()
                 },
 
-
+                bairrosSelecionados:[]
 
             }
         }, computed: {
@@ -281,17 +280,26 @@
         created: function () {
 
             this.$sdata.ObterEstados().then(res => { this.opcoes.estados = res; });
+
             for(var i=0;i<=20;i++){
                 var item = {id:i,label:(i==0)? "qualquer" : (i < 10? "0"+i : i),complement: (i == 0? "" : "ou +"),value:(i==0)? null : i};
                 this.opcoes.quantidades.push(item);
             }
 
+            this.opcoes.tiposImoveis.unshift({id:0,label:'qualquer',value:null});
+
             if (this.$validator.is(this.$root.buscaImovel.valorMaximo) && this.$root.buscaImovel.valorMaximo > 0) {
                 this.valorMaximo = "R$ " + this.$root.buscaImovel.valorMaximo;
             }
-            //if (this.$validator.is(this.$root.buscaImovel.imovel.quartos))
-            //    this.quartos = this.$root.buscaImovel.imovel.quartos;
 
+            if (this.$validator.is(this.$root.buscaImovel.imovel.interno.totalQuartos))
+                this.quartos = this.$root.buscaImovel.imovel.interno.totalQuartos;
+
+            if (this.$validator.is(this.$root.buscaImovel.imovel.endereco.estado)){
+                this.ObterCidades(this.$root.buscaImovel.imovel.endereco.estado);
+                //if (this.$validator.is(this.$root.buscaImovel.bairros))
+                //   this.ObterBairros(this.$root.buscaImovel.imovel.endereco.cidade);
+            }
 
             this.showForm = this.show;
 
@@ -313,16 +321,16 @@
 
                 this.isValidValues = true;
 
-                this.$root.buscaImovel.imovel.valorMinimo = this.$validator.is(this.valorMinimo) ? parseInt(this.valorMinimo.replace("R$ ", "").replaceAll(".", "")) : 0;
-                this.$root.buscaImovel.imovel.valorMaximo = this.$validator.is(this.valorMaximo) ? parseInt(this.valorMaximo.replace("R$ ", "").replaceAll(".", "")) : 0;
-                this.$root.buscaImovel.imovel.areaMinima  = this.$validator.is(this.areaMinima)  ? parseInt(this.areaMinima.replace("m² " , "").replaceAll(".", "")) : 0;
-                this.$root.buscaImovel.imovel.areaMaxima  = this.$validator.is(this.areaMaxima)  ? parseInt(this.areaMaxima.replace("m² " , "").replaceAll(".", "")) : 0;
+                this.$root.buscaImovel.valorMinimo = this.$validator.is(this.valorMinimo) ? parseInt(this.valorMinimo.replace("R$ ", "").replaceAll(".", "")) : 0;
+                this.$root.buscaImovel.valorMaximo = this.$validator.is(this.valorMaximo) ? parseInt(this.valorMaximo.replace("R$ ", "").replaceAll(".", "")) : 0;
+                this.$root.buscaImovel.areaMinima  = this.$validator.is(this.areaMinima)  ? parseInt(this.areaMinima.replace("m² " , "").replaceAll(".", "")) : 0;
+                this.$root.buscaImovel.areaMaxima  = this.$validator.is(this.areaMaxima)  ? parseInt(this.areaMaxima.replace("m² " , "").replaceAll(".", "")) : 0;
 
-                if (this.$root.buscaImovel.imovel.valorMaximo > 0 && (this.$root.buscaImovel.imovel.valorMaximo < this.$root.buscaImovel.imovel.valorMinimo)) {
+                if (this.$root.buscaImovel.valorMaximo > 0 && (this.$root.buscaImovel.valorMaximo < this.$root.buscaImovel.valorMinimo)) {
                     this.$tools.Alert("<b>Valor Máximo</b> deve ser maior ou igual ao <b>Valor Mínimo</b>")
                     this.isValidValues = false;
                 }
-                if (this.$root.buscaImovel.imovel.areaMaxima > 0 && (this.$root.buscaImovel.imovel.areaMaxima < this.$root.buscaImovel.imovel.areaMinima)) {
+                if (this.$root.buscaImovel.areaMaxima > 0 && (this.$root.buscaImovel.areaMaxima < this.$root.buscaImovel.areaMinima)) {
                     this.$tools.Alert("<b>Área Máxima</b> deve ser maior ou igual à <b>Área Mínima</b>");
                     this.isValidValues = false;
                 }
@@ -342,20 +350,16 @@
                     this.$root.buscaImovel.imovel.interno.totalSuites     = this.$validator.is(this.suites     ) ? parseInt(this.suites     )   : 0;
                     this.$root.buscaImovel.imovel.externo.totalVagas      = this.$validator.is(this.vagas      ) ? parseInt(this.vagas      )   : 0;
 
-                    this.$root.buscaImovel.valorMinimo       = this.$validator.is(this.valorMinimo) ? this.$tools.ParseInt(this.valorMinimo.replace("R$ ", "").replaceAll(".", "")) : 0;
-                    this.$root.buscaImovel.valorMaximo       = this.$validator.is(this.valorMaximo) ? this.$tools.ParseInt(this.valorMaximo.replace("R$ ", "").replaceAll(".", "")) : 0;
-                    this.$root.buscaImovel.areaMinima        = this.$validator.is(this.areaMinima)  ? this.$tools.ParseInt(this.areaMinima.replace("m² ", "" ).replaceAll(".", "")) : 0;
-                    this.$root.buscaImovel.areaMaxima        = this.$validator.is(this.areaMaxima)  ? this.$tools.ParseInt(this.areaMaxima.replace("m² ", "" ).replaceAll(".", "")) : 0;
-
+                    //c2("this.$root.buscaImovel.areaMaxima",this.$root.buscaImovel.areaMaxima)
                     //if (this.$validator.is(this.$root.buscaImovel.tipoImovel))
                     //    this.$root.buscaImovel.imovel.tipo = this.$root.buscaImovel.tipoImovel.label;
 
-                    if (this.buscaImovel.tipo)
-                        this.buscaImovel.imovel.idTipo =  this.buscaImovel.tipo.id;
+                    this.$root.buscaImovel.imovel.idTipo = (this.$validator.is(this.idTipoImovelSelecionado            ))? this.idTipoImovelSelecionado             : 0;
+                    //c2("this.$root.buscaImovel.imovel.idTipo",this.$root.buscaImovel.imovel.idTipo)
 
                     this.$root.buscaImovel.bairros = [];
-                    if (this.$root.buscaImovel.bairros?.length > 0)
-                        this.$root.buscaImovel.bairros.forEach(item => this.$root.buscaImovel.bairros.push(item.label));
+                    if (this.bairrosSelecionados.length > 0)
+                        this.bairrosSelecionados.forEach(item => this.$root.buscaImovel.bairros.push(item.label));
 
                     this.$root.buscaImovel.imovel.venda = true;
                     //console.table(this.$root.buscaImovel.imovel.bairros);
@@ -378,10 +382,13 @@
                 this.$root.buscaImovel.imovel = this.$models.imovel();
                 this.$root.buscaImovel.imovel.cod = "";
 
+                
+
                 this.opcoes.cidades = [];
                 this.opcoes.bairros = [];
 
 
+                this.idTipoImovelSelecionado = null;
                 this.tipoImovel = "";
                 this.tipoOperacao = "";
                 //this.estado        = "";
@@ -409,12 +416,12 @@
                 this.$root.buscaImovel.imovel.endereco.cidade   =   this.$root.buscaImovel.imovel.endereco.bairro   = "";
                 this.$root.buscaImovel.imovel.endereco.idCidade =   this.$root.buscaImovel.imovel.endereco.idBairro = 0;
 
-                this.carregandoCidades = true;
                 this.opcoes.bairros = [];
                 this.opcoes.cidades = [];
                 var cidades = [];
 
                 if (this.$validator.is(estado)) {
+                    this.carregandoCidades = true;
                     this.$root.buscaImovel.imovel.endereco.idEstado = this.opcoes.estados.filter((e) => e.value == estado)[0].id;
                     this.$sdata.ObterCidades(this.$root.buscaImovel.imovel.endereco.idEstado).then(res => { this.opcoes.cidades = res; this.carregandoCidades = false; });
                 }
@@ -427,11 +434,11 @@
                 this.$root.buscaImovel.imovel.endereco.bairro   = "";
                 this.$root.buscaImovel.imovel.endereco.idBairro = 0;
                 
-                this.carregandoBairros = true;
                 this.opcoes.bairros = [];
-                var bairros = [];
+                this.bairrosSelecionados = [];
 
                 if (this.$validator.is(cidade)) {
+                    this.carregandoBairros = true;
                     this.$root.buscaImovel.imovel.endereco.idCidade = this.opcoes.cidades.filter((c) => c.value == cidade)[0].id;
                     this.$sdata.ObterBairros(this.$root.buscaImovel.imovel.endereco.idCidade).then(res => { this.opcoes.bairros = res; this.carregandoBairros = false; });
                 } 
