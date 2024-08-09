@@ -1049,7 +1049,8 @@
                 busca                   : this.$models.busca(),
                 buscaImovel             : this.$models.buscaImovel(),
                 imovel                  : this.$models.imovel(),
-                admins                  : this.$root.admins
+                admins                  : this.$root.admins,
+                captadorSelecionado     :{}
             }
         }, computed: {
 
@@ -1101,7 +1102,10 @@
                             this.immagesBK      = this.imovel.imagens;
                         }
                         this.imovel.tipo = this.opcoes.tiposImoveis.filter(it => it.id == this.imovel.idTipo)[0];
+                        
                         this.imovel.adminCaptador = this.admins.filter(a => a.id == this.imovel.idAdminCaptador)[0];
+                        this.DefinirCaptador(this.imovel.adminCaptador);
+
                         if(this.imovel.endereco.idTipoComplemento == 0)
                             this.imovel.endereco.idTipoComplemento = null;
                         this.StepTo(2);
@@ -1422,6 +1426,14 @@
 
             },
 
+
+            DefinirCaptador(admin){
+                this.imovel.idAdminCaptador = admin.id;
+                this.imovel.captador        = admin.nome;
+               //c2("this.imovel.idAdminCaptador",this.imovel.idAdminCaptador );
+               //c2("this.imovel.captador       ",this.imovel.captador        );
+
+            },
 
 
 

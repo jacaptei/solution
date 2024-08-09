@@ -479,7 +479,7 @@
                     this.cep.estado         = this.$root.usuario.estado     = "";
 
                     this.$root.usuario.cep  = this.cep.numero;
-                    let res                 = await this.$sdata.SearchAddress(this.cep.numero);
+                    let res                 = await this.$sdata.BuscarEndereco(this.cep.numero);
 
                     if (this.$validator.is(res?.city)) {
                         this.cep.cidade         = this.$root.usuario.cidade     = res.city;

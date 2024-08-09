@@ -121,7 +121,7 @@
                 if (request?.status?.success){
                     this.buscaImovel        =  request.result;
                     c2("this.buscaImovel",this.buscaImovel);
-                    this.imoveisBuscaResult =  this.buscaImovel.result.imoveisJC;
+                    this.imoveisBuscaResult =  this.buscaImovel.result.imoveis;
                     if (this.$validator.is(this.imoveisBuscaResult)) {
                         for (var i = 0; i < this.imoveisBuscaResult.length; i++)
                             this.requests[i] = false;

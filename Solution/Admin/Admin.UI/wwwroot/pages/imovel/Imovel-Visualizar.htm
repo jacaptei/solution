@@ -91,7 +91,7 @@
                 var request     = await this.$api.Post("imovel/buscar",this.buscaImovel);
 
                 if (request?.status?.success){
-                    c2("request.result",request.result)
+                    //c2("request.result",request.result)
                     if(this.$validator.is(request.result.total > 0)){
                             this.buscaImovel        =  request.result;
                             this.imoveisBuscaResult =  this.buscaImovel.result.imoveis;
