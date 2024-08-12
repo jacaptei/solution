@@ -548,7 +548,7 @@
                     this.indisponivel = true;
                 }else {
 
-                    this.id = this.$route.query.id;
+                    this.id  =  this.$tools.ParseInt(this.$route.query.id);
                     this.cod = this.$route.query.cod;
 
                     this.corretor.id = this.$route.query.cid;
@@ -571,7 +571,7 @@
                     this.indisponivel = true;
                 else {
                     //c2("params", params)
-                    this.id     = params.id;
+                    this.id     = this.$tools.ParseInt(params.id);
                     this.cod    = params.cod;
 
                     this.corretor.id             = params.cid             ;

@@ -498,7 +498,7 @@
             </el-row>
                     
             <el-row :gutter="20" style="margin-top:10px">
-                    <el-col :md="6" :sm="12" :xs="24">
+                    <el-col :span="24" style="max-width:260px">
                         Local das chaves<br />
                         <span v-if="!exibirCampoAbertoOutroLocalChaves">
                                 <el-select v-model="imovel.localChaves"  value-key="id" placeholder="selecionar" filterable class="m-4" size="large" style="width:100%" @change="()=>{ if(imovel.localChaves == 'Outro'){imovel.localChaves = '';exibirCampoAbertoOutroLocalChaves = true;FocusOutroLocalChaves();} } ">
@@ -506,14 +506,10 @@
                             </el-select>
                         </span>
                         <span v-else>
-                            <el-input @keyup.enter="CheckoutStep3()" v-model="imovel.localChaves" placeholder=""  maxlength="75" ref="CampoAbertoOutroLocalChaves" style="width:calc(100% - 40px)"></el-input>
+                            <el-input @keyup.enter="CheckoutStep3()" v-model="imovel.localChaves" placeholder=""  maxlength="75" ref="CampoAbertoOutroLocalChaves" style="width:calc(100% - 20px)"></el-input>
                             <i class="fa fa-close" @click="()=>{imovel.localChaves='';exibirCampoAbertoOutroLocalChaves = false; }" style="margin-left:5px;color:var(--s-color-red);cursor:pointer"></i>
                         </span>
                     </el-col>
-                    <el-col :md="4" :sm="8" :xs="12"><el-checkbox label="Ocupado             " v-model="imovel.disposicao.ocupado             " size="large"></el-checkbox></el-col>
-                    <el-col :md="4" :sm="8" :xs="12"><el-checkbox label="Aceita financiamento" v-model="imovel.disposicao.aceitaFinanciamento " size="large"></el-checkbox></el-col>
-                    <el-col :md="4" :sm="8" :xs="12"><el-checkbox label="Aceita permuta      " v-model="imovel.disposicao.aceitaPermuta       " size="large"></el-checkbox></el-col>
-                    <el-col :md="4" :sm="8" :xs="12"><el-checkbox label="Placa               " v-model="imovel.disposicao.placa               " size="large"></el-checkbox></el-col>
             </el-row>
             <el-row :gutter="20" v-if="$root.usuario.god || $root.usuario.gestor">
                     <el-col :md="4" :sm="8" :xs="12"><el-checkbox label="Ativo               " v-model="imovel.ativo                          " size="large"></el-checkbox></el-col>
@@ -522,6 +518,10 @@
                     <el-col :md="4" :sm="8" :xs="12"><el-checkbox label="Locação             " v-model="imovel.locacao                        " size="large"></el-checkbox></el-col>
                     <el-col :md="4" :sm="8" :xs="12"><el-checkbox label="Residencial         " v-model="imovel.residencial                    " size="large"></el-checkbox></el-col>
                     <el-col :md="4" :sm="8" :xs="12"><el-checkbox label="Comercial           " v-model="imovel.comercial                      " size="large"></el-checkbox></el-col>
+                    <el-col :md="4" :sm="8" :xs="12"><el-checkbox label="Ocupado             " v-model="imovel.disposicao.ocupado             " size="large"></el-checkbox></el-col>
+                    <el-col :md="4" :sm="8" :xs="12"><el-checkbox label="Aceita financiamento" v-model="imovel.disposicao.aceitaFinanciamento " size="large"></el-checkbox></el-col>
+                    <el-col :md="4" :sm="8" :xs="12"><el-checkbox label="Aceita permuta      " v-model="imovel.disposicao.aceitaPermuta       " size="large"></el-checkbox></el-col>
+                    <el-col :md="4" :sm="8" :xs="12"><el-checkbox label="Placa               " v-model="imovel.disposicao.placa               " size="large"></el-checkbox></el-col>
                     <!--<el-col :md="4" :sm="8" :xs="12"><el-checkbox label="Disponivel          " v-model="imovel.disposicao.disponivel          " size="large"></el-checkbox></el-col>
                     <el-col :md="4" :sm="8" :xs="12"><el-checkbox label="Gestao JáCaptei     " v-model="imovel.disposicao.gestaoJacaptei      " size="large"></el-checkbox></el-col>
                     <el-col :md="4" :sm="8" :xs="12"><el-checkbox label="Gestao Premium      " v-model="imovel.disposicao.gestaoPremium       " size="large"></el-checkbox></el-col>
@@ -577,7 +577,7 @@
                             </el-col>-->
                             <el-col :md="24" style="margin-top:10px">
                                 Descrição<br />
-                                <el-input @keyup.enter="CheckoutStep3()" v-model="imovel.descricao" maxlength="4000" autosize type="textarea"></el-input>
+                                <el-input @keyup.enter="CheckoutStep3()" v-model="imovel.descricao" maxlength="4000" :rows="2" :autosize="{ minRows: 2, maxRows: 16 }" type="textarea"></el-input>
                             </el-col>
                         </el-row>
 
@@ -594,7 +594,7 @@
 
                                     <el-row :gutter="20">
                                         <el-col  :md="4" :sm="8" :xs="12" style="margin-top:10px">
-                                            Venda <!--<el-checkbox label="sob consulta" v-model="imovel.valor.sobConsulta  " size="large" style="margin-left:20px;height:20px"></el-checkbox>--><br />
+                                            Venda {{imovel.valor.venda}} <!--<el-checkbox label="sob consulta" v-model="imovel.valor.sobConsulta  " size="large" style="margin-left:20px;height:20px"></el-checkbox>--><br />
                                             <el-input input-style="color:var(--s-accent-color);max-width:200px" v-model="imovel.valor.venda" maxlength="20"  @keyup.enter="CheckoutStep3()"  ref="valor"  :formatter="(value) => `${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, '.')"    :parser="(value) => value.replace(/\R\$\s?|(\.*)/g, '').replace(/[a-zA-Z]/g, '')"><template #prepend>R$</template></el-input>
                                         </el-col>
                                         <el-col :md="4" :sm="8" :xs="12" style="margin-top:10px">
@@ -1390,6 +1390,7 @@
 
 
             ParseImovel(){
+
                     this.imovel.valor.venda                      = this.$tools.ParseFloat( this.imovel.valor.venda         );
                     this.imovel.valor.condominio                 = this.$tools.ParseFloat( this.imovel.valor.condominio    );
                     this.imovel.valor.iptuAnual                  = this.$tools.ParseFloat( this.imovel.valor.iptuAnual     );

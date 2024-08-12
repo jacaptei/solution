@@ -19,9 +19,9 @@
                                         </template>
                                           <el-row>
                                                 <el-col :span=12> Tipo de imóvel<div style="font-weight: 700;"><span> {{imovel.tipo.label}}</span></div></el-col>
-                                                <el-col :span=5> Índice         <div style="font-weight: 700;"><span v-if="$validator.is(imovel.documentacao.indiceCadastral)"> {{imovel.documentacao.indiceCadastral}}</span><span v-else>-</span></div></el-col>
+                                                <el-col :span=6> Índice         <div style="font-weight: 700;"><span v-if="$validator.is(imovel.documentacao.indiceCadastral)"> {{imovel.documentacao.indiceCadastral}}</span><span v-else>-</span></div></el-col>
                                                 <el-col :span=3> ID#            <div style="font-weight: 700;"><span> {{imovel.id}}</span></div></el-col>
-                                                <el-col :span=4> CÓD            <div style="font-weight: 700;"><span> {{imovel.cod}}</span></div></el-col>
+                                                <el-col :span=3> CÓD            <div style="font-weight: 700;"><span> {{imovel.cod}}</span></div></el-col>
                                           </el-row>
                                           <el-row style="margin-top:10px">
                                               <el-col :span=24> 
@@ -46,8 +46,8 @@
                                               </el-col>
                                           </el-row>
                                           <el-row style="margin-top:10px">
-                                                <el-col :lg=12 :md=12 :sm=24 :xs=24> Construtora          <div style="font-weight: 700;"><span v-if=construtora > 0"> {{imovel.construtora}}</span><span v-else>-</span></div></el-col>
-                                                <el-col :lg=12 :md=12 :sm=24 :xs=24> Ano da construção    <div style="font-weight: 700;"><span v-if=imovel.anoConstrucao > 0"> {{imovel.anoConstrucao}}</span><span v-else>-</span></div></el-col>
+                                                <el-col :lg=12 :md=12 :sm=24 :xs=24> Construtora          <div style="font-weight: 700;"><span v-if="construtora > 0"> {{imovel.construtora}}</span><span v-else>-</span></div></el-col>
+                                                <el-col :lg=12 :md=12 :sm=24 :xs=24> Ano da construção    <div style="font-weight: 700;"><span v-if="imovel.anoConstrucao > 0"> {{imovel.anoConstrucao}}</span><span v-else>-</span></div></el-col>
                                           </el-row>
                                           <el-row style="margin-top:10px">
                                                 <el-col :lg=12 :md=12 :sm=24 :xs=24> Local das chaves     <div style="font-weight: 700;"><span v-if="$validator.is(imovel.localChaves)"> {{imovel.localChaves}}</span><span v-else>-</span></div></el-col>

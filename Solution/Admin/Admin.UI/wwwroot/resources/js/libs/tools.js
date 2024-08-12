@@ -299,7 +299,8 @@ export default class Tools {
         var res = 0.00;
         var nstr = n + "";
         if(n){
-            nstr = nstr.replace(/R\$/g,"").replace(/ /g,"").replace(".","").replace(",",".");
+            //nstr = nstr.replace(/R\$/g,"").replace(/ /g,"").replace(".","").replace(",",".");
+            nstr = nstr.replaceAll("R","").replaceAll("r","").replaceAll("$","").replaceAll(".","").replaceAll(",",".").replaceAll(" ","");
             try{
                 res = parseFloat(nstr);
                 if(isNaN(res))

@@ -101,9 +101,9 @@ namespace JaCaptei.Application {
                 entity.idAdmin                  = entity.admin.id;
                 entity.idProprietario           = (entity.proprietario.id > 0)? entity.proprietario.id : entity.idProprietario;
 
-                entity.token                    =   Utils.Key.CreateToken();
-                entity.tokenNum                 =   Utils.Key.CreateTokenNum();
-                entity.ativo                    =   entity.ativoCRM = true;
+                //entity.token                    =   Utils.Key.CreateToken();
+                //entity.tokenNum                 =   Utils.Key.CreateTokenNum();
+                //entity.ativo                    =   entity.ativoCRM = true;
 
                 //entity.data            =   entity.dataAtualizacao = Utils.Date.GetLocalDateTime();
 

@@ -246,7 +246,7 @@ export default class Tools {
 
     }
 
-
+    /*
     ParseFloat(n){
         var res = 0.00;
         try{
@@ -255,6 +255,24 @@ export default class Tools {
   	        res = 0.00;
         }catch(e){
 	        res = 0.00;
+        }
+        return res;
+    }
+    */
+
+    ParseFloat(n){
+        var res = 0.00;
+        var nstr = n + "";
+        if(n){
+            //nstr = nstr.replace(/R\$/g,"").replace(/ /g,"").replace(".","").replace(",",".");
+            nstr = nstr.replaceAll("R","").replaceAll("r","").replaceAll("$","").replaceAll(".","").replaceAll(",",".").replaceAll(" ","");
+            try{
+                res = parseFloat(nstr);
+                if(isNaN(res))
+  	                res = 0.00;
+            }catch(e){
+	            res = 0.00;
+            }
         }
         return res;
     }

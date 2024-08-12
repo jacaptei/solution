@@ -31,7 +31,7 @@
 
                             <div class="q-pa-lg flex flex-center">
                                 <!--<el-pagination layout="prev, pager, next" :total="totalNav" :page-count="Math.ceil(totalNav/20)" v-model:current-page="page" @current-change="Nav"></el-pagination>-->
-                                    <el-pagination layout="prev, pager, next" :total="$root.buscaImovel.total" :page-size="$root.buscaImovel.resultsPerPage" v-model:current-page="$root.buscaImovel.page" @current-change="Buscar"></el-pagination>
+                                    <el-pagination layout="prev, pager, next" :total="$root.buscaImovel.total" :page-size="$root.buscaImovel.resultsPerPage" v-model:current-page="page" @current-change="Buscar"></el-pagination>
                             </div>
 
                             <!--
@@ -193,7 +193,7 @@
                         this.buscaTitulo = "buscando...";
                         this.$tools.Top();
                         this.showNavigator   = false;
-                        this.$root.buscaImovel.page = 1;
+                        this.$root.buscaImovel.page = this.page;
 
                         this.totalResults = 0;
                         this.results      = [];

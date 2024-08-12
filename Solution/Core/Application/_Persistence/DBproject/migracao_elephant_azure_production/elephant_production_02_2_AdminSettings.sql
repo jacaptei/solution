@@ -34,7 +34,7 @@ INSERT INTO "AdminSettings" ("id", "idAdmin", "receberSolicitacaoAgendada", "rec
 	(19, 19, 'false', 'false'),
 	(8, 9, 'false', 'false'),
 	(5, 6, 'false', 'false'),
-	(11, 12, 'false', 'false');
+	(11, 12, 'false', 'false'),
 	(29, 1, 'false', 'false');
 
 select * from "AdminSettings" order by id DESC;

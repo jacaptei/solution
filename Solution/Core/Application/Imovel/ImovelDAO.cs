@@ -39,8 +39,11 @@ namespace JaCaptei.Application {
                                 entity.endereco.complementoTipo     = entity.endereco.tipoComplemento.label;
                         }
 
+                        entity.token    = Utils.Key.CreateToken();
+                        entity.tokenNum = Utils.Key.CreateTokenNum();
                         entity.cod      = entity.tokenNum.ToString();
                         entity.validado = false;
+                        entity.ativo    = true;
 
                         entity.id   = conn.Insert<Imovel,int>(entity);
                         
@@ -207,6 +210,7 @@ namespace JaCaptei.Application {
         public AppReturn ObterPendentesValidacao() {
             ImovelBusca busca = new ImovelBusca();
             busca.somenteNaoValidados = true;
+            busca.somenteAtivos       = true;
             busca.page = 0;
             return Buscar(busca);
         }
@@ -362,6 +366,11 @@ namespace JaCaptei.Application {
 
                 string filter = " imovel.\"possuiToken\" = TRUE "; // discontinued <> 1
 
+
+                if(busca.somenteAtivos)
+                     filter += " AND imovel.ativo = TRUE ";
+                else if(busca.somenteNaoAativos)
+                     filter += " AND imovel.ativo = FALSE ";
 
                 if(busca.somenteValidados)
                      filter += " AND imovel.validado = TRUE ";
