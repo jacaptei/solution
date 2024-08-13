@@ -356,10 +356,11 @@
 
                     this.$root.buscaImovel.imovel.idTipo = (this.$validator.is(this.idTipoImovelSelecionado            ))? this.idTipoImovelSelecionado             : 0;
                     //c2("this.$root.buscaImovel.imovel.idTipo",this.$root.buscaImovel.imovel.idTipo)
-
-                    this.$root.buscaImovel.bairros = [];
-                    if (this.bairrosSelecionados.length > 0)
+                    if (this.bairrosSelecionados.length > 0){
+                        this.$root.buscaImovel.bairros = [];
                         this.bairrosSelecionados.forEach(item => this.$root.buscaImovel.bairros.push(item.label));
+                    }
+                    c2("this.$root.buscaImovel.bairros",this.$root.buscaImovel.bairros)
 
                     this.$root.buscaImovel.imovel.venda = true;
                     //console.table(this.$root.buscaImovel.imovel.bairros);

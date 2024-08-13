@@ -78,6 +78,7 @@ namespace JaCaptei.Administrativo.API.Controllers
             Usuario logado           = ObterUsuarioAutenticado();
             imovel.atualizadoPorId   = logado.id;
             imovel.atualizadoPorNome = logado.nome;
+            try {
 
             if(imovel.imagens?.Count > 0 || imagesFiles?.Count > 0) {
                 appReturn = service.Alterar(imovel);
@@ -85,6 +86,7 @@ namespace JaCaptei.Administrativo.API.Controllers
                     appReturn = await ImageShackUploadImagesFiles(imovel,imagesFiles);
             } else
                 appReturn.AddException("Imagens não inseridas.");
+            } catch(Exception ex) { string  sex = ex.ToString(); }
 
             return Result(appReturn);
 

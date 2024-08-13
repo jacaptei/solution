@@ -67,12 +67,10 @@ namespace JaCaptei.Application{
             if(!appReturn.status.success)
                 return appReturn;
 
-            //if(entity.imagens is null)
-            //    entity.imagens = new List<ImovelImagem>();
-            //else if(entity.imagens.Count > 0) {
+            if(entity.imagens?.Count > 0) {
                 entity.imagens.ForEach(i => i.principal = false);
                 entity.imagens[0].principal = true;
-           // }
+            }
 
             try {
                 LocalidadeService localidade = new LocalidadeService();
@@ -136,6 +134,10 @@ namespace JaCaptei.Application{
         public AppReturn Buscar(ImovelBusca busca) {
             //busca.somenteValidados = true;
             busca.imovel = BLO.Normalizar(busca.imovel);
+            if(busca.bairros?.Count > 0) {
+                for(int i=0;i<busca.bairros.Count;i++)
+                    busca.bairros[i] = Utils.String.NormalizeToUpper(busca.bairros[i]);
+            }
             return DAO.Buscar(busca);
         }
 

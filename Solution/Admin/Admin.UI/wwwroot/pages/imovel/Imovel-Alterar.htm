@@ -594,7 +594,7 @@
 
                                     <el-row :gutter="20">
                                         <el-col  :md="4" :sm="8" :xs="12" style="margin-top:10px">
-                                            Venda {{imovel.valor.venda}} <!--<el-checkbox label="sob consulta" v-model="imovel.valor.sobConsulta  " size="large" style="margin-left:20px;height:20px"></el-checkbox>--><br />
+                                            Venda<!--<el-checkbox label="sob consulta" v-model="imovel.valor.sobConsulta  " size="large" style="margin-left:20px;height:20px"></el-checkbox>--><br />
                                             <el-input input-style="color:var(--s-accent-color);max-width:200px" v-model="imovel.valor.venda" maxlength="20"  @keyup.enter="CheckoutStep3()"  ref="valor"  :formatter="(value) => `${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, '.')"    :parser="(value) => value.replace(/\R\$\s?|(\.*)/g, '').replace(/[a-zA-Z]/g, '')"><template #prepend>R$</template></el-input>
                                         </el-col>
                                         <el-col :md="4" :sm="8" :xs="12" style="margin-top:10px">
@@ -1097,7 +1097,10 @@
                         this.imoveisBuscaResult =  this.buscaImovel.result.imoveis;
                         this.imovel             =  this.buscaImovel.result.imoveis[0];
                         this.cep.numero         = this.imovel.endereco.cep;
-                        if(this.imovel.imagens?.length > 0 ){
+
+                        if(this.$validator.not(this.imovel.imagens))
+                            this.imovel.imagens = [];
+                        else{
                             this.imovel.imagens.forEach(i => this.imagesInputs.push({name:"noupdate",url:i.urlFull,}));
                             this.immagesBK      = this.imovel.imagens;
                         }

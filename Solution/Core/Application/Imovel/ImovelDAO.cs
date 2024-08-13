@@ -441,9 +441,9 @@ namespace JaCaptei.Application {
                 else if(busca.imovel.tipo.id > 0)
                     filter += " AND imovel.\"idTipo\" = " + busca.imovel.tipo.id.ToString() + " ";
 
-                if(busca.bairros.Count > 0) {
+                if(busca.bairros?.Count > 0) {
                     string items = "'" + String.Join("','", busca.bairros) + "'";
-                    filter += " AND ( endereco.bairro IN (" + items + ") OR endereco.\"bairroNorm\" IN (" + items + ") ) ";
+                    filter += " AND endereco.\"bairroNorm\" IN (" + items + ") ";
                 }else if(!System.String.IsNullOrWhiteSpace(busca.imovel.endereco.bairroNorm))
                     filter += " AND endereco.\"bairroNorm\" = '" + busca.imovel.endereco.bairroNorm + "' ";
 
