@@ -528,13 +528,6 @@
 
         },
         created: function () {
-
-           if (this.is(this.$sdata.Storage.Get("usuario"))) {
-               this.$root.usuario = this.$sdata.Storage.Get("usuario");
-               if (this.$root.usuario.id > 0)
-                this.$root.SignIn();
-           }
-
             //params = this.$tools.HandleParams();
             //c2("params", params)
             //this.id = params.id;
@@ -614,6 +607,25 @@
         },
 
         mounted() {
+            try{
+                if(this.$root?.usuario?.id > 0){
+                    if (this.is(this.$sdata.Storage.Get("usuario_jacaptei_2024080808"))) {
+                        var usuario = this.$sdata.Storage.Get("usuario_jacaptei_2024080808");
+                        this.$root.usuario.id = usuario.id;
+                        this.$root.usuario.apelido = usuario.apelido;
+                        this.$root.usuario.nome = usuario.nome;
+                        this.$root.usuario.email = usuario.email;
+                        this.$root.usuario.tokenJWT = usuario.tokenJWT;
+                        this.$root.usuario.cpf = usuario.cpf;
+                        this.$root.usuario.cnpj = usuario.cnpj;
+                        if (this.$root.usuario?.id > 0 && this.$root.usuario?.tokenJWT){
+                            if(this.$root.usuario.tokenJWT)
+                            axios.defaults.headers.common["Authorization"] = "Bearer " + this.$root.usuario.tokenJWT; 
+                            this.$root.isAuth = true;
+                        }
+                    }
+               }
+           }catch(e){ console.log(e);}
 
           this.Buscar();
 
@@ -723,7 +735,7 @@
                         this.onRequest    = true;
                         this.indisponivel = false;
 
-                        var request = await this.$api.Post("imovel/buscar",buscaImovel);
+                        var request = await this.$api.Post("imovel/buscar/unidade",buscaImovel);
 
                         if (request?.status?.success){
                             buscaImovel  =  request.result;
@@ -784,7 +796,7 @@
                //c2("imovelBusca.imovel.id", imovelBusca.imovel.id);
                //c2("imovelBusca.imovel.cod", imovelBusca.imovel.cod);
 
-                axios.post(this.$api.BuildURL("imovel/buscar"), imovelBusca).then((request) => {
+                axios.post(this.$api.BuildURL("imovel/buscar/unidade"), imovelBusca).then((request) => {
                     
                     //c2("request.data", request.data);
                     //c2("request.data", request.data.result.crmResult.result);
