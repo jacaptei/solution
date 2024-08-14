@@ -118,15 +118,17 @@ public class ImoviewService : IDisposable
         };
         var uriWithQuery = builder.Uri;
         var imgQtd = _imagesSendLimit == -1 ? imagens.Count : _imagesSendLimit;
+        int i = 1;
         foreach (var imagem in imagens.Take(imgQtd))
         {
             var fileContent = new ByteArrayContent(imagem.Arquivo);
             fileContent.Headers.ContentDisposition = new ContentDispositionHeaderValue("form-data")
             {
-                FileName = $"{imagem.Nome}.{imagem.Tipo}",
-                Name = $"{imagem.Nome}.{imagem.Tipo}"
+                FileName = $"foto{i}.{imagem.Tipo}",
+                Name = $"foto{i}.{imagem.Tipo}"
             };
             fileContent.Headers.ContentType = new MediaTypeHeaderValue($"image/{imagem.Tipo}");
+            i++;
             content.Add(fileContent, "fotos");
         }
         var res = await client.PostAsync(uriWithQuery, content);
@@ -545,6 +547,10 @@ public class ImoviewService : IDisposable
                 {
                     var imovelFull = await _retryPolicy.ExecuteAsync(() => _imoviewDAO.GetFullImovel(import.IdImovel));
                     request = _mapper.Map<ImoviewAddImovelRequest>(imovelFull);
+                    int.TryParse(import.CodUsuario, out int codusuario);
+                    int.TryParse(import.CodUnidade, out int codunidade);
+                    request.codigousuario = codusuario;
+                    request.codigounidade = codunidade;
                     var requestBody = Newtonsoft.Json.JsonConvert.SerializeObject(request);
                     importacaoImovel.RequestBody = requestBody;
                 }

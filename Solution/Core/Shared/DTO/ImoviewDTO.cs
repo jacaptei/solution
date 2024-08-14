@@ -218,6 +218,28 @@ public static class ImoviewCampos
         {"Terreno / Área"                , 32}
     });
 
+    public readonly static IReadOnlyDictionary<int, int> TiposImovelImoview = ImmutableDictionary.CreateRange(new Dictionary<int, int>
+    {
+        {16 , 9},
+        {2 , 2},
+        {3, 21},
+        {4, 36},
+        {19, 17},
+        {8 , 1},
+        {11, 20},
+        {12, 24},
+        {13, 23},
+        {5, 18},
+        {6, 19},
+        {26, 11},
+        {31, 34},
+        {33, 3},
+        {35, 4},
+        {40, 33},
+        {45, 42},
+        {46, 32}
+    });
+
     public readonly static IReadOnlyDictionary<string, int> LocaisChave = ImmutableDictionary.CreateRange(new Dictionary<string, int>
     {
         {"Imobiliária" , 1},
