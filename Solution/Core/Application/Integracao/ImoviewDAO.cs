@@ -160,7 +160,7 @@ public class ImoviewDAO: IDisposable {
     {
         if (importacaoImovel.Id > 0)
         {
-            var fields = Field.Parse<ImportacaoImovelImoview>(e => new { e.Status, e.ImoviewResponse, e.DataAtualizacao });
+            var fields = Field.Parse<ImportacaoImovelImoview>(e => new { e.Status, e.ImoviewResponse, e.DataAtualizacao, e.RequestBody, e.Imagens });
             await _conn.UpdateAsync<ImportacaoImovelImoview>(importacaoImovel, fields);
         }
         else

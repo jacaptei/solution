@@ -67,9 +67,9 @@ public class ImovelDTOProfile : Profile
             .ForMember(dest => dest.urlpublica, opt => opt.MapFrom(src => src.UrlPublica))
 
             .ForMember(dest => dest.finalidade, opt => opt.MapFrom(src => 2)) // Hardcoded venda
-            .ForMember(dest => dest.destinacao, opt => opt.MapFrom(src => GetFromDictionary(src.Destinacao, ImoviewCampos.Destinacoes, 1)))
-            .ForMember(dest => dest.codigotipo, opt => opt.MapFrom(src => GetFromDictionary(src.Tipo, ImoviewCampos.Tipos, 1)))
-            .ForMember(dest => dest.localchave, opt => opt.MapFrom(src => GetFromDictionary(src.LocalChaves, ImoviewCampos.LocaisChave, 1)))
+            .ForMember(dest => dest.destinacao, opt => opt.MapFrom(src => GetFromDictionary<string>(src.Destinacao, ImoviewCampos.Destinacoes, 1)))
+            .ForMember(dest => dest.codigotipo, opt => opt.MapFrom(src => GetFromDictionary<string>(src.Tipo, ImoviewCampos.Tipos, 1)))
+            .ForMember(dest => dest.localchave, opt => opt.MapFrom(src => GetFromDictionary<string>(src.LocalChaves, ImoviewCampos.LocaisChave, 1)))
 
             .ForMember(dest => dest.descricao, opt => opt.MapFrom(src => src.Descricao));
 
@@ -95,10 +95,10 @@ public class ImovelDTOProfile : Profile
             //.ForMember(dest => dest.identificadorchave,   opt => opt.MapFrom(src => src.Imovel.IdChave))
             //.ForMember(dest => dest.exclusivo,            opt => opt.MapFrom(src => src.ImovelDisposicao.exclusivo))
             .ForMember(dest => dest.anotacoes, opt => opt.MapFrom(src => src.Imovel.anotacoes))
-            .ForMember(dest => dest.localchave, opt => opt.MapFrom(src => GetFromDictionary(src.Imovel.localChaves, ImoviewCampos.LocaisChave, 1)))
-            .ForMember(dest => dest.destinacao, opt => opt.MapFrom(src => GetFromDictionary(src.Imovel.destinacao, ImoviewCampos.Destinacoes, 3)))
+            .ForMember(dest => dest.localchave, opt => opt.MapFrom(src => GetFromDictionary<string>(src.Imovel.localChaves, ImoviewCampos.LocaisChave, 1)))
+            .ForMember(dest => dest.destinacao, opt => opt.MapFrom(src => GetFromDictionary<string>(src.Imovel.destinacao, ImoviewCampos.Destinacoes, 3)))
             .ForMember(dest => dest.finalidade, opt => opt.MapFrom(src => 2)) // Hardcoded venda
-            .ForMember(dest => dest.codigotipo, opt => opt.MapFrom(src => src.Imovel.idTipo))
+            .ForMember(dest => dest.codigotipo, opt => opt.MapFrom(src => GetFromDictionary<int>(src.Imovel.idTipo, ImoviewCampos.TiposImovelImoview, 1)))
             .ForMember(dest => dest.descricao, opt => opt.MapFrom(src => src.Imovel.descricao));
 
         CreateMap<IntegracaoImoview, IntegracaoImoviewDTO>();
@@ -115,12 +115,13 @@ public class ImovelDTOProfile : Profile
         return areas;
     }
 
-    private int GetFromDictionary(string chave, IReadOnlyDictionary<string, int> valuePairs, int defaultValue = 1)
+    private int GetFromDictionary<T>(T chave, IReadOnlyDictionary<T, int> valuePairs, int defaultValue = 1)
     {
         if (valuePairs.ContainsKey(chave))
             return valuePairs[chave];
         return defaultValue;
     }
+
 
     private static DateTime StrToDateTime(string strVal) =>
         DateTime.TryParse(strVal, out DateTime dt) ? dt : DateTime.MinValue;
