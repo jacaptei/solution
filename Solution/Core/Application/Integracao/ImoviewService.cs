@@ -639,8 +639,8 @@ public class ImoviewService : IDisposable
         {
             var importacoesImoveis = await _retryPolicy.ExecuteAsync(() => _imoviewDAO.GetImportacaoImoveis(importacaoBairro.Id));
             imoveisImportados.AddRange(importacoesImoveis.Select(i => i.CodImovel));
-            imoveisNovos.AddRange(imoveisBairro.Where(imovel => !imoveisImportados.Any(cod => cod == imovel.codImovel)));
         }
+        imoveisNovos.AddRange(imoveisBairro.Where(imovel => !imoveisImportados.Any(cod => cod == imovel.codImovel)));
         return imoveisNovos.DistinctBy(i => i.codImovel).ToList();
     }
 
