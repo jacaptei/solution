@@ -13,6 +13,7 @@ using Polly;
 using Polly.Contrib.WaitAndRetry;
 using Polly.Retry;
 
+using System.Collections.Generic;
 using System.ComponentModel;
 using System.Net;
 using System.Net.Http.Headers;
@@ -580,6 +581,10 @@ public class ImoviewService : IDisposable
 
     private async Task<bool?> ProcessSingleImportacaoImovel(IntegracaoImoview integracao, ImportacaoBairroImoview importacaoBairro, ImovelListDTO imovelId, ServiceBusSender sender)
     {
+        if(string.IsNullOrWhiteSpace(imovelId.codImovel))
+        {
+            _logger?.LogWarning("Imovel sem cod: {id}", imovelId.idImovel);
+        }
         ImportacaoImovelImoview? importacaoImovel = await _retryPolicy.ExecuteAsync(() => _imoviewDAO.GetImportacaoImovel(importacaoBairro.Id, imovelId.codImovel));
 
         if (importacaoImovel != null)
@@ -600,7 +605,6 @@ public class ImoviewService : IDisposable
                 IdImportacaoBairro = importacaoBairro.Id,
                 IdIntegracao = integracao.Id
             };
-            var res = await SendImportQueue(sender, import);
             importacaoImovel = new ImportacaoImovelImoview
             {
                 Id = 0,
@@ -613,6 +617,7 @@ public class ImoviewService : IDisposable
                 Imagens = null
             };
             await _retryPolicy.ExecuteAsync(() => _imoviewDAO.SaveImportacaoImovel(importacaoImovel));
+            var res = await SendImportQueue(sender, import);
             return res;
         }
         catch (Exception ex)
@@ -628,13 +633,15 @@ public class ImoviewService : IDisposable
     private async Task<List<ImovelEndereco>> GetNovosImoveis(List<ImportacaoBairroImoview> importacoesBairro, IntegracaoBairroImoview bairroIntegrado)
     {
         var imoveisNovos = new List<ImovelEndereco>();
+        var imoveisBairro = await _retryPolicy.ExecuteAsync(() => _imoviewDAO.GetImoveisBairro(bairroIntegrado.IdBairro));
+        var imoveisImportados = new List<string>();
         foreach (var importacaoBairro in importacoesBairro)
         {
             var importacoesImoveis = await _retryPolicy.ExecuteAsync(() => _imoviewDAO.GetImportacaoImoveis(importacaoBairro.Id));
-            var imoveisBairro = await _retryPolicy.ExecuteAsync(() => _imoviewDAO.GetImoveisBairro(bairroIntegrado.IdBairro));
-            imoveisNovos.AddRange(imoveisBairro.Where(imovel => !importacoesImoveis.Any(importacao => importacao.CodImovel == imovel.codImovel)));
+            imoveisImportados.AddRange(importacoesImoveis.Select(i => i.CodImovel));
+            imoveisNovos.AddRange(imoveisBairro.Where(imovel => !imoveisImportados.Any(cod => cod == imovel.codImovel)));
         }
-        return imoveisNovos;
+        return imoveisNovos.DistinctBy(i => i.codImovel).ToList();
     }
 
     private static IntegracaoBairroImoview CreateBairroIntegrado(IntegracaoImoview integracao, IntegracaoEvent integracaoEvent, BairroDTO bairro)
@@ -655,6 +662,7 @@ public class ImoviewService : IDisposable
 
     private async Task SaveImportacaoBairro(IntegracaoImoview integracao, IntegracaoEvent integracaoEvent, IntegracaoBairroImoview bairroIntegrado, List<ImovelEndereco> imoveisNovos)
     {
+        var list = imoveisNovos.Where(i => !string.IsNullOrWhiteSpace(i.codImovel)).Select(i => new { i.idImovel, i.codImovel }).ToList();
         var importacaoBairro = new ImportacaoBairroImoview
         {
             Id = 0,
@@ -663,7 +671,7 @@ public class ImoviewService : IDisposable
             IdPlano = integracao!.IdPlano!.Value,
             DataInclusao = DateTime.UtcNow,
             Status = StatusIntegracao.Aguardando.GetDescription(),
-            Imoveis = Newtonsoft.Json.JsonConvert.SerializeObject(imoveisNovos.Select(i => new { i.idImovel, i.codImovel }))
+            Imoveis = Newtonsoft.Json.JsonConvert.SerializeObject(list)
         };
         await _retryPolicy.ExecuteAsync(() => _imoviewDAO.SaveImportacaoBairro(importacaoBairro));
     }
