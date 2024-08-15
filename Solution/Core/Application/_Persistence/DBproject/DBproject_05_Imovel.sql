@@ -95,8 +95,8 @@ CREATE	TABLE "Imovel"(
 	cod				 	            VARCHAR(20)		    UNIQUE NOT NULL,
 	"idCRM"				 	        VARCHAR(20)		    DEFAULT '',
 	"codCRM"		 	            VARCHAR(20)		    DEFAULT '',
-	"idChaves"		 	            VARCHAR(20)		    DEFAULT '',
-	"localChaves"	 	            VARCHAR(80)		    DEFAULT '',
+	"idChaves"		 	            VARCHAR(200)	    DEFAULT '',
+	"localChaves"	 	            VARCHAR(200)	    DEFAULT '',
     "totalChaves"	 	            SMALLINT            DEFAULT 0,
     index			 	            SMALLINT            DEFAULT 0,
 

@@ -50,194 +50,23 @@ namespace JaCaptei.API.Controllers {
         }
 
 
-        [Route("[action]")]
-        public async Task<IActionResult> BuscarNetsac([FromBody] ImovelBusca busca) {
+        [HttpPost]
+        [Route("buscar/unidade")]
+        public IActionResult BuscarUnidade([FromBody] ImovelBusca busca) {
 
-            if(ObterUsuarioAutenticado() is null) {
-                busca.crmResult = null;
-                appReturn.result = busca;
+            if(busca is null)
                 return Result(appReturn);
-            }
 
-            dynamic result;
-            dynamic crmResult;
-            dynamic images;
+            busca.resultsPerPage = 1;
 
-            if(string.IsNullOrWhiteSpace(busca.usuario.sessaoCRMglobal))
-                busca.usuario.sessaoCRMglobal = await CRM.ObterSessaoGlobal();
-
-            string sql = "SELECT * FROM Products " + ObterQueryBuscaImovel(busca) + " ORDER BY createdtime DESC ";
-
-            var data = new Dictionary<string, string>();
-            data.Add("_operation"   , "query");
-            data.Add("_session"     , busca.usuario.sessaoCRMglobal);
-            data.Add("query"        , sql);
-            data.Add("page"         , busca.page.ToString());
-
-            try {
-
-                using(HttpClient client = new HttpClient()) {
-                    HttpResponseMessage response = await client.PostAsync(CRM.ENDPOINT, new FormUrlEncodedContent(data));
-                    response.EnsureSuccessStatusCode();
-                    result          = response.Content.ReadAsStringAsync().Result;
-                    busca.crmResult = JsonSerializer.Deserialize<dynamic>(result);
-                    crmResult       = Newtonsoft.Json.JsonConvert.DeserializeObject<dynamic>(result);
-                    //var imgResult =  Newtonsoft.Json.JsonConvert.DeserializeObject<dynamic>(result);
-                    //var imgResult =  BuscarImoveisImagensCRM(busca.usuario.sessaoCRMglobal)
-                }
-
-                List<string> arrIds= new List<string>();
-
-                foreach(dynamic item in crmResult.result?.records)
-                    arrIds.Add(item.id.ToString());
-
-                if(arrIds.Count > 0) {
-                    string ids = string.Join(",",arrIds);
-                    dynamic imgs = await BuscarImoveisImagensCRM(busca.usuario.sessaoCRMglobal,ids);
-                    busca.result.imagensJson = imgs.ToString();
-                }
-
-
-            } catch(Exception ex) {
-                appReturn.SetAsException(ex);
-            }
-
-
-
-            sql = "SELECT COUNT(*) FROM Products " + ObterQueryBuscaImovel(busca);
-
-            data = new Dictionary<string, string>();
-            data.Add("_operation"   , "query");
-            data.Add("_session"     , busca.usuario.sessaoCRMglobal);
-            data.Add("query"        , sql);
-            data.Add("page"         , "0");
-
-            using(HttpClient client = new HttpClient()) {
-                HttpResponseMessage response = await client.PostAsync(CRM.ENDPOINT, new FormUrlEncodedContent(data));
-                response.EnsureSuccessStatusCode();
-                result          = response.Content.ReadAsStringAsync().Result;
-                var countResult =  Newtonsoft.Json.JsonConvert.DeserializeObject<dynamic>(result);
-                //var crmResult =  Newtonsoft.Json.JsonConvert.DeserializeObject<dynamic>(result);
-                //busca.result.totalResults = int.Parse(crmResult.result.records[0].count);
-                try { busca.result.totalResults = countResult.result.records[0].count; } catch(Exception e) { }
-            }
-
-            //return Ok(busca);
-            appReturn.result = busca;
+            busca.usuarioGod        = false;
+            busca.usuarioGestor     = false;
+            busca.somenteValidados  = true;
+            appReturn = service.Buscar(busca);
+            
             return Result(appReturn);
 
         }
-
-
-
-        
-        public async Task<dynamic> BuscarImoveisImagensCRM(string sessaoCRMglobal,string ids) {
-
-            bool success = false;
-            dynamic res;
-            dynamic ret;
-            try {
-                var data = new Dictionary<string, string>();
-                data.Add("_operation"   ,"imagesByProduct");
-                data.Add("_session"     ,sessaoCRMglobal);
-                data.Add("recordid"     ,ids);
-
-                using(HttpClient client = new HttpClient()) {
-                    HttpResponseMessage response = await client.PostAsync(CRM.ENDPOINT, new FormUrlEncodedContent(data));
-                    response.EnsureSuccessStatusCode();
-                    ret = response.Content.ReadAsStringAsync().Result;
-                    res = Newtonsoft.Json.JsonConvert.DeserializeObject<dynamic>(ret);
-                    //res = JArray.Parse(ret);
-                    success = bool.Parse(res.success.ToString());
-                }
-                if(success)
-                    return ret;
-            }catch(Exception ex) { 
-                var x = ex.ToString();
-            }
-            //string imagePath = res.result.records[0].blocks[2].fields[2].value;
-
-            return null;
-
-        }
-
-        
-
-
-
-
-
-        [HttpPost]
-        [Route("favoritos")]
-        public async Task<IActionResult> BuscarFavoritos([FromBody] Usuario usuario) {
-
-            dynamic result;
-
-            ImovelBusca busca = new ImovelBusca();
-            busca.usuario = usuario;
-
-            if(string.IsNullOrWhiteSpace(busca.usuario.sessaoCRMglobal))
-                busca.usuario.sessaoCRMglobal = await CRM.ObterSessaoGlobal();
-
-            busca.sql = "SELECT * FROM Products WHERE id IN( " + string.Join(",",busca.usuario.favoritos.Select(p => p.idImovelCRM)) + ");";
-
-            var data = new Dictionary<string, string>();
-            data.Add("_operation"   ,"query");
-            data.Add("_session"     , busca.usuario.sessaoCRMglobal);
-            data.Add("query"        ,busca.sql);
-            data.Add("page"         ,busca.page.ToString());
-
-            using(HttpClient client = new HttpClient()) {
-                HttpResponseMessage response    = await client.PostAsync(CRM.ENDPOINT, new FormUrlEncodedContent(data));
-                response.EnsureSuccessStatusCode();
-                result                          = response.Content.ReadAsStringAsync().Result;
-                busca.crmResult                 = JsonSerializer.Deserialize<dynamic>(result);
-            }
-
-            appReturn.result = busca;
-
-            return Result(appReturn);
-
-        }
-
-
-
-
-
-
-        [HttpPost]
-        public async Task<IActionResult> BuscarFavoritosCRM([FromBody] Usuario usuario) {
-
-            dynamic result;
-
-            ImovelBusca busca = new ImovelBusca();
-            busca.usuario = usuario;
-
-            if(string.IsNullOrWhiteSpace(busca.usuario.sessaoCRMglobal))
-                busca.usuario.sessaoCRMglobal = await CRM.ObterSessaoGlobal();
-
-            //busca.sql = "SELECT * FROM Products WHERE id IN( " + string.Join(",",busca.usuario.favoritos.Select(p => p.idImovelCRM)) + ");";
-
-            var data = new Dictionary<string, string>();
-            data.Add("_operation"   ,"queryStar");
-            data.Add("_session"     , busca.usuario.sessaoCRMglobal);
-            data.Add("userid"       , ("19x"+busca.usuario.idCRM));
-            data.Add("star"         , "1");
-            //data.Add("_operation"   ,"query");
-            //data.Add("query"        ,busca.sql);
-            //data.Add("page"         ,busca.page.ToString());
-
-            using(HttpClient client = new HttpClient()) {
-                HttpResponseMessage response    = await client.PostAsync(CRM.ENDPOINT, new FormUrlEncodedContent(data));
-                response.EnsureSuccessStatusCode();
-                result = response.Content.ReadAsStringAsync().Result;
-                busca.crmResult = JsonSerializer.Deserialize<dynamic>(result);
-            }
-
-            return Ok(busca);
-
-        }
-
 
 
         [Route("agenda/inserir")]

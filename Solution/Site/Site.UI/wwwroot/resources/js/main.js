@@ -421,7 +421,9 @@ $(document).ready(function () {
                         this.OpenLoginTermsAndPolicyModal();
                     }
                     //this.$sdata.Storage.Set("utk"    , this.usuario.token);
-                    //this.$sdata.Storage.Set("usuario", this.usuario);
+                    var storageuser = "usuario_jacaptei_2024080808";
+                    this.$sdata.Storage.Set(storageuser, this.usuario);
+
                     axios.defaults.headers.common["Authorization"] = "Bearer " + this.usuario.tokenJWT; 
                     this.isAuth = true;
 					//this.RouteTo("/home");

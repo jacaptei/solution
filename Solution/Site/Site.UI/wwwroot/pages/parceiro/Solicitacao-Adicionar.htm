@@ -91,7 +91,7 @@
                                     <el-option v-for="item in opcoes.cidades"
                                                :key="item.id"
                                                :label="item.label"
-                                               :value="item.nome"></el-option>
+                                               :value="item.value"></el-option>
                                 </el-select>
                             </el-col>
                             <el-col :xs="24" :sm="12" :md="8" :lg="8" class="s-input">
@@ -491,14 +491,14 @@
 
                 if (this.$validator.is(cidade)) {
                     this.carregandoBairros = true;
-                    this.solicitacao.idCidade = this.opcoes.cidades.filter((c) => c.nome == cidade)[0].id;
+                    this.solicitacao.idCidade = this.opcoes.cidades.filter((c) => c.value == cidade)[0].id;
                     this.$sdata.ObterBairros(this.solicitacao.idCidade).then(res => { this.carregandoBairros = false; c2("this.opcoes.bairros", res); this.opcoes.bairros = res; });
                 } 
 
             },
 
             DefinirBairro(bairro) {
-                this.solicitacao.idBairro = this.opcoes.bairros.filter((c) => c.nome == bairro)[0].id;
+                this.solicitacao.idBairro = this.opcoes.bairros.filter((c) => c.value == bairro)[0].id;
                 //this.$refs.logradouro.focus();
                 //this.solicitacao.bairro = bairro.label;
                 //c2("this.solicitacao", this.solicitacao);

@@ -41,6 +41,26 @@
 
                     <el-row :gutter="20">
                         <el-col :md="24">
+                            <div><p>Bairro</p><span></span></div>
+                            <div style="height:40px" v-if="carregandoBairros">
+                                <c-loading size="30px" style="padding-left:5px" color="#fff"></c-loading>
+                            </div>
+                            <div v-else-if="opcoes.bairros.length==0">
+                                <span style="color:#fff;padding-left:10px">selecione uma cidade</span>
+                            </div>
+                            <el-select v-else v-model="$root.buscaImovel.imovel.endereco.bairro" filterable :clearable="true" class="m-4" placeholder="qualquer" size="large" style="width:100%">
+                                <el-option v-for="item in opcoes.bairros"
+                                            :key="item.id"
+                                            :label="item.label"
+                                            :value="item.value">
+                                </el-option>
+                            </el-select>
+                        </el-col>
+                    </el-row>
+
+
+                    <!--<el-row :gutter="20">
+                        <el-col :md="24">
                             <div><p v-if="bairrosSelecionados.length <= 1">Bairro</p><p v-else>Bairros</p><span></span></div>
                             <div style="height:40px" v-if="carregandoBairros">
                                 <c-loading size="30px" style="padding-left:5px" color="#fff"></c-loading>
@@ -56,14 +76,14 @@
                                 </el-option>
                             </el-select>
                         </el-col>
-                    </el-row>
+                    </el-row>-->
 
 
                         <el-row :gutter="20">
                             <el-col :md="12" :sm="12" :xs="12">
                                 <p>Valor até R$</p>
-                                <!--<el-input input-style="color:var(--s-accent-color)" @blur="CheckValues" @keyup.enter="Search()" v-model="valorMaximo" placeholder="qualquer" maxlength="20" :formatter="(value) => `R$ ${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, '.')" :parser="(value) => value.replace(/\R\$\s?|(\.*)/g, '').replace(/[a-zA-Z]/g, '')"></el-input>-->
-                                <el-input input-style="color:var(--s-accent-color)" @keyup.enter="Buscar()" v-model="valorMinimo" placeholder="qualquer" maxlength="20" :formatter="(value) => `R$ ${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, '.')" :parser="(value) => value.replace(/\R\$\s?|(\.*)/g, '').replace(/[a-zA-Z]/g, '')"></el-input>
+                                <!--<el-input input-style="color:var(--s-accent-color)" @blur="CheckValues" @keyup.enter="Search()" v-model="valorMinimo" placeholder="qualquer" maxlength="20" :formatter="(value) => `R$ ${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, '.')" :parser="(value) => value.replace(/\R\$\s?|(\.*)/g, '').replace(/[a-zA-Z]/g, '')"></el-input>-->
+                                <el-input input-style="color:var(--s-accent-color)" @keyup.enter="Buscar()" v-model="valorMaximo" placeholder="qualquer" maxlength="20" :formatter="(value) => `R$ ${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, '.')" :parser="(value) => value.replace(/\R\$\s?|(\.*)/g, '').replace(/[a-zA-Z]/g, '')"></el-input>
                             </el-col>
                             <el-col :md="12" :sm="12" :xs="12">
                                 <p>Dormitórios</p>
@@ -178,6 +198,7 @@
         mounted() {
             // cclear();
             //this.isCollapse = this.$root.isMenuCollapse;
+            this.ClearFilter();
         },
         methods: {
 
@@ -256,6 +277,7 @@
 
                 
 
+                this.opcoes.cidades = [];
                 this.opcoes.cidades = [];
                 this.opcoes.bairros = [];
 
