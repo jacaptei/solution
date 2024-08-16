@@ -361,8 +361,8 @@ namespace JaCaptei.Application {
 
             string sql  = "SELECT JSON_AGG(res) FROM  ( " + select + filter  + " ORDER BY s.\"dataConsiderada\" ASC ) res ";
 
-            string filterFinalizados    = " WHERE s.ativo = 'TRUE' AND s.\"idStatus\" > 9 AND s.\"dataConsiderada\" >= '"+ finalizadosAPartirDe.ToString() + "' ";
-            if(!entity.god && !entity.gestor)
+            string filterFinalizados = " WHERE s.ativo = 'TRUE' AND s.\"idStatus\" > 9 AND s.\"dataConsiderada\" >= '" + finalizadosAPartirDe.ToString("yyyy-MM-dd HH:mm:ss") + "' ";
+            if (!entity.god && !entity.gestor)
                 filterFinalizados += " AND s.\"idAdmin\" = " + entity.id.ToString();
             string sqlFinalizados = "SELECT JSON_AGG(resf) FROM  ( " + select + filterFinalizados  + " ORDER BY s.\"dataConsiderada\" DESC LIMIT 100 ) resf ";
 
@@ -400,7 +400,7 @@ namespace JaCaptei.Application {
             string  filter  = " WHERE s.ativo = 'TRUE' AND s.\"idStatus\" < 9 AND s.\"idParceiro\" = " + entity.idParceiro.ToString();
             string  sql     = "SELECT JSON_AGG(res) FROM  ( " + select + filter  + " ORDER BY s.\"dataConsiderada\" DESC ) res ";
 
-            string filterFinalizados    = " WHERE s.ativo = 'TRUE' AND s.\"idStatus\" > 9 AND s.\"idParceiro\" = " + entity.idParceiro.ToString() + " AND s.data >= '"+ finalizadosAPartirDe.ToString() + "' ";
+            string filterFinalizados = " WHERE s.ativo = 'TRUE' AND s.\"idStatus\" > 9 AND s.\"dataConsiderada\" >= '" + finalizadosAPartirDe.ToString("yyyy-MM-dd HH:mm:ss") + "' ";
             string sqlFinalizados       = "SELECT JSON_AGG(resf) FROM  ( " + select + filterFinalizados  + " ORDER BY s.\"dataConsiderada\" DESC LIMIT 100) resf ";
 
             using(var conn = DB.GetConn()) {
