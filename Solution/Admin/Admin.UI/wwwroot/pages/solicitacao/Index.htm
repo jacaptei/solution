@@ -45,7 +45,7 @@
                 </el-col>
             </el-row>
             <el-row :gutter="20">
-                <el-col :md="24"  v-if="view == 'success' && tab !='busca' ">
+                <el-col :md="24" v-if="view == 'success' && tab !='busca' ">
                     <div style="float:right" v-if="$root.usuario.gestor || $root.usuario.god">
                         <el-select v-model="idAdminSelecionado" filterable placeholder="Todos" size="small" style="width:100%" @change="(idAdmin)=>{FiltrarPorAdmin(idAdmin)}">
                             <el-option v-for="admin in admins"
@@ -105,7 +105,7 @@
                                             <q-card-section style="cursor:pointer" @click="()=>{item.acaocard==('abrir-card'+item.id)?  item.acaocard=('fechar-card'+item.id) :  item.acaocard=('abrir-card'+item.id);}" :class="ObterStatusClass(item)">
                                                 <div class="text-h10">
                                                     <span class="text-h10">
-                                                        <b style="margin-right:10px;">ID# {{item.id}}</b> 
+                                                        <b style="margin-right:10px;">ID# {{item.id}}</b>
                                                         <i v-if="!item.validadoProprietario|| !item.validadaURL || !item.validadoEndereco" title="há dados invalidados" style="padding-left:4px;color:#fff;font-size:20px;" class="fa fa-warning"></i>
                                                         <span v-if="item.agendado">
                                                             <i title="agendado" style="padding-left:10px;padding-right:10px;color:#fff;font-size:17px;" class="fa fa-calendar"></i>
@@ -158,14 +158,14 @@
                                                     </div>-->
 
                                                     <div style="font-weight:500;color:#000;margin-bottom:10px">
-                                                        <el-input :value="'#'+item.admin.id + ' . '+item.admin.nome" readonly @click="()=>{item.acao=='abrir-admin'?  item.acao='fechar-admin' :  item.acao='abrir-admin';}" >
+                                                        <el-input :value="'#'+item.admin.id + ' . '+item.admin.nome" readonly @click="()=>{item.acao=='abrir-admin'?  item.acao='fechar-admin' :  item.acao='abrir-admin';}">
                                                             <template #prepend>
-                                                                <div style="text-transform:uppercase;font-weight:660;width:110px;text-align:right;cursor:pointer" @click="()=>{item.acao=='abrir-admin'?  item.acao='fechar-admin' :  item.acao='abrir-admin';}" >
+                                                                <div style="text-transform:uppercase;font-weight:660;width:110px;text-align:right;cursor:pointer" @click="()=>{item.acao=='abrir-admin'?  item.acao='fechar-admin' :  item.acao='abrir-admin';}">
                                                                     Admin   <i style="padding-left:10px" class="fa fa-user-gear"></i>
                                                                 </div>
                                                             </template>
                                                             <template #append>
-                                                                <div style="text-align:center;cursor:pointer;" @click="()=>{item.acao=='abrir-admin'?  item.acao='fechar-admin' :  item.acao='abrir-admin';}"  v-if="$root.usuario.god || $root.usuario.gestor">
+                                                                <div style="text-align:center;cursor:pointer;" @click="()=>{item.acao=='abrir-admin'?  item.acao='fechar-admin' :  item.acao='abrir-admin';}" v-if="$root.usuario.god || $root.usuario.gestor">
                                                                     <q-btn icon="fa fa-edit" flat style="margin-left:5px;width:10px" v-if="item.acao != 'abrir-admin'"></q-btn>
                                                                     <q-btn icon="fa fa-close" flat style="margin-left:5px;width:10px" v-else></q-btn>
                                                                 </div>
@@ -385,7 +385,7 @@
                                                     </span>
                                                     <span class="text-h10">
                                                         <span style="float:right">
-                                                            Verificando inserida em 
+                                                            Verificando inserida em
                                                             <span style="font-weight:300;font-size:15px;padding-right:20px">
                                                                 {{$tools.FormatDateHour(item.data)}}
                                                             </span>
@@ -409,14 +409,14 @@
                                                 <div>
 
                                                     <div style="font-weight:500;color:#000;margin-bottom:10px">
-                                                        <el-input :value="'#'+item.admin.id + ' . '+item.admin.nome" readonly @click="()=>{item.acao=='abrir-admin'?  item.acao='fechar-admin' :  item.acao='abrir-admin';}" >
+                                                        <el-input :value="'#'+item.admin.id + ' . '+item.admin.nome" readonly @click="()=>{item.acao=='abrir-admin'?  item.acao='fechar-admin' :  item.acao='abrir-admin';}">
                                                             <template #prepend>
-                                                                <div style="text-transform:uppercase;font-weight:660;width:110px;text-align:right;cursor:pointer" @click="()=>{item.acao=='abrir-admin'?  item.acao='fechar-admin' :  item.acao='abrir-admin';}" >
+                                                                <div style="text-transform:uppercase;font-weight:660;width:110px;text-align:right;cursor:pointer" @click="()=>{item.acao=='abrir-admin'?  item.acao='fechar-admin' :  item.acao='abrir-admin';}">
                                                                     Admin   <i style="padding-left:10px" class="fa fa-user-gear"></i>
                                                                 </div>
                                                             </template>
                                                             <template #append>
-                                                                <div style="text-align:center;cursor:pointer;" @click="()=>{item.acao=='abrir-admin'?  item.acao='fechar-admin' :  item.acao='abrir-admin';}"  v-if="$root.usuario.god || $root.usuario.gestor">
+                                                                <div style="text-align:center;cursor:pointer;" @click="()=>{item.acao=='abrir-admin'?  item.acao='fechar-admin' :  item.acao='abrir-admin';}" v-if="$root.usuario.god || $root.usuario.gestor">
                                                                     <q-btn icon="fa fa-edit" flat style="margin-left:5px;width:10px" v-if="item.acao != 'abrir-admin'"></q-btn>
                                                                     <q-btn icon="fa fa-close" flat style="margin-left:5px;width:10px" v-else></q-btn>
                                                                 </div>
@@ -668,7 +668,7 @@
 
 
                                                     <div style="margin-top:10px;font-weight:500;color:#000">
-                                                        <el-input placeholder="" :value="ObterDataVisita(item)" readonly >
+                                                        <el-input placeholder="" :value="ObterDataVisita(item)" readonly>
                                                             <template #prepend>
                                                                 <div style="text-transform:uppercase;font-weight:660;width:110px;text-align:right;cursor:pointer" @click="$tools.OpenCalendar(item.dataVisita)">
                                                                     Visita   <i style="padding-left:10px" class="fa fa-calendar" title="visita agendada"></i>
@@ -1025,7 +1025,7 @@
 
 
                                                     <div style="margin-top:10px;font-weight:500;color:#000">
-                                                        <el-input placeholder="" :value="ObterDataVisita(item)" readonly >
+                                                        <el-input placeholder="" :value="ObterDataVisita(item)" readonly>
                                                             <template #prepend>
                                                                 <div style="text-transform:uppercase;font-weight:660;width:110px;text-align:right;cursor:pointer" @click="$tools.OpenCalendar(item.dataVisita)">
                                                                     Visita   <i style="padding-left:10px" class="fa fa-calendar" title="visita agendada"></i>
@@ -1222,8 +1222,8 @@
 
             async RefreshAdmins() {
                 try {
-                    this.$root.admins   = (await this.$root.$api.Get("admin/obter/todos")).result;
-                    this.admins         = (this.$root.admins.filter(a => !a.god && !a.gestor));
+                    this.$root.admins = (await this.$root.$api.Get("admin/obter/todos")).result;
+                    this.admins = (this.$root.admins.filter(a => !a.god && !a.gestor));
                     this.adminSelecionado = { id: 0, nome: "Todos captadores", email: "" }
                     this.admins.unshift(this.adminSelecionado);
                 } catch (e) { }
@@ -1238,16 +1238,16 @@
                     else if (item.idStatus == 3) {
                         if (item.horasDataConsiderada < 0)
                             classcolor = 'bg-orange-6';
-                        if(item.horasDataConsiderada > 4)
+                        if (item.horasDataConsiderada > 4)
                             classcolor = 'bg-black';
-                        else if(item.horasDataConsiderada >= 2)
+                        else if (item.horasDataConsiderada >= 2)
                             classcolor = 'bg-red-9';
                         else
                             classcolor = 'bg-orange-9';
-                    }else
-                            classcolor = 'bg-orange-9';
+                    } else
+                        classcolor = 'bg-orange-9';
                 }
-                else{
+                else {
                     if (item.idStatus == 5)
                         classcolor = 'bg-primary';
                     else if (item.idStatus == 3) {
@@ -1333,12 +1333,17 @@
             ObterDataVisita(item) {
                 if (this.$validator.is(item.dataVisita)) {
                     var data = item.dataVisita;
-                    //return data.format("dd/mm/yyyy, ddd, HH:MM'h'");
-                    return (data.getFullYear() > 1900) ? data.format("dd/mm/yyyy, ddd, HH:MM'h'") : "sem visita agendada";
+                    if (item.dataVisita && typeof item.dataVisita === 'string') {
+                        var data = new Date(item.dataVisita);
+                        if (data.getFullYear() > 1900 && !isNaN(data.getTime())) {
+                            return data.format("dd/mm/yyyy, ddd, HH:MM'h'");
+                        }
+                    } else {
+                        return (data.getFullYear() > 1900) ? data.format("dd/mm/yyyy, ddd, HH:MM'h'") : "sem visita agendada";
+                    }
                 }
                 return "";
             },
-
 
             UpdateChart() {
                 if (this.tab == "distribuicao")
@@ -1512,12 +1517,12 @@
                     item.acao = request.result.acao = 0;
                     this.$tools.AlertSuccess("<b>SOLICITAÇÃO #" + item.id + "</b> realocada para <br><b>" + request.result.admin.nome + "</b> captador #" + request.result.admin.id + "<br> em AGUARDANDO.");
                     request.result.dataVisita = new Date(request.result.dataVisita);
-                    if (item.idStatus == 3){
+                    if (item.idStatus == 3) {
                         item = request.result;
                         this.resultsAguardando.find(a => a.id == item.id).idAdmin = item.idAdmin;
                         this.resultsAguardando.find(a => a.id == item.id).admin = item.admin;
                         //c2("ITEM",item)
-                    }else{
+                    } else {
                         this.resultsAguardando.unshift(request.result);
                         this.totalVerificando--;
                         this.totalAguardando++;
@@ -1534,29 +1539,29 @@
 
                 if (this.idAdminRealocar == 0)
                     this.RealocarNaFila(item);
-                else{
+                else {
 
-                    item.admin   = this.$root.admins.filter(a => a.id == this.idAdminRealocar)[0];
+                    item.admin = this.$root.admins.filter(a => a.id == this.idAdminRealocar)[0];
                     item.idAdmin = this.idAdminRealocar;
 
-                        item.acao = 'realocaradmin';
-                        var request = await this.$api.Post("solicitacao/realocar/admin", item);
-                        if (request?.status?.success) {
-                            item.acao = request.result.acao = 0;
-                            this.$tools.AlertSuccess("<b>SOLICITAÇÃO #" + item.id + "</b> realocada para <br><b>" + request.result.admin.nome + "</b> captador #"+ request.result.admin.id +"<br> em AGUARDANDO.");
-                            request.result.dataVisita = new Date(request.result.dataVisita);
-                            if (item.idStatus == 3) {
-                                item = request.result;
-                                this.resultsAguardando.find(a => a.id == item.id).idAdmin = item.idAdmin;
-                                this.resultsAguardando.find(a => a.id == item.id).admin = item.admin;
-                                //c2("ITEM",item)
-                            } else {
-                                this.resultsAguardando.unshift(request.result);
-                                this.totalVerificando--;
-                                this.totalAguardando++;
-                                item.ativo = false;
-                            }
+                    item.acao = 'realocaradmin';
+                    var request = await this.$api.Post("solicitacao/realocar/admin", item);
+                    if (request?.status?.success) {
+                        item.acao = request.result.acao = 0;
+                        this.$tools.AlertSuccess("<b>SOLICITAÇÃO #" + item.id + "</b> realocada para <br><b>" + request.result.admin.nome + "</b> captador #" + request.result.admin.id + "<br> em AGUARDANDO.");
+                        request.result.dataVisita = new Date(request.result.dataVisita);
+                        if (item.idStatus == 3) {
+                            item = request.result;
+                            this.resultsAguardando.find(a => a.id == item.id).idAdmin = item.idAdmin;
+                            this.resultsAguardando.find(a => a.id == item.id).admin = item.admin;
+                            //c2("ITEM",item)
+                        } else {
+                            this.resultsAguardando.unshift(request.result);
+                            this.totalVerificando--;
+                            this.totalAguardando++;
+                            item.ativo = false;
                         }
+                    }
                 }
             },
 
