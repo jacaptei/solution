@@ -107,11 +107,9 @@ namespace JaCaptei.Model {
         //Model.dataEvento.ToString("ddd",new System.Globalization.CultureInfo("pt-BR"))
 
         public DateTime ConvertToLocalDateTime(DateTime dateTime) {
-            //if (dateTime == null) { return dateTime; }
-            //TimeZoneInfo UtcBrasilia = TimeZoneInfo.FindSystemTimeZoneById("E. South America Standard Time");
-            //dateTime = TimeZoneInfo.ConvertTimeFromUtc(dateTime,UtcBrasilia).ToLocalTime();
-            //return dateTime;
-            return GetLocalDate(dateTime);
+            TimeZoneInfo brasiliaTimeZone = TimeZoneInfo.FindSystemTimeZoneById("E. South America Standard Time");
+            dateTime = TimeZoneInfo.ConvertTimeFromUtc(dateTime, brasiliaTimeZone);
+            return dateTime;
         }
 
 
