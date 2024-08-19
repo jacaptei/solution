@@ -400,8 +400,8 @@ namespace JaCaptei.Application {
             string  filter  = " WHERE s.ativo = 'TRUE' AND s.\"idStatus\" < 9 AND s.\"idParceiro\" = " + entity.idParceiro.ToString();
             string  sql     = "SELECT JSON_AGG(res) FROM  ( " + select + filter  + " ORDER BY s.\"dataConsiderada\" DESC ) res ";
 
-            string filterFinalizados = " WHERE s.ativo = 'TRUE' AND s.\"idStatus\" > 9 AND s.\"idParceiro\" = " + entity.idParceiro.ToString() + " AND s.\"dataConsiderada\" >= '" + finalizadosAPartirDe.ToString("yyyy-MM-dd HH:mm:ss") + "' ";
-            string sqlFinalizados    = "SELECT JSON_AGG(resf) FROM  ( " + select + filterFinalizados  + " ORDER BY s.\"dataConsiderada\" DESC LIMIT 200) resf ";
+            string filterFinalizados = " WHERE s.ativo = 'TRUE' AND s.\"idStatus\" > 9 AND s.\"idParceiro\" = " + entity.idParceiro.ToString(); // + " AND s.\"dataConsiderada\" >= '" + finalizadosAPartirDe.ToString("yyyy-MM-dd HH:mm:ss") + "' ";
+            string sqlFinalizados    = "SELECT JSON_AGG(resf) FROM  ( " + select + filterFinalizados  + " ORDER BY s.\"dataConsiderada\" DESC LIMIT 400) resf ";
 
             using(var conn = DB.GetConn()) {
 
