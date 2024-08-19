@@ -400,8 +400,8 @@ namespace JaCaptei.Application {
             string  filter  = " WHERE s.ativo = 'TRUE' AND s.\"idStatus\" < 9 AND s.\"idParceiro\" = " + entity.idParceiro.ToString();
             string  sql     = "SELECT JSON_AGG(res) FROM  ( " + select + filter  + " ORDER BY s.\"dataConsiderada\" DESC ) res ";
 
-            string filterFinalizados = " WHERE s.ativo = 'TRUE' AND s.\"idStatus\" > 9 AND s.\"dataConsiderada\" >= '" + finalizadosAPartirDe.ToString("yyyy-MM-dd HH:mm:ss") + "' ";
-            string sqlFinalizados       = "SELECT JSON_AGG(resf) FROM  ( " + select + filterFinalizados  + " ORDER BY s.\"dataConsiderada\" DESC LIMIT 100) resf ";
+            string filterFinalizados = " WHERE s.ativo = 'TRUE' AND s.\"idStatus\" > 9 AND s.\"idParceiro\" = " + entity.idParceiro.ToString() + " AND s.\"dataConsiderada\" >= '" + finalizadosAPartirDe.ToString("yyyy-MM-dd HH:mm:ss") + "' ";
+            string sqlFinalizados    = "SELECT JSON_AGG(resf) FROM  ( " + select + filterFinalizados  + " ORDER BY s.\"dataConsiderada\" DESC LIMIT 200) resf ";
 
             using(var conn = DB.GetConn()) {
 
@@ -409,9 +409,9 @@ namespace JaCaptei.Application {
                 if(res?.json_agg is not null)
                     entities    = JsonConvert.DeserializeObject<List<Solicitacao>>(res.json_agg);
 
-                var resF    = conn.ExecuteQuery(sqlFinalizados).FirstOrDefault();
-                if(resF?.json_agg is not null)
-                    finalizados = JsonConvert.DeserializeObject<List<Solicitacao>>(resF.json_agg);
+                var resf    = conn.ExecuteQuery(sqlFinalizados).FirstOrDefault();
+                if(resf?.json_agg is not null)
+                    finalizados = JsonConvert.DeserializeObject<List<Solicitacao>>(resf.json_agg);
 
                 entities.AddRange(finalizados);
             }

@@ -312,8 +312,32 @@ export default class Tools {
         return res;
     }
 
-
+    
     ParseInt(n){
+        var res = 0.00;
+        if(this.IsStringNumber(n)){
+            try{
+	            res = parseInt(n);
+              if(isNaN(res))
+  	            res = 0.00;
+            }catch(e){
+	            res = 0.00;
+            }
+        }
+        return res;
+    }
+
+    IsStringNumber(ns){  
+        var res = false;
+        try{
+            res = /^[0-9]+$/.test(ns)        ;
+        }catch(e){}
+        return res;
+    }
+
+
+
+    ParseInt_BK(n){
         var res = 0.00;
         try{
 	        res = parseInt(n);

@@ -283,8 +283,8 @@
                                             </div>
                                             <div style="font-weight:400;font-size:14pt;color:var(--s-alt-accent-color);margin:9px">
                                                 <div><b>{{corretor.nome}}</b></div>
-                                                <div style="color:#a5ffa6;margin-top:7px;font-size:14pt;cursor:pointer" @click="OpenLink(corretor.linkWhats)"><i class="fab fa-whatsapp" style="font-size:18px"></i> {{corretor.telefone}}  <i class="fa fa-up-right-from-square" style="padding-left:6px;font-size:14px;"></i></div>
-                                                <div style="color:#feffa5;margin-top:7px;font-size:13pt;cursor:pointer" @click="OpenLink(corretor.linkMail)"><i class="fa fa-envelope" style="font-size:14px"></i> {{corretor.email}}     <i class="fa fa-up-right-from-square" style="padding-left:6px;font-size:14px;"></i></div>
+                                                <div style="color:#a5ffa6;margin-top:7px;font-size:14pt;cursor:pointer" @click="OpenLink(corretor.linkWhats)" v-if="corretor.telefone" ><i class="fab fa-whatsapp" style="font-size:18px"></i> {{corretor.telefone}}  <i class="fa fa-up-right-from-square" style="padding-left:6px;font-size:14px;"></i></div>
+                                                <div style="color:#feffa5;margin-top:7px;font-size:13pt;cursor:pointer" @click="OpenLink(corretor.linkMail)" v-if="corretor.email"><i class="fa fa-envelope" style="font-size:14px"></i> {{corretor.email}}     <i class="fa fa-up-right-from-square" style="padding-left:6px;font-size:14px;"></i></div>
                                             </div>
                                         </el-col>
                                     </el-row>
@@ -521,6 +521,8 @@
 
                 corretor:{id:0},
 
+                usuario:{},
+
             }
 
 
@@ -528,29 +530,31 @@
 
         },
         created: function () {
-            //params = this.$tools.HandleParams();
-            //c2("params", params)
-            //this.id = params.id;
-            //this.cod = params.cod;
+
+            try{
+                var p = this.$tools.HandleParams();
+                this.id  = p.id;
+                this.cod = p.cod;
+            }catch(e){}
 
            //c2("this.$route.query.id", this.$route.query.id)
 
             if (this.$validator.is(this.$route.query)) {
 
-                if(this.$validator.not(this.$route.query.id)){
+                if(this.$validator.not(this.$route.query.id) && this.$validator.not(this.$route.query.cod)){
                     this.indisponivel = true;
                 }else {
 
                     this.id  =  this.$tools.ParseInt(this.$route.query.id);
                     this.cod = this.$route.query.cod;
 
-                    this.corretor.id = this.$route.query.cid;
-                    this.corretor.nome = this.$route.query.cnome;
-                    this.corretor.razao = this.$route.query.crazao;
-                    this.corretor.fantasia = this.$route.query.cfantasia;
-                    this.corretor.telefone = this.$route.query.ctelefone;
-                    this.corretor.email = this.$route.query.cemail;
-                    this.corretor.tipo = this.$route.query.ctipo;
+                    this.corretor.id        = this.$route.query.cid;
+                    this.corretor.nome      = this.$route.query.cnome;
+                    this.corretor.razao     = this.$route.query.crazao;
+                    this.corretor.fantasia  = this.$route.query.cfantasia;
+                    this.corretor.telefone  = this.$route.query.ctelefone;
+                    this.corretor.email     = this.$route.query.cemail;
+                    this.corretor.tipo      = this.$route.query.ctipo;
 
                     this.queryImage = this.$route.query.img;
                     //c(this.queryImage)
@@ -560,7 +564,7 @@
 
                 var params = this.$tools.HandleParams();
 
-                if (this.$validator.not(this.$route.query.id))
+                if (this.$validator.not(params.id) && this.$validator.not(params.cod))
                     this.indisponivel = true;
                 else {
                     //c2("params", params)
@@ -580,8 +584,14 @@
             }
 
             if(this.corretor.id > 0){
-                this.corretor.linkWhats = "https://api.whatsapp.com/send?phone=+55" + this.corretor.telefone.replaceAll("(", "").replaceAll(")", "").replaceAll("-", "").replaceAll(" ", "");
-                this.corretor.linkMail  = "mailto:" + this.corretor.email;
+                if(this.corretor.telefone)
+                    this.corretor.linkWhats = "https://api.whatsapp.com/send?phone=+55" + this.corretor.telefone.replaceAll("(", "").replaceAll(")", "").replaceAll("-", "").replaceAll(" ", "");
+                if(this.corretor.linkMail)
+                    this.corretor.linkMail  = "mailto:" + this.corretor.email;
+
+                //var usr = "jcuser"+this.corretor.id;
+                //var usuario = this.$sdata.Storage.Get(usr);
+                //c2("Usuario",usuario.nome);
             }
 
             //c2("corretor", this.corretor)
@@ -607,27 +617,24 @@
         },
 
         mounted() {
-            try{
-                if(this.$root?.usuario?.id > 0){
-                    if (this.is(this.$sdata.Storage.Get("usuario_jacaptei_2024080808"))) {
-                        var usuario = this.$sdata.Storage.Get("usuario_jacaptei_2024080808");
-                        this.$root.usuario.id = usuario.id;
-                        this.$root.usuario.apelido = usuario.apelido;
-                        this.$root.usuario.nome = usuario.nome;
-                        this.$root.usuario.email = usuario.email;
-                        this.$root.usuario.tokenJWT = usuario.tokenJWT;
-                        this.$root.usuario.cpf = usuario.cpf;
-                        this.$root.usuario.cnpj = usuario.cnpj;
-                        if (this.$root.usuario?.id > 0 && this.$root.usuario?.tokenJWT){
-                            if(this.$root.usuario.tokenJWT)
-                            axios.defaults.headers.common["Authorization"] = "Bearer " + this.$root.usuario.tokenJWT; 
-                            this.$root.isAuth = true;
-                        }
-                    }
-               }
-           }catch(e){ console.log(e);}
 
-          this.Buscar();
+         window.setTimeout(()=> {
+            
+            try{
+                if(!this.is(this.$root?.usuario) || !this.is(this.$root?.usuario?.id > 0)){
+                    var usr = "jcuser"+this.corretor.id;
+                    var usuario = this.$sdata.Storage.Get(usr);
+                    if (usuario?.id > 0 && usuario?.tokenJWT){
+                        this.$root.usuario = usuario;
+                        this.$root.SignIn();
+                    }
+                }
+           }catch(e){ console.log(e);}
+                    
+         }, 2000);
+
+         if(!this.indisponivel)
+            this.Buscar();
 
         },
         methods: {
@@ -728,9 +735,12 @@
             async Buscar(){
 
                         var buscaImovel = {imovel:{}};
-                        buscaImovel.imovel.id  = this.id;
-                        buscaImovel.imovel.cod = this.cod;
+                        buscaImovel.imovel.id  = this.$validator.not(this.id)?  0 : this.id;
+                        buscaImovel.imovel.cod = this.$validator.not(this.cod)? "": this.cod;
                         //this.imovel    = {};
+
+		c2("id" ,buscaImovel.imovel.id);
+		c2("cod",buscaImovel.imovel.cod);
 
                         this.onRequest    = true;
                         this.indisponivel = false;
@@ -740,7 +750,10 @@
                         if (request?.status?.success){
                             buscaImovel  =  request.result;
                             this.imovel  =  buscaImovel.result.imoveis[0];
-                            this.SetupImagens();
+                            if(this.$validator.not(this.imovel))
+                                this.indisponivel = true;
+                            else
+                                this.SetupImagens();
                         }else
                             this.indisponivel = true;
 

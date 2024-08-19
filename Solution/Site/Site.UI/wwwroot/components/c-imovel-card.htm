@@ -252,7 +252,8 @@ module.exports = {
                 //c(this.imovel.cod);
                 //this.$sdata.Storage.Set(("imovel"+imovel.cod),this.imovel);
                 this.$sdata.Storage.Set(this.imovel.key,this.imovel);
-                this.$sdata.Storage.Set("usuario",this.$root.usuario);
+                var usr = "jcuser"+this.$root.usuario.id;
+                this.$sdata.Storage.Set(usr,this.$root.usuario);
                 //this.$root.imovelClicado = this.imovel;
 
                 var querystr = this.$imovelHandler.BuildQueryLink(this.imovel, this.imovel.imagens[0], (this.$root.isAuth ? this.$root.usuario : null));

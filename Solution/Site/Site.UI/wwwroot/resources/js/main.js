@@ -421,8 +421,8 @@ $(document).ready(function () {
                         this.OpenLoginTermsAndPolicyModal();
                     }
                     //this.$sdata.Storage.Set("utk"    , this.usuario.token);
-                    var storageuser = "usuario_jacaptei_2024080808";
-                    this.$sdata.Storage.Set(storageuser, this.usuario);
+                    var usr = "jcuser"+this.usuario.id;
+                    this.$sdata.Storage.Set(usr, this.usuario);
 
                     axios.defaults.headers.common["Authorization"] = "Bearer " + this.usuario.tokenJWT; 
                     this.isAuth = true;
@@ -430,21 +430,20 @@ $(document).ready(function () {
                 },
 
                 SignOut(){
+                    var usr = "jcuser"+this.usuario.id;
+                    this.$sdata.Storage.Set(usr, null);
+                    this.$sdata.Storage.Set("utk", null);
                     this.log        = this.$models.log();
                     this.usuario    = this.$models.usuario();
                     this.isAuth     = false;
-                    this.$sdata.Storage.Set("utk", null);
-                    this.$sdata.Storage.Set("usuario", null);
                     //axios.defaults.headers.common["Authorization"] = "";
                 },
                 Exit(){
                     this.SignOut();
-                    this.$sdata.Storage.Set("utk", null);
-                    this.$sdata.Storage.Set("autoLogin", false);
-                    this.$sdata.Storage.Set("usuario", null);
                     this.isAuth = false;
+                    axios.defaults.headers.common["Authorization"] = "";
                     this.RouteTo("home");
-                    this.$route.name = '/home';
+                    //this.$sdata.Storage.Set("autoLogin", false);
                 },
 
 
