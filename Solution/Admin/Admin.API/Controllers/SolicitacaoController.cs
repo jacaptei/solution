@@ -58,9 +58,6 @@ namespace JaCaptei.Administrativo.API.Controllers {
 
             entity.admin = new Model.Admin { id = entity.idAdmin };
 
-            var dateUtil = new DateUtil();
-            entity.dataVisita = dateUtil.ConvertToLocalDateTime(entity.dataVisita);
-
             appReturn = service.Alterar(entity);
             return Result(appReturn);
         }
@@ -162,7 +159,7 @@ namespace JaCaptei.Administrativo.API.Controllers {
         [HttpPost]
         [Route("finalizar")]
         public IActionResult Finalizar([FromBody] Solicitacao entity) {
-            Model.Admin logado        = ObterAdminAutenticado();
+            Model.Admin logado  = ObterAdminAutenticado();
             entity.admin        = new Model.Admin();
             entity.admin.id     = entity.idAdmin = logado.id;
             entity.admin.nome   = logado.nome;
