@@ -373,7 +373,8 @@
                     this.fullscreenLoading = true;
                     var chaveApiString = this.integracao.chaveApi;
                     if (this.$validator.is(chaveApiString)) {
-                        var url = this.$api.BuildURL(`api/imoview/unidades?chave=${chaveApiString}`);
+                        var chaveApiEncoded = encodeURIComponent(chaveApiString);
+                        var url = this.$api.BuildURL(`api/imoview/unidades?chave=${chaveApiEncoded}`);
                         var response = await axios.get(url)
                             .then((response) => {
                                 if (response.data) {
