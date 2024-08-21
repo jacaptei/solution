@@ -271,7 +271,7 @@
                 });
             },
             QuantidadeBairros() {
-                return this.qntdBairros > this.locationGroups.length;
+                return this.locationGroups.length < 25;
             },
             getCityLabel(id) {
                 const cidade = this.opcoes.cidades.find(city => city.id === parseInt(id));
@@ -311,8 +311,9 @@
                         bairros: [],
                         enableFilterButton: false
                     });
-                } else {
-                    if (this.qntdBairros == 0) {
+                }
+                else {
+                    if (this.locationGroups.length == 0) {
                         this.$tools.MessageAlert("Informe um Parceiro!!");
                     } else {
                         this.$tools.MessageAlert("Quantidade máxima de bairros atingida.");
@@ -440,7 +441,7 @@
                 this.integracao.idCliente = this.perfilIntegracaoCadastro.cliente.id
                 this.integracao.idPlano = perfilIntegracaoCadastro.plano.id;
                 this.crm = imoviewCrm[0].id;
-                this.qntdBairros = this.perfilIntegracaoCadastro.plano.qtdBairros;
+                //this.qntdBairros = this.perfilIntegracaoCadastro.plano.qtdBairros;
 
                 if (perfilIntegracaoCadastro && perfilIntegracaoCadastro.integracao?.bairros) {
                     this.integracao.bairros = JSON.parse(perfilIntegracaoCadastro.integracao?.bairros);
@@ -459,6 +460,7 @@
                     this.fullscreenLoading = true;
                     const valid = await this.$refs.integracao.validate();
                     this.integracao.codUnidade = JSON.stringify(this.integracao.codUnidade);
+                    console.log(this.integracao);
 
                     if (valid) {
                         this.loading = true;
