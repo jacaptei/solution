@@ -35,7 +35,7 @@
                                                                                 {{proprietario.nome}}
                                                                                 <span style="font-size:11px;margin-left:4px">
                                                                                     <span v-if="!proprietario.ativo"          style="border-radius:10px;background-color:var(--s-color-red);margin-right:10px;color:#fff;padding:4px">INATIVO</span>
-                                                                                    <span v-else-if="!proprietario.excluido"  style="border-radius:10px;background-color:orange;color:#fff ;margin-right:10px;padding:4px;">EXCLUÍDO</span>
+                                                                                    <span v-else-if="proprietario.excluido"   style="border-radius:10px;background-color:orange;color:#fff ;margin-right:10px;padding:4px;">EXCLUÍDO</span>
                                                                                     <span style="font-weight:600;color:#353535"><i class="fa fa-up-right-from-square"></i></span>
                                                                                 </span>
                                                                             </div>

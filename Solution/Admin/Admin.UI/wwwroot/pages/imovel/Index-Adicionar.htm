@@ -1298,8 +1298,6 @@
 
             Validar(){
 
-                var ok = true;
-
                 var msg = "";
 
                 if (this.$validator.not(this.imovel.documentacao.indiceCadastral))
@@ -1335,11 +1333,12 @@
                     msg += "<b>Imagens</b> precisam totalizar menos 15<br>";
             
                 if (msg.length > 0){
-                    ok = false;
                     this.$tools.Alert(msg);
+                    return false;
+                }else{
+                    return true;
                 }
                 
-                return ok;
             },
 
             ParseImovel(){
