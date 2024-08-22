@@ -86,7 +86,7 @@
                     <el-row :gutter="20">
                         <el-col :md="24">
                             <div><p>Tipo de imóvel</p><span></span></div>
-                            <el-select v-model="idTipoImovelSelecionado"  value-key="id" filterable class="m-4" size="large" placeholder="qualquer"  style="width:100%" >
+                            <el-select v-model="idTipoImovelSelecionado" :teleported="false" value-key="id" filterable class="m-4" size="large" placeholder="qualquer" style="width:100%" >
                                 <el-option v-for="item in opcoes.tiposImoveis" :key="item.nome" :label="item.label":value="item.id"></el-option>
                             </el-select>
                         </el-col>
@@ -190,9 +190,6 @@
                             <el-col :md="4" :sm="8" :xs="12"><el-checkbox label="Salão de festas     " v-model="$root.buscaImovel.imovel.lazer.salaoFestas         " size="large"></el-checkbox></el-col>
                         </el-col>
                     </el-row>
-
-
-
 
                 </div>
                 <el-row :gutter="20" class="search-form">

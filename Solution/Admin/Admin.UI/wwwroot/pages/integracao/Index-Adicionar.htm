@@ -199,7 +199,7 @@
                 rules: {
                     chaveApi: [{ required: true, message: 'Por favor, insira a Chave API', trigger: 'blur' }],
                     codUsuario: [{ required: true, message: 'Por favor, insira o Código de Usuário', trigger: 'blur' }],
-                    codUnidade: [{ required: true, message: 'Por favor, selecione a Unidade', trigger: 'change' }]
+                    codUnidade: [{ required: true, message: 'Por favor, selecione a Unidade', trigger: 'blur' }]
                 },
                 fullscreenLoading: ref(false),
             };
@@ -291,6 +291,7 @@
                 this.integracao.idCliente = 0;
                 this.integracao.chaveApi = "";
                 this.integracao.codUsuario = "";
+                this.integracao.codUnidade = "";
             },
             removeLocationGroup(index) {
                 this.locationGroups.splice(index, 1);
@@ -311,7 +312,8 @@
                         bairros: [],
                         enableFilterButton: false
                     });
-                } else {
+                }
+                else {
                     if (this.qntdBairros == 0) {
                         this.$tools.MessageAlert("Informe um Parceiro!!");
                     } else {
@@ -360,8 +362,7 @@
             handleBairrosChange(selectedBairros, group, index) {
                 this.locationGroups[index].selectedBairros = selectedBairros;
                 if (this.locationGroups[index] && selectedBairros.length === 0) {
-                    // Exiba uma mensagem de erro ou implemente outra lógica
-                    console.error("Selecione pelo menos um bairro.");
+                    this.$tools.MessageAlert("Selecione pelo menos um bairro.");
                 } else {
                     this.integracao.bairros.push(selectedBairros);
                     this.disableButtonIntegration = true;
@@ -372,7 +373,8 @@
                     this.fullscreenLoading = true;
                     var chaveApiString = this.integracao.chaveApi;
                     if (this.$validator.is(chaveApiString)) {
-                        var url = this.$api.BuildURL(`api/imoview/unidades?chave=${chaveApiString}`);
+                        var chaveApiEncoded = encodeURIComponent(chaveApiString);
+                        var url = this.$api.BuildURL(`api/imoview/unidades?chave=${chaveApiEncoded}`);
                         var response = await axios.get(url)
                             .then((response) => {
                                 if (response.data) {
