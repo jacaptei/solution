@@ -422,7 +422,7 @@ namespace JaCaptei.Application {
             
 
 
-        public AppReturn Buscar(Search busca) {
+        public AppReturn Buscar(Busca busca) {
 
             List<Solicitacao> entities = new List<Solicitacao>();
 

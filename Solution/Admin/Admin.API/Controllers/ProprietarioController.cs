@@ -55,7 +55,7 @@ namespace JaCaptei.Administrativo.API.Controllers {
 
         [HttpPost]
         [Route("buscar")]
-        public IActionResult Buscar([FromBody] Search busca) {
+        public IActionResult Buscar([FromBody] Busca busca) {
             busca.item = JsonConvert.DeserializeObject<Proprietario>(busca.item.ToString());
            // busca.item = JObject.Parse(busca.item);
             appReturn = service.Buscar(busca);

@@ -57,11 +57,15 @@ namespace JaCaptei.Administrativo.API.Controllers
             imovel.inseridoPorNome  = imovel.atualizadoPorNome  = logado.nome;
 
             if(imagesFiles is not null && imagesFiles?.Count > 0) {
-                appReturn = service.Adicionar(imovel);
-                if(appReturn.status.success)
-                        appReturn = await ImageShackUploadImagesFiles(imovel,imagesFiles);
+                if(imagesFiles.Count < 15 && Config.settings.environment == "PRODUCTION")
+                    appReturn.AddException("Necessário ao menos 15 imagens.");
+                else{
+                    appReturn = service.Adicionar(imovel);
+                    if(appReturn.status.success)
+                            appReturn = await ImageShackUploadImagesFiles(imovel,imagesFiles);
+                }
             } else
-                appReturn.AddException("Imagens não inseridas.");
+                appReturn.AddException("Necessário inserir imagens.");
              
             return Result(appReturn);
 

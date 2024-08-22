@@ -1,0 +1,306 @@
+<template>
+
+    <div class="row">
+
+
+        <div class="col-12" v-if="$validator.not(proprietario) || proprietario?.id == 0">
+            NÃO IDENTIFICADO
+        </div>
+        <div class="col-12" v-else>
+
+                            <div class="row">
+
+                                <div class="col-12" id="proprietario-card">
+
+                                    <div id="proprietario-thumb">
+                                      <i  style="margin-top:30px;font-size:60px"class="fa fa-house-user"></i>
+                                       <div style="margin:10px;font-size:20px">
+                                            Proprietário
+                                            <div v-if="$validator.is(textoComplemento)">{{textoComplemento}}</div>
+                                       </div>
+                                    </div>
+
+                                    <el-row id="proprietario-body">
+                                        <div>
+
+                                            <el-col id="caracteristicas">
+
+                                                <el-row>
+                                                    <el-col :span=23 style="border-right:1px solid #e9e9e9">
+                                                        <el-row>
+                                                            <el-col :span=24>
+                                                                    <div style="padding-top:12px;padding-right:12px;cursor:pointer" @click="OpenProprietario(proprietario.id)" @click.middle="OpenProprietario(proprietario.id,'_blank')">
+                                                                        <div style="cursor:pointer;display:flow-root;">
+                                                                            <div id="title" style="float:left">
+                                                                                {{proprietario.nome}}
+                                                                                <span style="font-size:11px;margin-left:4px">
+                                                                                    <span v-if="!proprietario.ativo"          style="border-radius:10px;background-color:var(--s-color-red);margin-right:10px;color:#fff;padding:4px">INATIVO</span>
+                                                                                    <span v-else-if="!proprietario.excluido"  style="border-radius:10px;background-color:orange;color:#fff ;margin-right:10px;padding:4px;">EXCLUÍDO</span>
+                                                                                    <span style="font-weight:600;color:#353535"><i class="fa fa-up-right-from-square"></i></span>
+                                                                                </span>
+                                                                            </div>
+                                                                            <div style="display:inline-block;float:right;">
+                                                                                <span style="font-weight:600;font-size:11pt;padding-left:10px;color:black"><span style="color:var(--s-accent-color);"><span style="opacity:0.7">ID </span>#</span><span style="color:var(--s-alt-accent-color);font-size:12pt">{{proprietario.id}}</span></span>
+                                                                            </div>
+                                                                        </div>
+                                                                    </div>
+                                                                    <div>
+                                                                        <div id="subtitle" style="font-size:inherit; padding-top: 16px;">
+                                                                            <span v-if="$validator.is(proprietario.bairro)">{{proprietario.bairro}}, </span>
+                                                                            <span v-if="$validator.is(proprietario.cidade)">{{proprietario.cidade}}, </span>
+                                                                            <span v-if="$validator.is(proprietario.estado)">{{proprietario.estado}}, </span>
+                                                                            <span v-if="$validator.is(proprietario.cep)"  @click="$tools.Copy(endereco.cep)" >CEP: {{proprietario.cep}}  <i class="fa fa-copy" style="padding-left:10px;color:#666;text-decoration:none;cursor:pointer"></i></span>
+                                                                        </div>
+                                                                    </div>
+                                                                    <div id="location" style="cursor:pointer;padding: 12px 0px 0px 0px;">
+                                                                        <span>
+                                                                            <i class="fa fa-map-marker-alt" style="margin-right:3px"></i>
+                                                                            <span v-if="$validator.is(proprietario.logradouro)">{{proprietario.logradouro}}, </span>
+                                                                            <span v-if="$validator.is(proprietario.numero)">{{proprietario.numero}}, </span>
+                                                                            <span v-if="$validator.is(proprietario.complemento)"> {{proprietario.complemento}} </span>
+                                                                        </span>
+                                                                        <span>
+                                                                            <i class="fa fa-copy" style="padding-left:10px;color:#666;text-decoration:none" @click="$tools.Copy($tools.BuildAddress(proprietario))"></i>
+                                                                        </span>
+
+                                                                    </div>
+                                                            </el-col>
+                                                        </el-row>
+                                                        <el-row style="line-height:32px; font-size: 17px;">
+                                                            <el-col :span=12>
+                                                                <div style="cursor:pointer"><a :href="$tools.BuildWhatsappLink(proprietario.telefone,'Olá '+proprietario.apelido)" target="_blank" style="margin-left:00px;color:var(--s-color-green);text-decoration:none"><i class="fab fa-whatsapp" style="padding-right:3px;"></i> {{proprietario.telefone}}</a>  <i class="fa fa-copy" style="padding-left:3px;text-decoration:none;font-size:14px" @click="$tools.Copy(proprietario.telefone)"></i></div>
+                                                                <div style="cursor:pointer"><a :href="'mailto:'+proprietario.email" target="_blank" style="margin-left:00px;color:var(--el-color-primary);text-decoration:none"><i class="fa fa-envelope"></i>&nbsp; {{proprietario.email}}</a>  <i class="fa fa-copy" style="padding-left:3px;text-decoration:none;font-size:14px" @click="$tools.Copy(proprietario.email)"></i> </div>
+                                                            </el-col>
+                                                            <el-col :span=12>
+                                                                <div style="cursor:pointer"><a v-if="$validator.IsCPF(proprietario.cpf)" href="javascript:void(0)" @click="$tools.Copy(proprietario.cpf)" style="margin-left:0px;text-decoration:none;color:var(--s-color-tex-alt)">CPF: {{proprietario.cpf}}  <i class="fa fa-copy" style="padding-left:3px;text-decoration:none;font-size:14px"></i> </a></div>
+                                                                <div style="cursor:pointer"><a v-if="$validator.IsCNPJ(proprietario.cnpj)" href="javascript:void(0)" @click="$tools.Copy(proprietario.cnpj)" style="margin-left:0px;text-decoration:none;color:var(--s-color-tex-alt)">CNPJ: {{proprietario.cnpj}}  <i class="fa fa-copy" style="padding-left:3px;text-decoration:none;font-size:14px"></i></a></div>
+                                                            </el-col>
+                                                        </el-row>
+                                                    </el-col>
+                                                </el-row>
+                                            </el-col>
+                                        </div>
+
+
+                                </div>
+
+
+                            </div>
+
+
+        </div>
+
+
+    </div>
+
+
+
+
+
+</template>
+
+<script>
+module.exports = {
+
+    components: {
+
+	},
+
+        data: function () {
+            return {
+                view             : "proprietario",
+            }
+        }, computed: {
+
+        },
+
+        props: {
+            id:		            { type: Number, required: false, default: 0 },
+            proprietario:	    { type: Object, required: false, default: {}},
+            textoComplemento:	{ type: String, required: false, default: null },
+        },
+        watch: {
+        },
+        created: function () {
+
+	    },
+	    mounted(){
+
+	    },
+	    methods: {
+
+
+            Open(id,target="_blank"){
+                this.OpenProprietario();
+            },
+    
+            OpenProprietario(id,target="_blank"){
+                this.$root.RouteTo('proprietario/'+id);
+            },
+
+
+
+	    }
+
+}
+
+</script>
+
+
+<!--<script setup>
+const isCollapse = ref(true);
+const handleOpen = function(key, keyPath){
+  c(key, keyPath);
+}
+const handleClose = function(key, keyPath){
+  c(key, keyPath);
+}
+</script>-->
+
+<style scoped>
+
+    img {
+        display: flex;
+        justify-content: center;
+        width: 100%;
+        height: 100%;
+    }
+
+
+    #imovel-card {
+        min-height:198px;
+        width: 100%;
+        border-radius: 20px;
+        margin-left: 0px;
+        /*border:solid 2px #efefef;*/
+        box-shadow: rgba(99, 99, 99, 0.1) 0px 2px 8px 0px;
+        box-shadow: rgba(0, 0, 0, 0.16) 0px 1px 4px;
+        box-shadow: rgb(0 0 0 / 0.14) 1px 1px 6px 2px;
+    }
+    
+
+    #proprietario-card {
+        min-height:198px;
+        width: 100%;
+        border-radius: 20px;
+        margin-left: 0px;
+        /*border:solid 2px #efefef;*/
+        box-shadow: rgba(99, 99, 99, 0.1) 0px 2px 8px 0px;
+        box-shadow: rgba(0, 0, 0, 0.16) 0px 1px 4px;
+        box-shadow: rgb(0 0 0 / 0.14) 1px 1px 6px 2px;
+    }
+
+    #imovel-card-xs {
+        width: auto;
+        height: auto;
+        border-radius: 14px;
+        padding: 10px;
+        /*border:solid 2px #efefef;*/
+        box-shadow: rgba(99, 99, 99, 0.1) 0px 2px 8px 0px;
+        box-shadow: rgba(0, 0, 0, 0.16) 0px 1px 4px;
+    }
+
+
+    #carousel-thumbs {
+        /*height:240px;*/
+        display: inline-block;
+        padding: 0px;
+        max-width: 250px;
+        width: inherit;
+        float: left;
+    }
+
+    
+    #proprietario-thumb {
+        /*height:240px;*/
+        display: inline-block;
+        padding: 0px;
+        max-width: 250px;
+        width: inherit;
+        height: 198px;
+        border-radius: 20px 0px 0px 20px;        float: left;
+        color:#fff;
+        background-color:var(--s-color-primary);
+        text-align:center;
+    }
+
+
+
+    #carousel-thumbs-xs {
+        display: block;
+        padding: 0px;
+        width: 100%;
+    }
+
+    #imovel-body {
+        display: inline-block;
+        padding-left:12px;
+        width: 75%;
+    }
+    
+    #proprietario-body {
+        display: inline-block;
+        padding-left:12px;
+        width: 75%;
+    }
+
+    #imovel-body-xs {
+        display: block;
+        padding: 10px;
+        /*width: calc(100% - 20px);*/
+    }
+
+    #title {
+        font-size: 18px;
+        /*line-height: 24px;*/
+        font-weight: 600;
+        color: var(--s-color-primary);
+    }
+
+    #subtitle {
+        font-size: 16px;
+        padding-top: 6px;
+        font-weight: 700;
+        color: var(--s-color-text);
+    }
+
+
+    .icons {
+        width: 28px;
+        display: inline-block;
+        text-align: center;
+        line-height: 32px;
+        color: var(--s-accent-color);
+    }
+
+
+    #location {
+        font-size: 15px;
+        line-height: 28px;
+        font-weight: 500;
+        color: #131A2E;
+        color: #6a728a;
+        padding: 6px 0px 4px 0px;
+    }
+
+
+    #caracteristicas {
+        font-size: 15px;
+        line-height: 16px;
+        font-weight: 500;
+        color: #131A2E;
+        color: #6a728a;
+        padding: 0px;
+    }
+
+
+    #value {
+        font-size: 22px;
+        font-weight: 700;
+        color: var(--s-accent-color);
+        padding: 14px 0px 14px 0px;
+    }
+
+</style>
+
+

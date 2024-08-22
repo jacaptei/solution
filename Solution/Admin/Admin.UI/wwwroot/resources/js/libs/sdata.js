@@ -15,7 +15,7 @@ export default class SData {
         this.opcoes.months         = this.GetMonthsOptions();
         this.opcoes.years          = this.GetYearsOptions();
         this.opcoes.yearsReverse   = this.GetYearsOptionsReverse();
-        this.opcoes.locaisChaves   = [{id:1,value:"PROPRIETARIO",label:"Proprietário"},{id:2,value:"JA_CAPTEI",label:"JáCaptei"},{id:3,value:"OUTRO",label:"Outro"}];
+        this.opcoes.locaisChaves   = [{id:1,value:"PROPRIETARIO",label:"Proprietário"},{id:2,value:"IMOBILIARIA",label:"Imobiliária"},{id:3,value:"LOCATARIO",label:"Locatário"},{id:4,value:"JA_CAPTEI",label:"JáCaptei"},{id:4,value:"OUTRO",label:"Outro"}];
 
         //this.opcoes.tiposImoveis   = this.ObterTiposImoveis();
         //this.locations            = locations;

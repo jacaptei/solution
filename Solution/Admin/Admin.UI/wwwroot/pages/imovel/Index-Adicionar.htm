@@ -47,8 +47,11 @@
         <el-row>
             <el-col :md="24">
                <c-division></c-division>
+                <div style="font-weight:700;color:var(--s-color-primary)">BUSCAR PROPRIETÁRIO</div>
+               <c-division></c-division>
             </el-col>
         </el-row>
+
 
    		<el-row @keyup.enter="BuscarProprietario()">
 			<el-col :md="24">
@@ -1168,6 +1171,8 @@
 
                 if(this.$validator.not(this.imovel.localChaves))
                     msg += "<b>Local das chaves</b> não informado<br>";
+                if(this.$validator.not(this.imovel.descricao))
+                    msg += "<b>Descrição</b> não informada<br>";
                 
                 if (msg.length > 0)
                     this.$tools.Alert(msg);
@@ -1182,13 +1187,18 @@
             },
 
             CheckoutStep5(){
-                if(this.imagesInputs.length == 0){
+                
+                if(this.imagesInputs.length == 0)
                      this.$tools.Alert("<b>Imagens</b> não inseridas.");
-                }else{
+                else if(this.imagesInputs.length < 15)
+                    this.$tools.Alert("<b>Imagens</b> precisam ser pelo menos 15<br>");
+               else{
                     this.stepCaptions[5] = this.imagesInputs.length + " imagens";
                     this.StepTo(6);
                     this.Enviar();
                 }
+              
+                    this.Enviar();
             },
 
             CheckoutStep6(){
@@ -1218,66 +1228,119 @@
 
             async Enviar() {
 
-                this.ParseImovel();
+                if(this.Validar()){
 
-                this.imagesFiles = [];
+                    this.ParseImovel();
 
-                const formData = new FormData();
+                    this.imagesFiles = [];
 
-                formData.append("jsonImovel", JSON.stringify(this.imovel));
+                    const formData = new FormData();
 
-                this.imagesInputs.forEach((img)=>{
-                    var imageFile = Object.assign({}, img).raw;
-                    formData.append('imagesFiles',imageFile, imageFile.name);
-                });
+                    formData.append("jsonImovel", JSON.stringify(this.imovel));
 
-                this.onrequest = true;
+                    this.imagesInputs.forEach((img)=>{
+                        var imageFile = Object.assign({}, img).raw;
+                        formData.append('imagesFiles',imageFile, imageFile.name);
+                    });
 
-                 var url = this.$api.BuildURL("imovel/adicionar");
-                 var result = axios.post(url,formData,{headers:{"Accept": "application/json","Content-Type": "multipart/form-data"} }).then((request) => {
-                       //c(request);
-                      if (request.data.status.success){
-                            //c2("request.data",request.data)
-                            this.imovel = request.data.result;
-                            this.CheckoutStep6();
-                            return request.data;
-                       }else
-					        this.CheckoutStep7();
+                    this.onrequest = true;
 
-				}).catch((error) => {
-					//ce(error);
-                    if (error.response) {
-                        ce(error);
-                    }
-					this.CheckoutStep7();
-				}).finally(() => {
-                    this.onrequest = false;
-				});
+                     var url = this.$api.BuildURL("imovel/adicionar");
+                     var result = axios.post(url,formData,{headers:{"Accept": "application/json","Content-Type": "multipart/form-data"} }).then((request) => {
+                           //c(request);
+                          if (request.data.status.success){
+                                //c2("request.data",request.data)
+                                this.imovel = request.data.result;
+                                this.CheckoutStep6();
+                                return request.data;
+                           }else
+					            this.CheckoutStep7();
 
-
-               /*
-                formData.append("imovel", JSON.stringify(this.imovel));
-
-                this.imagesInputs.forEach((img)=>{
-                    var imageFile = Object.assign({}, img).raw;
-                    formData.append('imagesFiles',imageFile, imageFile.name);
-                });
-
-                var resultImgs, resultImv;
-
-                 var resultImgs = axios.post(url,formData,{headers:{"Accept": "application/json","Content-Type": "multipart/form-data"} }).then((request) => {
-                        if (this.$validator.is(resultImgs?.status?.success)){
-                                c("success imagens");
-                                resultImv = await this.$api.Post("imovel/adicionar", this.imovel);
-                                if(this.$validator.is(resultImv?.status?.success))
-                                    this.CheckoutStep5();
+				    }).catch((error) => {
+					    //ce(error);
+                        if (error.response) {
+                            ce(error);
                         }
-                 });  
-                 */
+					    this.CheckoutStep7();
+				    }).finally(() => {
+                        this.onrequest = false;
+				    });
+
+
+                   /*
+                    formData.append("imovel", JSON.stringify(this.imovel));
+
+                    this.imagesInputs.forEach((img)=>{
+                        var imageFile = Object.assign({}, img).raw;
+                        formData.append('imagesFiles',imageFile, imageFile.name);
+                    });
+
+                    var resultImgs, resultImv;
+
+                     var resultImgs = axios.post(url,formData,{headers:{"Accept": "application/json","Content-Type": "multipart/form-data"} }).then((request) => {
+                            if (this.$validator.is(resultImgs?.status?.success)){
+                                    c("success imagens");
+                                    resultImv = await this.$api.Post("imovel/adicionar", this.imovel);
+                                    if(this.$validator.is(resultImv?.status?.success))
+                                        this.CheckoutStep5();
+                            }
+                     });  
+                     */
+
+                }
+
 
 
             },
 
+
+
+
+            Validar(){
+
+                var ok = true;
+
+                var msg = "";
+
+                if (this.$validator.not(this.imovel.documentacao.indiceCadastral))
+                    msg += "<b>ÍNDICE CADASTRAL</b> não informado<br>";
+
+                if (this.$validator.not(this.imovel.endereco.cep))
+                    msg += "<b>CEP</b> não informado<br>";
+
+                if (this.$validator.not(this.imovel.endereco.estado))
+                    msg += "<b>ESTADO</b> não selecionado<br>";
+
+                if (this.$validator.not(this.imovel.endereco.cidade))
+                    msg += "<b>CIDADE</b> não selecionada<br>";
+
+                if (this.$validator.not(this.imovel.endereco.bairro))
+                    msg += "<b>BAIRRO</b> não selecionado<br>";
+
+                if (this.$validator.not(this.imovel.endereco.logradouro))
+                    msg += "<b>LOGRADOURO</b> não informado<br>";
+
+                if (this.$validator.not(this.imovel.endereco.numero))
+                    msg += "<b>NÚMERO</b> não informado (informe <b>SN</b> se não houver)<br>";
+
+                if(this.$validator.not(this.imovel.localChaves))
+                    msg += "<b>Local das chaves</b> não informado<br>";
+
+                if(this.$validator.not(this.imovel.descricao))
+                    msg += "<b>Descrição</b> não informada<br>";
+               
+                if(this.imagesInputs.length == 0)
+                    msg += "<b>Imagens</b> não inseridas<br>";
+                else if(this.imagesInputs.length < 15)
+                    msg += "<b>Imagens</b> precisam totalizar menos 15<br>";
+            
+                if (msg.length > 0){
+                    ok = false;
+                    this.$tools.Alert(msg);
+                }
+                
+                return ok;
+            },
 
             ParseImovel(){
                     this.imovel.valor.venda                     = this.$tools.ParseFloat( this.imovel.valor.venda         );

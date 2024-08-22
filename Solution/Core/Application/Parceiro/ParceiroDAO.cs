@@ -717,7 +717,7 @@ namespace JaCaptei.Application{
 
 
 
-        public AppReturn Buscar(Search busca) {
+        public AppReturn Buscar(Busca busca) {
 
             List<Parceiro> entities = new List<Parceiro>();
 
@@ -792,7 +792,7 @@ namespace JaCaptei.Application{
             return appReturn;
         }
 
-        public AppReturn BuscarConta(Search busca) {
+        public AppReturn BuscarConta(Busca busca) {
 
             string sql      = "SELECT * FROM \"Parceiro\" ";
             string sqlCount = "SELECT COUNT(*) FROM \"Parceiro\" ";

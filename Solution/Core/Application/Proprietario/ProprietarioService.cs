@@ -114,7 +114,7 @@ namespace JaCaptei.Application{
 
 
 
-        public AppReturn Buscar(Search busca) {
+        public AppReturn Buscar(Busca busca) {
             appReturn = DAO.Buscar(busca);
             return appReturn;
         }

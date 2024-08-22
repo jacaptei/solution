@@ -148,7 +148,7 @@ namespace JaCaptei.Application{
         }
 
 
-        public AppReturn Buscar(Search busca) {
+        public AppReturn Buscar(Busca busca) {
 
             string sql      = "SELECT * FROM \"Proprietario\" ";
             string sqlCount = "SELECT COUNT(*) FROM \"Proprietario\" ";
