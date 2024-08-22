@@ -199,7 +199,7 @@
                 rules: {
                     chaveApi: [{ required: true, message: 'Por favor, insira a Chave API', trigger: 'blur' }],
                     codUsuario: [{ required: true, message: 'Por favor, insira o Código de Usuário', trigger: 'blur' }],
-                    codUnidade: [{ required: true, message: 'Por favor, selecione a Unidade', trigger: 'change' }]
+                    codUnidade: [{ required: true, message: 'Por favor, selecione a Unidade', trigger: 'blur' }]
                 },
                 fullscreenLoading: ref(false),
             };
@@ -271,7 +271,7 @@
                 });
             },
             QuantidadeBairros() {
-                return this.locationGroups.length < 25;
+                return this.qntdBairros > this.locationGroups.length;
             },
             getCityLabel(id) {
                 const cidade = this.opcoes.cidades.find(city => city.id === parseInt(id));
@@ -291,6 +291,7 @@
                 this.integracao.idCliente = 0;
                 this.integracao.chaveApi = "";
                 this.integracao.codUsuario = "";
+                this.integracao.codUnidade = "";
             },
             removeLocationGroup(index) {
                 this.locationGroups.splice(index, 1);
@@ -313,7 +314,7 @@
                     });
                 }
                 else {
-                    if (this.locationGroups.length == 0) {
+                    if (this.qntdBairros == 0) {
                         this.$tools.MessageAlert("Informe um Parceiro!!");
                     } else {
                         this.$tools.MessageAlert("Quantidade máxima de bairros atingida.");
@@ -361,8 +362,7 @@
             handleBairrosChange(selectedBairros, group, index) {
                 this.locationGroups[index].selectedBairros = selectedBairros;
                 if (this.locationGroups[index] && selectedBairros.length === 0) {
-                    // Exiba uma mensagem de erro ou implemente outra lógica
-                    console.error("Selecione pelo menos um bairro.");
+                    this.$tools.MessageAlert("Selecione pelo menos um bairro.");
                 } else {
                     this.integracao.bairros.push(selectedBairros);
                     this.disableButtonIntegration = true;
@@ -442,7 +442,7 @@
                 this.integracao.idCliente = this.perfilIntegracaoCadastro.cliente.id
                 this.integracao.idPlano = perfilIntegracaoCadastro.plano.id;
                 this.crm = imoviewCrm[0].id;
-                //this.qntdBairros = this.perfilIntegracaoCadastro.plano.qtdBairros;
+                this.qntdBairros = this.perfilIntegracaoCadastro.plano.qtdBairros;
 
                 if (perfilIntegracaoCadastro && perfilIntegracaoCadastro.integracao?.bairros) {
                     this.integracao.bairros = JSON.parse(perfilIntegracaoCadastro.integracao?.bairros);
@@ -461,7 +461,6 @@
                     this.fullscreenLoading = true;
                     const valid = await this.$refs.integracao.validate();
                     this.integracao.codUnidade = JSON.stringify(this.integracao.codUnidade);
-                    console.log(this.integracao);
 
                     if (valid) {
                         this.loading = true;
