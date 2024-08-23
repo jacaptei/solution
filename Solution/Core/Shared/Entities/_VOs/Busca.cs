@@ -1,7 +1,7 @@
 ﻿namespace JaCaptei.Model{
 
 
-    public class Search{
+    public class Busca{
 
         public dynamic          item            { get; set; }
 
@@ -16,6 +16,9 @@
         public int              offset          { get => ((page-1) * resultsPerPage); }
         public string           status          { get; set; } = "";
         public int              idStatus        { get; set; }
+
+        public string           name            { get; set; } = "";
+        public string           document        { get; set; } = "";
         
         public int[]            mins            { get; set; } = new int[10];
         public int[]            maxs            { get; set; } = new int[10];
@@ -35,7 +38,7 @@
         public string           filter          { get; set; }
 
 
-        public Search() {
+        public Busca() {
             resultsPerPage = 20;
         }
 
@@ -43,7 +46,7 @@
     }
 
 
-    public class SearchSolicitacoes:Search {
+    public class SearchSolicitacoes:Busca {
 
             public int totalAguardando  { get; set; }
             public int totalVerificando { get; set; }

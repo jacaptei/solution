@@ -41,7 +41,7 @@ namespace JaCaptei.Application
             dicModels.Add("solicitacao"         ,   new Solicitacao());
             dicModels.Add("tiposStatus"         ,   ObterTiposStatus());
             dicModels.Add("favorito"            ,   new ImovelFavorito());
-            dicModels.Add("busca"               ,   new Search());
+            dicModels.Add("busca"               ,   new Busca());
             dicModels.Add("log"                 ,   new Log());
             
             return dicModels;

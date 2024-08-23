@@ -193,6 +193,8 @@ namespace JaCaptei.Application {
                         //entityDB.dataAtualizacao    = Utils.Date.GetLocalDateTime();
                         conn.Update<Imovel>(entityDB);
 
+                        entity.proprietario = conn.Query<Proprietario>(e => e.id == entity.idProprietario).FirstOrDefault();
+
                     } else
                         appReturn.AddException("Não foi possível validar (registro não encontrado ou inválido).");
                 }
@@ -303,14 +305,10 @@ namespace JaCaptei.Application {
                         +" JOIN \"ImovelDisposicao\"                  disposicao      ON (disposicao.\"idImovel\"     = imovel.id)  "
                         +" JOIN \"ImovelDocumentacao\"                documentacao    ON (documentacao.\"idImovel\"   = imovel.id)  "
                         +" JOIN \"ImovelTipo\"                        tipo            ON (tipo.id                     = imovel.\"idTipo\")  "
-                    ;
+                        +" JOIN \"Proprietario\"                      proprietario    ON (proprietario.id             = imovel.\"idProprietario\")  "
+            ;
 
-            if(busca.usuarioGod || busca.usuarioGestor)
-                from += " JOIN \"Proprietario\"                      proprietario    ON (proprietario.id             = imovel.\"idProprietario\")  ";
-
-                string  filter   = ObterQueryBuscaImovel(busca);
-
-
+            string  filter   = ObterQueryBuscaImovel(busca);
 
             string  sqlCount = "SELECT COUNT(*) "
                         + " FROM " + from
@@ -483,6 +481,16 @@ namespace JaCaptei.Application {
                 if(busca.imovel.lazer.piscina)               { filter += " AND lazer.piscina                = TRUE ";  }
                 if(busca.imovel.lazer.quadraPoliesportiva)   { filter += " AND lazer.\"quadraPoliesportiva\"= TRUE ";  }
                 if(busca.imovel.lazer.salaoFestas)           { filter += " AND lazer.\"salaoFestas\"        = TRUE ";  }
+
+
+                if(busca.imovel.proprietario.id > 0 )
+                    filter += " AND proprietario.id = " +busca.imovel.proprietario.id.ToString() + " " ;
+                if(Utils.Validator.Is(busca.imovel.proprietario.email))
+                    filter += " AND proprietario.email LIKE '%" +busca.imovel.proprietario.email + "%' " ;
+                if(Utils.Validator.Is(busca.imovel.proprietario.cpf))
+                    filter += " AND proprietario.cpf LIKE '%" +busca.imovel.proprietario.cpf + "%' " ;
+                if(Utils.Validator.Is(busca.imovel.proprietario.cnpj))
+                    filter += " AND proprietario.cnpj LIKE '%" +busca.imovel.proprietario.cnpj + "%' " ;
 
                 filter = Utils.Validator.ParseSafeSQL(filter);
 

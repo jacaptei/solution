@@ -152,8 +152,7 @@ namespace JaCaptei.Application
 
             appReturn = DAO.Adicionar(entity);
 
-            if (appReturn.status.success)
-            {
+            if (appReturn.status.success){
                 Mail mail = new Mail();
                 mail.emailTo = entity.email;
                 mail.about = "Confirme seu cadastro";
@@ -447,7 +446,7 @@ namespace JaCaptei.Application
 
 
 
-        public AppReturn Buscar(Search busca)
+        public AppReturn Buscar(Busca busca)
         {
             busca.item = BLO.NormalizarParaBusca(busca.item);
             appReturn = DAO.Buscar(busca);

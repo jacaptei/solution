@@ -15,6 +15,7 @@ const c_search_form             = LoadComponent(componentPath+"c-search-form.htm
 const c_building_card           = LoadComponent(componentPath+"c-building-card.htm");
 const c_imovel_card             = LoadComponent(componentPath+"c-imovel-card.htm");
 const c_imovel_view             = LoadComponent(componentPath+"c-imovel-view.htm");
+const c_proprietario_card       = LoadComponent(componentPath+"c-proprietario-card.htm");
 const c_menu_header             = LoadComponent(componentPath+"c-menu-header.htm");
 const c_menu                    = LoadComponent(componentPath+"c-menu.htm");
 const c_card                    = LoadComponent(componentPath+"c-card.htm");

@@ -84,21 +84,24 @@
                                                             <el-col :span=5> <i class="icons fa fa-building "></i>      elevadores  <div style="font-size: 17px;font-weight: 700;text-align:center;max-width:100px;margin-top:-4px">{{imovel.externo.totalElevadores}}</div></el-col>
                                                         </el-row>
                                                         <el-row style="line-height:20px">
-                                                            <el-col :span=5> <i class="icons mdi mdi-set-square " style="margin-right:-4px"></i>Área Total  <div style="font-size: 15px;font-weight: 700;text-align:center;max-width:110px;margin-top:-4px">{{imovel.area.total}} m&#178;</div></el-col>
-                                                            <el-col :span=5> <i class="icons mdi mdi-set-square " style="margin-right:-4px"></i>Área Interna<div style="font-size: 15px;font-weight: 700;text-align:center;max-width:110px;margin-top:-4px">{{imovel.area.interna}} m&#178;</div></el-col>
-                                                            <el-col :span=5> <i class="icons mdi mdi-set-square " style="margin-right:-4px"></i>Área Externa<div style="font-size: 15px;font-weight: 700;text-align:center;max-width:110px;margin-top:-4px">{{imovel.area.externa}} m&#178;</div></el-col>
-                                                            <el-col :span=5 v-if="imovel.proprietario?.id > 0" style="color:var(--s-color-primary);cursor:pointer" @click="view='proprietario'" > <i class="icons fa fa-house-user   " style="margin-right:-4px"></i>Proprietário<div style="font-size: 15px;font-weight: 700;text-align:center;max-width:110px;margin-top:-4px">{{imovel.proprietario.apelido}}</div></el-col>
+                                                            <el-col :span=5> <i class="icons mdi mdi-set-square "  style="margin-right:-4px"></i>Área Total  <div style="font-size: 15px;font-weight: 700;text-align:center;max-width:110px;margin-top:-4px">{{imovel.area.total}} m&#178;</div></el-col>
+                                                            <el-col :span=5> <i class="icons mdi mdi-set-square "  style="margin-right:-4px"></i>Área Interna<div style="font-size: 15px;font-weight: 700;text-align:center;max-width:110px;margin-top:-4px">{{imovel.area.interna}} m&#178;</div></el-col>
+                                                            <el-col :span=5> <i class="icons mdi mdi-set-square "  style="margin-right:-4px"></i>Área Externa<div style="font-size: 15px;font-weight: 700;text-align:center;max-width:110px;margin-top:-4px">{{imovel.area.externa}} m&#178;</div></el-col>
+                                                            <el-col :span=5 v-if="imovel.anoConstrucao > 0"> <i class="icons mdi mdi-cake-variant"></i>{{imovel.anoConstrucao}}<div style="font-size: 15px;font-weight: 700;text-align:center;max-width:110px;margin-top:-4px">{{idade}} anos</div></el-col>
+                                                            <el-col :span=5 v-else                         > <i class="icons mdi mdi-cake-variant"></i>indefinido<div style="font-size: 15px;font-weight: 700;text-align:center;max-width:110px;margin:0px"></div></el-col>
                                                        </el-row>
                                                     </el-col>
                                                     <el-col :span=1></el-col>
                                                     <el-col :span=6>
                                                         <el-row>
-                                                            <el-col :span=24 style="padding-top:12px"> <div style="color:#01cb25;font-size: 20px;font-weight:700;display:inline-block">{{$tools.FormatMoneyBR(imovel.valor.venda)}}</div></el-col>
+                                                            <el-col :span=24 style="padding-top:8px"> <div style="color:#01cb25;font-size: 20px;font-weight:700;display:inline-block">{{$tools.FormatMoneyBR(imovel.valor.venda)}}</div></el-col>
                                                             <el-col :span=24 style="padding-top:6px">Condomínio:     <div style="font-size: 15px;font-weight:700;display:inline-block">{{$tools.FormatMoneyBR(imovel.valor.condominio)}}</div></el-col>
                                                             <el-col :span=24 style="padding-top:3px">IPTU mensal:    <div style="font-size: 15px;font-weight:700;display:inline-block">{{$tools.FormatMoneyBR(imovel.valor.iptuMensal)}}</div></el-col>
-                                                            <el-col :span=24 style="padding-top:12px">Atualização    <div style="font-size: 12px;font-weight:700">{{$tools.FormatDateHourToBR(imovel.dataAtualizacao)}} <span style="font-weight:normal;color:#555555">{{$tools.GetHours(imovel.dataAtualizacao)}}h por</span><br />{{imovel.atualizadoPorNome}} <span v-if="imovel.atualizadoPorId > 0" style="font-weight:normal">ID #{{imovel.atualizadoPorId}}</span></div></el-col>
+                                                            <el-col :span=24 style="padding-top:3px">Comissao:       <div style="font-size: 15px;font-weight:700;display:inline-block">{{imovel.valor.comissao}}%</div></el-col>
+                                                            <el-col :span=24 style="padding-top:8px">Atualização    <div style="font-size: 12px;font-weight:700">{{$tools.FormatDateHourToBR(imovel.dataAtualizacao)}} <span style="font-weight:normal;color:#555555">{{$tools.GetHours(imovel.dataAtualizacao)}}h por </span> {{imovel.atualizadoPorNome}} <span v-if="imovel.atualizadoPorId > 0" style="font-weight:normal">ID #{{imovel.atualizadoPorId}}</span></div></el-col>
                                                             <!--<el-col :span=24 style="padding-top:12px">Atualizado por  ID #{{imovel.atualizadoPorId}}   <div style="font-size: 13px;font-weight:700">{{imovel.atualizadoPorNome}}</div></el-col>-->
-                                                            <el-col :span=24 style="padding-top:12px" v-if="$validator.is(imovel.captador)">Captado por    <div style="font-size: 12px;font-weight:700">{{imovel.captador}}  <span v-if="imovel.idAdminCaptador > 0" style="font-weight:normal">ID #{{imovel.idAdminCaptador}}</span></div></el-col>
+                                                            <el-col :span=24 style="padding-top:8px" v-if="$validator.is(imovel.captador)">Captado por    <div style="font-size: 12px;font-weight:700;display:inline-block">{{imovel.captador}}  <span v-if="imovel.idAdminCaptador > 0" style="font-weight:normal">ID #{{imovel.idAdminCaptador}}</span></div></el-col>
+                                                            <el-col :span=24 v-if="imovel.proprietario?.id > 0" style="color:var(--s-color-primary);cursor:pointer;margin-left:-5px" @click="view='proprietario'" > <i class="icons fa fa-house-user   " style="margin-right:-4px"></i>Prop. <div style="font-size: 15px;display:inline-block;font-weight: 700;text-align:center;max-width:110px;margin-top:-4px"> {{imovel.proprietario.apelido}}</div></el-col>
                                                         </el-row>
                                                     </el-col>
                                                 </el-row>
@@ -163,7 +166,7 @@
                                                                                 {{imovel.proprietario.nome}}
                                                                                 <span style="font-size:11px;margin-left:4px">
                                                                                     <span v-if="!imovel.proprietario.ativo"          style="border-radius:10px;background-color:var(--s-color-red);margin-right:10px;color:#fff;padding:4px">INATIVO</span>
-                                                                                    <span v-else-if="!imovel.proprietario.excluido"  style="border-radius:10px;background-color:orange;color:#fff ;margin-right:10px;padding:4px;">EXCLUÍDO</span>
+                                                                                    <span v-else-if="imovel.proprietario.excluido"  style="border-radius:10px;background-color:orange;color:#fff ;margin-right:10px;padding:4px;">EXCLUÍDO</span>
                                                                                     <span style="font-weight:600;color:#353535"><i class="fa fa-up-right-from-square"></i></span>
                                                                                 </span>
                                                                             </div>
@@ -239,7 +242,8 @@ module.exports = {
                 view             : "imovel",
                 showModalImages  : false,
                 imageIndex       : 0,
-                favoritando      : false
+                favoritando      : false,
+                idade            : 1,
             }
         }, computed: {
 
@@ -255,7 +259,7 @@ module.exports = {
 
 	    },
 	    mounted(){
-
+            this.idade = (new Date().getFullYear() - this.imovel.anoConstrucao);
 	    },
 	    methods: {
 
