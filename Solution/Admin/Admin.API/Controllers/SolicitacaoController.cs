@@ -58,9 +58,6 @@ namespace JaCaptei.Administrativo.API.Controllers {
 
             entity.admin = new Model.Admin { id = entity.idAdmin };
 
-            var dateUtil = new DateUtil();
-            entity.dataVisita = dateUtil.ConvertToLocalDateTime(entity.dataVisita);
-
             appReturn = service.Alterar(entity);
             return Result(appReturn);
         }
@@ -162,7 +159,7 @@ namespace JaCaptei.Administrativo.API.Controllers {
         [HttpPost]
         [Route("finalizar")]
         public IActionResult Finalizar([FromBody] Solicitacao entity) {
-            Model.Admin logado        = ObterAdminAutenticado();
+            Model.Admin logado  = ObterAdminAutenticado();
             entity.admin        = new Model.Admin();
             entity.admin.id     = entity.idAdmin = logado.id;
             entity.admin.nome   = logado.nome;
@@ -185,7 +182,7 @@ namespace JaCaptei.Administrativo.API.Controllers {
             if(!logado.gestor)
                 entity.idAdmin = logado.id;
 
-            Search busca = new Search{item = entity };
+            Busca busca = new Busca{item = entity };
             appReturn = service.Buscar(busca);
             return Result(appReturn);
         }
@@ -194,7 +191,7 @@ namespace JaCaptei.Administrativo.API.Controllers {
         [Authorize(Roles = "ADMIN_GOD,ADMIN_GESTOR,ADMIN_PADRAO")]
         [HttpPost]
         [Route("buscarrange")]
-        public IActionResult BuscarRange([FromBody] Search busca) {
+        public IActionResult BuscarRange([FromBody] Busca busca) {
 
             busca.item = JsonConvert.DeserializeObject<Solicitacao>(busca.item.ToString());
 

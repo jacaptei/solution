@@ -216,6 +216,7 @@ namespace JaCaptei.Application{
                 endereco += Utils.Validator.Is(entity.logradouro )?(entity.logradouro +", "  ) : "";
                 endereco += Utils.Validator.Is(entity.numero     )?(entity.numero     +", "  ) : "";
                 endereco += Utils.Validator.Is(entity.complemento)?(entity.complemento+", "  ) : "";
+                endereco += Utils.Validator.Is(entity.bairro)?(entity.bairro+ ", "  ) : "";
                 endereco += Utils.Validator.Is(entity.cidade     )?(entity.cidade     +", "  ) : "";
                 endereco += Utils.Validator.Is(entity.estado     )?(entity.estado            ) : "";
                 endereco += Utils.Validator.Is(entity.cep        )?("<br>CEP: " + entity.cep ) : "";
@@ -256,7 +257,7 @@ namespace JaCaptei.Application{
 
 
 
-        public AppReturn Buscar(Search busca) {
+        public AppReturn Buscar(Busca busca) {
             appReturn = DAO.Buscar(busca);
             return appReturn;
         }

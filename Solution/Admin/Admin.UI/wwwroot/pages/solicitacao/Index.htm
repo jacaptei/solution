@@ -2,9 +2,6 @@
 
     <div class="row">
         <div class="col-12">
-
-
-
             <q-tabs v-model="tab"
                     dense
                     no-caps
@@ -1470,10 +1467,10 @@
 
             async Captar(item) {
                 item.acao = 'captar';
+                item.dataVisita = new Date(item.dataVisita).toISOString();
                 var request = await this.$api.Post("solicitacao/captar", item);
                 if (request?.status?.success) {
                     item.acao = 0;
-                    //this.$tools.AlertSuccess("SOLICITAÇÃO #" + item.id + " captada em verificação!");
                     this.$tools.MessageSuccess("SOLICITAÇÃO #" + item.id + " captada em verificação!");
                     request.result.dataVisita = new Date(request.result.dataVisita);
                     request.result.acaocard = 'abrir-card' + request.result.id;
@@ -1483,10 +1480,7 @@
                     item.ativo = false;
                     this.tab = "verificando";
                     this.$tools.Top();
-                    //window.setTimeout(() => this.$refs[("avaliacao" + request.result.id)].focus(), 2000);
-                    //c(this.results);
-                }//else
-                //  this.view = "fail";
+                }
             },
 
             async Reavaliar(item) {
@@ -1630,6 +1624,7 @@
 
             async Finalizar(item) {
                 item.acao = 'finalizar';
+                item.dataVisita = new Date(item.dataVisita).toISOString();
                 var request = await this.$api.Post("solicitacao/finalizar", item);
                 if (request?.status?.success) {
                     item.acao = 0;

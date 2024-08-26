@@ -50,8 +50,8 @@ namespace JaCaptei.API.Controllers
         [HttpPost]
         [Route("alterar")]
         public IActionResult Alterar([FromBody] Solicitacao entity) {
-            if(entity is null) {
-                appReturn.AddException("Usuário inexistente ou inválido");
+            if(entity is null || entity?.id == 0 || entity?.idParceiro == 0) {
+                appReturn.AddException("Solicitação inexistente ou inválida");
                 return Result(appReturn);
             }
 
@@ -83,7 +83,7 @@ namespace JaCaptei.API.Controllers
 
         [HttpPost]
         [Route("buscar")]
-        public IActionResult Buscar([FromBody] Search busca) {
+        public IActionResult Buscar([FromBody] Busca busca) {
             busca.item = JsonConvert.DeserializeObject<Solicitacao>(busca.item.ToString());
            // busca.item = JObject.Parse(busca.item);
             appReturn = service.Buscar(busca);

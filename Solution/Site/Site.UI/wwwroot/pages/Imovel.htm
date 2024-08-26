@@ -737,11 +737,7 @@
                         var buscaImovel = {imovel:{}};
                         buscaImovel.imovel.id  = this.$validator.not(this.id)?  0 : this.id;
                         buscaImovel.imovel.cod = this.$validator.not(this.cod)? "": this.cod;
-                        //this.imovel    = {};
-
-		c2("id" ,buscaImovel.imovel.id);
-		c2("cod",buscaImovel.imovel.cod);
-
+        
                         this.onRequest    = true;
                         this.indisponivel = false;
 

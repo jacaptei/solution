@@ -5,6 +5,8 @@ namespace JaCaptei.Model {
 
             public String           sql                 {get;set;} = "";
             public String           sessaoCRM           {get;set;} = "";
+            public String           name                {get;set;} = "";
+            public String           document            {get;set;} = "";
             public int              page                {get;set;} = 1;
             public int              resultsPerPage      {get;set;} = 10;
 

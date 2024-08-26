@@ -29,15 +29,15 @@
 
                         <q-stepper v-model="step" ref="stepper" color="primary" done-color="green-13" animated >
 
-                          <!--<q-step :name="1" title="PROPRIETÁRIO"    prefix="1" :caption="stepCaptions[1]" :done="step > 1"></q-step>-->
+                          -<q-step :name="1" title="PROPRIETÁRIO"    prefix="1" :caption="stepCaptions[1]" :done="step > 1"></q-step>
 
-                          <q-step :name="2" title="LOCALIZAÇÃO"     prefix="1"  :done="step > 2" ></q-step>
+                          <q-step :name="2" title="LOCALIZAÇÃO"     prefix="1" :caption="stepCaptions[2]"  :done="step > 2" ></q-step>
                                                                                 
                           <q-step :name="3" title="PARTICULARIDADES" prefix="2" :done="step > 3"></q-step>
                                                                                 
                           <q-step :name="4" title="CARACTERÍSTICAS" prefix="3"  :done="step > 4"></q-step>
                                                                                 
-                          <q-step :name="5" title="IMAGENS"         prefix="4"  :done="step > 5"></q-step>               
+                          <q-step :name="5" title="IMAGENS"         prefix="4" :caption="stepCaptions[5]"  :done="step > 5"></q-step>               
 
                           <!--<q-step :name="5" title="CONFIRMAÇÃO" prefix="5" :caption="stepCaptions[5]" :done="step == 5" >--><!--describe --><!--</q-step>-->               
 
@@ -59,13 +59,19 @@
 
         <el-row>
             <el-col :md="24">
-                <q-btn label='ADICIONAR PROPRIETÁRIO' color="primary" @click="$root.RouteTo('proprietarios',{view:'adicionar',from:'imoveis'})" style="width:340px;margin-right:20px"></q-btn>
-                <q-btn label='PROSSEGUIR COM PROPRIETÁRIO "JÁ CAPTEI"' color="orange" @click="CheckoutStep1(proprietarioJacaptei)" style="width:340px"></q-btn>
+               <c-proprietario-card textoComplemento="atual" :proprietario="imovel.proprietario"></c-proprietario-card>
+            </el-col>
+            <el-col :md="24">
+                <div style="padding:14px;padding-bottom:0px">
+                    <q-btn label='PROSSEGUIR SEM ALTERAR PROPRIETÁRIO' color="primary" @click="CheckoutStep1(imovel.proprietario)" style="width:340px"></q-btn>
+                </div>
             </el-col>
         </el-row>
 
         <el-row>
             <el-col :md="24">
+               <c-division></c-division>
+                <div style="font-weight:700;color:var(--s-color-primary)">BUSCAR OUTRO PROPRIETÁRIO</div>
                <c-division></c-division>
             </el-col>
         </el-row>
@@ -76,27 +82,27 @@
                 <el-row :gutter="20">
                         <el-col :xs="24" :sm="12" :md="8":lg="6" class="s-input">
                             <div>NOME<span></span></div>
-                            <el-input @keyup.enter="Buscar()" v-model="busca.item.nome" placeholder="qualquer" maxlength="120" ref="nome" input-style="text-transform:uppercase;"></el-input>
+                            <el-input v-model="buscaProprietario.item.nome" placeholder="qualquer" maxlength="120" ref="nome" input-style="text-transform:uppercase;"></el-input>
                         </el-col>
                         <el-col :xs="24" :sm="12" :md="8":lg="6" class="s-input">
                             <div>E-MAIL <span></span></div>
-                            <el-input @keyup.enter="Buscar()" v-model="busca.item.email" placeholder="qualquer" maxlength="80" input-style="text-transform:lowercase;"></el-input>
+                            <el-input v-model="buscaProprietario.item.email" placeholder="qualquer" maxlength="80" input-style="text-transform:lowercase;"></el-input>
                         </el-col>
                         <el-col :xs="24" :sm="12" :md="8":lg="6" class="s-input">
                             <div>TELEFONE <span></span></div>
-                            <el-input @keyup.enter="Buscar()" v-model="busca.item.telefone" placeholder="qualquer" maxlength="40" input-style="text-transform:lowercase;" v-maska data-maska="(##) #####-#### ********************"></el-input>
+                            <el-input v-model="buscaProprietario.item.telefone" placeholder="qualquer" maxlength="40" input-style="text-transform:lowercase;" v-maska data-maska="(##) #####-#### ********************"></el-input>
                         </el-col>
                         <el-col :xs="24" :sm="12" :md="8":lg="6" class="s-input">
                             <div>CPF<span></span></div>
-                            <el-input @keyup.enter="Buscar()" v-model="busca.item.cpf" placeholder="qualquer" maxlength="22" v-maska data-maska="###.###.###-##" @blur="CheckDoc"></el-input>
+                            <el-input v-model="buscaProprietario.item.cpf" placeholder="qualquer" maxlength="22" v-maska data-maska="###.###.###-##" @blur="CheckDoc"></el-input>
                         </el-col>
                         <el-col :xs="24" :sm="12" :md="8":lg="6" class="s-input">
                             <div>RG<span></span></div>
-                            <el-input @keyup.enter="Buscar()" v-model="busca.item.rg" placeholder="qualquer" maxlength="22" ref="documento"></el-input>
+                            <el-input v-model="buscaProprietario.item.rg" placeholder="qualquer" maxlength="22" ref="documento"></el-input>
                         </el-col>
                         <el-col :xs="24" :sm="12" :md="8":lg="6" class="s-input">
                             <div>ID<span></span></div>
-                            <el-input-number @keyup.enter="Buscar()" v-model="id" placeholder="qualquer" maxlength="20" ref="id" :controls="false"></el-input-number>
+                            <el-input-number v-model="buscaProprietario.item.id" placeholder="qualquer" maxlength="20" ref="id" :controls="false"></el-input-number>
                         </el-col>
                         <el-col :xs="24" :sm="12" :md="8" :lg="6" class="s-input">
                             <div><span></span></div>
@@ -131,11 +137,11 @@
                             <el-col :md="24">
                                 <div style="float:left">
                                     <span style="color:var(--s-color-primary)">encontrados</span><br />
-                                        <span v-if="busca.total > 0">{{busca.total}}</span>
+                                        <span v-if="buscaProprietario.total > 0">{{buscaProprietario.total}}</span>
                                         <span v-else style="color:var(--s-color-orange)">nada encontrado</span>
                                 </div>
                                 <div style="float:right">
-                                    <q-input v-model.number="busca.resultsPerPage" type="number" style="max-width:140px" label="RESULTADOS POR PÁGINA" stack-label :min="1" :dense="true" @keyup.enter="()=>{ if(!onrequest){ Buscar(1);}}" ></q-input>
+                                    <q-input v-model.number="buscaProprietario.resultsPerPage" type="number" style="max-width:140px" label="RESULTADOS POR PÁGINA" stack-label :min="1" :dense="true" @keyup.enter="()=>{ if(!onrequest){ BuscarProprietario(1);}}" ></q-input>
                                 </div>
                             </el-col>
                         </el-row>
@@ -273,7 +279,7 @@
                     <el-col :md="24">
 
                         <div class="q-pa-lg flex flex-center">
-                                    <el-pagination layout="prev, pager, next" :total="busca.total" :page-size="busca.resultsPerPage" v-model:current-page="busca.page" @current-change="Buscar"></el-pagination>
+                                    <el-pagination layout="prev, pager, next" :total="buscaProprietario.total" :page-size="buscaProprietario.resultsPerPage" v-model:current-page="buscaProprietario.page" @current-change="BuscarProprietario"></el-pagination>
                         </div>
 
                     </el-col>
@@ -330,7 +336,7 @@
                                             <el-input v-model="cep.numero" placeholder="" ref="postalCode" v-maska data-maska="#####-###" @keyup="()=>{  if(cep.numero.length>=9){BuscarEndereco();} }">
                                                 <template #append>
                                                     <c-loading size="20px" v-if="carregandoCEP"></c-loading>
-                                                    <i class="fa fa-search" v-else-if="(cep.numero.length < 9)" style="color:var(--s-accent-color)" @click="$tools.Alert('Preencha todo o CEP para poder realizar a busca.')"></i>
+                                                    <i class="fa fa-search" v-else-if="(cep.numero.length < 9)" style="color:var(--s-accent-color)" @click="$tools.Alert('Preencha todo o CEP para poder realizar a buscaProprietario.')"></i>
                                                     <i class="fa fa-search" v-else style="color:var(--s-accent-color);cursor:pointer" @click="BuscarEndereco"></i>
                                                 </template>
                                             </el-input>
@@ -970,8 +976,8 @@
                 <input type="hidden" id="imovelFormData" />
                 <div v-if="step <= 5">
                         <div style="float:left">
-                            <q-btn label="VOLTAR"       outline color="primary" @click="$root.RouteTo('/imoveis')"  style="margin-right:20px;width:120px"  v-if="step <= 2"></q-btn>
-                            <q-btn label="VOLTAR"       outline color="primary" @click="StepTo(--step)"             style="margin-right:20px;width:120px"  v-if="step > 2 && step < 6"></q-btn>
+                            <q-btn label="VOLTAR"       outline color="primary" @click="$root.RouteTo('/imoveis')"  style="margin-right:20px;width:120px"  v-if="step <= 1"></q-btn>
+                            <q-btn label="VOLTAR"       outline color="primary" @click="StepTo(--step)"             style="margin-right:20px;width:120px"  v-if="step > 1 && step < 6"></q-btn>
                             <q-btn label="PROSSEGUIR"   outline color="primary" @click="Checkout(step)"             style="margin-right:20px;width:120px"  v-if="step < 5"></q-btn>
                             <q-btn label="SALVAR"               color="primary" @click="CheckoutStep5"              style="margin-right:20px;width:120px"   icon="fa fa-save"></q-btn>
                         </div>
@@ -1046,7 +1052,7 @@
                 imoveisRegiaoBuscaResult:[],
                 proprietarioJacaptei: {id:1,nome:"JáCaptei"},
                 stepCaptions:['','','','','','','','',''],
-                busca                   : this.$models.busca(),
+                buscaProprietario       : this.$models.busca(),
                 buscaImovel             : this.$models.buscaImovel(),
                 imovel                  : this.$models.imovel(),
                 admins                  : this.$root.admins,
@@ -1064,9 +1070,12 @@
         created: function () {
 
            this.$sdata.ObterEstados().then(res => { this.opcoes.estados = res; });
+           this.buscaProprietario.item = this.$models.proprietario();
+           this.buscaProprietario.page = 1;
+
            //if(this.$validator.is(this.$router.params?.proprietario)){
-           //    this.busca.item = this.$router.params.proprietario;
-           //    this.CheckoutStep1(this.busca.item);
+           //    this.buscaProprietario.item = this.$router.params.proprietario;
+           //    this.CheckoutStep1(this.buscaProprietario.item);
            //}else
            //     this.StepTo(1);
             
@@ -1111,7 +1120,9 @@
 
                         if(this.imovel.endereco.idTipoComplemento == 0)
                             this.imovel.endereco.idTipoComplemento = null;
-                        this.StepTo(2);
+
+                        this.StepTo(1);
+                        this.BuscarProprietario();
                     }
                 } 
 
@@ -1155,6 +1166,7 @@
                    this.cep    = { numero: "", estado: "", cidade: "", logradouro: ""};
 
                    this.busca                  = this.$models.busca();
+                   this.buscaProprietario      = this.$models.busca();
                    this.buscaImovel            = this.$models.buscaImovel();
                    this.imovel                 = this.$models.imovel();
 
@@ -1163,7 +1175,7 @@
                    this.imovel.tipo             = this.opcoes.tiposImoveis.filter(it => it.id == this.imovel.idTipo)[0];
                    this.imovel.adminCaptador    = this.admins.filter(a => a.id == 1)[0];
 
-                   this.busca.item = this.$models.proprietario();
+                   this.buscaProprietario.item = this.$models.proprietario();
                    this.imagesInputs = [];
                    this.imagesFiles = [];
                    this.stepCaptions = ['','','','','','','','','','','','','','',''];
@@ -1203,10 +1215,10 @@
 
             StepTo(_step){
                 this.step = _step;
-                if(_step == 1){
-                   this.StepTo(2);
-                   //this.BuscarProprietario();
-                }
+                //if(_step == 1){
+                //   this.StepTo(2);
+                //   //this.BuscarProprietario();
+                //}
                 if(_step==2){
                    window.setTimeout(() => this.$refs.indiceCadastral.focus(), 500);
                 }
@@ -1227,13 +1239,12 @@
             },
 
             CheckoutStep1(_proprietario){
-                //c2("_proprietario",_proprietario);
-                this.imovel.proprietario = _proprietario;
-                this.imovel.idPoprietario = _proprietario.id;
-                //this.imovel.endereco.numero = 100;
-                //this.stepCaptions[1] = this.imovel.proprietario.nome;
+                if(this.$validator.is(_proprietario)){
+                    this.imovel.proprietario  = _proprietario;
+                    this.imovel.idPoprietario = _proprietario.id;
+                }
+                this.stepCaptions[1] = this.imovel.proprietario.apelido;
                 this.StepTo(2);
-
             },
 
             async CheckoutStep2(){
@@ -1290,6 +1301,8 @@
 
                 if(this.$validator.not(this.imovel.localChaves))
                     msg += "<b>Local das chaves</b> não informado<br>";
+                if(this.$validator.not(this.imovel.descricao))
+                    msg += "<b>Descrição</b> não informada<br>";
                 
                 if (msg.length > 0)
                     this.$tools.Alert(msg);
@@ -1309,7 +1322,6 @@
                      this.$tools.Alert("<b>Imagens</b> não inseridas.");
                 }else{
                     this.stepCaptions[5] = this.imagesInputs.length + " imagens";
-                    this.StepTo(6);
                     this.Enviar();
                 }
             },
@@ -1330,8 +1342,8 @@
             HandleRemoverImagem(uploadFile, uploadFiles){
               //c("remove")
               //c2("uploadFiles",uploadFiles)
-              c2("imovel.imagens",this.imovel.imagens);
-              c2("uploadFile",uploadFile)
+              //c2("imovel.imagens",this.imovel.imagens);
+              //c2("uploadFile",uploadFile)
               if(uploadFile.name == "noupdate")
                 this.imovel.imagens = this.imovel.imagens.filter(i=> i.url !== uploadFile.url);
             
@@ -1348,47 +1360,97 @@
 
             async Enviar() {
 
-                this.ParseImovel();
+                if(this.Validar()){
 
-                this.imagesFiles = [];
+                        this.StepTo(6);
 
-                const formData = new FormData();
-                formData.append("jsonImovel", JSON.stringify(this.imovel));
+                        this.ParseImovel();
 
-                if(this.$validator.is(this.imagesInputs) && this.imagesInputs.length > 0){
-                    this.imagesInputs.forEach((img)=>{
-                        if(img.name !== "noupdate"){
-                            var imageFile = Object.assign({}, img).raw;
-                            formData.append('imagesFiles',imageFile, imageFile.name);
-                        }
-                    });
-                }else
-                    formData.append('imagesFiles',[]);
+                        this.imagesFiles = [];
+
+                        const formData = new FormData();
+                        formData.append("jsonImovel", JSON.stringify(this.imovel));
+
+                        if(this.$validator.is(this.imagesInputs) && this.imagesInputs.length > 0){
+                            this.imagesInputs.forEach((img)=>{
+                                if(img.name !== "noupdate"){
+                                    var imageFile = Object.assign({}, img).raw;
+                                    formData.append('imagesFiles',imageFile, imageFile.name);
+                                }
+                            });
+                        }else
+                            formData.append('imagesFiles',[]);
                     
 
 
-                //this.onrequest = true;
+                        //this.onrequest = true;
             
-                 var url = this.$api.BuildURL("imovel/alterar");
-                 var result = axios.post(url,formData,{headers:{"Accept": "application/json","Content-Type": "multipart/form-data"} }).then((request) => {
-                       //c(request);
-                      if (request.data.status.success){
-                            this.CheckoutStep6();
-                            return request.data;
-                       }else
+                         var url = this.$api.BuildURL("imovel/alterar");
+                         var result = axios.post(url,formData,{headers:{"Accept": "application/json","Content-Type": "multipart/form-data"} }).then((request) => {
+                               //c(request);
+                              if (request.data.status.success){
+                                    this.CheckoutStep6();
+                                    return request.data;
+                               }else
+					                this.CheckoutStep7();
+
+				        }).catch((error) => {
+					        //ce(error);
+                            if (error.response) {
+                                ce(error);
+                            }
 					        this.CheckoutStep7();
+				        }).finally(() => {
+                           // this.onrequest = false;
+				        });
+                     }
 
-				}).catch((error) => {
-					//ce(error);
-                    if (error.response) {
-                        ce(error);
-                    }
-					this.CheckoutStep7();
-				}).finally(() => {
-                   // this.onrequest = false;
-				});
-     
 
+            },
+
+            Validar(){
+
+                var msg = "";
+
+                if (this.$validator.not(this.imovel.documentacao.indiceCadastral))
+                    msg += "<b>ÍNDICE CADASTRAL</b> não informado<br>";
+
+                if (this.$validator.not(this.imovel.endereco.cep))
+                    msg += "<b>CEP</b> não informado<br>";
+
+                if (this.$validator.not(this.imovel.endereco.estado))
+                    msg += "<b>ESTADO</b> não selecionado<br>";
+
+                if (this.$validator.not(this.imovel.endereco.cidade))
+                    msg += "<b>CIDADE</b> não selecionada<br>";
+
+                if (this.$validator.not(this.imovel.endereco.bairro))
+                    msg += "<b>BAIRRO</b> não selecionado<br>";
+
+                if (this.$validator.not(this.imovel.endereco.logradouro))
+                    msg += "<b>LOGRADOURO</b> não informado<br>";
+
+                if (this.$validator.not(this.imovel.endereco.numero))
+                    msg += "<b>NÚMERO</b> não informado (informe <b>SN</b> se não houver)<br>";
+
+                if(this.$validator.not(this.imovel.localChaves))
+                    msg += "<b>Local das chaves</b> não informado<br>";
+
+                if(this.$validator.not(this.imovel.descricao))
+                    msg += "<b>Descrição</b> não informada<br>";
+             
+                if(this.imagesInputs.length == 0 && this.imovel?.imagens.length == 0)
+                    msg += "<b>Imagens</b> não inseridas<br>";
+                else if(this.imagesInputs.length < 15 && this.imovel?.imagens.length < 15)
+                    msg += "<b>Imagens</b> precisam ser pelo menos 15<br>";
+             
+                if (msg.length > 0){
+                    this.$tools.Alert(msg);
+                    return false;
+                }else{
+                    return true;
+                }
+                
             },
 
 
@@ -1429,6 +1491,7 @@
 
 
             },
+
 
 
             DefinirCaptador(admin){
@@ -1528,22 +1591,18 @@
 
 
 
-            async BuscarProprietario(page=1){
+            async BuscarProprietario(){
 
                 this.proprietariosBuscaResult = [];
+                this.buscaProprietario.result = [];
 
-                if(this.$validator.is(this.id))
-                    this.busca.item.id = this.id;
-
-                this.busca.page = page;
-                this.busca.result = [];
                 this.onrequest  = true;
-                var request     = await this.$api.Post("proprietario/buscar",this.busca);
+                var request     = await this.$api.Post("proprietario/buscar",this.buscaProprietario);
                 this.onrequest  = false;
 
                 if (request?.status?.success){
-                    this.busca = request.result;
-                    this.proprietariosBuscaResult = this.busca.result;
+                    this.buscaProprietario = request.result;
+                    this.proprietariosBuscaResult = this.buscaProprietario.result;
                     this.proprietariosBuscaResult.forEach(d => {d.onrequest=false;});
                 } 
 

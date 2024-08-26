@@ -57,17 +57,21 @@ namespace JaCaptei.Administrativo.API.Controllers
             imovel.inseridoPorNome  = imovel.atualizadoPorNome  = logado.nome;
 
             if(imagesFiles is not null && imagesFiles?.Count > 0) {
-                appReturn = service.Adicionar(imovel);
-                if(appReturn.status.success)
-                        appReturn = await ImageShackUploadImagesFiles(imovel,imagesFiles);
+                if(imagesFiles.Count < 15 && Config.settings.environment == "PRODUCTION")
+                    appReturn.AddException("Necessário ao menos 15 imagens.");
+                else{
+                    appReturn = service.Adicionar(imovel);
+                    if(appReturn.status.success)
+                            appReturn = await ImageShackUploadImagesFiles(imovel,imagesFiles);
+                }
             } else
-                appReturn.AddException("Imagens não inseridas.");
+                appReturn.AddException("Necessário inserir imagens.");
              
             return Result(appReturn);
 
         }
         
-        
+
         [HttpPost]
         [Route("[action]")]
         [Authorize(Roles = "ADMIN_GOD,ADMIN_GESTOR")]
@@ -81,11 +85,17 @@ namespace JaCaptei.Administrativo.API.Controllers
             try {
 
             if(imovel.imagens?.Count > 0 || imagesFiles?.Count > 0) {
-                appReturn = service.Alterar(imovel);
-                if(appReturn.status.success && imagesFiles.Count > 0)
-                    appReturn = await ImageShackUploadImagesFiles(imovel,imagesFiles);
+                    if(imagesFiles.Count < 15 && Config.settings.environment == "PRODUCTION")
+                        appReturn.AddException("Necessário ao menos 15 imagens.");
+                    else{
+                        appReturn = service.Alterar(imovel);
+                        if(appReturn.status.success && imagesFiles.Count > 0)
+                            appReturn = await ImageShackUploadImagesFiles(imovel,imagesFiles);
+                        else
+                            service.AlterarImagens(imovel);
+                    }
             } else
-                appReturn.AddException("Imagens não inseridas.");
+                appReturn.AddException("Necessário inserir imagens.");
             } catch(Exception ex) { string  sex = ex.ToString(); }
 
             return Result(appReturn);

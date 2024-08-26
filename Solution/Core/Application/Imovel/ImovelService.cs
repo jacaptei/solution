@@ -96,6 +96,20 @@ namespace JaCaptei.Application{
 
             appReturn = DAO.Validar(entity);
 
+            if(appReturn.status.success) {
+
+                string url = (Config.settings.environment == "PRODUCTION")? entity.ObterUrlPublica() :  entity.ObterUrlPublica("https://homolog.jacaptei.com.br");
+
+                Mail mail       = new Mail();
+                mail.emailTo    = entity.proprietario.email;
+                mail.about      = "Seu imóvel foi cadastrado";
+                mail.message    = "Olá " + entity.proprietario.apelido + ".<br><br>Seu imóvel já se encontra cadastrado em nossa plataforma com <b style='color:#ef5924'>CÓD "+entity.cod+"</b><br><br><a href='" + url + "' target='_blank' style='color:#ef5924'>" + url + "</a>";
+                mail.Send();
+
+                entity.proprietario = new Proprietario();
+            }
+
+
             return appReturn;
         }
 
@@ -109,6 +123,10 @@ namespace JaCaptei.Application{
 
         public void AdicionarImagens(Imovel entity) {
             DAO.AdicionarImagens(entity);
+        }
+        
+        public void AlterarImagens(Imovel entity) {
+            DAO.AlterarImagens(entity);
         }
 
         
@@ -133,7 +151,7 @@ namespace JaCaptei.Application{
 
         public AppReturn Buscar(ImovelBusca busca) {
             //busca.somenteValidados = true;
-            busca.imovel = BLO.Normalizar(busca.imovel);
+            busca.imovel = BLO.NormalizarBusca(busca.imovel);
             if(busca.bairros?.Count > 0) {
                 for(int i=0;i<busca.bairros.Count;i++)
                     busca.bairros[i] = Utils.String.NormalizeToUpper(busca.bairros[i]);
