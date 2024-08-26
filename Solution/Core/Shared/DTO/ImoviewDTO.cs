@@ -161,21 +161,6 @@ public class ImagemDTO
     public byte[] Arquivo { get; set; }
 }
 
-/*/
- "id": 0,
-    "idCliente": 60,
-    "idOperador": 3,
-    "dataInclusao": "2024-07-03T22:57:46.920624",
-    "dataAtualizacao": null,
-    "codUsuario": "4907",
-    "codUnidade": "6151",
-    "chaveApi": "qnnYE4Fev/v2kRbZ5F9PgEGCkJI3Ixflcl0FADcTGyA=",
-    "idPlano": 4,
-    "status": "",
-    "bairros": "[{\"id\": 3278, \"nome\": \"Belvedere\", \"idCidade\": 2754, \"idEstado\":11}]",
-    "imoveis": null
- * */
-
 public static class ImoviewCampos
 {
     public readonly static IReadOnlyDictionary<string, int> Finalidades = ImmutableDictionary.CreateRange(new Dictionary<string, int>
@@ -200,19 +185,29 @@ public static class ImoviewCampos
     {
         {"Andar corrido"                 , 9},
         {"Apartamento"                   , 2},
-        {"Apartamento com área privativa", 21},
-        {"Apartamento Duplex"            , 36},
         {"Área privativa"                , 17},
         {"Casa"                          , 1},
+        {"Chácara"                       , 16}, //
+        {"Cobertura"                     , 18},
+        {"Fazenda"                       , 14}, // 23
+        {"Flat"                          , 12}, // 25
+        {"Galpão"                        , 11},
+        {"Garagem"                       , 7}, // 27
+        {"Kitnet"                        , 10},// 30
+        {"Loja"                          , 5}, // 32
+        {"Lote"                          , 3},
+        {"Lote em condomínio"            , 4},
+        {"Prédio"                        , 8}, // 39
+        {"Sala"                          , 6}, // 41
+        {"Salão"                         , 13}, // 42
+        {"Sitio"                         , 15}, // 43
+        {"Apartamento com área privativa", 21},
+        {"Apartamento Duplex"            , 36},
         {"Casa em condomínio"            , 20},
         {"Casa geminada"                 , 24},
         {"Casa geminada coletiva"        , 23},
-        {"Cobertura"                     , 18},
         {"Cobertura Duplex"              , 19},
-        {"Galpão"                        , 11},
         {"Loft"                          , 34},
-        {"Lote"                          , 3},
-        {"Lote em condomínio"            , 4},
         {"Prédio Comercial"              , 33},
         {"Studio"                        , 42},
         {"Terreno / Área"                , 32}
@@ -220,24 +215,33 @@ public static class ImoviewCampos
 
     public readonly static IReadOnlyDictionary<int, int> TiposImovelImoview = ImmutableDictionary.CreateRange(new Dictionary<int, int>
     {
-        {16 , 9},
-        {2 , 2},
-        {3, 21},
-        {4, 36},
-        {19, 17},
         {8 , 1},
-        {11, 20},
-        {12, 24},
-        {13, 23},
-        {5, 18},
-        {6, 19},
-        {26, 11},
-        {31, 34},
+        {2 , 2},
         {33, 3},
         {35, 4},
+        {32, 5},
+        {41, 6},
+        {27, 7},
+        {39, 8},
+        {16, 9},
+        {30, 10},
+        {26, 11},
+        {25, 12},
+        {42, 13},
+        {23, 14},
+        {43, 15},
+        {19, 17},
+        {5, 18},
+        {6, 19},
+        {11, 20},
+        {3, 21},
+        {13, 23},
+        {12, 24},
+        {46, 32},
         {40, 33},
+        {31, 34},
+        {4, 36},
         {45, 42},
-        {46, 32}
     });
 
     public readonly static IReadOnlyDictionary<string, int> LocaisChave = ImmutableDictionary.CreateRange(new Dictionary<string, int>
