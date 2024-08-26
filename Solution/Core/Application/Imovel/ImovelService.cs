@@ -124,6 +124,10 @@ namespace JaCaptei.Application{
         public void AdicionarImagens(Imovel entity) {
             DAO.AdicionarImagens(entity);
         }
+        
+        public void AlterarImagens(Imovel entity) {
+            DAO.AlterarImagens(entity);
+        }
 
         
         public AppReturn Excluir(int id) {

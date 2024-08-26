@@ -1239,13 +1239,12 @@
             },
 
             CheckoutStep1(_proprietario){
-                //c2("_proprietario",_proprietario);
-                this.imovel.proprietario = _proprietario;
-                this.imovel.idPoprietario = _proprietario.id;
-                //this.imovel.endereco.numero = 100;
+                if(this.$validator.is(_proprietario)){
+                    this.imovel.proprietario  = _proprietario;
+                    this.imovel.idPoprietario = _proprietario.id;
+                }
                 this.stepCaptions[1] = this.imovel.proprietario.apelido;
                 this.StepTo(2);
-
             },
 
             async CheckoutStep2(){
