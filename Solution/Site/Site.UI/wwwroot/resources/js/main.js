@@ -65,7 +65,7 @@ $(document).ready(function () {
                     autoLogin       : false,
                     rememberMe      : false,
                     onRequest       : false,
-                    //test            : "root context ok",
+                    //test          : "root context ok",
                     title: {
                         label       : "HOME",
                         icon        : "fa fa-user",
@@ -105,27 +105,25 @@ $(document).ready(function () {
 
 		},
 		watch: {
-
+            
 		},
         beforeCreate: function () {
 		},
         created: function () {
+            //var setupres = this.SetUp();
 
-                //var setupres = this.SetUp();
+            this.localidade.estados = this.$sdata.forms.states;
+            // SETUP ROUTES --------------------------
+            this.routing.title = this.title;
+            this.routing.menuIndex = "01-00-00-00";
 
-                this.localidade.estados = this.$sdata.forms.states;
-
-                // SETUP ROUTES --------------------------
-                this.routing.title = this.title;
-                this.routing.menuIndex = "01-00-00-00";
-               
-                this.$router.beforeEach((to, from, next) => {
-                  this.status.pageLoading   = true;
-                  this.routing.lastPath     = from.path; // this.$router.currentRoute.path;
-                  this.routing.menuIndex    = to.meta.menuIndex;
-                  this.routing.area         = to.meta.area;
-                  this.routing.label        = to.meta.label;
-                  next();
+            this.$router.beforeEach((to, from, next) => {
+                this.status.pageLoading = true;
+                this.routing.lastPath = from.path; // this.$router.currentRoute.path;
+                this.routing.menuIndex = to.meta.menuIndex;
+                this.routing.area = to.meta.area;
+                this.routing.label = to.meta.label;
+                next();
                 /*
                   if(to.path !== "/login" && !this.isAuth){
                         this.routing.menuIndex = "00-00-00-00";
@@ -135,95 +133,90 @@ $(document).ready(function () {
                         next();
                   }
                 */
-                });
-                
+            });
 
-                this.$router.afterEach((router) => {
-                    this.status.pageLoading     =   false;
-                    this.routing.currentPath    =   router.path;
-                    this.routing.keypath        =   router.meta.keypath;
-                    this.$tools.Top();
-                });
+            this.$router.afterEach((router) => {
+                this.status.pageLoading = false;
+                this.routing.currentPath = router.path;
+                this.routing.keypath = router.meta.keypath;
+                this.$tools.Top();
+            });
 
-                axios.create({
-                            baseURL: API.URL(),
-                            headers: {
-                                'Access-Control-Allow-Origin': '*',
-                                'Content-Type': 'application/json',
-                            },
-                            withCredentials: false
-                });
+            axios.create({
+                baseURL: API.URL(),
+                headers: {
+                    'Access-Control-Allow-Origin': '*',
+                    'Content-Type': 'application/json',
+                },
+                withCredentials: false
+            });
 
-
-                this.headBannerImagesShuffled = this.headBannerImages.sort((a, b) => 0.5 - Math.random());
-                
-
-
+            this.headBannerImagesShuffled = this.headBannerImages.sort((a, b) => 0.5 - Math.random());
 
             // SETUP
+            axios.get(this.$api.BuildURL("suporte/modelos/obter")).then((request) => {
 
-			axios.get(this.$api.BuildURL("suporte/modelos/obter")).then((request) => {
+                this.status.loading = true;
 
-                            this.status.loading         = true;
+                this.$models.data = request.data;
+                this.log = this.$models.log();
+                const storedUser = this.ValidateSessionWithToken();
+                if (storedUser) {
+                    // Se o token é válido, carregue os dados do usuário e marque como autenticado
+                    this.usuario = storedUser;
+                    this.isAuth = true;
+                } else {
+                    // Caso contrário, considere o usuário não autenticado
+                    this.usuario = this.$models.usuario();
+                    this.isAuth = false;
+                }
+                this.localidade = this.$models.localidade();
+                this.imovel = this.$models.imovel();
+                this.favorito = this.$models.favorito();
+                this.buscaImovel = this.$models.buscaImovel();
+                this.buscaImovel.imovel = this.$models.imovel();
 
-							this.$models.data           = request.data;
-                            this.log                    = this.$models.log();
-                            this.usuario                = this.$models.usuario();
-                            this.localidade             = this.$models.localidade();
-                            this.imovel                 = this.$models.imovel();
-                            this.favorito               = this.$models.favorito();
-                            this.buscaImovel            = this.$models.buscaImovel();
-                            this.buscaImovel.imovel     = this.$models.imovel();
+                this.buscaImovel.opcoes = {
+                    estados: [],
+                    cidades: [],
+                    bairros: [],
+                    quantidades: [],
+                    tiposImoveis: this.$models.tiposImoveis(),
+                    tiposComplementos: this.$models.tiposComplementos()
+                }
 
-                            this.buscaImovel.opcoes = { 
-                                estados: [], 
-                                cidades: [], 
-                                bairros: [],
-                                quantidades:[],
-                                tiposImoveis:this.$models.tiposImoveis(),
-                                tiposComplementos:this.$models.tiposComplementos()
-                            }
+                this.$sdata.ObterEstados().then(res => { this.buscaImovel.opcoes.estados = res; });
 
-                            this.$sdata.ObterEstados().then(res => { this.buscaImovel.opcoes.estados = res; });
+                for (var i = 0; i <= 20; i++) {
+                    var item = { id: i, label: (i == 0) ? "qualquer" : (i < 10 ? "0" + i : i), complement: (i == 0 ? "" : "ou +"), value: (i == 0) ? null : i };
+                    this.buscaImovel.opcoes.quantidades.push(item);
+                }
 
-                            for(var i=0;i<=20;i++){
-                                var item = {id:i,label:(i==0)? "qualquer" : (i < 10? "0"+i : i),complement: (i == 0? "" : "ou +"),value:(i==0)? null : i};
-                                this.buscaImovel.opcoes.quantidades.push(item);
-                            }
+                this.buscaImovel.opcoes.tiposImoveis.unshift({ id: 0, label: 'qualquer', value: null });
 
-                            this.buscaImovel.opcoes.tiposImoveis.unshift({id:0,label:'qualquer',value:null});
+                this.usuario.nome = "";
+                this.usuario.razao = "";
+                this.usuario.username = "";
+                this.usuario.senha = "";
 
+                this.dataBackend = new Date(this.usuario.data);
+                //c2("this.dataBackend",this.dataBackend);
 
-                            this.usuario.nome           = "";
-                            this.usuario.razao          = "";
-				            this.usuario.username       = "";
-				            this.usuario.senha          = "";
+                var content = {};
+                //this.localidade.estados  = this.localidade.estados.filter((e)=>e.uf == "MG");
 
-                            this.dataBackend            = new Date(this.usuario.data);
-                            //c2("this.dataBackend",this.dataBackend);
+                content.localidade = this.localidade;
 
-                            var content = {};
-                            //this.localidade.estados  = this.localidade.estados.filter((e)=>e.uf == "MG");
-                                                
-                            content.localidade = this.localidade;
-                            
-                            this.status.loading = false;
+                this.status.loading = false;
 
-					}).catch((error) => {
-                        ce(error);
-                       this.$tools.Alert("Não foi possível iniciar o site corretamente, favor tentar novamente");
-					}).finally(() => {
-                        this.status.loading = false;
-					});  
+            }).catch((error) => {
+                ce(error);
+                this.$tools.Alert("Não foi possível iniciar o site corretamente, favor tentar novamente");
+            }).finally(() => {
+                this.status.loading = false;
+            });
 
-
-                          
-                //});
-                            
-
-
-
-
+            
 		},
         beforeUnmount() {
             this.SignOut();
@@ -397,6 +390,32 @@ $(document).ready(function () {
                     this.title.visible  = false;
                 },
 
+            ValidateSessionWithToken() {
+                const cookies = document.cookie.split('; ');
+                const authTokenCookie = cookies.find(cookie => cookie.startsWith('authToken='));
+                const url = this.$api.BuildURL("autenticacao/validarautenticacao");
+
+                if (authTokenCookie) {
+                    const authToken = authTokenCookie.split('=')[1];
+
+                    if (authToken) {
+                        axios.post(url, {}, {
+                            headers: {
+                                'Authorization': `Bearer ${authToken}`
+                            }
+                        }).then(response => {
+                            console.log('Resposta:', response.data);
+                        }).catch(error => {
+                            console.error('Erro na requisição:', error);
+                        });
+                    } else {
+                        console.warn('Token inválido ou malformado.');
+                    }
+                } else {
+                    console.warn('Token não encontrado.');
+                }
+            },
+
                 SetFullTitler(visible, label, icon, actionLabel, actionIcon, actionLink) {
                     this.titler.visible     = visible    ;
                     this.titler.label       = label      ;
@@ -406,7 +425,6 @@ $(document).ready(function () {
                     this.titler.actionLink  = actionLink ;
                 },
 
-
                 SetCountrySettings(item){
                             this.usuario.account.country      =   item.value;
                             this.usuario.account.countryCode  =   item.code;
@@ -415,27 +433,36 @@ $(document).ready(function () {
                             //c(this.usuario.account)
                 },
 
-                // AUTH --------------------------------
+             // AUTH --------------------------------
                 SignIn(){
                     if (this.usuario.aceitouPoliticaPrivacidade === false || this.usuario.aceitouTermos === false) {
                         this.OpenLoginTermsAndPolicyModal();
                     }
-                    //this.$sdata.Storage.Set("utk"    , this.usuario.token);
+                    //this.$sdata.Storage.Set("utk", this.usuario.token);
                     var usr = "jcuser"+this.usuario.id;
                     this.$sdata.Storage.Set(usr, this.usuario);
-
                     axios.defaults.headers.common["Authorization"] = "Bearer " + this.usuario.tokenJWT; 
+                    this.setCookie('authToken', this.$root.usuario.tokenJWT, 7); 
                     this.isAuth = true;
-					//this.RouteTo("/home");
-                },
+            },
 
-                SignOut(){
+            setCookie(name, value, hours) {
+                const expires = new Date(Date.now() + hours * 60 * 60 * 1000).toUTCString();
+                document.cookie = `${name}=${value}; expires=${expires}; path=/; Secure; SameSite=Strict`;
+            },
+
+            deleteCookie(name) {
+                document.cookie = `${name}=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/; Secure; SameSite=Strict`;
+            },
+
+            SignOut(){
                     var usr = "jcuser"+this.usuario.id;
                     this.$sdata.Storage.Set(usr, null);
                     this.$sdata.Storage.Set("utk", null);
                     this.log        = this.$models.log();
                     this.usuario    = this.$models.usuario();
-                    this.isAuth     = false;
+                    this.isAuth = false;
+                    this.deleteCookie('authToken');
                     //axios.defaults.headers.common["Authorization"] = "";
                 },
                 Exit(){
