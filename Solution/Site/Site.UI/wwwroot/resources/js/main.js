@@ -160,16 +160,16 @@ $(document).ready(function () {
 
                 this.$models.data = request.data;
                 this.log = this.$models.log();
-                const storedUser = this.ValidateSessionWithToken();
-                if (storedUser) {
-                    // Se o token é válido, carregue os dados do usuário e marque como autenticado
-                    this.usuario = storedUser;
-                    this.isAuth = true;
-                } else {
-                    // Caso contrário, considere o usuário não autenticado
-                    this.usuario = this.$models.usuario();
-                    this.isAuth = false;
-                }
+                //const storedUser = this.ValidateSessionWithToken();
+                //if (storedUser) {
+                //    // Se o token é válido, carregue os dados do usuário e marque como autenticado
+                //    this.usuario = storedUser;
+                //    this.isAuth = true;
+                //} else {
+                //    // Caso contrário, considere o usuário não autenticado
+                //    this.usuario = this.$models.usuario();
+                //    this.isAuth = false;
+                //}
                 this.localidade = this.$models.localidade();
                 this.imovel = this.$models.imovel();
                 this.favorito = this.$models.favorito();
@@ -390,31 +390,31 @@ $(document).ready(function () {
                     this.title.visible  = false;
                 },
 
-            ValidateSessionWithToken() {
-                const cookies = document.cookie.split('; ');
-                const authTokenCookie = cookies.find(cookie => cookie.startsWith('authToken='));
-                const url = this.$api.BuildURL("autenticacao/validarautenticacao");
+            //ValidateSessionWithToken() {
+            //    const cookies = document.cookie.split('; ');
+            //    const authTokenCookie = cookies.find(cookie => cookie.startsWith('authToken='));
+            //    const url = this.$api.BuildURL("autenticacao/validarautenticacao");
 
-                if (authTokenCookie) {
-                    const authToken = authTokenCookie.split('=')[1];
+            //    if (authTokenCookie) {
+            //        const authToken = authTokenCookie.split('=')[1];
 
-                    if (authToken) {
-                        axios.post(url, {}, {
-                            headers: {
-                                'Authorization': `Bearer ${authToken}`
-                            }
-                        }).then(response => {
-                            console.log('Resposta:', response.data);
-                        }).catch(error => {
-                            console.error('Erro na requisição:', error);
-                        });
-                    } else {
-                        console.warn('Token inválido ou malformado.');
-                    }
-                } else {
-                    console.warn('Token não encontrado.');
-                }
-            },
+            //        if (authToken) {
+            //            axios.post(url, {}, {
+            //                headers: {
+            //                    'Authorization': `Bearer ${authToken}`
+            //                }
+            //            }).then(response => {
+            //                console.log('Resposta:', response.data);
+            //            }).catch(error => {
+            //                console.error('Erro na requisição:', error);
+            //            });
+            //        } else {
+            //            console.warn('Token inválido ou malformado.');
+            //        }
+            //    } else {
+            //        console.warn('Token não encontrado.');
+            //    }
+            //},
 
                 SetFullTitler(visible, label, icon, actionLabel, actionIcon, actionLink) {
                     this.titler.visible     = visible    ;
