@@ -220,6 +220,10 @@ namespace JaCaptei.Application {
 
 
 
+        public void AlterarImagens(Imovel entity) {
+            AdicionarImagens(entity);
+        }
+
         public void AdicionarImagens(Imovel entity) {
             using(var conn = DB.GetConn()) {
 

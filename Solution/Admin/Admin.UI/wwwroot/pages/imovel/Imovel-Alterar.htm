@@ -1239,13 +1239,12 @@
             },
 
             CheckoutStep1(_proprietario){
-                //c2("_proprietario",_proprietario);
-                this.imovel.proprietario = _proprietario;
-                this.imovel.idPoprietario = _proprietario.id;
-                //this.imovel.endereco.numero = 100;
+                if(this.$validator.is(_proprietario)){
+                    this.imovel.proprietario  = _proprietario;
+                    this.imovel.idPoprietario = _proprietario.id;
+                }
                 this.stepCaptions[1] = this.imovel.proprietario.apelido;
                 this.StepTo(2);
-
             },
 
             async CheckoutStep2(){
@@ -1442,7 +1441,7 @@
              
                 if(this.imagesInputs.length == 0 && this.imovel?.imagens.length == 0)
                     msg += "<b>Imagens</b> não inseridas<br>";
-                else if(this.imagesInputs.length < 15 && this.imovel?.imagens.length < 15)
+                if(this.imagesInputs.length < 15 && this.imovel?.imagens.length < 15)
                     msg += "<b>Imagens</b> precisam ser pelo menos 15<br>";
              
                 if (msg.length > 0){

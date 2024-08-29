@@ -54,6 +54,7 @@
                         <span v-if="$validator.is(imovel.endereco.bairro)">, {{imovel.endereco.bairro}}  </span>
                         <span v-if="$validator.is(imovel.endereco.cidade)">, {{imovel.endereco.cidade}}</span>
                         <span v-if="$validator.is(imovel.endereco.estado)">, {{imovel.endereco.estado}}</span>
+                        <span v-if="$validator.is(imovel.endereco.cep)">, CEP: {{imovel.endereco.cep}}</span>
                     </div>
 
                     <el-col id="resources">
@@ -73,6 +74,7 @@
                             <el-col :md=4 style="min-width:126px"> <i class="icons mdi mdi-set-square "></i>{{imovel.area.interna}} m&#178; <span style="color:#a5a5a5"> &nbsp;int.</span></el-col>
                             <el-col :md=4 style="min-width:126px"> <i class="icons mdi mdi-set-square "></i>{{imovel.area.externa}} m&#178;  <span style="color:#a5a5a5"> &nbsp;ext.</span></el-col>
                             <el-col :md=4 style="min-width:126px"> <i class="icons fa fa-car "></i>{{imovel.externo.totalVagas}} vagas</el-col>
+                            <el-col :md=4 style="min-width:126px;display:flex" v-if="imovel.anoConstrucao > 0"> <i class="icons icons mdi mdi-cake-variant " v-if="imovel.anoConstrucao > 0"></i><span style="padding-top:8px">{{imovel.anoConstrucao}} <span style="color:#a5a5a5">{{imovel.idade}}a</span></span></el-col>
                         </el-row>
                     </el-col>
                     <el-col id="resources">
@@ -80,7 +82,8 @@
                             <el-col :md=6 id="value">{{$tools.FormatMoneyBR(imovel.valor.venda)}}</el-col>
                             <el-col v-if="$root.isAuth" :md=5 style="padding-top:12px"><span style="color:var(--s-color-primary);font-weight:600">Condomínio</span> <div style="font-weight:700">{{$tools.FormatMoneyBR(imovel.valor.condominio)}}</div></el-col>
                             <el-col v-if="$root.isAuth" :md=5 style="padding-top:12px"><span style="color:var(--s-color-primary);font-weight:600">IPTU      </span> <div style="font-weight:700">{{$tools.FormatMoneyBR(imovel.valor.iptuMensal)}}</div></el-col>
-                            <el-col :md="$root.isAuth? 6 : 18"><div style="float:right;padding-right:20px;padding-top:14px"> <q-btn label="Abrir" flat icon="fa fa-up-right-from-square" size="md" color="secondary" @click="Open()" @click.middle="Open('_blank')"></q-btn></div></el-col>
+                            <el-col v-if="$root.isAuth" :md=5 style="padding-top:12px"><span style="color:var(--s-color-primary);font-weight:600">Comissão  </span> <div style="font-weight:700">{{imovel.valor.comissao}}%</div></el-col>
+                            <el-col :md="3"><div style="float:right;padding-right:20px;padding-top:14px"> <q-btn label="Abrir" flat icon="fa fa-up-right-from-square" size="sm" color="secondary" @click="Open()" @click.middle="Open('_blank')"></q-btn></div></el-col>
                         </el-row>
                     </el-col>
                 </div>

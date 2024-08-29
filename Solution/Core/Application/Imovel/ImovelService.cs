@@ -27,6 +27,8 @@ namespace JaCaptei.Application{
            //     appReturn.AddException("Valor não informado.");
            // if(entity.area.total <= 0)
            //     appReturn.AddException("Área não informada.");
+           if(Utils.Validator.Not(entity.descricao))
+               appReturn.AddException("Descrição não informada.");
            if(entity.endereco.idTipoComplemento == 0)
                appReturn.AddException("Tipo de complemento não selecionado.");
            else if(entity.endereco.idTipoComplemento == 2 && Utils.Validator.Not(entity.endereco.complementoTipo))
@@ -59,6 +61,8 @@ namespace JaCaptei.Application{
             if(entity.idProprietario <= 0)
                 appReturn.AddException("Proprietário não identificado.");
 
+            if(Utils.Validator.Not(entity.descricao))
+                appReturn.AddException("Descrição não informada.");
             if(entity.endereco.idTipoComplemento == 0)
                 appReturn.AddException("Tipo de complemento não selecionado.");
             else if(entity.endereco.idTipoComplemento == 2 && Utils.Validator.Not(entity.endereco.complementoTipo))
@@ -123,6 +127,10 @@ namespace JaCaptei.Application{
 
         public void AdicionarImagens(Imovel entity) {
             DAO.AdicionarImagens(entity);
+        }
+        
+        public void AlterarImagens(Imovel entity) {
+            DAO.AlterarImagens(entity);
         }
 
         
