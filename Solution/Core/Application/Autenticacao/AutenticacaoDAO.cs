@@ -1,32 +1,92 @@
-﻿using System;
-using System.Collections.Generic;
-using Microsoft.Data.SqlClient;
-using System.Threading.Tasks;
-using RepoDb;
-using JaCaptei.Application;
+﻿using RepoDb;
 using JaCaptei.Model;
 using JaCaptei.Application.DAL;
-using System.Collections.Specialized;
-using RepoDb.Enumerations;
-using System.Runtime.Intrinsics.Arm;
-using RepoDb.Extensions;
-using JaCaptei.Model.Model;
-using MailKit.Search;
+using Npgsql;
 
 namespace JaCaptei.Application.Autenticacao
 {
 
-    public class AutenticacaoDAO: DAOBase {
+    public class AutenticacaoDAO : DAOBase
+    {
+        public AppReturn Autenticar(Parceiro entity)
+        {
+            Parceiro entityDB = new Parceiro();
+            entity.senha = Utils.Key.EncodeToBase64(entity.senha.ToLower());
+
+            using (var conn = new NpgsqlConnection(DB.CS))
+            {
+                try
+                {
+                    if (Utils.Validator.IsEmail(entity.username))
+                    {
+                        entity.email = Utils.String.HigienizeMail(entity.username);
+                        entityDB = conn.Query<Parceiro>(e => e.email == entity.email && e.senha == entity.senha).FirstOrDefault();
+                    }
+                    else if (Utils.Validator.IsCPF(entity.cpf))
+                    {
+                        entity.cpfNum = Utils.Number.ToLong(entity.username);
+                        entityDB = conn.Query<Parceiro>(e => e.cpfNum == entity.cpfNum && e.senha == entity.senha).FirstOrDefault();
+                    }
+                    else
+                    {
+                        entity.cnpjNum = Utils.Number.ToLong(entity.username);
+                        entityDB = conn.Query<Parceiro>(e => e.cnpjNum == entity.cnpjNum && e.senha == entity.senha).FirstOrDefault();
+                    }
+                }
+                catch (Exception e)
+                {
+                    appReturn.AddException(e.ToString());
+                }
+            }
+            appReturn.result = entityDB;
+            return appReturn;
+        }
+
+        public SessaoUsuario ObterSessaoAtivaById(int id, string tokenJWT)
+        {
+            SessaoUsuario entity = new SessaoUsuario();
+            using (var conn = new NpgsqlConnection(DB.CS))
+                entity = conn.Query<SessaoUsuario>(e => e.idParceiro == id).LastOrDefault();
+            return entity;
+        }
+
+        public SessaoUsuario SalvarSessao(SessaoUsuario sessaoUsuario)
+        {
+            SessaoUsuario entity = new SessaoUsuario();
+            using (var conn = new NpgsqlConnection(DB.CS))
+                entity.tokenJWT = conn.Insert<SessaoUsuario, string>(sessaoUsuario);
+            return entity;
+        }
+
+        public SessaoUsuario RevogarToken(int id, string tokenJWT)
+        {
+            using (var conn = new NpgsqlConnection(DB.CS))
+            {
+                SessaoUsuario entity = conn.Query<SessaoUsuario>(e => e.idParceiro == id).LastOrDefault();
+                if (entity != null && entity.id > 0)
+                {
+                    entity.isRevoked = true;
+                    entity.revokedAt = DateTime.UtcNow;
+                    entity.revokedAt = DateTime.UtcNow;
+                    entity.replacedBySession = entity.sessionId;
+                    int affectedRows = conn.Update<SessaoUsuario>(entity, e => e.id == entity.id);
+                    if (affectedRows > 0)
+                    {
+                        return entity;
+                    }
+                }
+            return entity;
+            }
+        }
 
         /*
+
         public Usuario ObterUsuarioPeloEmail(string email) {
             Usuario entity = null;
             using(var conn = new DBcontext().GetConn())
                 entity = conn.ExecuteQuery<Usuario>("SELECT id, email FROM [Usuario] WHERE email=@email",new { email }).FirstOrDefault();
             return entity;
         }
-
-
 
         public Usuario ObterDadosDoUsuario(Usuario usuario) {
 
