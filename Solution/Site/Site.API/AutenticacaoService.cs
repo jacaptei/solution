@@ -11,14 +11,16 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace JaCaptei.Services
 {
-    public class AutenticacaoService: ServiceBase{
+    public class AutenticacaoService : ServiceBase
+    {
 
         AutenticacaoBLO BLO = new AutenticacaoBLO();
         AutenticacaoDAO DAO = new AutenticacaoDAO();
         ParceiroService parceiroService = new ParceiroService();
 
-        public AppReturn AutenticarParceiro(Parceiro entity) {
-            if(!BLO.ValidarAutenticacaoParceiro(entity).status.success)
+        public AppReturn AutenticarParceiro(Parceiro entity)
+        {
+            if (!BLO.ValidarAutenticacaoParceiro(entity).status.success)
                 return appReturn;
             return parceiroService.Autenticar(entity);
         }
@@ -64,15 +66,34 @@ namespace JaCaptei.Services
             return new OkObjectResult("Sessão criada com sucesso.");
         }
 
-        public ActionResult InvalidarToken(Parceiro parceiro) {
-
-            var sessaoAtiva = VerificarSessaoAtiva(parceiro.id, parceiro.tokenJWT);
-
-            if (sessaoAtiva !=null)
+        public ActionResult InvalidarToken(Parceiro parceiro, HttpContext httpContext)
+        {
+            if (parceiro == null || httpContext == null)
             {
-                DAO.RevogarToken(sessaoAtiva.idParceiro, sessaoAtiva.tokenJWT);
+                return new BadRequestObjectResult("Invalid input.");
             }
-            return new OkObjectResult("Token Revogado.");
+
+            try
+            {
+                var sessaoAtiva = VerificarSessaoAtiva(parceiro.id, parceiro.tokenJWT);
+                var novaSessaoUsuario = CriarNovaSessao(parceiro, httpContext);
+
+                if (sessaoAtiva != null)
+                {
+                    DAO.RevogarToken(sessaoAtiva.idParceiro, sessaoAtiva.tokenJWT, novaSessaoUsuario);
+                }
+
+                DAO.SalvarSessao(novaSessaoUsuario);
+                return new OkObjectResult("Token Revogado e Nova Sessão Gerada.");
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"An error occurred: {ex.Message}");
+
+                Console.WriteLine($"Stack Trace: {ex.StackTrace}");
+
+                return new StatusCodeResult(StatusCodes.Status500InternalServerError);
+            }
         }
 
         private SessaoUsuario CriarNovaSessao(Parceiro parceiro, HttpContext httpContext)
@@ -81,13 +102,15 @@ namespace JaCaptei.Services
             string userAgent = httpContext.Request.Headers["User-Agent"].ToString();
             return new SessaoUsuario
             {
-                sessionId = Guid.NewGuid(),
-                idParceiro = parceiro.id,
-                tokenJWT = parceiro.tokenJWT,
                 ipAddress = ipAddress,
                 userAgent = userAgent,
+                idParceiro = parceiro.id,
+                sessionId = Guid.NewGuid(),
                 createdAt = DateTime.UtcNow,
+                tokenJWT = parceiro.tokenJWT,
                 expiresAt = DateTime.UtcNow.AddHours(7),
+                lastAccessedAt = DateTime.UtcNow,
+                createdByIp = ipAddress
             };
         }
 
@@ -116,11 +139,10 @@ namespace JaCaptei.Services
             DAO.SalvarSessao(sessaoUsuario);
         }
 
-        public AppReturn ValidarParceiro(string token)
+        public string ValidarToken(string token)
         {
             var tokenHandler = new JwtSecurityTokenHandler();
             var key = Encoding.ASCII.GetBytes(Config.settings.key);
-
             try
             {
                 var validationParameters = new TokenValidationParameters
@@ -147,26 +169,37 @@ namespace JaCaptei.Services
 
                 if (int.TryParse(idString, out int id))
                 {
-                    var sessaoUsuario = DAO.ObterSessaoAtivaById(id, token);
-                    return new AppReturn
+                    var informacaoToken = DAO.ValidarToken(id, token);
+
+                    if (informacaoToken?.isRevoked == true)
                     {
-                        result = sessaoUsuario
-                    };
+                        return "Token revogado.";
+                    }
+                    else
+                    {
+                        return "Token válido e sessão ativa.";
+                    }
                 }
                 else
                 {
-                    return new AppReturn
-                    {
-                        result = "ID inválido no token."
-                    };
+                    return "ID inválido no token.";
                 }
             }
-            catch (SecurityTokenException ex)
+            catch (SecurityTokenExpiredException)
             {
-                return new AppReturn
-                {
-                    result = "Token inválido."
-                };
+                return "Token expirado.";
+            }
+            catch (SecurityTokenInvalidSignatureException)
+            {
+                return "Assinatura do token inválida.";
+            }
+            catch (SecurityTokenException)
+            {
+                return "Token inválido.";
+            }
+            catch (Exception ex)
+            {
+                return $"Erro inesperado: {ex.Message}";
             }
         }
     }

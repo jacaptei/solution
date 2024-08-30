@@ -10,6 +10,7 @@ using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
+using Microsoft.AspNetCore.Authentication;
 
 namespace JaCaptei.API.Controllers
 {
@@ -46,16 +47,14 @@ namespace JaCaptei.API.Controllers
         [Route("iniciarsessaoerevogartoken")]
         public async Task<IActionResult> IniciarSessaoRevogarToken([FromBody] Parceiro entity)
         {
-
             appReturn = autenticacaoService.Autenticar(entity);
-            autenticacaoService.InvalidarToken(appReturn.result);
 
             if (appReturn.status.success)
             {
                 entity = appReturn.result;
                 entity.roles = "PARCEIRO";
                 entity.tokenJWT = JWTokenService.GenerateToken(entity);
-                var criarSessaoResult = autenticacaoService.CriarSessao(entity, HttpContext);
+                autenticacaoService.InvalidarToken(entity, HttpContext);
             }
             return Result(appReturn);
         }

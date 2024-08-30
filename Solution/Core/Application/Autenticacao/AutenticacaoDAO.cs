@@ -49,6 +49,13 @@ namespace JaCaptei.Application.Autenticacao
                 entity = conn.Query<SessaoUsuario>(e => e.idParceiro == id).LastOrDefault();
             return entity;
         }
+        public SessaoUsuario ValidarToken(int id, string tokenJWT)
+        {
+            SessaoUsuario entity = new SessaoUsuario();
+            using (var conn = new NpgsqlConnection(DB.CS))
+                entity = conn.Query<SessaoUsuario>(e => e.idParceiro == id && e.tokenJWT == tokenJWT && e.isRevoked == true).LastOrDefault();
+            return entity;
+        }
 
         public SessaoUsuario SalvarSessao(SessaoUsuario sessaoUsuario)
         {
@@ -58,7 +65,7 @@ namespace JaCaptei.Application.Autenticacao
             return entity;
         }
 
-        public SessaoUsuario RevogarToken(int id, string tokenJWT)
+        public SessaoUsuario RevogarToken(int id, string tokenJWT, SessaoUsuario novaSessaoUsuario)
         {
             using (var conn = new NpgsqlConnection(DB.CS))
             {
@@ -67,8 +74,8 @@ namespace JaCaptei.Application.Autenticacao
                 {
                     entity.isRevoked = true;
                     entity.revokedAt = DateTime.UtcNow;
-                    entity.revokedAt = DateTime.UtcNow;
-                    entity.replacedBySession = entity.sessionId;
+                    entity.revokedByIp = novaSessaoUsuario.ipAddress;
+                    entity.replacedBySession = novaSessaoUsuario.sessionId;
                     int affectedRows = conn.Update<SessaoUsuario>(entity, e => e.id == entity.id);
                     if (affectedRows > 0)
                     {
