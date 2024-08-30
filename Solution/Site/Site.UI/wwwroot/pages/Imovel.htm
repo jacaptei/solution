@@ -111,18 +111,20 @@
                                         <span v-if="$validator.is(imovel.endereco.complemento)"> <span v-if="$validator.is(imovel.endereco.complementoTipo)">{{imovel.endereco.complementoTipo}} </span> {{imovel.endereco.complemento}}, </span>
                                         <!--<span v-if="$validator.is(imovel.andar && imovel.andar > 0)">{{imovel.andar}}º andar,  </span>-->
                                     </span>
-                                    <span v-if="$validator.is(imovel.endereco.bairro)">{{imovel.endereco.bairro}}, </span>
-                                    <span v-if="$validator.is(imovel.endereco.cidade)">{{imovel.endereco.cidade}}, </span>
-                                    <span v-if="$validator.is(imovel.endereco.estado)">{{imovel.endereco.estado}}  </span>
+                                    <span v-if="$validator.is(imovel.endereco.bairro)">{{imovel.endereco.bairro}}</span>
+                                    <span v-if="$validator.is(imovel.endereco.cidade)">, {{imovel.endereco.cidade}}</span>
+                                    <span v-if="$validator.is(imovel.endereco.estado)">, {{imovel.endereco.estado}}</span>
+                                    <span v-if="$validator.is(imovel.endereco.cep)">, CEP: {{imovel.endereco.cep}}  </span>
 
                                 </div>
 
 
                                 <el-col class="price">
                                     <el-row>
-                                        <el-col :md=8>Valor de Venda<br /><span>{{$tools.FormatMoneyBR(imovel.valor.venda)}}</span></el-col>
-                                        <el-col v-if="$root.isAuth" :md=8>Condomínio<br /><span>{{$tools.FormatMoneyBR(imovel.valor.condominio)}}</span></el-col>
-                                        <el-col v-if="$root.isAuth" :md=8>IPTU<br /><span>{{$tools.FormatMoneyBR(imovel.valor.iptuMensal)}}</span></el-col>
+                                        <el-col :md=6>Valor de Venda<br /><span>{{$tools.FormatMoneyBR(imovel.valor.venda)}}</span></el-col>
+                                        <el-col v-if="$root.isAuth" :md=6>Condomínio<br /><span>{{$tools.FormatMoneyBR(imovel.valor.condominio)}}</span></el-col>
+                                        <el-col v-if="$root.isAuth" :md=6>IPTU<br /><span>{{$tools.FormatMoneyBR(imovel.valor.iptuMensal)}}</span></el-col>
+                                        <el-col v-if="$root.isAuth" :md=6>Comissão<br /><span>{{imovel.valor.comissao}}%</span></el-col>
                                     </el-row>
                                 </el-col>
 
@@ -143,17 +145,13 @@
                                         <el-col :md=6> <i class="icons mdi mdi-bed-king"></i>{{imovel.interno.totalQuartos}} quartos</el-col>
                                         <el-col :md=6> <i class="icons fa fa-shower"    ></i>{{imovel.interno.totalBanheiros}} banheiros</el-col>
                                         <el-col :md=6> <i class="icons fa fa-bath"      ></i>{{imovel.interno.totalSuites}} suítes</el-col>
-                                        <!--<el-col :md=6 v-if="$root.isAuth"> <i class="icons fa fa-building"></i><span v-if="$validator.is(imovel.andar && imovel.andar > 0)">{{imovel.andar}}º andar</span><span v-else>térreo</span></el-col>-->
-                                        <el-col :md=6 v-if="$root.isAuth"> 
-                                                <span v-if="$validator.is(imovel.complemento)"><i class="icons fa fa-building"></i> <span v-if="$validator.is(imovel.complementoTipo)">{{imovel.complementoTipo}} </span> {{imovel.complemento}}, </span>
-                                                <span v-else-if="$validator.is(imovel.numero)"><i class="icons fa fa-home"></i><span>nº {{imovel.numero}}</span> </span>
-                                        </el-col>
                                         <el-col :md=6 v-if="$root.isAuth"> <i class="icons fa fa-building"></i><span v-if="$validator.is(imovel.andar && imovel.andar > 0)">{{imovel.andar}}º andar</span><span v-else>térreo</span></el-col>
                                         <el-col :md=6> <i class="icons fa fa-car "         ></i>{{imovel.externo.totalVagas}} vagas</el-col>
                                         <el-col :md=6> <i class="icons mdi mdi-set-square "></i>{{imovel.area.total}} m&#178; <span style="color:#a5a5a5"> &nbsp;total</span></el-col>
                                         <el-col :md=6> <i class="icons mdi mdi-set-square "></i>{{imovel.area.interna}} m&#178; <span style="color:#a5a5a5"> &nbsp;interna</span></el-col>
                                         <el-col :md=6> <i class="icons mdi mdi-set-square "></i>{{imovel.area.externa}} m&#178;  <span style="color:#a5a5a5"> &nbsp;externa</span></el-col>
                                         <el-col :md=6> <i class="icons fa fa-elevator     "></i>{{imovel.externo.totalElevadores}} <span v-if="imovel.externo.totalElevadores <=1">elevador</span><span v-else>elevadores</span></el-col>
+                                        <el-col :md=6 style="display:flex" v-if="imovel.anoConstrucao > 0"> <i class="icons icons mdi mdi-cake-variant " v-if="imovel.anoConstrucao > 0"></i><span style="padding-top:8px">{{imovel.anoConstrucao}} <span style="color:#a5a5a5">{{imovel.idade}} anos</span></span></el-col>
                                     </el-row>
                                 </el-col>
 
@@ -629,12 +627,15 @@
                         this.$root.SignIn();
                     }
                 }
-           }catch(e){ console.log(e);}
+           }catch(e){ 
+               console.log(e);
+           }finally{
+             if(!this.indisponivel)
+                this.Buscar();
+           }
                     
          }, 2000);
 
-         if(!this.indisponivel)
-            this.Buscar();
 
         },
         methods: {
@@ -738,6 +739,9 @@
                         buscaImovel.imovel.id  = this.$validator.not(this.id)?  0 : this.id;
                         buscaImovel.imovel.cod = this.$validator.not(this.cod)? "": this.cod;
         
+                        if(this.$root.isAuth)
+                            buscaImovel.usuario = this.$root.usuario;
+
                         this.onRequest    = true;
                         this.indisponivel = false;
 

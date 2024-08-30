@@ -32,6 +32,7 @@ namespace JaCaptei.Model {
             public string               construtora        {get;set;} = "";
             public string               construtoraNorm    {get;set;} = "";
             public short                anoConstrucao      {get;set;}
+            public int                  idade              { get => (Utils.Date.GetLocalDateTime().Year) - anoConstrucao; }
             public string               edificio           {get;set;} = "";
             public string               edificioNorm       {get;set;} = "";
             public string               nome               {get;set;} = "";

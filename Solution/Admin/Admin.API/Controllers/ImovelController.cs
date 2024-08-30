@@ -85,7 +85,7 @@ namespace JaCaptei.Administrativo.API.Controllers
             try {
 
             if(imovel.imagens?.Count > 0 || imagesFiles?.Count > 0) {
-                    if(imagesFiles.Count < 15 && Config.settings.environment == "PRODUCTION")
+                    if(( (imagesFiles.Count + imovel.imagens.Count) < 15) && Config.settings.environment == "PRODUCTION")
                         appReturn.AddException("Necessário ao menos 15 imagens.");
                     else{
                         appReturn = service.Alterar(imovel);
