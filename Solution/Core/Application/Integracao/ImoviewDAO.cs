@@ -85,7 +85,9 @@ public class ImoviewDAO: IDisposable {
 
     public async Task<List<ImovelEndereco>> GetImoveisBairro(int idBairro)
     {
-        var res = await _conn.QueryAsync<ImovelEndereco>(i => i.idBairro == idBairro);
+        const string queryImoveisBairro = "SELECT ie.*  FROM \"Imovel\" i INNER JOIN \"ImovelEndereco\" ie ON i.id = ie.\"idImovel  WHERE i.ativo = true AND ie.\"idBairro\" = @idBairro";
+        //var res = await _conn.QueryAsync<ImovelEndereco>(i => i.idBairro == idBairro);
+        var res = await _conn.QueryAsync<ImovelEndereco>(queryImoveisBairro, new { idBairro });
         return res.ToList();
     }
 
@@ -189,11 +191,13 @@ public class ImoviewDAO: IDisposable {
 
     internal async Task<IntegracaoImoview?> GetIntegracaoImportacaoBairro(int idImportBairro)
     {
-        var importacaoBairro = (await _conn.QueryAsync<ImportacaoBairroImoview>(i => i.Id == idImportBairro)).FirstOrDefault();
-        if (importacaoBairro == null) return default;
-        var integracaoBairro = (await _conn.QueryAsync<IntegracaoBairroImoview>(i => i.Id == importacaoBairro.IdIntegracaoBairro)).FirstOrDefault();
-        if (integracaoBairro == null) return default;
-        var integracao = (await _conn.QueryAsync<IntegracaoImoview>(i => i.Id == integracaoBairro.IdIntegracao)).FirstOrDefault();
+        const string queryIntegracaoPorImportacaoId = "SELECT i.* FROM \"ImportacaoBairroImoview\" ibi inner join \"IntegracaoBairroImoview\" ib on ibi.\"idIntegracaoBairro\" = ib.id inner join \"IntegracaoImoview\" i on ib.\"idIntegracao\" = i.id where ibi.id = @idImportBairro";
+        //var importacaoBairro = (await _conn.QueryAsync<ImportacaoBairroImoview>(i => i.Id == idImportBairro)).FirstOrDefault();
+        //if (importacaoBairro == null) return default;
+        //var integracaoBairro = (await _conn.QueryAsync<IntegracaoBairroImoview>(i => i.Id == importacaoBairro.IdIntegracaoBairro)).FirstOrDefault();
+        //if (integracaoBairro == null) return default;
+        //var integracao = (await _conn.QueryAsync<IntegracaoImoview>(i => i.Id == integracaoBairro.IdIntegracao)).FirstOrDefault();
+        var integracao = (await _conn.QueryAsync<IntegracaoImoview>(queryIntegracaoPorImportacaoId, new { idImportBairro })).FirstOrDefault();
         return integracao;
     }
 
