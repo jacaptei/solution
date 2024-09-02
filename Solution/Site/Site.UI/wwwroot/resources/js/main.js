@@ -160,8 +160,6 @@ $(document).ready(function () {
                                     confirmButtonText: "Voltar para a página inicial",
                                     callback: () => {
                                         this.SignOut();
-                                        this.userSessionIsRevoked = true;
-                                        window.location.href = "/home";
                                     }
                                 }
                             );
@@ -463,6 +461,7 @@ $(document).ready(function () {
                 this.usuario = this.$models.usuario();
                 this.isAuth = false;
                 this.DeleteCookie('authToken');
+                axios.defaults.headers.common["Authorization"] = "";
             },
 
             VerificarStatusSessao() {
