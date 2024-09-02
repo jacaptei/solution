@@ -3,7 +3,6 @@ using System.Numerics;
 using MailKit;
 using Microsoft.AspNetCore.Authorization;
 using static JaCaptei.Model.Enums;
-using JaCaptei.Services;
 using JaCaptei.Model;
 using JaCaptei.Application;
 using Microsoft.IdentityModel.Tokens;
@@ -11,6 +10,7 @@ using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
 using Microsoft.AspNetCore.Authentication;
+using JaCaptei.Site.API.Middleware.Autenticacao;
 
 namespace JaCaptei.API.Controllers
 {
