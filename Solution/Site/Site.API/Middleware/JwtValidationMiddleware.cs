@@ -1,9 +1,10 @@
-﻿using Microsoft.AspNetCore.Http;
-using System.Linq;
+﻿using System.Linq;
+using Microsoft.AspNetCore.Http;
 using System.Threading.Tasks;
 using System.IdentityModel.Tokens.Jwt;
-using JaCaptei.Services;
 using Microsoft.AspNetCore.Authentication;
+using JaCaptei.Site.API.Middleware.Autenticacao;
+using System.Text.Json;
 
 namespace JaCaptei.API.Middleware
 {
@@ -20,26 +21,31 @@ namespace JaCaptei.API.Middleware
         {
             var authorizationHeader = context.Request.Headers["Authorization"].FirstOrDefault();
 
-            if (!string.IsNullOrEmpty(authorizationHeader))
+            if (string.IsNullOrEmpty(authorizationHeader))
             {
-                if (authorizationHeader.StartsWith("Bearer "))
-                {
-                    var token = authorizationHeader.Substring("Bearer ".Length).Trim();
-                    var statusToken = ValidarToken(token);
+                await _next(context);
+                return;
+            }
 
-                    if (statusToken == "Token revogado.")
-                    {
-                        context.Response.StatusCode = StatusCodes.Status403Forbidden;
-                        await context.Response.WriteAsync("Token Revogado.");
-                        return;
-                    }
-                }
-                else
+            if (!authorizationHeader.StartsWith("Bearer "))
+            {
+                context.Response.StatusCode = StatusCodes.Status401Unauthorized;
+                await context.Response.WriteAsync("Cabeçalho Authorization inválido.");
+                return;
+            }
+
+            var token = authorizationHeader.Substring("Bearer ".Length).Trim();
+            var statusToken = ValidarToken(token);
+
+            if (statusToken != "Token válido e sessão ativa.")
+            {
+                context.Response.StatusCode = StatusCodes.Status403Forbidden;
+                context.Response.ContentType = "application/json";
+                await context.Response.WriteAsync(JsonSerializer.Serialize(new
                 {
-                    context.Response.StatusCode = StatusCodes.Status401Unauthorized;
-                    await context.Response.WriteAsync("Cabeçalho Authorization inválido.");
-                    return;
-                }
+                    error_message = statusToken
+                }));
+                return;
             }
             await _next(context);
         }
