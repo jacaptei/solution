@@ -65,7 +65,6 @@ $(document).ready(function () {
                     autoLogin       : false,
                     rememberMe      : false,
                     onRequest       : false,
-                    //test          : "root context ok",
                     title: {
                         label       : "HOME",
                         icon        : "fa fa-user",
@@ -96,43 +95,36 @@ $(document).ready(function () {
                     imovel              : {},
                     imovelClicado       : {},
                     localidade          : {estado:{},cidade:{},bairro:{},estados:[],cidades:[],bairros:[]},
-                    dataBackend         : new Date()
+                    dataBackend: new Date(),
+                    hasDisplayed403: false,
+                    userSessionIsRevoked: false
 			}
-		}, computed: {
+        },
+        computed: {
 
 		},
 		props: {
 
 		},
-		watch: {
-            
+        watch: {
 		},
         beforeCreate: function () {
 		},
         created: function () {
-            //var setupres = this.SetUp();
 
             this.localidade.estados = this.$sdata.forms.states;
-            // SETUP ROUTES --------------------------
+
+//-------------------------- SETUP ROUTES --------------------------
             this.routing.title = this.title;
             this.routing.menuIndex = "01-00-00-00";
 
             this.$router.beforeEach((to, from, next) => {
                 this.status.pageLoading = true;
-                this.routing.lastPath = from.path; // this.$router.currentRoute.path;
+                this.routing.lastPath = from.path; 
                 this.routing.menuIndex = to.meta.menuIndex;
                 this.routing.area = to.meta.area;
                 this.routing.label = to.meta.label;
                 next();
-                /*
-                  if(to.path !== "/login" && !this.isAuth){
-                        this.routing.menuIndex = "00-00-00-00";
-                        next({ path: "/login" });
-                  }else{
-                        this.routing.menuIndex = to.meta.menuIndex;
-                        next();
-                  }
-                */
             });
 
             this.$router.afterEach((router) => {
@@ -150,6 +142,38 @@ $(document).ready(function () {
                 },
                 withCredentials: false
             });
+
+            axios.interceptors.response.use(
+                response => {
+                    this.error = [];
+                    return response;
+                },
+                error => {
+                    if (error.response && error.response.status === 403) {
+                        if (!this.hasDisplayed403) {
+                            this.hasDisplayed403 = true;
+                            ElementPlus.ElMessageBox.alert(
+                                "Sua conta foi acessada recentemente de um novo dispositivo. <br/>Para sua segurança, faça login novamente para confirmar sua identidade.<br/>",
+                                "Acesso negado.",
+                                {
+                                    dangerouslyUseHTMLString: true,
+                                    confirmButtonText: "Voltar para a página inicial",
+                                    callback: () => {
+                                        this.SignOut();
+                                        this.userSessionIsRevoked = true;
+                                        window.location.href = "/home";
+                                    }
+                                }
+                            );
+                        }
+                        return Promise.reject(error);
+                    } else {
+                        this.error = this.error || [];
+                        this.error.push(error);
+                        return Promise.reject(error);
+                    }
+                }
+            );
 
             this.headBannerImagesShuffled = this.headBannerImages.sort((a, b) => 0.5 - Math.random());
 
@@ -215,180 +239,157 @@ $(document).ready(function () {
             }).finally(() => {
                 this.status.loading = false;
             });
-
-            
 		},
         beforeUnmount() {
             this.SignOut();
         },
-		mounted() {
-
-
+        mounted() {
             window.addEventListener("online", () => {
-              this.status.online = true;
+                this.status.online = true;
             });
             window.addEventListener("offline", () => {
-              this.status.online = false;
+                this.status.online = false;
             });
 
             this.params = this.$tools.HandleParams();
-            
+
             var url = window.location;
             var name = "home";
             var link = "/home";
             var tag = url.hash.replace("#/", "");
             var tag = url.pathname.replace("/", "");
 
-            //c2("url=",url)
-            //c2("tag=",tag)
-
-
             window.location.hash.replace("/#", "");
-            //var tag = url.pathname.replace("/", "");
-            //c2("params", this.params)
-            //c2("tag",tag)
-            if (this.$validator.IsSet(tag)){
-                 tag = tag.split("?")[0];
-                 if(tag != "imovel")
+            if (this.$validator.IsSet(tag)) {
+                tag = tag.split("?")[0];
+                if (tag != "imovel")
                     link = this.RouteTo(tag);
             }
             else
                 this.RouteTo({ name: name, route: link });
 
-
-
-
-
-
-			//this.RouteTo("/clients");
-			//this.RouteTo("/clients","insert");
-			//this.RouteTo("/clients","search");
+            //this.RouteTo("/clients");
+            //this.RouteTo("/clients","insert");
+            //this.RouteTo("/clients","search");
             // this.RouteTo("/home");
-            
+
             //window.setInterval(()=>this.KeepCRMsession(),600000);
             //window.setInterval(()=>this.UpdateCRMsession(),90000);
 
             //window.onbeforeunload(()=>{    this.Exit();        });
-		},
-		methods: {
+        },
+        methods: {
 
-                UpdateCRMsession(){
-                    //c("KeepCRMsession");
-                     axios.get(this.$api.BuildURL("KeepCRMsession")).then((request) => {
-                         this.usuario.sessaoCRMsystem = request.data.sessao;
-                         //c2("this.usuario.sessaoCRMsystem",this.usuario.sessaoCRMsystem);
-                     });
-                },
+            UpdateCRMsession() {
+                //c("KeepCRMsession");
+                axios.get(this.$api.BuildURL("KeepCRMsession")).then((request) => {
+                    this.usuario.sessaoCRMsystem = request.data.sessao;
+                    //c2("this.usuario.sessaoCRMsystem",this.usuario.sessaoCRMsystem);
+                });
+            },
 
-                RequestLogin(mensagem = "É necessário estar logado para acessar esta área") {
-                    if (this.$route.name != '/home') {
-                        //this.$tools.MessageAlert(mensagem, 100);
-                        window.setTimeout(() => this.OpenLoginModal(), 500);
-                    }
-                },
+            RequestLogin(mensagem = "É necessário estar logado para acessar esta área") {
+                if (this.$route.name != '/home') {
+                    //this.$tools.MessageAlert(mensagem, 100);
+                    window.setTimeout(() => this.OpenLoginModal(), 500);
+                }
+            },
 
-                Login(){
-                    this.OpenLoginModal();
-                },
+            Login() {
+                this.OpenLoginModal();
+            },
 
-                OpenLoginModal(){
-				    //this.$root.usuario.usernameCRM	=	"api";
-				    //this.$root.usuario.senhaCRM     =	"Ofeko@123dw";
-				    this.$root.showLoginModal	    =	true;
-                },
+            OpenLoginModal() {
+                //this.$root.usuario.usernameCRM	=	"api";
+                //this.$root.usuario.senhaCRM     =	"Ofeko@123dw";
+                this.$root.showLoginModal = true;
+            },
 
-                OpenLoginTermsAndPolicyModal(){
-				    this.$root.showTermsAndPolicyModal = true;
-                },
+            OpenLoginTermsAndPolicyModal() {
+                this.$root.showTermsAndPolicyModal = true;
+            },
 
+            /*
+           async  SetUp(){
+             
+                    var uf = "MG";
+                    this.status.loading = true;
 
-                /*
-               async  SetUp(){
-                 
-                        var uf = "MG";
-                        this.status.loading = true;
+                          await   axios.get(this.$api.BuildURL("suporte/modelos/obter")).then((request) => {
+                                            this.$models.data                   = request.data;
+                                            this.log                            = this.$models.log();
+                                            this.usuario                        = this.$models.usuario();
+                                            this.localidade                     = this.$models.localidade();
+                                            this.imovel                         = this.$models.imovel();
+                                            this.favorito                       = this.$models.favorito();
+                                            this.search.imovelBusca             = this.$models.imovelBusca();
 
-						      await   axios.get(this.$api.BuildURL("suporte/modelos/obter")).then((request) => {
-									            this.$models.data                   = request.data;
-                                                this.log                            = this.$models.log();
-                                                this.usuario                        = this.$models.usuario();
-                                                this.localidade                     = this.$models.localidade();
-                                                this.imovel                         = this.$models.imovel();
-                                                this.favorito                       = this.$models.favorito();
-                                                this.search.imovelBusca             = this.$models.imovelBusca();
+//                                        this.search.opcoes.tiposImoveis = this.$data.ObterTiposImoveisOptions(this.$models.tiposImoveis());
+                                            var tiposImoveis = this.$models.tiposImoveis();
+                                            this.search.opcoes.tiposImoveis = [];
+                                            for (var i = 0; i < tiposImoveis.length; i++)
+                                                this.search.opcoes.tiposImoveis.push({ 'label': tiposImoveis[i], 'value': tiposImoveis[i] });
 
-    //                                        this.search.opcoes.tiposImoveis = this.$data.ObterTiposImoveisOptions(this.$models.tiposImoveis());
-                                                var tiposImoveis = this.$models.tiposImoveis();
-                                                this.search.opcoes.tiposImoveis = [];
-                                                for (var i = 0; i < tiposImoveis.length; i++)
-                                                    this.search.opcoes.tiposImoveis.push({ 'label': tiposImoveis[i], 'value': tiposImoveis[i] });
+                                            //this.search.opcoes.tiposImoveis    = this.$models.tiposImoveis();
+                                            //c2("this.search.options.tiposImoveis", this.search.opcoes.tiposImoveis);
+                                            //c2("this.search.options.tiposImoveis", this.$data.ObterTiposImoveisOptions(this.$models.tiposImoveis()));
+                                            //c2(" this.$models.tiposImoveis()", this.$models.tiposImoveis());
 
-                                                //this.search.opcoes.tiposImoveis    = this.$models.tiposImoveis();
-                                                //c2("this.search.options.tiposImoveis", this.search.opcoes.tiposImoveis);
-                                                //c2("this.search.options.tiposImoveis", this.$data.ObterTiposImoveisOptions(this.$models.tiposImoveis()));
-                                                //c2(" this.$models.tiposImoveis()", this.$models.tiposImoveis());
+                                            this.usuario.nome           = "";
+                                            this.usuario.razao          = "";
+                                            this.usuario.username       = "";
+                                            this.usuario.senha          = "";
+                                            
+                                           // if(this.routing.label=="HOME")
+                                           //     this.search.localEstado = uf;
 
-                                                this.usuario.nome           = "";
-                                                this.usuario.razao          = "";
-				                                this.usuario.username       = "";
-				                                this.usuario.senha          = "";
-				                                
-                                               // if(this.routing.label=="HOME")
-                                               //     this.search.localEstado = uf;
+                                            //c2("localidade",this.localidade)
+                                            //c2("localidade.estados",this.localidade.estados)
 
-                                                //c2("localidade",this.localidade)
-                                                //c2("localidade.estados",this.localidade.estados)
+                                            var content = {};
+                                            //this.localidade.estados  = this.localidade.estados.filter((e)=>e.uf == "MG");
+                                            
+                                            content.localidade = this.localidade;
 
-                                                var content = {};
-                                                //this.localidade.estados  = this.localidade.estados.filter((e)=>e.uf == "MG");
-                                                
-                                                content.localidade = this.localidade;
+                                            this.search.SetUp(content);
+                                            var cidades =   this.$sdata.ObterCidades(12);
+                                            c2("cidades", cidades)
 
-                                                this.search.SetUp(content);
-                                                var cidades =   this.$sdata.ObterCidades(12);
-                                                c2("cidades", cidades)
+                                            return true;
 
-                                                return true;
+                                    }).catch((error) => {
+                                        ce(error);
+                                        return false;
+                                    }).finally(() => {
+                                        this.status.loading = false;
+                                    });  
+                      
+                      //});
+            },
+            */
 
-							            }).catch((error) => {
-                                            ce(error);
-                                            return false;
-							            }).finally(() => {
-                                            this.status.loading = false;
-							            });  
+            GetBanner(index) {
+                var img = "resources/images/pages/banners/" + this.headBannerImagesShuffled[index - 1];
+                return img;
+            },
 
+//-------------------------------- VIEW BROKERS --------------------------------
 
-                          
-                          //});
-                            
+            SetTitle(label, icon, actionBack = "/home") {
+                if (this.$validator.IsSet(label)) {
+                    this.title.visible = true;
+                    this.title.label = label;
+                    this.title.icon = icon;
+                    this.title.actionBack = actionBack;
+                } else
+                    this.NoTitle();
+            },
 
-
-                },
-
-                */
-
-                GetBanner(index){
-                    var img = "resources/images/pages/banners/" + this.headBannerImagesShuffled[index-1];
-                    return img;
-                },
-
-                // VIEW BROKERS --------------------------------
-
-                SetTitle(label,icon,actionBack="/home") {
-                    if(this.$validator.IsSet(label)){
-                        this.title.visible      = true;
-                        this.title.label        = label;
-                        this.title.icon         = icon;
-                        this.title.actionBack   = actionBack;
-                    }else
-                        this.NoTitle();
-                },
-
-                NoTitle() {
-                    this.title.label    = "";
-                    this.title.icon     = "";
-                    this.title.visible  = false;
-                },
+            NoTitle() {
+                this.title.label = "";
+                this.title.icon = "";
+                this.title.visible = false;
+            },
 
             //ValidateSessionWithToken() {
             //    const cookies = document.cookie.split('; ');
@@ -416,147 +417,154 @@ $(document).ready(function () {
             //    }
             //},
 
-                SetFullTitler(visible, label, icon, actionLabel, actionIcon, actionLink) {
-                    this.titler.visible     = visible    ;
-                    this.titler.label       = label      ;
-                    this.titler.icon        = icon       ;
-                    this.titler.actionLabel = actionLabel;
-                    this.titler.actionIcon  = actionIcon ;
-                    this.titler.actionLink  = actionLink ;
-                },
-
-                SetCountrySettings(item){
-                            this.usuario.account.country      =   item.value;
-                            this.usuario.account.countryCode  =   item.code;
-                            this.usuario.account.countryDDI   =   item.ddi;
-							this.$tools.account	              =   this.usuario.account;
-                            //c(this.usuario.account)
-                },
-
-             // AUTH --------------------------------
-                SignIn(){
-                    if (this.usuario.aceitouPoliticaPrivacidade === false || this.usuario.aceitouTermos === false) {
-                        this.OpenLoginTermsAndPolicyModal();
-                    }
-                    //this.$sdata.Storage.Set("utk", this.usuario.token);
-                    var usr = "jcuser"+this.usuario.id;
-                    this.$sdata.Storage.Set(usr, this.usuario);
-                    axios.defaults.headers.common["Authorization"] = "Bearer " + this.usuario.tokenJWT; 
-                    this.setCookie('authToken', this.$root.usuario.tokenJWT, 7); 
-                    this.isAuth = true;
+            SetFullTitler(visible, label, icon, actionLabel, actionIcon, actionLink) {
+                this.titler.visible = visible;
+                this.titler.label = label;
+                this.titler.icon = icon;
+                this.titler.actionLabel = actionLabel;
+                this.titler.actionIcon = actionIcon;
+                this.titler.actionLink = actionLink;
             },
 
-            setCookie(name, value, hours) {
+            SetCountrySettings(item) {
+                this.usuario.account.country = item.value;
+                this.usuario.account.countryCode = item.code;
+                this.usuario.account.countryDDI = item.ddi;
+                this.$tools.account = this.usuario.account;
+            },
+
+//-------------------------------- AUTH --------------------------------
+
+            SignIn() {
+                if (this.usuario.aceitouPoliticaPrivacidade === false || this.usuario.aceitouTermos === false) {
+                    this.OpenLoginTermsAndPolicyModal();
+                }
+                var usr = "jcuser" + this.usuario.id;
+                this.$sdata.Storage.Set(usr, this.usuario);
+                axios.defaults.headers.common["Authorization"] = "Bearer " + this.usuario.tokenJWT;
+                this.SetCookie('authToken', this.$root.usuario.tokenJWT, 7);
+                this.isAuth = true;
+            },
+
+            SetCookie(name, value, hours) {
                 const expires = new Date(Date.now() + hours * 60 * 60 * 1000).toUTCString();
                 document.cookie = `${name}=${value}; expires=${expires}; path=/; Secure; SameSite=Strict`;
             },
 
-            deleteCookie(name) {
+            DeleteCookie(name) {
                 document.cookie = `${name}=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/; Secure; SameSite=Strict`;
             },
 
-            SignOut(){
-                    var usr = "jcuser"+this.usuario.id;
-                    this.$sdata.Storage.Set(usr, null);
-                    this.$sdata.Storage.Set("utk", null);
-                    this.log        = this.$models.log();
-                    this.usuario    = this.$models.usuario();
-                    this.isAuth = false;
-                    this.deleteCookie('authToken');
-                    //axios.defaults.headers.common["Authorization"] = "";
-                },
-                Exit(){
-                    this.SignOut();
-                    this.isAuth = false;
-                    axios.defaults.headers.common["Authorization"] = "";
-                    this.RouteTo("home");
-                    //this.$sdata.Storage.Set("autoLogin", false);
-                },
+            SignOut() {
+                var usr = "jcuser" + this.usuario.id;
+                this.$sdata.Storage.Set(usr, null);
+                this.$sdata.Storage.Set("utk", null);
+                this.log = this.$models.log();
+                this.usuario = this.$models.usuario();
+                this.isAuth = false;
+                this.DeleteCookie('authToken');
+            },
 
-
-                // ROUTING --------------------------------
-
-                RouteTo(destiny,action=null) {
-                    //c(action)
-                    var link = { name: "home", route: "/home" };
-                    if (this.$validator.IsSet(destiny) && typeof destiny === "object") {
-                        if (this.$validator.IsntSet(destiny.name)   ) destiny.name = link.name;
-                        if (this.$validator.IsntSet(destiny.route)  ) destiny.route = link.route;
-                        if (this.$validator.IsntSet(destiny.action) ) destiny.action = link.action;
-                        link = destiny;
-                    } else {
-                        link.route = destiny;
-                     }
-
-                     if(this.$validator.IsSet(action))
-                        link.route += (this.$validator.IsSet(action))? "/"+action : "/";
-
-                    //console.log("RouteTo = " + link.route);
-                    this.$router.push({ path: link.route  }).catch((e) => { console.log("RouteTo Error - " + e); });
-                    //this.$router.push(link.name);
-                    //this.$router.push({ path: link.route, params: { index: link.index, view: link.view, label: link.label, icon: link.icon, id: link.id, cod: link.cod, item: link.item } }).catch((e) => { console.log("RouteTo Error - " + e); });
-                    //console.log("this.$router.currentRoute.meta = " + JSON.stringify(this.$router.currentRoute))
-                    //c("this.$router.params",this.$router.params)
-
-                    this.$tools.ToTop();
-
-                },
-
-                RouteBack: function () {
-                    
-                    if(this.$validator.IsSet(this.$router.go(-1)))
-                        this.$router = this.$router.go(-1); //this.RouteTo(this.$router.go(-1).path);
-                    else
-                        this.RouteTo("/home");
-                    
-                },
-
-                RouteNext: function () {
-                    var router = this.$router.go(1);
-                    console.log(router);
-                },
-
-                RouteToIndexParam: function (route_index = null, item = {}) {
-                    if (this.$validator.IsSet(route_index)) {
-                        this.route_index = route_index;
-                        this.currentRoute = this.currentRoutes[route_index];
-                    } else {
-                        this.route_index = 1;
-                        this.currentRoute = this.currentRoutes[1];
+            VerificarStatusSessao() {
+                axios.interceptors.response.use(
+                    response => {
+                        this.error = [];
+                        return response;
+                    },
+                    error => {
+                        this.error = this.error || [];
+                        this.error.push(error);
+                        const is403Error = error.response && error.response.status === 403;
+                        if (is403Error && !this.hasAlerted) {
+                            window.location.href = "/home";
+                            return;
+                        }
+                        return Promise.reject(error);
                     }
-                    this.$validator.ScrollTo("scrolltoppoint");
-                    this.$router.push({
-                        name: this.currentRoute,
-                        params: { point: JSON.stringify(item) },
-                    });
-                },
+                );
+            },
 
+            Exit() {
+                this.SignOut();
+                this.isAuth = false;
+                axios.defaults.headers.common["Authorization"] = "";
+                this.RouteTo("home");
+                //this.$sdata.Storage.Set("autoLogin", false);
+            },
 
-                // MIX --------------------------------
+//-------------------------------- ROUTING --------------------------------
 
-                ZoomOut(){
-                        if(this.zoom - 0.05 >= 0 )
-                            this.zoom -= 0.05;
-                        this.ZoomSet(this.zoom);
-                },
-                ZoomIn(){
-                        this.zoom += 0.05;
-                        this.ZoomSet(this.zoom);
-                },
-                ZoomReset(){
-                        this.zoom = 1;
-                        this.ZoomSet(this.zoom);
-                },
-                ZoomSet(z){
-                        //document.body.style.zoom = this.zoom;
-                        //document.body.style.transform = 'scale(0.5)';
-                    document.body.style.transform = 'scale('+z+')';
-                    document.body.style.transformOrigin = 'left top';
+            RouteTo(destiny, action = null) {
+                var link = { name: "home", route: "/home" };
+                if (this.$validator.IsSet(destiny) && typeof destiny === "object") {
+                    if (this.$validator.IsntSet(destiny.name)) destiny.name = link.name;
+                    if (this.$validator.IsntSet(destiny.route)) destiny.route = link.route;
+                    if (this.$validator.IsntSet(destiny.action)) destiny.action = link.action;
+                    link = destiny;
+                } else {
+                    link.route = destiny;
                 }
 
+                if (this.$validator.IsSet(action))
+                    link.route += (this.$validator.IsSet(action)) ? "/" + action : "/";
 
-		}
-	});
+                this.$router.push({ path: link.route }).catch((e) => { console.log("RouteTo Error - " + e); });
+                //this.$router.push(link.name);
+                //this.$router.push({ path: link.route, params: { index: link.index, view: link.view, label: link.label, icon: link.icon, id: link.id, cod: link.cod, item: link.item } }).catch((e) => { console.log("RouteTo Error - " + e); });
+                //console.log("this.$router.currentRoute.meta = " + JSON.stringify(this.$router.currentRoute))
+                //c("this.$router.params",this.$router.params)
+                this.$tools.ToTop();
+            },
+            RouteBack: function () {
+                if (this.$validator.IsSet(this.$router.go(-1)))
+                    this.$router = this.$router.go(-1);
+                else
+                    this.RouteTo("/home");
+            },
+
+            RouteNext: function () {
+                var router = this.$router.go(1);
+                console.log(router);
+            },
+
+            RouteToIndexParam: function (route_index = null, item = {}) {
+                if (this.$validator.IsSet(route_index)) {
+                    this.route_index = route_index;
+                    this.currentRoute = this.currentRoutes[route_index];
+                } else {
+                    this.route_index = 1;
+                    this.currentRoute = this.currentRoutes[1];
+                }
+                this.$validator.ScrollTo("scrolltoppoint");
+                this.$router.push({
+                    name: this.currentRoute,
+                    params: { point: JSON.stringify(item) },
+                });
+            },
+
+//-------------------------------- MIX --------------------------------
+
+            ZoomOut() {
+                if (this.zoom - 0.05 >= 0)
+                    this.zoom -= 0.05;
+                this.ZoomSet(this.zoom);
+            },
+            ZoomIn() {
+                this.zoom += 0.05;
+                this.ZoomSet(this.zoom);
+            },
+            ZoomReset() {
+                this.zoom = 1;
+                this.ZoomSet(this.zoom);
+            },
+            ZoomSet(z) {
+                //document.body.style.zoom = this.zoom;
+                //document.body.style.transform = 'scale(0.5)';
+                document.body.style.transform = 'scale(' + z + ')';
+                document.body.style.transformOrigin = 'left top';
+            }
+        }
+    });
 
         //const plugins = {
         //    install() {
@@ -611,8 +619,6 @@ $(document).ready(function () {
 	  }
 	});*/
 
-
-
 	App.use(ROUTER);
 	App.use(Quasar);
 	Quasar.iconSet.set(Quasar.iconSet.fontawesomeV6);
@@ -655,9 +661,7 @@ $(document).ready(function () {
     App.component("c-cadastro-jaindica"     , c_cadastro_jaindica       );
     App.component("c-cadastro-parceiro"     , c_cadastro_parceiro       );
 
-	// --------- MOUNT
+    // ------------------ MOUNT  ---------------------------
+
 	App.mount("#app");
-
-
-
 });
