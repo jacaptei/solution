@@ -58,11 +58,9 @@ namespace JaCaptei.Site.API.Middleware.Autenticacao
 
             if (sessaoAtiva != null && sessaoAtiva.isRevoked == false)
             {
-                return new ConflictObjectResult(parceiro.id);
+                return new ConflictObjectResult("Parceiro já possui uma sessão ativa");
             }
-
             var sessaoUsuario = CriarNovaSessao(parceiro, httpContext);
-
             DAO.SalvarSessao(sessaoUsuario);
             return new OkObjectResult("Sessão criada com sucesso.");
         }
@@ -122,9 +120,7 @@ namespace JaCaptei.Site.API.Middleware.Autenticacao
             if (sessaoUsuario != null)
             {
                 DateTime expiresAtUtc = DateTime.Parse(sessaoUsuario.expiresAt.ToString(), null, System.Globalization.DateTimeStyles.AdjustToUniversal);
-
                 DateTime expiresAtLocal = expiresAtUtc.ToLocalTime();
-
                 DateTime currentTimeLocal = DateTime.UtcNow.AddHours(-3);
 
                 if (expiresAtLocal > currentTimeLocal)
