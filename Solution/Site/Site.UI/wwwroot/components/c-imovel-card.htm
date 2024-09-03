@@ -5,14 +5,14 @@
         <div class="col-12 xs-hide" id="build-card">
 
             <div id="carousel-thumbs">
-                <el-carousel :interval="0" arrow="always" style="border-radius:14px 0px 0px 14px;" v-if="imovel.imagens.length > 0">
+                <el-carousel :interval="0" arrow="always" style="border-radius:14px 0px 0px 14px;" v-if="imovel.imagens?.length > 0">
                     <el-carousel-item v-for="(item,index) in thumbs" :key="index" @click="OpenModalImages(index)" style="cursor:pointer;">
                         <!--<img :src="item.url" />-->
                         <div>
                             <el-image style="height:244px;width:100%;position:unset;display:inherit;" :src="item.url" fit="cover" />
                         </div>
 
-                        <div>{{index+1}} / {{imovel.imagens.length}}</div> <div><i class="fa-solid fa-up-right-and-down-left-from-center"></i></div>
+                        <div>{{index+1}} / {{imovel.imagens?.length}}</div> <div><i class="fa-solid fa-up-right-and-down-left-from-center"></i></div>
                     </el-carousel-item>
                 </el-carousel>
                 <el-carousel :interval="0" arrow="never" style="border-radius:14px 0px 0px 14px;" v-else>
@@ -99,10 +99,10 @@
         <div class="col-12 md-hide sm-hide lg-hide xl-hide" id="build-card-xs">
 
             <div id="carousel-xs">
-                <el-carousel :interval="0" arrow="always" style="border-radius:14px 14px 0px 0px;" v-if="imovel.imagens.length > 0">
+                <el-carousel :interval="0" arrow="always" style="border-radius:14px 14px 0px 0px;" v-if="imovel.imagens?.length > 0">
                     <el-carousel-item v-for="(item,index) in imovel.imagens" :key="index" style="cursor:pointer;">
                         <img :src="item.url" />
-                        <div>{{index+1}} / {{imovel.imagens.length}}</div> <div><i class="fa-solid fa-up-right-and-down-left-from-center"></i></div>
+                        <div>{{index+1}} / {{imovel.imagens?.length}}</div> <div><i class="fa-solid fa-up-right-and-down-left-from-center"></i></div>
                     </el-carousel-item>
                 </el-carousel>
                 <el-carousel :interval="0" arrow="never" style="border-radius:14px 14px 0px 0px;" v-else>
@@ -180,7 +180,7 @@
                     <q-btn v-else size="4px" color="white" @click="onClick"></q-btn>
                 </template>
 
-                <q-carousel-slide v-for="(item,index) in imovel.imagens" :name="index" :img-src="item.urlLarge"></q-carousel-slide>
+                <q-carousel-slide v-for="(item,index) in imovel?.imagens" :name="index" :img-src="item.urlLarge"></q-carousel-slide>
 
             </q-carousel>
 
@@ -229,7 +229,7 @@ module.exports = {
 
                 var limitTotalThumbs = 4;
                 
-                if(this.imovel?.imagens.length == 0)
+                if(this.$validator.not(this.imovel?.imagens) || this.imovel?.imagens?.length == 0)
                     this.thumbs.push( { url: "../resources/images/noimages.jpg" });
                 else{
                     this.imovel.imagens.forEach( img => {

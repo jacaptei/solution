@@ -66,13 +66,14 @@ namespace JaCaptei.API.Controllers {
             appReturn = service.Buscar(busca);
 
             if(busca.usuario is null || busca.usuario?.id == 0 || Utils.Validator.Not(busca.usuario?.tokenJWT)){
-                appReturn.result.result.imoveis[0].endereco.logradouro  = "";
-                appReturn.result.result.imoveis[0].endereco.numero      = "";
-                appReturn.result.result.imoveis[0].endereco.andar       = "";
-                appReturn.result.result.imoveis[0].endereco.cep         = "";
-                appReturn.result.result.imoveis[0].valor.condominio     = 0;
-                appReturn.result.result.imoveis[0].valor.iptuMensal     = 0;
-                appReturn.result.result.imoveis[0].valor.comissao       = 0;
+                appReturn.result.result.imoveis[0].endereco.logradouro      = "";
+                appReturn.result.result.imoveis[0].endereco.logradouroNorm  = "";
+                appReturn.result.result.imoveis[0].endereco.numero          = "";
+                appReturn.result.result.imoveis[0].endereco.andar           = "";
+                appReturn.result.result.imoveis[0].endereco.cep             = "";
+                appReturn.result.result.imoveis[0].valor.condominio         = 0;
+                appReturn.result.result.imoveis[0].valor.iptuMensal         = 0;
+                appReturn.result.result.imoveis[0].valor.comissao           = 0;
             }
             
             return Result(appReturn);

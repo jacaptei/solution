@@ -14,6 +14,9 @@
 			<div v-else-if="!onloading && ($validator.not(proprietario) || proprietario?.id==0)">
 				Registro não encontrado.
 			</div>
+			<div v-else-if="proprietario.id==1" style="color:var(--s-color-red)">
+				Este é um proprietário do sistema e não pode ser editado.
+			</div>
 			<div v-else>
 				<div>
 					<el-col :md="24">

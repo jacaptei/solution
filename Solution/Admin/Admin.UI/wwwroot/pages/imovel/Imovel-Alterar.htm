@@ -477,7 +477,48 @@
 
         <div v-if="step == 3">
 
+
+
+                                        
             <el-row :gutter="20" style="margin-top:10px">
+                <el-col :md="24" style="color:var(--s-color-primary);font-weight:700">
+                    STATUS
+                </el-col>
+            </el-row>
+                    
+            <el-row :gutter="20" style="margin-top:10px" v-if="$root.usuario.god || $root.usuario.gestor">
+                    <el-col :span="8" :xs="24" style="max-width:120px">
+                        <el-checkbox label="Ativo" v-model="imovel.ativo " size="large"></el-checkbox><br />
+                        <el-checkbox label="Validado" v-model="imovel.validado" size="large"></el-checkbox>
+                    </el-col>
+                    <el-col :span="12" :xs="24">
+                             <div v-if="!imovel.ativo">
+                                <span style="color:var(--s-color-red);">Motivo da inativação</span><span style="color:#b1b1b1;float:right;padding-right:30px" v-if="exibirCampoAbertoMotivoInativacao">{{imovel.motivoInativacao.length}}/50</span><br />
+                                <span v-if="!exibirCampoAbertoMotivoInativacao">
+                                        <el-select v-model="imovel.motivoInativacao"  value-key="id" placeholder="selecionar" filterable class="m-4" size="large" style="width:100%" @change="()=>{ if(imovel.motivoInativacao == 'Outro'){imovel.motivoInativacao = '';exibirCampoAbertoMotivoInativacao = true;FocusCampoAbertoMotivoInativacao();} } ">
+                                        <el-option v-for="item in opcoes.motivosInativacao" :key="item.id" :label="item.label" :value="item.label"></el-option>
+                                    </el-select>
+                                </span>
+                                <span v-else>
+                                    <el-input @keyup.enter="CheckoutStep3()" v-model="imovel.motivoInativacao" placeholder="até 50 caracteres"  maxlength="50" ref="CampoAbertoMotivoInativacao" style="width:calc(100% - 20px)"></el-input>
+                                    <i class="fa fa-close" @click="()=>{imovel.motivoInativacao='';exibirCampoAbertoMotivoInativacao = false; }" style="margin-left:5px;color:var(--s-color-red);cursor:pointer"></i>
+                                </span>
+                            </div>
+                    </el-col>
+            </el-row>
+            <el-row :gutter="20" style="margin-top:0px" v-else>
+                    <el-col :span="8" :xs="24" style="max-width:120px">
+                            <div v-if="imovel.ativo" class="checkicon"><i class="fa fa-check"></i> Ativo </div>
+                            <div v-else class="nocheckicon" @click="$tools.Alert(imovel.motivoInativacao,'Motivo da inativação')"><i class="fa fa-xmark"></i> Inativo <a href="javascript:void(0)" style="color:#fff;text-decoration:none"><i class="fa fa-message"></i></a></div>
+                            <div v-if="imovel.validado" class="checkicon"><i class="fa fa-check"></i> Validado </div>
+                            <div v-else class="nocheckicon"><i class="fa fa-xmark"></i> Invalidado </div>
+                    </el-col>
+            </el-row>
+
+
+
+
+            <el-row :gutter="20" style="margin-top:30px">
                 <el-col  :md="6" :sm="12" :xs="24" style="color:var(--s-color-primary);font-weight:700">
                     RESPONSÁVEL PELA CAPTAÇÃO<br />
                     <span style="color:var(--s-color-text);font-weight:700" v-if="$validator.is(imovel.adminCaptador)">
@@ -504,7 +545,7 @@
             </el-row>
                     
             <el-row :gutter="20" style="margin-top:10px">
-                    <el-col :span="24" style="max-width:260px">
+                    <el-col :span="8" :xs="24" style="max-width:260px">
                         Local das chaves<br />
                         <span v-if="!exibirCampoAbertoOutroLocalChaves">
                                 <el-select v-model="imovel.localChaves"  value-key="id" placeholder="selecionar" filterable class="m-4" size="large" style="width:100%" @change="()=>{ if(imovel.localChaves == 'Outro'){imovel.localChaves = '';exibirCampoAbertoOutroLocalChaves = true;FocusOutroLocalChaves();} } ">
@@ -518,8 +559,6 @@
                     </el-col>
             </el-row>
             <el-row :gutter="20" v-if="$root.usuario.god || $root.usuario.gestor">
-                    <el-col :md="4" :sm="8" :xs="12"><el-checkbox label="Ativo               " v-model="imovel.ativo                          " size="large"></el-checkbox></el-col>
-                    <el-col :md="4" :sm="8" :xs="12"><el-checkbox label="Válido              " v-model="imovel.validado                       " size="large"></el-checkbox></el-col>
                     <el-col :md="4" :sm="8" :xs="12"><el-checkbox label="Venda               " v-model="imovel.venda                          " size="large"></el-checkbox></el-col>
                     <el-col :md="4" :sm="8" :xs="12"><el-checkbox label="Locação             " v-model="imovel.locacao                        " size="large"></el-checkbox></el-col>
                     <el-col :md="4" :sm="8" :xs="12"><el-checkbox label="Residencial         " v-model="imovel.residencial                    " size="large"></el-checkbox></el-col>
@@ -1038,6 +1077,7 @@
                 carregandoBairros: false,
                 exibirCampoAbertoOutroComplemento: false,
                 exibirCampoAbertoOutroLocalChaves: false,
+                exibirCampoAbertoMotivoInativacao: false,
                 verificadoImoveisNaRegiao: false,
                 cep: { numero: "", estado: "", cidade: "", logradouro: ""},
                 opcoes: { estados: [], cidades: [], bairros: [],
@@ -1045,7 +1085,8 @@
                     anos:[],
                     tiposImoveis:this.$models.tiposImoveis(),
                     tiposComplementos:this.$models.tiposComplementos(),
-                    locaisChaves: this.$sdata.opcoes.locaisChaves
+                    locaisChaves: this.$sdata.opcoes.locaisChaves,
+                    motivosInativacao: this.$sdata.opcoes.motivosInativacao
                 },
                 proprietariosBuscaResult:[],
                 imoveisBuscaResult:[],
@@ -1101,7 +1142,7 @@
 
                 // c2("request",request);
                 if (request?.status?.success){
-                    this.buscaImovel        =  request.result;
+                    this.buscaImovel    =  request.result;
                     if(this.$validator.is(this.buscaImovel.result.imoveis)){
                         this.imoveisBuscaResult =  this.buscaImovel.result.imoveis;
                         this.imovel             =  this.buscaImovel.result.imoveis[0];
@@ -1299,6 +1340,9 @@
                 //    this.$refs.areainterna.focus()
                 //}
 
+                if (!this.imovel.ativo && this.$validator.not(this.imovel.motivoInativacao))
+                    msg += "<b>MOTIVO DA INATIVAÇÃO</b> não informado<br>";
+
                 if(this.$validator.not(this.imovel.localChaves))
                     msg += "<b>Local das chaves</b> não informado<br>";
                 if(this.$validator.not(this.imovel.descricao))
@@ -1412,6 +1456,9 @@
 
                 var msg = "";
 
+                if (!this.imovel.ativo && this.$validator.not(this.imovel.motivoInativacao))
+                    msg += "<b>MOTIVO DA INATIVAÇÃO</b> não informado<br>";
+
                 if (this.$validator.not(this.imovel.documentacao.indiceCadastral))
                     msg += "<b>ÍNDICE CADASTRAL</b> não informado<br>";
 
@@ -1441,8 +1488,8 @@
              
                 if(this.imagesInputs.length == 0 && this.imovel?.imagens.length == 0)
                     msg += "<b>Imagens</b> não inseridas<br>";
-                if(this.imagesInputs.length < 15 && this.imovel?.imagens.length < 15)
-                    msg += "<b>Imagens</b> precisam ser pelo menos 15<br>";
+                //if(this.imagesInputs.length < 15 && this.imovel?.imagens.length < 15)
+                //    msg += "<b>Imagens</b> precisam ser pelo menos 15<br>";
              
                 if (msg.length > 0){
                     this.$tools.Alert(msg);
@@ -1667,6 +1714,14 @@
                 window.setTimeout(()=>this.$refs.CampoAbertoOutroComplemento.focus(),200);
             },
 
+            FocusOutroLocalChaves(){
+                window.setTimeout(()=>this.$refs.CampoAbertoOutroLocalChaves.focus(),200);
+            },
+
+            FocusCampoAbertoMotivoInativacao(){
+                window.setTimeout(()=>this.$refs.CampoAbertoMotivoInativacao.focus(),200);
+            },
+
 
 
 
@@ -1678,6 +1733,15 @@
 
 
 <style scoped>
+
+    .checkicon{
+        color:var(--s-color-primary);
+    }
+
+    .nocheckicon{
+        color:var(--s-color-red);
+        opacity:0.5;
+    }
 
 </style>
 

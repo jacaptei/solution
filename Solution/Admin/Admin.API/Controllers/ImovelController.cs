@@ -147,6 +147,8 @@ namespace JaCaptei.Administrativo.API.Controllers
 
             if(imagesFiles?.Count > 0) {
 
+                    if(imovel.imagens?.Count > 0)
+                        ordem = (short) imovel.imagens.Sum(i => Convert.ToInt32(i.ordem));
 
                     foreach(IFormFile imageFile in imagesFiles) {
 

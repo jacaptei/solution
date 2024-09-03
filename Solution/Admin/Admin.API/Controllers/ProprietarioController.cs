@@ -34,8 +34,12 @@ namespace JaCaptei.Administrativo.API.Controllers {
                 appReturn.AddException("Proprietário inexistente ou inválido");
                 return Result(appReturn);
             }
+            else if(entity.id == 1) {
+                appReturn.AddException("Este proprietário não pode ser editado");
+                return Result(appReturn);
+            }
 
-            Model.Admin logado                = ObterAdminAutenticado();
+            Model.Admin logado          = ObterAdminAutenticado();
             entity.atualizadoPorId      = logado.id;
             entity.atualizadoPorNome    = logado.nome;
 
