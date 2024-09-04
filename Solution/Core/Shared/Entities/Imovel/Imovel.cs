@@ -67,6 +67,7 @@ namespace JaCaptei.Model {
 
             public string                           tag                     {get;set;}  ="";
             public string                           status                  {get;set;}  = "ATIVO";
+            public string                           motivoInativacao        {get;set;}  = "";
             public bool                             ativo                   {get;set;}  = true;
             public bool                             visivel                 {get;set;}  = true;
             public bool                             validado                {get;set;}  = true;

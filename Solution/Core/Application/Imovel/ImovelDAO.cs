@@ -238,15 +238,12 @@ namespace JaCaptei.Application {
                             conn.Delete<ImovelImagem>((i) => i.idImovel == entity.id);
 
                             if(entity.imagens.Count > 0) {
-
+                                entity.imagens = entity.imagens.OrderBy(i => i.ordem).ToList();
                                 entity.imagens.ForEach(i => i.principal = false);
                                 entity.imagens[0].principal = true;
                                 entityDB.urlImagemPrincipal = entity.imagens[0].url;
                                 entityDB.possuiImagens = true;
-
                                 entity.imagens.ForEach(i => { conn.Insert<ImovelImagem>(i); });
-
-
                             } else {
                                 entityDB.urlImagemPrincipal = "https://jacaptei.com.br/resources/images/logo.png";
                                 entityDB.possuiImagens = false;
@@ -319,7 +316,7 @@ namespace JaCaptei.Application {
                         + " WHERE " + filter;
 
             string  sql      = " SELECT JSON_AGG(res) FROM( SELECT      imovel.*                                                                                            "
-                        +"                                            , (SELECT json_agg(img.*) FROM \"ImovelImagem\" img where img.\"idImovel\" = imovel.id)  as imagens   "
+                        +"                                            , (SELECT json_agg(img.* ORDER BY ordem) FROM \"ImovelImagem\" img WHERE img.\"idImovel\" = imovel.id)  as imagens   "
                         +"                                            , to_json(endereco.*)      as endereco                                                                "
                         +"                                            , to_json(valor.*)         as valor                                                                   "
                         +"                                            , to_json(area.*)          as area                                                                    "

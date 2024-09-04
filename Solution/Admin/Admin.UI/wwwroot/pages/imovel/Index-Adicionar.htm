@@ -1198,7 +1198,6 @@
                     this.Enviar();
                 }
               
-                    this.Enviar();
             },
 
             CheckoutStep6(){
@@ -1210,11 +1209,15 @@
             },
 
             HandleChangeImagem(uploadFile, uploadFiles){
-              //c("change")
             },
 
             HandleRemoverImagem(uploadFile, uploadFiles){
               //c("remove")
+            },
+
+            HandleSuccessImagem(uploadFile, uploadFiles){
+              c("imagesInputs > change")
+              c(this.imagesInputs)
             },
 
             HandlePreviewImagem(file){
