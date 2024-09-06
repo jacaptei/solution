@@ -133,17 +133,7 @@ namespace JaCaptei.Site.API.Middleware.Autenticacao
         public SessaoUsuario VerificarSessaoAtiva(int idParceiro, string tokenJWT)
         {
             var sessaoUsuario = DAO.ObterSessaoAtivaById(idParceiro);
-
-            if (sessaoUsuario == null)
-            {
-                return sessaoUsuario;
-            }
-
-            if (!string.IsNullOrEmpty(sessaoUsuario.tokenJWT) && IsTokenValid(sessaoUsuario.expiresAt))
-            {
-                return sessaoUsuario;
-            }
-            return null;
+            return sessaoUsuario;
         }
 
         private bool IsTokenValid(DateTime? expiresAt)
