@@ -30,29 +30,46 @@ namespace JaCaptei.Site.API.Middleware.Autenticacao
         {
             appReturn = BLO.ValidarDadosLogin(entity);
 
+            Parceiro parceiroAutenticado = null;
+            string senhaCodificada = Utils.Key.EncodeToBase64(entity.senha.ToLower());
+
             if (!appReturn.status.success)
                 return appReturn;
 
-            appReturn = DAO.Autenticar(entity);
+            if (Utils.Validator.IsEmail(entity.username))
+            {
+                entity.email = Utils.String.HigienizeMail(entity.username);
+                parceiroAutenticado = DAO.GetParceiroByEmail(entity.email, senhaCodificada);
+            }
+            else if (Utils.Validator.IsCPF(entity.username))
+            {
+                entity.cpfNum = Utils.Number.ToLong(entity.username);
+                parceiroAutenticado = DAO.GetParceiroByCpf(entity.cpfNum, senhaCodificada);
+            }
+            else if (Utils.Validator.IsCNPJ(entity.username))
+            {
+                entity.cnpjNum = Utils.Number.ToLong(entity.username);
+                parceiroAutenticado = DAO.GetParceiroByCnpj(entity.cnpjNum, senhaCodificada);
+            }
 
             entity = appReturn.result;
 
-            if (entity is null)
+            if (parceiroAutenticado is null)
                 appReturn.SetAsNotFound("Parceiro não encontrado.");
             else
             {
-                entity.RemoverDadosSensiveis();
-                if (!entity.ativo)
+                parceiroAutenticado.RemoverDadosSensiveis();
+                if (!parceiroAutenticado.ativo)
                     appReturn.SetAsGone("Parceiro não ativo.");
                 else
                 {
-                    appReturn.result = entity;
+                    appReturn.result = parceiroAutenticado;
                 }
             }
             return appReturn;
         }
 
-        public ActionResult CriarSessao(Parceiro parceiro, HttpContext httpContext)
+        public ActionResult CriarSessao(Parceiro parceiro, HttpContext context)
         {
             var sessaoAtiva = VerificarSessaoAtiva(parceiro.id, parceiro.tokenJWT);
 
@@ -60,14 +77,14 @@ namespace JaCaptei.Site.API.Middleware.Autenticacao
             {
                 return new ConflictObjectResult("Parceiro já possui uma sessão ativa");
             }
-            var sessaoUsuario = CriarNovaSessao(parceiro, httpContext);
+            var sessaoUsuario = CriarNovaSessao(parceiro, context);
             DAO.SalvarSessao(sessaoUsuario);
             return new OkObjectResult("Sessão criada com sucesso.");
         }
 
-        public ActionResult InvalidarToken(Parceiro parceiro, HttpContext httpContext)
+        public ActionResult InvalidarToken(Parceiro parceiro, HttpContext context)
         {
-            if (parceiro == null || httpContext == null)
+            if (parceiro == null || context == null)
             {
                 return new BadRequestObjectResult("Invalid input.");
             }
@@ -75,11 +92,11 @@ namespace JaCaptei.Site.API.Middleware.Autenticacao
             try
             {
                 var sessaoAtiva = VerificarSessaoAtiva(parceiro.id, parceiro.tokenJWT);
-                var novaSessaoUsuario = CriarNovaSessao(parceiro, httpContext);
+                var novaSessaoUsuario = CriarNovaSessao(parceiro, context);
 
                 if (sessaoAtiva != null)
                 {
-                    DAO.RevogarToken(sessaoAtiva.idParceiro, sessaoAtiva.tokenJWT, novaSessaoUsuario);
+                    DAO.RevogarToken(sessaoAtiva, novaSessaoUsuario);
                 }
 
                 DAO.SalvarSessao(novaSessaoUsuario);
@@ -115,20 +132,26 @@ namespace JaCaptei.Site.API.Middleware.Autenticacao
 
         public SessaoUsuario VerificarSessaoAtiva(int idParceiro, string tokenJWT)
         {
-            SessaoUsuario sessaoUsuario = DAO.ObterSessaoAtivaById(idParceiro, tokenJWT);
+            var sessaoUsuario = DAO.ObterSessaoAtivaById(idParceiro);
 
-            if (sessaoUsuario != null)
+            if (sessaoUsuario == null)
             {
-                DateTime expiresAtUtc = DateTime.Parse(sessaoUsuario.expiresAt.ToString(), null, System.Globalization.DateTimeStyles.AdjustToUniversal);
-                DateTime expiresAtLocal = expiresAtUtc.ToLocalTime();
-                DateTime currentTimeLocal = DateTime.UtcNow.AddHours(-3);
-
-                if (expiresAtLocal > currentTimeLocal)
-                {
-                    return sessaoUsuario;
-                }
+                return sessaoUsuario;
             }
-            return sessaoUsuario;
+
+            if (!string.IsNullOrEmpty(sessaoUsuario.tokenJWT) && IsTokenValid(sessaoUsuario.expiresAt))
+            {
+                return sessaoUsuario;
+            }
+            return null;
+        }
+
+        private bool IsTokenValid(DateTime? expiresAt)
+        {
+            DateTime expiresAtUtc = DateTime.Parse(expiresAt.ToString(), null, System.Globalization.DateTimeStyles.AdjustToUniversal);
+            DateTime currentTimeUtc = DateTime.UtcNow;
+
+            return expiresAtUtc > currentTimeUtc;
         }
 
         private void SalvarSessao(SessaoUsuario sessaoUsuario)
