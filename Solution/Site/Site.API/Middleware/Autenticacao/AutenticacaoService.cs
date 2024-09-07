@@ -72,8 +72,9 @@ namespace JaCaptei.Site.API.Middleware.Autenticacao
         public ActionResult CriarSessao(Parceiro parceiro, HttpContext context)
         {
             var sessaoAtiva = VerificarSessaoAtiva(parceiro.id, parceiro.tokenJWT);
+            bool validadeSessao = sessaoAtiva != null && IsTokenValid(sessaoAtiva.expiresAt);
 
-            if (sessaoAtiva != null && sessaoAtiva.isRevoked == false)
+            if (sessaoAtiva != null && !sessaoAtiva.isRevoked && validadeSessao)
             {
                 return new ConflictObjectResult("Parceiro já possui uma sessão ativa");
             }
