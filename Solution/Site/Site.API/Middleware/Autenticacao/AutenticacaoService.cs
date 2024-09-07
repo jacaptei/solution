@@ -136,10 +136,9 @@ namespace JaCaptei.Site.API.Middleware.Autenticacao
             var sessaoUsuario = DAO.ObterSessaoAtivaById(idParceiro);
             return sessaoUsuario;
         }
-
         private bool IsTokenValid(DateTime? expiresAt)
         {
-            DateTime expiresAtUtc = DateTime.Parse(expiresAt.ToString(), null, System.Globalization.DateTimeStyles.AdjustToUniversal);
+            DateTime expiresAtUtc = expiresAt.Value.ToUniversalTime();
             DateTime currentTimeUtc = DateTime.UtcNow;
 
             return expiresAtUtc > currentTimeUtc;
