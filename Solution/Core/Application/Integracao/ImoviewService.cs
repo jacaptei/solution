@@ -792,6 +792,16 @@ public class ImoviewService : IDisposable
         }
         _logger?.LogInformation("Reprocessamento concluído. {sucesso} processados com sucesso. {erro} processados com erro.", sucesso, erro);
     }
+
+    public async Task<List<IntegracaoComboDTO>> GetIntegracoes()
+    {
+        return await _imoviewDAO.GetIntegracoes();
+    }
+
+    public async Task<IntegracaoReport?> GetReportIntegracao(IntegracaoComboDTO integracao)
+    {
+        return await _imoviewDAO.GetReportIntegracao(integracao.Integracao);
+    }
 }
 
 public record IntegrarClienteResponse

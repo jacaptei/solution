@@ -5,8 +5,8 @@ using RepoDb.Attributes.Parameter.Npgsql;
 
 namespace JaCaptei.Model.Entities
 {
-    [Map("IntegracaoImoview")]
-    public class IntegracaoImoview : IIntegracaoCRM
+    [Map("IntegracaoVistaSoft")]
+    public class IntegracaoVistaSoft : IIntegracaoCRM
     {
         [Map("id")]
         public int Id { get; set; }
@@ -23,12 +23,6 @@ namespace JaCaptei.Model.Entities
         [Map("dataAtualizacao")]
         public DateTime? DataAtualizacao { get; set; }
 
-        [Map("codUsuario")]
-        public string CodUsuario { get; set; }
-
-        [Map("codUnidade")]
-        public string CodUnidade { get; set; }
-
         [Map("chaveApi")]
         public string ChaveApi { get; set; }
 
@@ -40,7 +34,7 @@ namespace JaCaptei.Model.Entities
 
         [Map("bairros")]
         [NpgsqlDbType(NpgsqlDbType.Jsonb)]
-        public string Bairros { get; set; } 
+        public string Bairros { get; set; }
 
         [Map("imoveis")]
         [NpgsqlDbType(NpgsqlDbType.Jsonb)]
