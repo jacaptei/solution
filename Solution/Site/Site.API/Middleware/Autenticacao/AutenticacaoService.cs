@@ -78,6 +78,7 @@ namespace JaCaptei.Site.API.Middleware.Autenticacao
             {
                 return new ConflictObjectResult("Parceiro já possui uma sessão ativa");
             }
+
             var sessaoUsuario = CriarNovaSessao(parceiro, context);
             DAO.SalvarSessao(sessaoUsuario);
             return new OkObjectResult("Sessão criada com sucesso.");
@@ -117,6 +118,9 @@ namespace JaCaptei.Site.API.Middleware.Autenticacao
         {
             string ipAddress = httpContext.Connection.RemoteIpAddress?.ToString();
             string userAgent = httpContext.Request.Headers["User-Agent"].ToString();
+
+            DateTime tokenExpirationDate = GetTokenExpirationDate(parceiro.tokenJWT);
+
             return new SessaoUsuario
             {
                 ipAddress = ipAddress,
@@ -125,7 +129,7 @@ namespace JaCaptei.Site.API.Middleware.Autenticacao
                 sessionId = Guid.NewGuid(),
                 createdAt = DateTime.UtcNow,
                 tokenJWT = parceiro.tokenJWT,
-                expiresAt = DateTime.UtcNow.AddHours(7),
+                expiresAt = tokenExpirationDate,
                 lastAccessedAt = DateTime.UtcNow,
                 createdByIp = ipAddress
             };
@@ -147,6 +151,13 @@ namespace JaCaptei.Site.API.Middleware.Autenticacao
         private void SalvarSessao(SessaoUsuario sessaoUsuario)
         {
             DAO.SalvarSessao(sessaoUsuario);
+        }
+        private DateTime GetTokenExpirationDate(string token)
+        {
+            var tokenHandler = new JwtSecurityTokenHandler();
+            var jwtToken = tokenHandler.ReadJwtToken(token);
+            var exp = jwtToken.Payload.Exp;
+            return DateTimeOffset.FromUnixTimeSeconds(exp.Value).UtcDateTime;
         }
         public string ValidarToken(string token)
         {
