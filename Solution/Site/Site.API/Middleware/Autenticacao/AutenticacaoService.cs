@@ -128,7 +128,7 @@ namespace JaCaptei.Site.API.Middleware.Autenticacao
                     return sessaoUsuario;
                 }
             }
-            return null;
+            return sessaoUsuario;
         }
 
         private void SalvarSessao(SessaoUsuario sessaoUsuario)
