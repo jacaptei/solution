@@ -62,13 +62,13 @@
                                                                     <div id="location" style="cursor:pointer;">
                                                                         <span @click="$tools.OpenMapImovel(imovel)">
                                                                             <i class="fa fa-map-marker-alt" style="margin-right:3px"></i>
-                                                                            <span v-if="$validator.is(imovel.endereco.logradouro)">{{imovel.endereco.logradouro}}, </span>
-                                                                            <span v-if="$validator.is(imovel.endereco.numero)">{{imovel.endereco.numero}}, </span>
-                                                                            <span v-if="$validator.is(imovel.endereco.complementoTipo)" style="padding-right:3px">{{imovel.endereco.complementoTipo}} </span>
+                                                                            <span v-if="$validator.is(imovel.endereco.logradouro)">{{imovel.endereco.logradouro}} </span>
+                                                                            <span v-if="$validator.is(imovel.endereco.numero)">, {{imovel.endereco.numero}} </span>
+                                                                            <span v-if="$validator.is(imovel.endereco.complementoTipo)" style="padding-right:3px">, {{imovel.endereco.complementoTipo}} </span>
                                                                             <span v-if="$validator.is(imovel.endereco.complemento)"> {{imovel.endereco.complemento}} </span>
                                                                             <span v-if="$validator.is(imovel.endereco.andar && imovel.endereco.andar > 0)">, {{imovel.endereco.andar}}º andar  </span>
-                                                                            <!--<span v-if="$validator.is(imovel.endereco.bairro)">{{imovel.endereco.bairro}}, </span>
-                                                                            <span v-if="$validator.is(imovel.endereco.cidade)">{{imovel.endereco.cidade}}, </span>
+                                                                            <span v-if="$validator.is(imovel.endereco.bairro)">, {{imovel.endereco.bairro}} </span>
+                                                                            <!--<span v-if="$validator.is(imovel.endereco.cidade)">{{imovel.endereco.cidade}}, </span>
                                                                             <span v-if="$validator.is(imovel.endereco.estado)">{{imovel.endereco.estado}}  </span>-->
                                                                         </span>
                                                                         <span>

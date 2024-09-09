@@ -858,7 +858,7 @@
             <div style="width:100%">
                        
                   <el-upload
-                    accept="image/png,image/jpeg"
+                    accept="image/jpeg"
                     :auto-upload="false"
                     ref="uploadImagesComponent"
                     v-model:file-list="imagesInputs"
@@ -924,7 +924,7 @@
         <div v-if="step == 8">
             <div class="flex-center" style="padding-top:30px;height:240px;width:100%;text-align:center">
                     <c-info type="fail" title="Falhou" subtitle="Não foi possível efetuar o cadastro"></c-info>
-                    <q-btn label="TENTAR NOVAMENTE" outline @click="StepTo(5)"></q-btn>
+                    <q-btn label="TENTAR NOVAMENTE" outline @click="TentarNovamente"></q-btn>
             </div>
         </div>
 
@@ -1192,8 +1192,8 @@
                 
                 if(this.imagesInputs.length == 0)
                      this.$tools.Alert("<b>Imagens</b> não inseridas.");
-                else if(this.imagesInputs.length < 15)
-                    this.$tools.Alert("<b>Imagens</b> precisam ser pelo menos 15<br>");
+                else if(this.imagesInputs.length < 4)
+                    this.$tools.Alert("<b>Imagens</b> precisam ser pelo menos 4<br>");
                else{
                     this.stepCaptions[5] = this.imagesInputs.length + " imagens";
                     this.StepTo(6);
@@ -1209,6 +1209,12 @@
             CheckoutStep7(){
                 this.StepTo(8);
             },
+
+            TentarNovamente(){
+                this.imagesInputs = [];
+                this.StepTo(5);
+            },
+
 
             HandleChangeImagem(uploadFile, uploadFiles){
             },

@@ -49,7 +49,7 @@ namespace JaCaptei.Administrativo.API.Controllers
         
         [HttpPost]
         [Route("[action]")]
-        //[RequestTimeout(900000)]
+        [RequestTimeout(900000)]
         public async Task<IActionResult> Adicionar([FromForm] string jsonImovel, List<IFormFile> imagesFiles) {
 
             Imovel imovel = JsonConvert.DeserializeObject<Imovel>(jsonImovel);
@@ -58,17 +58,28 @@ namespace JaCaptei.Administrativo.API.Controllers
             imovel.inseridoPorId    = imovel.atualizadoPorId    = logado.id;
             imovel.inseridoPorNome  = imovel.atualizadoPorNome  = logado.nome;
 
-            if(imagesFiles is not null && imagesFiles?.Count > 0) {
-                if(imagesFiles.Count < 15 && Config.settings.environment == "PRODUCTION")
-                    appReturn.AddException("Necessário ao menos 15 imagens.");
-                else{
-                    appReturn = service.Adicionar(imovel);
-                    if(appReturn.status.success)
-                            appReturn = await ImageShackUploadImagesFiles(imovel,imagesFiles);
-                }
-            } else
-                appReturn.AddException("Necessário inserir imagens.");
-             
+            try {
+                if(imagesFiles is not null && imagesFiles?.Count > 0) {
+                    if(imagesFiles.Count < 4 && Config.settings.environment == "PRODUCTION")
+                        appReturn.AddException("Necessário ao menos 4 imagens.");
+                    else {
+                        appReturn = service.Adicionar(imovel);
+                        if(appReturn.status.success){
+                            try{
+                                appReturn = await ImageShackUploadImagesFiles(imovel,imagesFiles);
+                            }catch(Exception e){
+                                service.ExcluirFisicamente(imovel);
+                                appReturn.SetAsException("Não foi possível inserir imagens.",e);
+                            }
+
+                        }
+                    }
+                } else
+                    appReturn.AddException("Necessário inserir imagens.");
+            }catch(Exception e){
+                appReturn.SetAsException("Não foi possível inserir imóvel.",e);
+            }
+
             return Result(appReturn);
 
         }
@@ -77,7 +88,7 @@ namespace JaCaptei.Administrativo.API.Controllers
         [HttpPost]
         [Route("[action]")]
         [Authorize(Roles = "ADMIN_GOD,ADMIN_GESTOR")]
-        //[RequestTimeout(900000)]
+        [RequestTimeout(900000)]
         public async Task<IActionResult> Alterar([FromForm] string jsonImovel, List<IFormFile> imagesFiles) {
 
             Imovel imovel = JsonConvert.DeserializeObject<Imovel>(jsonImovel);
@@ -87,8 +98,8 @@ namespace JaCaptei.Administrativo.API.Controllers
             imovel.atualizadoPorNome = logado.nome;
             try {
                     if(imovel.imagens?.Count > 0 || imagesFiles?.Count > 0) {
-                            if(( (imagesFiles.Count + imovel.imagens.Count) < 15) && Config.settings.environment == "PRODUCTION")
-                                appReturn.AddException("Necessário ao menos 15 imagens.");
+                            if(( (imagesFiles.Count + imovel.imagens.Count) < 4) && Config.settings.environment == "PRODUCTION")
+                                appReturn.AddException("Necessário ao menos 4 imagens.");
                             else{
                                 appReturn = service.Alterar(imovel);
                                 if(appReturn.status.success && imagesFiles.Count > 0)
@@ -98,7 +109,7 @@ namespace JaCaptei.Administrativo.API.Controllers
                             }
                     } else
                         appReturn.AddException("Necessário inserir imagens.");
-            } catch(Exception ex) { string  sex = ex.ToString(); }
+            } catch(Exception ex) { string  e = ex.ToString(); }
 
             return Result(appReturn);
 

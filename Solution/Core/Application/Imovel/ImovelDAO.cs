@@ -186,12 +186,19 @@ namespace JaCaptei.Application {
             return appReturn;
         }
 
-        //public AppReturn Excluir(Imovel entity) {
-        //    using(var conn = new DBcontext().GetConn()) {
-        //        conn.Delete<Imovel>(entity);
-        //    }
-        //    return appReturn;
-        //}
+
+
+
+        public AppReturn ExcluirFisicamente(int _id) {
+            return ExcluirFisicamente(new Imovel { id = _id });
+        }
+
+        public AppReturn ExcluirFisicamente(Imovel entity) {
+            using(var conn = new DBcontext().GetConn()) {
+                conn.Delete<Imovel>(entity);
+            }
+            return appReturn;
+        }
 
 
         public AppReturn Validar(Imovel entity) {
