@@ -232,11 +232,9 @@
             //this.agenda.hora.setHours(16, 0, 0);
             this.dateStart = new Date();
 
-           //if (this.$root.dataBackend < this.dateNow){
-                this.dateNow        = new Date(this.$root.dataBackend);
-                this.dateStart      = new Date(this.$root.dataBackend);
-                this.dateRangeInit  = new Date(this.$root.dataBackend);
-            //}
+            this.dateNow        = new Date();
+            this.dateStart      = new Date();
+            this.dateRangeInit  = new Date();
 
             this.solicitacao.dataVisita = new Date(1900, 0, 1, 0, 0, 0, 0);
 

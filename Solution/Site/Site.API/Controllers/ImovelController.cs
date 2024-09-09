@@ -39,10 +39,16 @@ namespace JaCaptei.API.Controllers {
                 appReturn.AddException("Necessário autenticação");
                 return Result(appReturn);
             }else{
-                busca.usuarioGod        = false;
-                busca.usuarioGestor     = false;
-                busca.somenteValidados  = true;
+                busca.usuarioGod            = false;
+                busca.usuarioGestor         = false;
+
+                busca.somenteValidados      = true;
+                busca.somenteAtivos         = true;
+                busca.somenteVisiveis       = true;
+                busca.somenteNaoExcluidos   = true;
+
                 appReturn = service.Buscar(busca);
+
             }
 
             return Result(appReturn);
@@ -59,9 +65,13 @@ namespace JaCaptei.API.Controllers {
 
             busca.resultsPerPage = 1;
 
-            busca.usuarioGod        = false;
-            busca.usuarioGestor     = false;
-            busca.somenteValidados  = true;
+            busca.usuarioGod            = false;
+            busca.usuarioGestor         = false;
+
+            busca.somenteValidados      = true;
+            busca.somenteAtivos         = true;
+            busca.somenteVisiveis       = true;
+            busca.somenteNaoExcluidos   = true;
 
             appReturn = service.Buscar(busca);
 

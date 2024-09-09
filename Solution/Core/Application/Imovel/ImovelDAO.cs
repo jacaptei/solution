@@ -168,11 +168,30 @@ namespace JaCaptei.Application {
         }
 
         public AppReturn Excluir(Imovel entity) {
-            using(var conn = new DBcontext().GetConn()) {
-                conn.Delete<Imovel>(entity);
+            Imovel entityDB = new Imovel();
+            try {
+                using(var conn = new DBcontext().GetConn()) {
+                    entityDB = conn.Query<Imovel>(e => e.id == entity.id).FirstOrDefault();
+                    if(entityDB is not null && entityDB?.id > 0) {
+                        entityDB.dataAtualizacao    = Utils.Date.GetLocalDateTime();
+                        entityDB.excluido           = true;
+                        conn.Update<Imovel>(entityDB);
+                    } else
+                        appReturn.AddException("Não foi possível excluir (registro não encontrado ou inválido).");
+                }
+            } catch(Exception ex) {
+                appReturn.AddException("Não foi possível excluir (registro não encontrado ou inválido).");
+                appReturn.status.exception = ex.ToString();
             }
             return appReturn;
         }
+
+        //public AppReturn Excluir(Imovel entity) {
+        //    using(var conn = new DBcontext().GetConn()) {
+        //        conn.Delete<Imovel>(entity);
+        //    }
+        //    return appReturn;
+        //}
 
 
         public AppReturn Validar(Imovel entity) {
@@ -365,21 +384,41 @@ namespace JaCaptei.Application {
 
                 string filter = " imovel.\"possuiToken\" = TRUE "; // discontinued <> 1
 
-
                 if(busca.somenteAtivos)
-                     filter += " AND imovel.ativo = TRUE ";
-                else if(busca.somenteNaoAativos)
-                     filter += " AND imovel.ativo = FALSE ";
+                    filter += " AND imovel.ativo = TRUE ";
+                else if(busca.ativos ^ busca.naoAtivos) {
+                    if(busca.ativos)
+                        filter += " AND imovel.ativo = TRUE ";
+                    else if(busca.naoAtivos)
+                        filter += " AND imovel.ativo = FALSE ";
+                }
 
                 if(busca.somenteValidados)
-                     filter += " AND imovel.validado = TRUE ";
-                else if(busca.somenteNaoValidados)
-                     filter += " AND imovel.validado = FALSE ";
+                    filter += " AND imovel.validado = TRUE ";
+                else if(busca.validados ^ busca.naoValidados) {
+                    if(busca.validados)
+                        filter += " AND imovel.validado = TRUE ";
+                    else if(busca.naoValidados)
+                        filter += " AND imovel.validado = FALSE ";
+                }
 
                 if(busca.somenteVisiveis)
-                     filter += " AND imovel.visivel = TRUE ";
-                else if(busca.somenteNaoVisiveis)
-                     filter += " AND imovel.visivel = FALSE ";
+                    filter += " AND imovel.visivel = TRUE ";
+                else if(busca.visiveis ^ busca.naoVisiveis) {
+                    if(busca.visiveis)
+                        filter += " AND imovel.visivel = TRUE ";
+                    else if(busca.naoVisiveis)
+                        filter += " AND imovel.visivel = FALSE ";
+                }
+
+                if(busca.somenteNaoExcluidos)
+                    filter += " AND imovel.excluido = FALSE ";
+                else if(busca.excluidos ^ busca.naoExcluidos) {
+                    if(busca.excluidos)
+                        filter += " AND imovel.excluido = TRUE ";
+                    else if(busca.naoExcluidos)
+                        filter += " AND imovel.excluido = FALSE ";
+                }
 
                 if(busca.somenteOutroID)
                      filter += " AND imovel.id <> " +busca.imovel.id.ToString() + " " ;
@@ -387,12 +426,6 @@ namespace JaCaptei.Application {
                     filter += " AND imovel.id = " + busca.imovel.id.ToString() + " ";
                 else if(Utils.Validator.Is(busca.imovel.cod))
                     filter += " AND imovel.cod = '" + busca.imovel.cod + "' ";
-           
-
-                //if(!System.String.IsNullOrWhiteSpace(busca.imovelJC.endereco.cep))
-                //    filter += " AND endereco.\"cepNorm\" = '" + busca.imovelJC.endereco.cepNorm + "' ";
-                //else if(!System.String.IsNullOrWhiteSpace(busca.cepBase))
-                //    filter += " AND endereco.\"cepNorm\" LIKE '%" + busca.cepBase + "%' ";
 
 
                 if(!System.String.IsNullOrWhiteSpace(busca.imovel.documentacao.indiceCadastral))

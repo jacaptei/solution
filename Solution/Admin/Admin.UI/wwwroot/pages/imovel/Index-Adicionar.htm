@@ -430,9 +430,10 @@
                     <div>verificando imóveis...</div>
                     <div style="margin:10px;margin-top:20px"><c-loading></c-loading></div>
                 </el-col>
-                <el-col  :md="24" style="color:var(--s-color-primary);font-weight:700" v-if="$validator.is(imoveisBuscaResult) && imoveisBuscaResult?.length > 0">
+                <el-col  :md="24" style="color:var(--s-color-primary);font-weight:700" v-if="existeImovelNaRegiao">
                         <div>
-                          <el-alert title="Já consta imóvel cadastrado com essas características." description="Verifique se não há erro no índice cadastral e endereço ou se o mesmo já foi cadastrado." type="warning" show-icon />
+                          <el-alert v-if="imoveisBuscaResult[0].excluido" title="Já consta imóvel excluído com essas características." description="" type="info" show-icon />
+                          <el-alert v-else title="Já consta imóvel cadastrado com essas características." description="Verifique se não há erro no índice cadastral e endereço ou se o mesmo já foi cadastrado." type="warning" show-icon />
                         </div>
                          <div class="col-12" v-for="(item,index) in imoveisBuscaResult" style="margin:20px">
                                         <c-imovel-card :imovel="item"></c-imovel-card>
@@ -998,7 +999,8 @@
                 buscaImovel             : this.$models.buscaImovel(),
                 imovel                  : this.$models.imovel(),
                 admins                  : this.$root.admins,
-                captadorSelecionado     :{}
+                captadorSelecionado     :{},
+                existeImovelNaRegiao    :false
             }
         }, computed: {
 
@@ -1522,8 +1524,9 @@
                             this.buscaImovel.imovel.endereco.complemento = this.imovel.endereco.complemento;
 
                         if(this.cep.numero)
-                            this.buscaImovel.cepBase = this.$validator.is(this.buscaImovel.imovel.endereco.cep )? this.imovel.endereco.cep.split("-")[0]   : ""       ;
+                            this.buscaImovel.cepBase = this.$validator.is(this.buscaImovel.imovel.endereco.cep )? this.imovel.endereco.cep.split("-")[0]   : "" ;
 
+                        this.buscaImovel.incluirExcluidos = true;
                         this.buscaImovel.page = 0;
                         this.buscaImovel.result.imoveis = [];
                         this.ontablequest  = true;
@@ -1533,6 +1536,7 @@
                         if (request?.status?.success){
                             this.buscaImovel        =  request.result;
                             this.imoveisBuscaResult =  this.buscaImovel.result.imoveis;
+                            this.existeImovelNaRegiao = (this.$validator.is(this.imoveisBuscaResult) && this.imoveisBuscaResult?.length > 0);
                         } 
                 }else
                     this.$tools.Alert("Necessário informar o CEP ou endereço (estado, cidade, bairro e logradouro)");

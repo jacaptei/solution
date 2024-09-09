@@ -59,7 +59,7 @@
                        @contact="ScrollTo('planos')"></c-box>
             </article>
 
-            <el-row style="padding: 20px">
+            <el-row style="padding: 20px" id="planos">
                 <el-col :xs="24" :sm="8" :md="8" :lg="8">
                     <q-btn label="PLANO PARA CORRETORES"
                            color="primary"
@@ -70,7 +70,7 @@
                     <el-image src="../resources/images/plano_basic.png"
                               @click="SelecionarPlano(2)"
                               fit="contain"
-                              style="width: 100%;">
+                              style="width: 100%;cursor:pointer;">
                     </el-image>
                 </el-col>
 
@@ -85,12 +85,12 @@
                         <el-image src="../resources/images/plano_pro.png"
                                   @click="SelecionarPlano(3)"
                                   fit="contain"
-                                  style="width: 100%; margin-right:5px">
+                                  style="width: 100%; margin-right:5px;cursor:pointer">
                         </el-image>
                         <el-image src="../resources/images/plano_advanced.png"
                                   @click="SelecionarPlano(4)"
                                   fit="contain"
-                                  style="width: 100%;">
+                                  style="width: 100%;cursor:pointer;">
                         </el-image>
                     </el-col>
                 </el-col>
