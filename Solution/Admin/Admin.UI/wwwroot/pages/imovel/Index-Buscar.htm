@@ -417,7 +417,6 @@
                 this.onrequest  = true;
                 var request     = await this.$api.Post("imovel/buscar",this.buscaImovel);
                 this.onrequest  = false;
-                //c2("request",request)
                 if (request?.status?.success){
                     this.buscaImovel        =  request.result;
                     this.imoveisBuscaResult =  this.buscaImovel.result.imoveis;
