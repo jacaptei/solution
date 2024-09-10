@@ -249,7 +249,6 @@
                         .catch((error) => {
                             if (error.response) {
                                 if (error.response.status == 409) {
-                                    console.log(error.response);
                                     this.messageFail = "Este usuário já está conectado em outra janela. <br><br>Deseja manter a sessão atual?";
                                     this.ShowView("question");
                                     return;
