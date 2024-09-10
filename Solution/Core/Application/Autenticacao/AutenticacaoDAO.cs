@@ -120,5 +120,27 @@ namespace JaCaptei.Application.Autenticacao
                 }
             }
         }
+
+        public async Task<bool> RevokeTokenAfterSignOutAsync(SessaoUsuario sessaoUsuario)
+        {
+            try
+            {
+                using (var conn = new NpgsqlConnection(DB.CS))
+                {
+                    sessaoUsuario.isRevoked = true;
+                    sessaoUsuario.revokedAt = DateTime.UtcNow;
+
+                    // Atualiza a sessão no banco
+                    int affectedRows = await conn.UpdateAsync<SessaoUsuario>(sessaoUsuario, e => e.id == sessaoUsuario.id);
+
+                    // Verifica se houve atualização
+                    return affectedRows > 0;
+                }
+            }
+            catch (NpgsqlException ex)
+            {
+                throw new ApplicationException("An error occurred while accessing the database. Please contact support if the problem persists.", ex);
+            }
+        }
     }
 }
