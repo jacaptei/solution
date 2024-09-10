@@ -53,7 +53,6 @@ namespace JaCaptei.Application.Autenticacao
                 throw;
             }
         }
-
         public SessaoUsuario ObterSessaoAtivaById(int idParceiro)
         {
             try
@@ -84,7 +83,6 @@ namespace JaCaptei.Application.Autenticacao
                 throw new ApplicationException("An error occurred while accessing the database. Please contact support if the problem persists.", ex);
             }
         }
-
         public SessaoUsuario SalvarSessao(SessaoUsuario sessaoUsuario)
         {
             try
