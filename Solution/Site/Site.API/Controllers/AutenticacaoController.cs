@@ -68,8 +68,8 @@ namespace JaCaptei.API.Controllers
             if (authHeader != null && authHeader.StartsWith("Bearer "))
             {
                 string token = authHeader.Substring("Bearer ".Length).Trim();
-                //autenticacaoService.ValidarParceiro(token);
-                //return Ok(autenticacaoService.ValidarParceiro(token));
+                autenticacaoService.ValidarToken(token);
+                return Ok(autenticacaoService.ValidarToken(token));
             }
             return BadRequest("Cabeçalho Authorization não encontrado ou inválido.");
         }
