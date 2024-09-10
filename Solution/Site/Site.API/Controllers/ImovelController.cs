@@ -4,6 +4,7 @@ using System.Numerics;
 using JaCaptei.Application;
 using JaCaptei.Model;
 using System.Text.Json;
+using Microsoft.AspNetCore.Authorization;
 
 namespace JaCaptei.API.Controllers {
 
@@ -50,11 +51,8 @@ namespace JaCaptei.API.Controllers {
                 appReturn = service.Buscar(busca);
 
             }
-
             return Result(appReturn);
-
         }
-
 
         [HttpPost]
         [Route("buscar/unidade")]
