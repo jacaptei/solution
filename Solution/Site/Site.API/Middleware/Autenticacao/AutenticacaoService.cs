@@ -71,7 +71,7 @@ namespace JaCaptei.Site.API.Middleware.Autenticacao
 
         public ActionResult CriarSessao(Parceiro parceiro, HttpContext context)
         {
-            var sessaoAtiva = VerificarSessaoAtiva(parceiro.id, parceiro.tokenJWT);
+            SessaoUsuario sessaoAtiva = VerificarSessaoAtiva(parceiro.id, parceiro.tokenJWT);
             bool validadeSessao = sessaoAtiva != null && IsTokenValid(sessaoAtiva.expiresAt);
 
             if (sessaoAtiva != null && !sessaoAtiva.isRevoked && validadeSessao)
@@ -79,7 +79,7 @@ namespace JaCaptei.Site.API.Middleware.Autenticacao
                 return new ConflictObjectResult("Parceiro já possui uma sessão ativa");
             }
 
-            var sessaoUsuario = CriarNovaSessao(parceiro, context);
+            SessaoUsuario sessaoUsuario = CriarNovaSessao(parceiro, context);
             DAO.SalvarSessao(sessaoUsuario);
             return new OkObjectResult("Sessão criada com sucesso.");
         }
@@ -147,7 +147,6 @@ namespace JaCaptei.Site.API.Middleware.Autenticacao
 
             return expiresAtUtc > currentTimeUtc;
         }
-
         private void SalvarSessao(SessaoUsuario sessaoUsuario)
         {
             DAO.SalvarSessao(sessaoUsuario);
@@ -221,6 +220,28 @@ namespace JaCaptei.Site.API.Middleware.Autenticacao
             {
                 return $"Erro inesperado: {ex.Message}";
             }
+        }
+
+        public async Task RevokeTokenAfterSignOutAsync(string token, HttpContext context)
+        {
+            SessaoUsuario sessaoUsuario = DAO.ObterSessaoAtivaByToken(token);
+
+            if (sessaoUsuario == null)
+            {
+
+                await context.Response.WriteAsync("Sessão não encontrada.");
+                return;
+            }
+
+            bool revogacaoSucesso = await DAO.RevokeTokenAfterSignOutAsync(sessaoUsuario);
+
+            if (!revogacaoSucesso)
+            {
+                context.Response.StatusCode = StatusCodes.Status500InternalServerError;
+                await context.Response.WriteAsync("Falha ao revogar o token.");
+                return;
+            }
+            context.Response.StatusCode = StatusCodes.Status200OK;
         }
     }
 }

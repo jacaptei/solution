@@ -55,6 +55,7 @@ namespace JaCaptei.API.Controllers
                 entity.roles = "PARCEIRO";
                 entity.tokenJWT = JWTokenService.GenerateToken(entity);
                 autenticacaoService.InvalidarToken(entity, HttpContext);
+                autenticacaoService.CriarSessao(entity, HttpContext);
             }
             return Result(appReturn);
         }
@@ -72,6 +73,31 @@ namespace JaCaptei.API.Controllers
                 return Ok(autenticacaoService.ValidarToken(token));
             }
             return BadRequest("Cabeçalho Authorization não encontrado ou inválido.");
+        }
+
+        [HttpPost]
+        [Route("revogarsessao")]
+        public async Task<IActionResult> RevogarSessaoAsync()
+        {
+            var authHeader = Request.Headers["Authorization"].FirstOrDefault();
+
+            if (authHeader == null || !authHeader.StartsWith("Bearer "))
+            {
+                return Unauthorized("Token de autenticação não encontrado.");
+            }
+
+            string token = authHeader.Substring("Bearer ".Length).Trim();
+
+            try
+            {
+                await autenticacaoService.RevokeTokenAfterSignOutAsync(token, HttpContext);
+
+                return Ok("Token revogado com sucesso.");
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError, "Ocorreu um erro ao processar a solicitação.");
+            }
         }
     }
 }
