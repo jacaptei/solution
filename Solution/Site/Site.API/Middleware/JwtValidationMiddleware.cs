@@ -28,14 +28,7 @@ namespace JaCaptei.API.Middleware
             }
             var routePath = context.Request.Path;
 
-            var rotasPermitidasSemAutenticacao = new List<string>
-            {
-                "/imovel/buscar/unidade",
-                "/registro",
-                "/esqueci-senha"
-            };
-
-            if (rotasPermitidasSemAutenticacao.Contains(routePath))
+            if (RotasPermitidasSemAutenticacao.Contains(routePath))
             {
                 await _next(context);
                 return;
@@ -72,5 +65,12 @@ namespace JaCaptei.API.Middleware
             var verificandoSessaoRevogada = autenticacaoService.ValidarToken(token);
             return verificandoSessaoRevogada;
         }
+
+        private static readonly HashSet<string> RotasPermitidasSemAutenticacao = new HashSet<string>
+        {
+            "/imovel/buscar/unidade",
+            "/registro",
+            "/esqueci-senha"
+        };
     }
 }
