@@ -68,6 +68,21 @@ namespace JaCaptei.Application.Autenticacao
                 throw new ApplicationException("An error occurred while accessing the database. Please contact support if the problem persists.", ex);
             }
         }
+        public SessaoUsuario ObterSessaoAtivaByToken(string token)
+        {
+            try
+            {
+                using (var conn = new NpgsqlConnection(DB.CS))
+                {
+                    conn.Open();
+                    return conn.Query<SessaoUsuario>(e => e.tokenJWT == token).LastOrDefault();
+                }
+            }
+            catch (NpgsqlException ex)
+            {
+                throw new ApplicationException("An error occurred while accessing the database. Please contact support if the problem persists.", ex);
+            }
+        }
         public SessaoUsuario ValidarToken(int id, string tokenJWT)
         {
             try
