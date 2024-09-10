@@ -112,6 +112,7 @@ $(document).ready(function () {
 		},
         created: function () {
 
+            this.RestoreSession();
             this.localidade.estados = this.$sdata.forms.states;
 
 //-------------------------- SETUP ROUTES --------------------------
@@ -244,13 +245,15 @@ $(document).ready(function () {
             this.SignOut();
         },
         mounted() {
+
+           
             window.addEventListener("online", () => {
                 this.status.online = true;
             });
             window.addEventListener("offline", () => {
                 this.status.online = false;
             });
-
+           
             this.params = this.$tools.HandleParams();
 
             var url = window.location;
@@ -389,6 +392,58 @@ $(document).ready(function () {
                 this.title.label = "";
                 this.title.icon = "";
                 this.title.visible = false;
+            },
+
+            async RestoreSession() {
+                const authToken = this.getCookie('authToken');
+
+                if (!authToken) {
+                    return;
+                }
+
+                const decodedToken = this.ParseJwt(authToken);
+                const storedUser = localStorage.getItem(`jcuser${decodedToken._id}`);
+
+                if (authToken) {
+                    try {
+                        const response = await axios.post(this.$api.BuildURL("autenticacao/validarautenticacao"), {}, {
+                            headers: { 'Authorization': `Bearer ${authToken}` }
+                        });
+
+                        if (storedUser) {
+                            this.usuario = JSON.parse(storedUser);
+                            return this.isAuth = true;
+                        } else {
+                            console.warn('Sessão não encontrada.');
+                            this.RequestLogin("Sessão não encontrada. Por favor, faça login.");
+                        }
+                    } catch (error) {
+                        console.error('Erro ao validar o token:', error);
+                        this.RequestLogin("Sua sessão expirou. Por favor, faça login novamente.");
+                    }
+                }
+            },
+
+            ParseJwt(token) {
+                try {
+                    const base64Url = token.split('.')[1];
+                    const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
+                    const jsonPayload = decodeURIComponent(atob(base64).split('').map(function (c) {
+                        return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2);
+                    }).join(''));
+
+                    return JSON.parse(jsonPayload);
+                } catch (error) {
+                    console.error('Erro ao decodificar o token JWT:', error);
+                    return null;
+                }
+            },
+
+            getCookie(name) {
+                const value = `; ${document.cookie}`;
+                const parts = value.split(`; ${name}=`);
+                if (parts.length === 2) return parts.pop().split(';').shift();
+                return null;
             },
 
             //ValidateSessionWithToken() {

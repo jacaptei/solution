@@ -26,6 +26,20 @@ namespace JaCaptei.API.Middleware
                 await _next(context);
                 return;
             }
+            var routePath = context.Request.Path;
+
+            var rotasPermitidasSemAutenticacao = new List<string>
+            {
+                "/imovel/buscar/unidade",
+                "/registro",
+                "/esqueci-senha"
+            };
+
+            if (rotasPermitidasSemAutenticacao.Contains(routePath))
+            {
+                await _next(context);
+                return;
+            }
 
             if (!authorizationHeader.StartsWith("Bearer "))
             {

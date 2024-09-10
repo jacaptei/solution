@@ -4,6 +4,7 @@ using System.Numerics;
 using JaCaptei.Application;
 using JaCaptei.Model;
 using System.Text.Json;
+using Microsoft.AspNetCore.Authorization;
 
 namespace JaCaptei.API.Controllers {
 
@@ -44,11 +45,8 @@ namespace JaCaptei.API.Controllers {
                 busca.somenteValidados  = true;
                 appReturn = service.Buscar(busca);
             }
-
             return Result(appReturn);
-
         }
-
 
         [HttpPost]
         [Route("buscar/unidade")]
@@ -59,9 +57,9 @@ namespace JaCaptei.API.Controllers {
 
             busca.resultsPerPage = 1;
 
+            busca.somenteValidados  = true;
             busca.usuarioGod        = false;
             busca.usuarioGestor     = false;
-            busca.somenteValidados  = true;
 
             appReturn = service.Buscar(busca);
 
