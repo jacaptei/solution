@@ -40,8 +40,8 @@
                                                                                 <span style="font-size:11px;margin-left:4px">
                                                                                     <span v-if="imovel.excluido"   style="border-radius:8px;background-color:#222222;color:#fff ;   margin-right:10px;padding:4px;">EXCLUÍDO</span>
                                                                                     <span v-if="!imovel.ativo"     style="border-radius:8px;background-color:var(--s-color-red);    margin-right:10px;color:#fff;padding:4px" @click="$tools.Alert(imovel.motivoInativacao,'Motivo da inativação')">INATIVO <a href="javascript:void(0)" style="color:#fff;text-decoration:none"><i class="fa fa-message"></i></a></span>
-                                                                                    <span v-if="!imovel.validado"  style="border-radius:8px;background-color:orange;color:#fff ;    margin-right:10px;padding:4px;">NÃO VALIDADO</span>
                                                                                     <span v-if="!imovel.visivel"   style="border-radius:8px;background-color:var(--s-color-purple); margin-right:10px;color:#fff;padding:4px">NÃO VISÍVEL</span>
+                                                                                    <span v-if="!imovel.validado"  style="border-radius:8px;background-color:orange;color:#fff ;    margin-right:10px;padding:4px;">NÃO VALIDADO</span>
                                                                                     <span style="font-weight:600;color:#353535"><i class="fa fa-up-right-from-square"></i></span>
                                                                                 </span>
                                                                             </div>
