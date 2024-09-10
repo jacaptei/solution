@@ -40,7 +40,6 @@
 
                 <el-row :gutter="20" :style="bloqueadoEnvio? 'opacity:0.5;pointer-events:none;':'opacity:1'">
 
-
                     <el-col :xs="24" :sm="12" :md="8" :lg="8" class="s-input">
                         <div><p>CEP</p><span></span></div>
                         <el-input v-model="cep.numero" placeholder="" ref="postalCode" v-maska data-maska="#####-###" @keyup="()=>{  if(cep.numero.length>=9){BuscarEndereco();} }">
@@ -192,11 +191,6 @@
         props: {},
         watch: {},
         created: function () {
-            this.dateStart = new Date();
-            this.dateNow = new Date(this.$root.dataBackend);
-            this.dateStart = new Date(this.$root.dataBackend);
-            this.dateRangeInit = new Date(this.$root.dataBackend);
-
             this.solicitacao.dataVisita = new Date(1900, 0, 1, 0, 0, 0, 0);
 
             this.dateRangeInit.setHours(0, 0, 0, 0);
