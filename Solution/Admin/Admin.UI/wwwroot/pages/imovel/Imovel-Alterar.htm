@@ -487,11 +487,15 @@
             </el-row>
                     
             <el-row :gutter="20" style="margin-top:10px" v-if="$root.usuario.god || $root.usuario.gestor">
-                    <el-col :span="8" :xs="24" style="max-width:120px">
+                    <el-col :span="8" :xs="24" style="max-width:160px">
                         <el-checkbox label="Ativo" v-model="imovel.ativo " size="large"></el-checkbox><br />
                         <el-checkbox label="Validado" v-model="imovel.validado" size="large"></el-checkbox>
                     </el-col>
-                    <el-col :span="12" :xs="24">
+                    <el-col :span="8" :xs="24" style="max-width:160px">
+                        <el-checkbox label="Visível no site" v-model="imovel.visivel" size="large"></el-checkbox><br />
+                        <el-checkbox label="Excluído" v-model="imovel.excluido" size="large"></el-checkbox>
+                    </el-col>
+                    <el-col :span="8" :xs="24">
                              <div v-if="!imovel.ativo">
                                 <span style="color:var(--s-color-red);">Motivo da inativação</span><span style="color:#b1b1b1;float:right;padding-right:30px" v-if="exibirCampoAbertoMotivoInativacao">{{imovel.motivoInativacao.length}}/50</span><br />
                                 <span v-if="!exibirCampoAbertoMotivoInativacao">
@@ -919,7 +923,7 @@
             <div style="width:100%">
                        
                   <el-upload
-                    accept="image/png,image/jpeg"
+                    accept="image/jpeg"
                     :auto-upload="false"
                     ref="uploadImagesComponent"
                     v-model:file-list="imagesInputs"
@@ -984,7 +988,7 @@
         <div v-if="step == 8">
             <div class="flex-center" style="padding-top:30px;height:240px;width:100%;text-align:center">
                     <c-info type="fail" title="Falhou" subtitle="Não foi possível atender a requisição"></c-info>
-                    <q-btn label="TENTAR NOVAMENTE" outline @click="StepTo(5)"></q-btn>
+                    <q-btn label="TENTAR NOVAMENTE" outline @click="TentarNovamente"></q-btn>
             </div>
         </div>
 
@@ -1377,6 +1381,11 @@
 
             CheckoutStep7(){
                 this.StepTo(8);
+            },
+
+            TentarNovamente(){
+                this.imagesInputs = [];
+                this.StepTo(5);
             },
 
             HandleChangeImagem(uploadFile, uploadFiles){

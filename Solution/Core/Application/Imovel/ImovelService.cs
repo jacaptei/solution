@@ -140,6 +140,13 @@ namespace JaCaptei.Application{
         public AppReturn Excluir(Imovel entity) {
            return DAO.Excluir(entity);
         }
+                
+        public AppReturn ExcluirFisicamente(int id) {
+           return DAO.ExcluirFisicamente(id);
+        }
+        public AppReturn ExcluirFisicamente(Imovel entity) {
+           return DAO.ExcluirFisicamente(entity);
+        }
 
 
 

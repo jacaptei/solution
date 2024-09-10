@@ -430,9 +430,10 @@
                     <div>verificando imóveis...</div>
                     <div style="margin:10px;margin-top:20px"><c-loading></c-loading></div>
                 </el-col>
-                <el-col  :md="24" style="color:var(--s-color-primary);font-weight:700" v-if="$validator.is(imoveisBuscaResult) && imoveisBuscaResult?.length > 0">
+                <el-col  :md="24" style="color:var(--s-color-primary);font-weight:700" v-if="existeImovelNaRegiao">
                         <div>
-                          <el-alert title="Já consta imóvel cadastrado com essas características." description="Verifique se não há erro no índice cadastral e endereço ou se o mesmo já foi cadastrado." type="warning" show-icon />
+                          <el-alert v-if="imoveisBuscaResult[0].excluido" title="Já consta imóvel excluído com essas características." description="" type="info" show-icon />
+                          <el-alert v-else title="Já consta imóvel cadastrado com essas características." description="Verifique se não há erro no índice cadastral e endereço ou se o mesmo já foi cadastrado." type="warning" show-icon />
                         </div>
                          <div class="col-12" v-for="(item,index) in imoveisBuscaResult" style="margin:20px">
                                         <c-imovel-card :imovel="item"></c-imovel-card>
@@ -857,7 +858,7 @@
             <div style="width:100%">
                        
                   <el-upload
-                    accept="image/png,image/jpeg"
+                    accept="image/jpeg"
                     :auto-upload="false"
                     ref="uploadImagesComponent"
                     v-model:file-list="imagesInputs"
@@ -923,7 +924,7 @@
         <div v-if="step == 8">
             <div class="flex-center" style="padding-top:30px;height:240px;width:100%;text-align:center">
                     <c-info type="fail" title="Falhou" subtitle="Não foi possível efetuar o cadastro"></c-info>
-                    <q-btn label="TENTAR NOVAMENTE" outline @click="StepTo(5)"></q-btn>
+                    <q-btn label="TENTAR NOVAMENTE" outline @click="TentarNovamente"></q-btn>
             </div>
         </div>
 
@@ -998,7 +999,8 @@
                 buscaImovel             : this.$models.buscaImovel(),
                 imovel                  : this.$models.imovel(),
                 admins                  : this.$root.admins,
-                captadorSelecionado     :{}
+                captadorSelecionado     :{},
+                existeImovelNaRegiao    :false
             }
         }, computed: {
 
@@ -1190,8 +1192,8 @@
                 
                 if(this.imagesInputs.length == 0)
                      this.$tools.Alert("<b>Imagens</b> não inseridas.");
-                else if(this.imagesInputs.length < 15)
-                    this.$tools.Alert("<b>Imagens</b> precisam ser pelo menos 15<br>");
+                else if(this.imagesInputs.length < 4)
+                    this.$tools.Alert("<b>Imagens</b> precisam ser pelo menos 4<br>");
                else{
                     this.stepCaptions[5] = this.imagesInputs.length + " imagens";
                     this.StepTo(6);
@@ -1207,6 +1209,12 @@
             CheckoutStep7(){
                 this.StepTo(8);
             },
+
+            TentarNovamente(){
+                this.imagesInputs = [];
+                this.StepTo(5);
+            },
+
 
             HandleChangeImagem(uploadFile, uploadFiles){
             },
@@ -1522,8 +1530,9 @@
                             this.buscaImovel.imovel.endereco.complemento = this.imovel.endereco.complemento;
 
                         if(this.cep.numero)
-                            this.buscaImovel.cepBase = this.$validator.is(this.buscaImovel.imovel.endereco.cep )? this.imovel.endereco.cep.split("-")[0]   : ""       ;
+                            this.buscaImovel.cepBase = this.$validator.is(this.buscaImovel.imovel.endereco.cep )? this.imovel.endereco.cep.split("-")[0]   : "" ;
 
+                        this.buscaImovel.incluirExcluidos = true;
                         this.buscaImovel.page = 0;
                         this.buscaImovel.result.imoveis = [];
                         this.ontablequest  = true;
@@ -1533,6 +1542,7 @@
                         if (request?.status?.success){
                             this.buscaImovel        =  request.result;
                             this.imoveisBuscaResult =  this.buscaImovel.result.imoveis;
+                            this.existeImovelNaRegiao = (this.$validator.is(this.imoveisBuscaResult) && this.imoveisBuscaResult?.length > 0);
                         } 
                 }else
                     this.$tools.Alert("Necessário informar o CEP ou endereço (estado, cidade, bairro e logradouro)");

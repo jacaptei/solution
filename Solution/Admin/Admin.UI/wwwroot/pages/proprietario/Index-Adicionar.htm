@@ -42,13 +42,17 @@
                                     </el-select>
                                 </el-col>
                                 <el-col :xs="24" :sm="12" :md="8" :lg="6" class="s-input">
-                                    <div>CPF<span></span></div>
+                                    <div>CPF<span> opcional se houver CNPJ</span></div>
                                     <el-input @keyup.enter="Enviar()" v-model="proprietario.cpf" maxlength="22" v-maska data-maska="###.###.###-##" @blur="CheckDoc"></el-input>
                                 </el-col>
-                                <el-col :xs="24" :sm="12" :md="8" :lg="6" class="s-input-optional">
+                                <el-col :xs="24" :sm="12" :md="8" :lg="6" class="s-input">
+                                    <div>CNPJ<span> opcional se houver CPF</span></div>
+                                    <el-input @keyup.enter="Enviar()" v-model="proprietario.cnpj" maxlength="22" v-maska data-maska="##.###.###/####-##" @blur="CheckDoc" ref="documento"></el-input>
+                                </el-col>
+                                <!--<el-col :xs="24" :sm="12" :md="8" :lg="6" class="s-input-optional">
                                     <div>RG<span></span></div>
                                     <el-input @keyup.enter="Enviar()" v-model="proprietario.rg" maxlength="22" ref="documento"></el-input>
-                                </el-col>
+                                </el-col>-->
 
                                 <el-col :xs="24" :sm="12" :md="8" :lg="6" class="s-input-optional">
                                     <div><p>CEP</p><span></span></div>
@@ -126,7 +130,7 @@
                                     <!--<q-btn label="VOLTAR" outline color="primary" @click="$emit('voltar')"></q-btn>-->
                                 </el-col>
                                 <el-col :md="12" class="s-input">
-                                    <div><i class="fa fa-square"></i> campos necessários</div>
+                                    <div><i class="fa fa-square"></i> campos necessários </div>
                                 </el-col>
                             </el-row>
 
@@ -252,14 +256,17 @@
 
                 var msg = "";
 
-                if (this.$validator.not(this.proprietario.cpf))
-                    msg += "<b>CPF</b> não informado<br>";
-                else if (!this.$validator.IsCPF(this.proprietario.cpf))
-                    msg += "<b>CPF</b> inválido<br>";
+                if (this.$validator.not(this.proprietario.cpf) && this.$validator.not(this.proprietario.cnpj))
+                    msg += "<b>CPF ou CNPJ</b> não informado<br>";
+                else{
+                    if (this.$validator.is(this.proprietario.cpf) && !this.$validator.IsCPF(this.proprietario.cpf))
+                         msg += "<b>CPF</b> inválido<br>";
+                    if (this.$validator.is(this.proprietario.cnpj) && !this.$validator.IsCNPJ(this.proprietario.cnpj))
+                         msg += "<b>CNPJ</b> inválido<br>";  
+                 }
+
                 if (this.$validator.not(this.proprietario.nome))
                     msg += "<b>NOME</b> não informado<br>";
-
-
 
                 if (this.$validator.not(this.proprietario.email))
                     msg += "<b>E-MAIL</b> não informado<br>";
@@ -326,6 +333,8 @@
                 window.setTimeout(() => {
                         if (this.$validator.is(this.proprietario.cpf) && !this.$validator.IsCPF(this.proprietario.cpf))
                             this.$tools.Alert("CPF inválido");
+                        else if (this.$validator.is(this.proprietario.cnpj) && !this.$validator.IsCNPJ(this.proprietario.cnpj))
+                            this.$tools.Alert("CNPJ inválido");
                 }, 500);
             },
 

@@ -1,8 +1,64 @@
 ﻿<template>
 
     <div>
-        <article>
-        </article>
+        <el-row>
+            
+            <el-col :xs="12" :sm="8" :md="6" :lg="4">
+                <q-card class="home-card" @click="$root.RouteTo('/parceiros')">
+                    <q-card-section class="q-pt-none">
+                        <i class="fa fa-user-alt"></i>
+                    </q-card-section>
+                    <q-card-section class="q-pt-none">
+                            PARCEIROS
+                    </q-card-section>
+                </q-card>
+            </el-col>
+            
+            <el-col :xs="12" :sm="8" :md="6" :lg="4">
+                <q-card class="home-card" @click="$root.RouteTo('/proprietarios')">
+                    <q-card-section class="q-pt-none">
+                        <i class="fa fa-house-user"></i>
+                    </q-card-section>
+                    <q-card-section class="q-pt-none">
+                            PROPRIETÁRIOS
+                    </q-card-section>
+                </q-card>
+            </el-col>
+            
+            <el-col :xs="12" :sm="8" :md="6" :lg="4">
+                <q-card class="home-card" @click="$root.RouteTo('/imoveis')">
+                    <q-card-section class="q-pt-none">
+                        <i class="fa fa-building"></i>
+                    </q-card-section>
+                    <q-card-section class="q-pt-none">
+                            IMÓVEIS
+                    </q-card-section>
+                </q-card>
+            </el-col>
+            
+            <el-col :xs="12" :sm="8" :md="6" :lg="4">
+                <q-card class="home-card" @click="$root.RouteTo('/solicitacoes')">
+                    <q-card-section class="q-pt-none">
+                        <i class="fa fa-bell-concierge"></i>
+                    </q-card-section>
+                    <q-card-section class="q-pt-none">
+                            SOLICITAÇÕES
+                    </q-card-section>
+                </q-card>
+            </el-col>
+            
+            <el-col :xs="12" :sm="8" :md="6" :lg="4">
+                <q-card class="home-card" @click="$root.RouteTo('/integracao')">
+                    <q-card-section class="q-pt-none">
+                        <i class="fa fa-link"></i>
+                    </q-card-section>
+                    <q-card-section class="q-pt-none">
+                            INTEGRAÇÃO
+                    </q-card-section>
+                </q-card>
+            </el-col>
+
+        </el-row>
     </div>
 
 
@@ -59,10 +115,21 @@
 
 <style scoped>
 
-    .accent-name {
-        color: var(--s-color-accent);
+    .home-card {
+        color: var(--s-color-primary);
+        margin:20px;
         font-weight: 600;
+        font-size: 15px;
+        cursor:pointer;
+        text-align:center;
+        box-shadow: 0 1px 5px rgb(0 95 255 / 20%), 0 2px 2px rgb(0 99 255 / 14%), 0 3px 1px -2px rgb(0 91 255 / 12%);
     }
+ .home-card i{font-size:34px;padding-top:20px}
+ .home-card .q-card-section{margin-bottom:-20px;}
+ .home-card:hover{
+    /*border: 1px solid var(--s-color-primary);*/
+    box-shadow: 0 1px 5px rgb(0 95 255 / 40%), 0 2px 2px rgb(0 99 255 / 34%), 0 3px 1px -2px rgb(0 91 255 / 22%);
+     }
 </style>
 
 
