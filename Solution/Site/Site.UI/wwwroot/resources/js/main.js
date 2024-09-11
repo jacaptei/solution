@@ -152,18 +152,29 @@ $(document).ready(function () {
                 },
                 error => {
                     if (error.response && error.response.status === 403) {
+                        const errorMessage = error.response.data.error_message;
                         if (!this.hasDisplayed403) {
                             this.hasDisplayed403 = true;
+                            let message = "";
+                            if (errorMessage === "Token revogado.") {
+                                message = "Sua conta foi acessada recentemente em um novo dispositivo. Para sua segurança, faça login novamente para confirmar sua identidade.";
+                            } else if (errorMessage === "Token expirado.") {
+                                message = "Sua sessão expirou. Por favor, faça login novamente.";
+                            } else if (errorMessage === "Assinatura do token inválida.") {
+                                message = "A assinatura do token é inválida. Por favor, faça login novamente.";
+                            } else if (errorMessage === "Token inválido.") {
+                                message = "O token fornecido é inválido. Por favor, faça login novamente.";
+                            }
+
                             ElementPlus.ElMessageBox.alert(
-                                "Sua conta foi acessada recentemente de um novo dispositivo. <br/>Para sua segurança, faça login novamente para confirmar sua identidade.<br/>",
+                                message,
                                 "Acesso negado.",
                                 {
-                                    dangerouslyUseHTMLString: true,
                                     confirmButtonText: "Voltar para a página inicial",
                                     callback: () => {
                                         this.SignOut();
-                                        this.userSessionIsRevoked = true;
                                         window.location.href = "/home";
+                                        this.userSessionIsRevoked = true;
                                     }
                                 }
                             );
@@ -314,7 +325,7 @@ $(document).ready(function () {
             },
 
             async ValidateSessionWithToken() {
-                const interval = 300000;
+                const interval = 500000;
                 const cookies = document.cookie.split('; ');
                 let authToken = cookies.find(cookie => cookie.startsWith('authToken='));
                 authToken = authToken ? authToken.split('=')[1] : null;
@@ -368,11 +379,9 @@ $(document).ready(function () {
                             return this.isAuth = true;
                         } else {
                             console.warn('Sessão não encontrada.');
-                            this.RequestLogin("Sessão não encontrada. Por favor, faça login.");
                         }
                     } catch (error) {
                         console.error('Erro ao validar o token:', error);
-                        this.RequestLogin("Sua sessão expirou. Por favor, faça login novamente.");
                     }
                 }
             },
