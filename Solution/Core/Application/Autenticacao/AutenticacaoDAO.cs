@@ -68,6 +68,21 @@ namespace JaCaptei.Application.Autenticacao
                 throw new ApplicationException("An error occurred while accessing the database. Please contact support if the problem persists.", ex);
             }
         }
+        public SessaoUsuario ObterSessaoAtivaByToken(string token)
+        {
+            try
+            {
+                using (var conn = new NpgsqlConnection(DB.CS))
+                {
+                    conn.Open();
+                    return conn.Query<SessaoUsuario>(e => e.tokenJWT == token).LastOrDefault();
+                }
+            }
+            catch (NpgsqlException ex)
+            {
+                throw new ApplicationException("An error occurred while accessing the database. Please contact support if the problem persists.", ex);
+            }
+        }
         public SessaoUsuario ValidarToken(int id, string tokenJWT)
         {
             try
@@ -76,6 +91,24 @@ namespace JaCaptei.Application.Autenticacao
                 {
                     conn.Open();
                     return conn.Query<SessaoUsuario>(e => e.idParceiro == id && e.tokenJWT == tokenJWT && e.isRevoked == true).LastOrDefault();
+                }
+            }
+            catch (NpgsqlException ex)
+            {
+                throw new ApplicationException("An error occurred while accessing the database. Please contact support if the problem persists.", ex);
+            }
+        }
+        public bool AtualizarSessão(int id, string tokenJWT)
+        {
+            try
+            {
+                using (var conn = new NpgsqlConnection(DB.CS))
+                {
+                    SessaoUsuario sessaoUsuario = new SessaoUsuario();
+                    sessaoUsuario.lastAccessedAt = DateTime.UtcNow;
+                    conn.Open();
+                    int affectedRows = conn.Update<SessaoUsuario>(sessaoUsuario, e => e.idParceiro == id && e.tokenJWT == tokenJWT);
+                    return affectedRows > 0;
                 }
             }
             catch (NpgsqlException ex)
