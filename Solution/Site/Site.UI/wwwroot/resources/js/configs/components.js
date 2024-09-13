@@ -25,6 +25,7 @@ const c_info                    = LoadComponent(componentPath+"c-info.htm");
 const c_notes                   = LoadComponent(componentPath+"c-notes.htm");
 const c_tip                     = LoadComponent(componentPath+"c-tip.htm");
 const c_space                   = LoadComponent(componentPath+"c-space.htm");
+const c_agendamento             = LoadComponent(componentPath+"c-agendamento.htm");
 const c_schedule                = LoadComponent(componentPath+"c-schedule.htm");
 const c_schedules               = LoadComponent(componentPath+"c-schedules.htm");
 const c_favorites               = LoadComponent(componentPath+"c-favorites.htm");

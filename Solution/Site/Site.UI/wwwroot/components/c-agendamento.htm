@@ -1,0 +1,259 @@
+<template>
+
+
+
+                    <div class="building-form-wrapper">
+                        <div class="building-form" style="color:#fff">
+
+								<el-row :gutter="20">
+                                        <el-col :md="24" style="width:100%;text-align:center;font-weight:600;font-size:16pt;margin-top:10px;margin-bottom:20px;">
+								                    Agendar visita
+                                        </el-col>
+                                </el-row>
+
+								<div v-if="view == 'home'">
+										<el-row style="color:var(--s-accent-color);width:100%;text-align:center">
+												<el-col :md="24"> 
+														 <q-date        v-model="agenda.data"    style="text-align:left"     minimal @click="UpdateDate"></q-date>         
+												</el-col>
+										</el-row>
+
+										<el-row :gutter="20" style="padding:6px;margin-top:5px;padding-bottom:-14px">
+												<el-col :md="24">
+														<q-btn id="bt-send" label="Prosseguir" color="secondary" style="font-size:18px;width:100%;height:50px;border-radius:20px" @click="Start()"></q-btn>
+														<div style="width:100%;text-align:center;padding-top:14px;">
+															<span v-if="loading"> <c-loading size="20px" color="white"></c-loading></span>
+															<span v-else></span>
+														</div>
+												</el-col>
+										</el-row>
+								</div>
+
+								<div v-else-if="view == 'hour'">
+
+										<el-row style="color:var(--s-accent-color);width:100%;text-align:center">
+												<el-col :md="24"> 
+													<span style="color:white;font-size:19px;font-weight:700;color:yellow">
+															{{$tools.FormatDateToBR(data)}}, {{$tools.GetFullDayWeek(data)}} 
+													</span> 	
+													<el-time-picker      v-model="data"  placeholder="horário" size="large" ></el-time-picker>
+												</el-col>
+												<el-col :md="24"> 
+													<el-input    v-model="agenda.obs"    maxlength="400"    placeholder="Observações"    show-word-limit :rows="7" type="textarea" ></el-input>
+												</el-col>
+										</el-row>
+
+										<el-row :gutter="20" style="padding:6px;margin-top:5px;padding-bottom:-14px">
+												<el-col :md="24">
+														<q-btn id="bt-back" label="Voltar"	 color="secondary"  style="float:left;font-size:18px;width:40%;height:50px;border-radius:20px" @click="ShowView('home')"></q-btn>
+														<q-btn id="bt-send" label="Concluir" color="green"		style="float:right;font-size:18px;width:50%;height:50px;border-radius:20px" @click="Send()"></q-btn>
+												</el-col>
+										</el-row>
+
+								</div>
+
+
+								<div v-else-if="view == 'sending'" style="width:100%;text-align:center;color:#fff;height:140px">
+										<br />
+										<c-loading size="60px" color="white"></c-loading>
+										<!--<q-btn id="bt-back" label="Voltar"	 color="secondary"  style="float:left;font-size:18px;width:100%;height:50px;border-radius:20px;margin-top:20px" @click="ShowView('hour')"></q-btn>-->
+								</div>
+							
+
+								<div v-else-if="view == 'success'" style="width:100%;text-align:center;color:#fff;height:140px">
+											<div class="title" style="color:var(--s-color-neon-green)"><b><i class="fa fa-circle-check"></i> Sucesso</b></div>
+											<span>visita agendada</span>
+											<br />
+											<br />
+											<q-btn  label="Ok" color="secondary"		style="float:right;font-size:18px;width:100%;height:50px;border-radius:20px" @click="ShowView('home')"></q-btn>
+								</div>
+							
+
+								<div v-else-if="view == 'fail'" style="width:100%;text-align:center;color:#fff;height:140px">
+											<div class="title" style="color:#ffd800"><b><i class="fa fa-circle-xmark"></i> Falhou</b></div>
+											<span>não foi possível agendar</span>
+											<br />
+											<br />
+											<q-btn  label="Tentar novamente" color="secondary"		style="float:right;font-size:18px;width:100%;height:50px;border-radius:20px" @click="ShowView('home')"></q-btn>
+								</div>
+
+
+
+                        </div>
+                    </div>
+
+
+</template>
+
+<script>
+module.exports = {
+    components: {
+
+	},	
+	
+	data: function () {
+		return {
+			view:"home",
+			content:"",
+			agenda : {data : new Date(), hora : "", obs:""},
+			onRequest:false,
+			data:new Date(),
+		}
+	},computed: {
+      
+	},
+	
+	props:{
+        imovel:		{ type: Object,  required: true, default: {} },
+        link:		{ type: String,  required: true, default: "" },
+	},
+	watch:{
+	},
+	created: function () {
+			this.data = new Date();//.format("yyyy/mm/dd");
+			this.data.setHours(16,0,0);
+			this.agenda.data = this.GetQDate();
+	 },
+	mounted(){
+
+	},		  
+	methods: {
+
+		UpdateDate(){
+			//c(this.agenda.data)
+			this.data = this.$tools.BuildDateYMD(this.agenda.data.replaceAll("/","-"));
+			this.data.setHours(16,0,0);
+		},
+
+		Start(){
+			if(this.$root.isAuth)
+				this.view = "hour";
+			else
+				this.$root.RequestLogin();
+		},
+
+		ShowView(view){
+			this.view = view;
+		},
+
+		GetLocation(){
+			var res = "";
+            res +=this.$validator.is(this.imovel.endereco)?							this.imovel.endereco +", "	:  "";
+            res +=this.$validator.is(this.imovel.numero)?							this.imovel.numero	 +", "	:  "";	
+            res +=this.$validator.is(this.imovel.andar && this.imovel.andar > 0)?	this.imovel.andar 	 +" andar, "	:  "";
+            res +=this.$validator.is(this.imovel.bairro)?							this.imovel.bairro	 +", "	:  "";
+            res +=this.$validator.is(this.imovel.cidade)?							this.imovel.cidade	 +", "	:  "";
+            res +=this.$validator.is(this.imovel.estado)?							this.imovel.estado			:  "";
+			return res;
+		},
+
+		GetQDate(){
+			this.agenda.hora = this.data;
+			return  this.data.getFullYear() + "/" +
+					(((this.data.getMonth() + 1) < 10) ? "0" + (this.data.getMonth() + 1) : (this.data.getMonth() + 1)) + "/" +
+					(this.data.getDate() < 10 ? "0" + this.data.getDate() : this.data.getDate()) ;
+		},
+
+		FormatQDate(){
+			return  this.data.getFullYear() + "-" +
+					(((this.data.getMonth() + 1) < 10) ? "0" + (this.data.getMonth() + 1) : (this.data.getMonth() + 1)) + "-" +
+					(this.data.getDate() < 10 ? "0" + this.data.getDate() : this.data.getDate()) ;
+		},
+		
+		FormatQDateHour(){
+			return  (this.data.getHours() < 10 ? "0" + this.data.getHours() : this.data.getHours()) + ":" +
+					(this.data.getMinutes() < 10 ? "0" + this.data.getMinutes() : this.data.getMinutes()) ;
+		},
+
+
+
+		Send(){
+
+				this.ShowView('sending');
+			
+				var subject = "Visita ao imóvel, cod: " + this.imovel.cod +" id: "+this.imovel.id;
+				var location = "";
+				location +=this.$validator.is(this.imovel.endereco)?						      this.imovel.endereco:  "";
+				location +=this.$validator.is(this.imovel.numero)?							" , "+this.imovel.numero :  "";	
+				location +=this.$validator.is(this.imovel.andar && this.imovel.andar > 0)?	" , "+this.imovel.andar 	 +" andar "	:  "";
+
+				var agendaCRM = {};
+				agendaCRM.values = {};
+
+				agendaCRM.values.date_start			=	this.agenda.data.replaceAll("/","-");
+				agendaCRM.values.due_date			=	this.agenda.data.replaceAll("/","-");
+				agendaCRM.values.time_start			=	this.FormatQDateHour();
+				agendaCRM.values.time_end			=	this.FormatQDateHour();
+				agendaCRM.values.duration_hours		=	0;
+				agendaCRM.values.activitytype		=	"Call";
+				agendaCRM.values.location			=	this.GetLocation();
+				agendaCRM.values.subject			=	subject;
+				agendaCRM.values.assigned_user_id	=	this.$root.usuario.idCRM;
+				agendaCRM.values.eventstatus		=	"Solicitado";
+				agendaCRM.values.visibility			=	"Private";
+				agendaCRM.values.taskpriority		=	"Medium";
+				agendaCRM.values.description		=	this.agenda.obs;
+				//agendaCRM.values.parent_id			=	this.imovel.id;
+				agendaCRM.values.parent_id			=	"";
+
+				agendaCRM.usuario					=	this.$root.usuario;
+
+				//c(agendaCRM)
+				//axios.get(Utils.BuildURL("/home/login"))
+				//    .then(response => { console.log(response.data) })
+				//    .catch(error => console.log(error))
+				//const result = await axios.post(Utils.BuildURL("/home/login"), this.$root.usuario);
+
+				axios.post(this.$api.BuildURL("imovel/agenda/inserir"),agendaCRM).then((request) => {
+						//c(request)
+						if(request.data.status.success){
+							this.ShowView("success");
+						}else{
+						}
+					}).catch((error) => {
+						ce(error);
+						this.ShowView("fail");
+					}).finally(() => {
+								
+					});
+			},
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+	}				
+		
+}
+
+</script>
+
+
+<style scoped>
+.s-note{
+	margin:20px;margin-top:0px;
+	text-align:left
+}
+.s-note-item{
+    color: rgb(173 173 173);
+    font-size: 16px;
+    font-weight: 600;
+	margin-bottom:10px;
+}
+.s-note-item > i{
+    font-size: 16px;
+    font-weight: 600;
+	margin-right:6px;
+}
+</style>
+
+

@@ -36,37 +36,77 @@
                     </el-col>
                 </el-row>
                 <el-row :gutter="20">
-                    <el-col :xs="12" :sm="6" :md="4" :lg="3" class="s-input" style="max-width:85px">
+                    <el-col :xs="12" :sm="6" :md="4" :lg="4" class="s-input" style="max-width:240px">
                         <div>ATIVOS<span></span></div>
-                        <el-switch v-model="buscaImovel.ativos" inline-prompt style="--el-switch-on-color: var(--s-color-green); --el-switch-off-color: var(--s-color-red)" active-text="&nbsp;&nbsp;SIM&nbsp;&nbsp;" inactive-text="&nbsp;&nbsp;NÃO&nbsp;&nbsp;" @change="()=>{ if(!buscaImovel.ativos && !buscaImovel.naoAtivos){ buscaImovel.naoAtivos = true; } }"></el-switch>
+                          <q-btn-toggle
+                            v-model="statusAtivo"
+                            push
+                            rounded
+                            unelevated
+                            toggle-color="primary"
+                            size="sm"
+                            :options="[
+                              {label: 'SIM',    value: 1},
+                              {label: 'TODOS',  value: 0},
+                              {label: 'NÃO',    value: -1}
+                            ]"
+                            @click="()=>{ if(statusAtivo == 0){ buscaImovel.ativos = true; buscaImovel.naoAtivos = true; }else{  if(statusAtivo == 1){ buscaImovel.ativos = true; buscaImovel.naoAtivos = false; }else{ buscaImovel.ativos = false; buscaImovel.naoAtivos = true; } } }"
+                          ></q-btn-toggle>
+                        <!--<el-switch v-model="buscaImovel.ativos" inline-prompt style="--el-switch-on-color: var(--s-color-green); --el-switch-off-color: var(--s-color-red)" active-text="&nbsp;&nbsp;SIM&nbsp;&nbsp;" inactive-text="&nbsp;&nbsp;NÃO&nbsp;&nbsp;" @change="()=>{ if(!buscaImovel.ativos && !buscaImovel.naoAtivos){ buscaImovel.naoAtivos = true; } }"></el-switch>-->
                     </el-col>
-                    <el-col :xs="12" :sm="6" :md="4" :lg="4" class="s-input" style="max-width:135px">
-                        <div>INATIVOS<span></span></div>
-                        <el-switch v-model="buscaImovel.naoAtivos" inline-prompt style="--el-switch-on-color: var(--s-color-green); --el-switch-off-color: var(--s-color-red)" active-text="&nbsp;&nbsp;SIM&nbsp;&nbsp;" inactive-text="&nbsp;&nbsp;NÃO&nbsp;&nbsp;" @change="()=>{ if(!buscaImovel.ativos && !buscaImovel.naoAtivos){ buscaImovel.ativos = true; } }"></el-switch>
-                    </el-col>
-                    <el-col :xs="12" :sm="6" :md="4" :lg="4" class="s-input" style="max-width:85px">
-                        <div>VISÍVEIS<span></span></div>
-                        <el-switch v-model="buscaImovel.visiveis" inline-prompt style="--el-switch-on-color: var(--s-color-green); --el-switch-off-color: var(--s-color-red)" active-text="&nbsp;&nbsp;SIM&nbsp;&nbsp;" inactive-text="&nbsp;&nbsp;NÃO&nbsp;&nbsp;" @change="()=>{ if(!buscaImovel.visiveis && !buscaImovel.naoVisiveis){ buscaImovel.naoVisiveis = true; } }"></el-switch>
-                    </el-col>
-                    <el-col :xs="12" :sm="6" :md="4" :lg="4" class="s-input" style="max-width:135px">
-                        <div>NÃO VISÍVEIS<span> no site</span></div>
-                        <el-switch v-model="buscaImovel.naoVisiveis" inline-prompt style="--el-switch-on-color: var(--s-color-green); --el-switch-off-color: var(--s-color-red)" active-text="&nbsp;&nbsp;SIM&nbsp;&nbsp;" inactive-text="&nbsp;&nbsp;NÃO&nbsp;&nbsp;" @change="()=>{ if(!buscaImovel.visiveis && !buscaImovel.naoVisiveis){ buscaImovel.visiveis = true; } }"></el-switch>
-                    </el-col>
-                    <el-col :xs="12" :sm="6" :md="4" :lg="4" class="s-input" style="max-width:85px">
+                    <el-col :xs="12" :sm="6" :md="4" :lg="4" class="s-input" style="max-width:240px">
                         <div>VALIDADOS<span></span></div>
-                        <el-switch v-model="buscaImovel.validados" inline-prompt style="--el-switch-on-color: var(--s-color-green); --el-switch-off-color: var(--s-color-red)" active-text="&nbsp;&nbsp;SIM&nbsp;&nbsp;" inactive-text="&nbsp;&nbsp;NÃO&nbsp;&nbsp;" @change="()=>{ if(!buscaImovel.validados && !buscaImovel.naoValidados){ buscaImovel.naoValidados = true; } }"></el-switch>
+                          <q-btn-toggle
+                            v-model="statusValidado"
+                            push
+                            rounded
+                            unelevated
+                            toggle-color="primary"
+                            size="sm"
+                            :options="[
+                              {label: 'SIM',    value: 1},
+                              {label: 'TODOS',  value: 0},
+                              {label: 'NÃO',    value: -1}
+                            ]"
+                            @click="()=>{ if(statusValidado == 0){ buscaImovel.validados = true; buscaImovel.naoValidados = true; }else{  if(statusValidado == 1){ buscaImovel.validados = true; buscaImovel.naoValidados = false; }else{ buscaImovel.validados = false; buscaImovel.naoValidados = true; } } }"
+                          ></q-btn-toggle>
+                        <!--<el-switch v-model="buscaImovel.validados" inline-prompt style="--el-switch-on-color: var(--s-color-green); --el-switch-off-color: var(--s-color-red)" active-text="&nbsp;&nbsp;SIM&nbsp;&nbsp;" inactive-text="&nbsp;&nbsp;NÃO&nbsp;&nbsp;" @change="()=>{ if(!buscaImovel.validados && !buscaImovel.naoValidados){ buscaImovel.naoValidados = true; } }"></el-switch>-->
                     </el-col>
-                    <el-col :xs="12" :sm="6" :md="4" :lg="4" class="s-input" style="max-width:135px">
-                        <div>NÃO VALIDADOS<span></span></div>
-                        <el-switch v-model="buscaImovel.naoValidados" inline-prompt style="--el-switch-on-color: var(--s-color-green); --el-switch-off-color: var(--s-color-red)" active-text="&nbsp;&nbsp;SIM&nbsp;&nbsp;" inactive-text="&nbsp;&nbsp;NÃO&nbsp;&nbsp;" @change="()=>{ if(!buscaImovel.validados && !buscaImovel.naoValidados){ buscaImovel.validados = true; } }"></el-switch>
+                    <el-col :xs="12" :sm="6" :md="4" :lg="4" class="s-input" style="max-width:240px">
+                        <div>VISÍVEIS<span> no site</span></div>
+                          <q-btn-toggle
+                            v-model="statusVisivel"
+                            push
+                            rounded
+                            unelevated
+                            toggle-color="primary"
+                            size="sm"
+                            :options="[
+                              {label: 'SIM',    value: 1},
+                              {label: 'TODOS',  value: 0},
+                              {label: 'NÃO',    value: -1}
+                            ]"
+                            @click="()=>{ if(statusVisivel == 0){ buscaImovel.visiveis = true; buscaImovel.naoVisiveis = true; }else{  if(statusVisivel == 1){ buscaImovel.visiveis = true; buscaImovel.naoVisiveis = false; }else{ buscaImovel.visiveis = false; buscaImovel.naoVisiveis = true; } } }"
+                          ></q-btn-toggle>
+                        <!--<el-switch v-model="buscaImovel.visiveis" inline-prompt style="--el-switch-on-color: var(--s-color-green); --el-switch-off-color: var(--s-color-red)" active-text="&nbsp;&nbsp;SIM&nbsp;&nbsp;" inactive-text="&nbsp;&nbsp;NÃO&nbsp;&nbsp;" @change="()=>{ if(!buscaImovel.visiveis && !buscaImovel.naoVisiveis){ buscaImovel.naoVisiveis = true; } }"></el-switch>-->
                     </el-col>
-                    <el-col :xs="12" :sm="6" :md="4" :lg="4" class="s-input" style="max-width:85px">
+                    <el-col :xs="12" :sm="6" :md="4" :lg="4" class="s-input" style="max-width:120px">
                         <div>EXCLUÍDOS<span></span></div>
-                        <el-switch v-model="buscaImovel.excluidos" inline-prompt style="--el-switch-on-color: var(--s-color-green); --el-switch-off-color: var(--s-color-red)" active-text="&nbsp;&nbsp;SIM&nbsp;&nbsp;" inactive-text="&nbsp;&nbsp;NÃO&nbsp;&nbsp;" @change="()=>{ if(!buscaImovel.excluidos && !buscaImovel.naoExcluidos){ buscaImovel.naoExcluidos = true; } }"></el-switch>
-                    </el-col>
-                    <el-col :xs="12" :sm="6" :md="4" :lg="4" class="s-input" style="max-width:135px">
-                        <div>NÃO EXCLUÍDOS<span></span></div>
-                        <el-switch v-model="buscaImovel.naoExcluidos" inline-prompt style="--el-switch-on-color: var(--s-color-green); --el-switch-off-color: var(--s-color-red)" active-text="&nbsp;&nbsp;SIM&nbsp;&nbsp;" inactive-text="&nbsp;&nbsp;NÃO&nbsp;&nbsp;" @change="()=>{ if(!buscaImovel.excluidos && !buscaImovel.naoExcluidos){ buscaImovel.excluidos = true; } }"></el-switch>
+                          <q-btn-toggle
+                            v-model="statusExcluido"
+                            push
+                            rounded
+                            unelevated
+                            toggle-color="primary"
+                            size="sm"
+                            :options="[
+                              {label: 'SIM',    value: 1},
+                              {label: 'TODOS',  value: 0},
+                              {label: 'NÃO',    value: -1}
+                            ]"
+                            @click="()=>{ if(statusExcluido == 0){ buscaImovel.excluidos = true; buscaImovel.naoExcluidos = true; }else{  if(statusExcluido == 1){ buscaImovel.excluidos = true; buscaImovel.naoExcluidos = false; }else{ buscaImovel.excluidos = false; buscaImovel.naoExcluidos = true; } } }"
+                          ></q-btn-toggle>
+                        <!--<el-switch v-model="buscaImovel.excluidos" inline-prompt style="--el-switch-on-color: var(--s-color-green); --el-switch-off-color: var(--s-color-red)" active-text="&nbsp;&nbsp;SIM&nbsp;&nbsp;" inactive-text="&nbsp;&nbsp;NÃO&nbsp;&nbsp;" @change="()=>{ if(!buscaImovel.excluidos && !buscaImovel.naoExcluidos){ buscaImovel.naoExcluidos = true; } }"></el-switch>-->
                     </el-col>
                 </el-row>
                 <el-row :gutter="20">
@@ -346,7 +386,10 @@
                 totalBanheiros          : null,
                 totalSuites             : null,
                 totalVagas              : null,
-
+                statusAtivo             : 0,
+                statusValidado          : 0,
+                statusVisivel           : 0,
+                statusExcluido          : -1,
 
             }
         }, computed: {
