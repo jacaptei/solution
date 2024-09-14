@@ -66,11 +66,10 @@ namespace JaCaptei.Application {
                                     appReturn.AddException("O atendimento de solicitações não agendadas não estão disponíveis no dia de hoje (favor enviar suas solicitações no próximo dia útil)");
                                 else if(!entity.agendado && parceiroSettings.totalSolicitacoesAbertasNaoAgendadas >= parceiroSettings.limiteSolicitacoesDiariasNaoAgendadas)
                                     appReturn.AddException("O limite diário de solicitações foi alcançado.");
-                                else if(entity.agendado && parceiroSettings.totalSolicitacoesAbertasAgendadas >= parceiroSettings.limiteSolicitacoesDiariasAgendadas)
-                                    appReturn.AddException("O limite diário de solicitações agendadas foi alcançado.");
+                                //else if(entity.agendado && parceiroSettings.totalSolicitacoesAbertasAgendadas >= parceiroSettings.limiteSolicitacoesDiariasAgendadas)
+                                //    appReturn.AddException("O limite diário de solicitações agendadas foi alcançado.");
                             }
                         }
-
 
                         if(appReturn.status.success) {
 

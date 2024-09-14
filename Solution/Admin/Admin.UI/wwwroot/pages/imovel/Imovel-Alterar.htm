@@ -29,7 +29,7 @@
 
                         <q-stepper v-model="step" ref="stepper" color="primary" done-color="green-13" animated >
 
-                          -<q-step :name="1" title="PROPRIETÁRIO"    prefix="1" :caption="stepCaptions[1]" :done="step > 1"></q-step>
+                          -<q-step :name="1" title="STATUS / PROP."    prefix="1" :caption="stepCaptions[1]" :done="step > 1"></q-step>
 
                           <q-step :name="2" title="LOCALIZAÇÃO"     prefix="1" :caption="stepCaptions[2]"  :done="step > 2" ></q-step>
                                                                                 
@@ -53,10 +53,94 @@
 
 
 
-         <!--#region PROPRIETARIO  -->
+         <!--#region STATUS-PROPRIETARIO  -->
 
         <div v-if="step == 1">
 
+
+                                        
+            <el-row :gutter="20" style="margin-top:0px">
+                <el-col :md="24" style="color:var(--s-color-primary);font-weight:700">
+                    STATUS
+                </el-col>
+            </el-row>
+
+            <el-row  style="margin-top:0px">
+                <el-col :span="24">
+                    <c-division></c-division>
+                </el-col>
+            </el-row>
+                    
+            <el-row :gutter="20" style="margin-top:10px" v-if="$root.usuario.god || $root.usuario.gestor">
+                    <el-col :xs="12" :sm="6" :md="4" :lg="3" class="s-input" style="max-width:120px">
+                        <div>ATIVO<span></span></div>
+                        <el-switch v-model="imovel.ativo" inline-prompt style="--el-switch-on-color: var(--s-color-green); --el-switch-off-color: var(--s-color-red)" active-text="&nbsp;&nbsp;SIM&nbsp;&nbsp;" inactive-text="&nbsp;&nbsp;NÃO&nbsp;&nbsp;"></el-switch>
+                    </el-col>
+                    <el-col :xs="12" :sm="6" :md="4" :lg="3" class="s-input" style="max-width:120px">
+                        <div>VALIDADO<span></span></div>
+                        <el-switch v-model="imovel.validado" inline-prompt style="--el-switch-on-color: var(--s-color-green); --el-switch-off-color: var(--s-color-red)" active-text="&nbsp;&nbsp;SIM&nbsp;&nbsp;" inactive-text="&nbsp;&nbsp;NÃO&nbsp;&nbsp;"></el-switch>
+                    </el-col>
+                    <el-col :xs="12" :sm="6" :md="4" :lg="3" class="s-input" style="max-width:120px">
+                        <div>VISÍVEL<span> no site</span></div>
+                        <el-switch v-model="imovel.visivel" inline-prompt style="--el-switch-on-color: var(--s-color-green); --el-switch-off-color: var(--s-color-red)" active-text="&nbsp;&nbsp;SIM&nbsp;&nbsp;" inactive-text="&nbsp;&nbsp;NÃO&nbsp;&nbsp;"></el-switch>
+                    </el-col>
+                    <el-col :xs="12" :sm="6" :md="4" :lg="3" class="s-input" style="max-width:160px">
+                        <div>EXLUÍDO<span></span></div>
+                        <el-switch v-model="imovel.excluido" inline-prompt style="--el-switch-on-color: var(--s-color-red); --el-switch-off-color: var(--s-color-green)" active-text="&nbsp;&nbsp;SIM&nbsp;&nbsp;" inactive-text="&nbsp;&nbsp;NÃO&nbsp;&nbsp;"></el-switch>
+                    </el-col>
+                    <el-col :xs="12" :sm="6" :md="4" :lg="3" class="s-input" style="max-width:140px">
+                        <div><span></span></div>
+                        <q-btn label="SALVAR"               color="primary" @click="CheckoutStep5"              style="margin-right:20px;width:120px"   icon="fa fa-save"></q-btn>
+                    </el-col>
+                    <el-col :span="24" :xs="24">
+                             <div v-if="!imovel.ativo">
+                                <span style="color:var(--s-color-red);">Motivo da inativação</span><span style="color:#b1b1b1;float:right;padding-right:30px" v-if="exibirCampoAbertoMotivoInativacao">{{imovel.motivoInativacao.length}}/50</span><br />
+                                <span v-if="!exibirCampoAbertoMotivoInativacao">
+                                        <el-select v-model="imovel.motivoInativacao"  value-key="id" placeholder="selecionar" filterable class="m-4" size="large" style="width:100%" @change="()=>{ if(imovel.motivoInativacao == 'Outro'){imovel.motivoInativacao = '';exibirCampoAbertoMotivoInativacao = true;FocusCampoAbertoMotivoInativacao();} } ">
+                                        <el-option v-for="item in opcoes.motivosInativacao" :key="item.id" :label="item.label" :value="item.label"></el-option>
+                                    </el-select>
+                                </span>
+                                <span v-else>
+                                    <el-input @keyup.enter="CheckoutStep3()" v-model="imovel.motivoInativacao" placeholder="até 50 caracteres"  maxlength="50" ref="CampoAbertoMotivoInativacao" style="width:calc(100% - 20px)"></el-input>
+                                    <i class="fa fa-close" @click="()=>{imovel.motivoInativacao='';exibirCampoAbertoMotivoInativacao = false; }" style="margin-left:5px;color:var(--s-color-red);cursor:pointer"></i>
+                                </span>
+                            </div>
+                    </el-col>
+            </el-row>
+            <el-row :gutter="20" style="margin-top:0px" v-else>
+                    <el-col :span="8" :xs="24" style="max-width:120px">
+                            <div v-if="imovel.ativo"        class="checkiconstatus"><i class="fa fa-check"></i> Ativo </div>
+                            <div v-if="imovel.validado"     class="checkiconstatus"><i class="fa fa-check"></i> Validado </div>
+                            <div v-if="imovel.visivel"      class="checkiconstatus"><i class="fa fa-check"></i> Visível</div>
+                            <div v-if="!imovel.excluido"    class="checkiconstatus"><i class="fa fa-check"></i> Não excluído</div>
+                            <div v-if="!imovel.ativo"       class="inactive" @click="$tools.Alert(imovel.motivoInativacao,'Motivo da inativação')" style="cursor:pointer"><i class="fa fa-xmark"></i> Inativo <a href="javascript:void(0)" style="color:var(--s-color-red);text-decoration:none"><i class="fa fa-message"></i></a></div>
+                            <div v-if="!imovel.visivel"     class="inactive"><i class="fa fa-xmark"></i> Não validado </div>
+                            <div v-if="!imovel.validado"    class="inactive"><i class="fa fa-xmark"></i> Não visível </div>
+                            <div v-if="imovel.excluido"     class="inactive"><i class="fa fa-xmark"></i> Excluído</div>
+                    </el-col>
+            </el-row>
+
+
+            <el-row style="margin-top:0px">
+                <el-col :span="24">
+                    <c-division></c-division>
+                </el-col>
+            </el-row>
+          
+
+                                        
+        <el-row :gutter="20" style="margin-top:10px">
+            <el-col :md="24" style="color:var(--s-color-primary);font-weight:700">
+                PROPRIETÁRIO
+            </el-col>
+        </el-row>
+
+        <el-row style="margin-top:0px">
+            <el-col :span="24">
+                <c-division></c-division>
+            </el-col>
+        </el-row>
+                    
         <el-row>
             <el-col :md="24">
                <c-proprietario-card textoComplemento="atual" :proprietario="imovel.proprietario"></c-proprietario-card>
@@ -477,7 +561,9 @@
 
         <div v-if="step == 3">
 
-            <el-row :gutter="20" style="margin-top:10px">
+
+
+            <el-row :gutter="20" style="margin-top:30px">
                 <el-col  :md="6" :sm="12" :xs="24" style="color:var(--s-color-primary);font-weight:700">
                     RESPONSÁVEL PELA CAPTAÇÃO<br />
                     <span style="color:var(--s-color-text);font-weight:700" v-if="$validator.is(imovel.adminCaptador)">
@@ -504,7 +590,7 @@
             </el-row>
                     
             <el-row :gutter="20" style="margin-top:10px">
-                    <el-col :span="24" style="max-width:260px">
+                    <el-col :span="8" :xs="24" style="max-width:260px">
                         Local das chaves<br />
                         <span v-if="!exibirCampoAbertoOutroLocalChaves">
                                 <el-select v-model="imovel.localChaves"  value-key="id" placeholder="selecionar" filterable class="m-4" size="large" style="width:100%" @change="()=>{ if(imovel.localChaves == 'Outro'){imovel.localChaves = '';exibirCampoAbertoOutroLocalChaves = true;FocusOutroLocalChaves();} } ">
@@ -518,8 +604,6 @@
                     </el-col>
             </el-row>
             <el-row :gutter="20" v-if="$root.usuario.god || $root.usuario.gestor">
-                    <el-col :md="4" :sm="8" :xs="12"><el-checkbox label="Ativo               " v-model="imovel.ativo                          " size="large"></el-checkbox></el-col>
-                    <el-col :md="4" :sm="8" :xs="12"><el-checkbox label="Válido              " v-model="imovel.validado                       " size="large"></el-checkbox></el-col>
                     <el-col :md="4" :sm="8" :xs="12"><el-checkbox label="Venda               " v-model="imovel.venda                          " size="large"></el-checkbox></el-col>
                     <el-col :md="4" :sm="8" :xs="12"><el-checkbox label="Locação             " v-model="imovel.locacao                        " size="large"></el-checkbox></el-col>
                     <el-col :md="4" :sm="8" :xs="12"><el-checkbox label="Residencial         " v-model="imovel.residencial                    " size="large"></el-checkbox></el-col>
@@ -880,7 +964,7 @@
             <div style="width:100%">
                        
                   <el-upload
-                    accept="image/png,image/jpeg"
+                    accept="image/jpeg"
                     :auto-upload="false"
                     ref="uploadImagesComponent"
                     v-model:file-list="imagesInputs"
@@ -945,7 +1029,7 @@
         <div v-if="step == 8">
             <div class="flex-center" style="padding-top:30px;height:240px;width:100%;text-align:center">
                     <c-info type="fail" title="Falhou" subtitle="Não foi possível atender a requisição"></c-info>
-                    <q-btn label="TENTAR NOVAMENTE" outline @click="StepTo(5)"></q-btn>
+                    <q-btn label="TENTAR NOVAMENTE" outline @click="TentarNovamente"></q-btn>
             </div>
         </div>
 
@@ -1038,6 +1122,7 @@
                 carregandoBairros: false,
                 exibirCampoAbertoOutroComplemento: false,
                 exibirCampoAbertoOutroLocalChaves: false,
+                exibirCampoAbertoMotivoInativacao: false,
                 verificadoImoveisNaRegiao: false,
                 cep: { numero: "", estado: "", cidade: "", logradouro: ""},
                 opcoes: { estados: [], cidades: [], bairros: [],
@@ -1045,7 +1130,8 @@
                     anos:[],
                     tiposImoveis:this.$models.tiposImoveis(),
                     tiposComplementos:this.$models.tiposComplementos(),
-                    locaisChaves: this.$sdata.opcoes.locaisChaves
+                    locaisChaves: this.$sdata.opcoes.locaisChaves,
+                    motivosInativacao: this.$sdata.opcoes.motivosInativacao
                 },
                 proprietariosBuscaResult:[],
                 imoveisBuscaResult:[],
@@ -1101,7 +1187,7 @@
 
                 // c2("request",request);
                 if (request?.status?.success){
-                    this.buscaImovel        =  request.result;
+                    this.buscaImovel    =  request.result;
                     if(this.$validator.is(this.buscaImovel.result.imoveis)){
                         this.imoveisBuscaResult =  this.buscaImovel.result.imoveis;
                         this.imovel             =  this.buscaImovel.result.imoveis[0];
@@ -1299,6 +1385,9 @@
                 //    this.$refs.areainterna.focus()
                 //}
 
+                if (!this.imovel.ativo && this.$validator.not(this.imovel.motivoInativacao))
+                    msg += "<b>MOTIVO DA INATIVAÇÃO</b> não informado<br>";
+
                 if(this.$validator.not(this.imovel.localChaves))
                     msg += "<b>Local das chaves</b> não informado<br>";
                 if(this.$validator.not(this.imovel.descricao))
@@ -1333,6 +1422,11 @@
 
             CheckoutStep7(){
                 this.StepTo(8);
+            },
+
+            TentarNovamente(){
+                this.imagesInputs = [];
+                this.StepTo(5);
             },
 
             HandleChangeImagem(uploadFile, uploadFiles){
@@ -1412,6 +1506,9 @@
 
                 var msg = "";
 
+                if (!this.imovel.ativo && this.$validator.not(this.imovel.motivoInativacao))
+                    msg += "<b>MOTIVO DA INATIVAÇÃO</b> não informado<br>";
+
                 if (this.$validator.not(this.imovel.documentacao.indiceCadastral))
                     msg += "<b>ÍNDICE CADASTRAL</b> não informado<br>";
 
@@ -1441,8 +1538,8 @@
              
                 if(this.imagesInputs.length == 0 && this.imovel?.imagens.length == 0)
                     msg += "<b>Imagens</b> não inseridas<br>";
-                if(this.imagesInputs.length < 15 && this.imovel?.imagens.length < 15)
-                    msg += "<b>Imagens</b> precisam ser pelo menos 15<br>";
+                //if(this.imagesInputs.length < 15 && this.imovel?.imagens.length < 15)
+                //    msg += "<b>Imagens</b> precisam ser pelo menos 15<br>";
              
                 if (msg.length > 0){
                     this.$tools.Alert(msg);
@@ -1667,6 +1764,14 @@
                 window.setTimeout(()=>this.$refs.CampoAbertoOutroComplemento.focus(),200);
             },
 
+            FocusOutroLocalChaves(){
+                window.setTimeout(()=>this.$refs.CampoAbertoOutroLocalChaves.focus(),200);
+            },
+
+            FocusCampoAbertoMotivoInativacao(){
+                window.setTimeout(()=>this.$refs.CampoAbertoMotivoInativacao.focus(),200);
+            },
+
 
 
 
@@ -1678,6 +1783,15 @@
 
 
 <style scoped>
+
+    .checkicon{
+        color:var(--s-color-primary);
+    }
+
+    .nocheckicon{
+        color:var(--s-color-red);
+        opacity:0.5;
+    }
 
 </style>
 

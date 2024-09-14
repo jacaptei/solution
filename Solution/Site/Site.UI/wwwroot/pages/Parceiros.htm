@@ -8,7 +8,7 @@
         </div>
         <div v-else>
             <div style="cursor:pointer" @click="ScrollTo('planos')">
-                <div class="banner" style="background:url('resources/images/pages/banners/banner_mensalidade.jpg');background-size:cover;"></div>
+                <div class="banner" style="background:url('resources/images/pages/banners/banner_mensalidade.png');background-size:cover;"></div>
             </div>
 
             <article class="content-boxes">
@@ -44,7 +44,7 @@
                        image="resources/images/pages/parceiros/comissao.png"
                        align="left"
                        title="100% da Comissão<br />para Você"
-                       content="Na JáCaptei você fica com <b>100% da comissão</b> assinando nossa plataforma a partir de <b>R$ 387,00 por mês</b>.<br /><span style='color:#888;font-size:16px'>consulte as condições com nossos consultores</span>"
+                       content="Na JáCaptei você fica com <b>100% da comissão</b> assinando nossa plataforma a partir de <b>R$ 449,00 por mês</b>.<br /><span style='color:#888;font-size:16px'>consulte as condições com nossos consultores</span>"
                        btlabel="Seja um parceiro JáCaptei"
                        event="contact"
                        @contact="ScrollTo('planos')"></c-box>
@@ -59,7 +59,7 @@
                        @contact="ScrollTo('planos')"></c-box>
             </article>
 
-            <el-row style="padding: 20px">
+            <el-row style="padding: 20px" id="planos">
                 <el-col :xs="24" :sm="8" :md="8" :lg="8">
                     <q-btn label="PLANO PARA CORRETORES"
                            color="primary"
@@ -70,7 +70,7 @@
                     <el-image src="../resources/images/plano_basic.png"
                               @click="SelecionarPlano(2)"
                               fit="contain"
-                              style="width: 100%;">
+                              style="width: 100%;cursor:pointer;">
                     </el-image>
                 </el-col>
 
@@ -85,12 +85,12 @@
                         <el-image src="../resources/images/plano_pro.png"
                                   @click="SelecionarPlano(3)"
                                   fit="contain"
-                                  style="width: 100%; margin-right:5px">
+                                  style="width: 100%; margin-right:5px;cursor:pointer">
                         </el-image>
                         <el-image src="../resources/images/plano_advanced.png"
                                   @click="SelecionarPlano(4)"
                                   fit="contain"
-                                  style="width: 100%;">
+                                  style="width: 100%;cursor:pointer;">
                         </el-image>
                     </el-col>
                 </el-col>

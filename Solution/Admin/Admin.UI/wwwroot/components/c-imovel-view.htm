@@ -46,8 +46,18 @@
                                               </el-col>
                                           </el-row>
                                           <el-row style="margin-top:10px">
-                                                <el-col :lg=12 :md=12 :sm=24 :xs=24> Construtora          <div style="font-weight: 700;"><span v-if="construtora > 0"> {{imovel.construtora}}</span><span v-else>-</span></div></el-col>
-                                                <el-col :lg=12 :md=12 :sm=24 :xs=24> Ano da construção    <div style="font-weight: 700;"><span v-if="imovel.anoConstrucao > 0"> {{imovel.anoConstrucao}}</span><span v-else>-</span></div></el-col>
+                                                <el-col :lg=6 :md=6 :sm=24 :xs=24> Status       
+                                                        <div v-if="imovel.ativo"        class="checkiconstatus"><i class="fa fa-check"></i> Ativo </div>
+                                                        <div v-if="imovel.validado"     class="checkiconstatus"><i class="fa fa-check"></i> Validado </div>
+                                                        <div v-if="imovel.visivel"      class="checkiconstatus"><i class="fa fa-check"></i> Visível</div>
+                                                        <div v-if="!imovel.excluido"    class="checkiconstatus"><i class="fa fa-check"></i> Não excluído</div>
+                                                        <div v-if="!imovel.ativo"       class="inactive" @click="$tools.Alert(imovel.motivoInativacao,'Motivo da inativação')" style="cursor:pointer"><i class="fa fa-xmark"></i> Inativo <a href="javascript:void(0)" style="color:var(--s-color-red);text-decoration:none"><i class="fa fa-message"></i></a></div>
+                                                        <div v-if="!imovel.visivel"     class="inactive"><i class="fa fa-xmark"></i> Não validado </div>
+                                                        <div v-if="!imovel.validado"    class="inactive"><i class="fa fa-xmark"></i> Não visível </div>
+                                                        <div v-if="imovel.excluido"     class="inactive"><i class="fa fa-xmark"></i> Excluído</div>
+                                                </el-col>
+                                                <el-col :lg=6 :md=6 :sm=24 :xs=24> Construtora          <div style="font-weight: 700;"><span v-if="construtora > 0"> {{imovel.construtora}}</span><span v-else>-</span></div></el-col>
+                                                <el-col :lg=6 :md=6 :sm=24 :xs=24> Ano da construção    <div style="font-weight: 700;"><span v-if="imovel.anoConstrucao > 0"> {{imovel.anoConstrucao}}</span><span v-else>-</span></div></el-col>
                                           </el-row>
                                           <el-row style="margin-top:10px">
                                                 <el-col :lg=12 :md=12 :sm=24 :xs=24> Local das chaves     <div style="font-weight: 700;"><span v-if="$validator.is(imovel.localChaves)"> {{imovel.localChaves}}</span><span v-else>-</span></div></el-col>
@@ -60,8 +70,6 @@
                                                 <el-col :lg=8 :md=10 :sm=12 :xs=12 v-if="imovel.disposicao.aceitaFinanciamento " class="checkicon"><i class="fa fa-check"></i> Aceita financiamento  </el-col>
                                                 <el-col :lg=8 :md=10 :sm=12 :xs=12 v-if="imovel.disposicao.aceitaPermuta       " class="checkicon"><i class="fa fa-check"></i> Aceita permuta        </el-col>
                                                 <el-col :lg=8 :md=10 :sm=12 :xs=12 v-if="imovel.disposicao.placa               " class="checkicon"><i class="fa fa-check"></i> Placa                 </el-col>
-                                                <el-col :lg=8 :md=10 :sm=12 :xs=12 v-if="imovel.ativo                          " class="checkicon"><i class="fa fa-check"></i> Ativo                </el-col>
-                                                <el-col :lg=8 :md=10 :sm=12 :xs=12 v-if="imovel.validado                       " class="checkicon"><i class="fa fa-check"></i> Válido               </el-col>
                                                 <el-col :lg=8 :md=10 :sm=12 :xs=12 v-if="imovel.residencial                    " class="checkicon"><i class="fa fa-check"></i> Residencial          </el-col>
                                                 <el-col :lg=8 :md=10 :sm=12 :xs=12 v-if="imovel.comercial                      " class="checkicon"><i class="fa fa-check"></i> Comercial            </el-col>
                                           </el-row>
@@ -72,8 +80,6 @@
                                                 <el-col :lg=8 :md=10 :sm=12 :xs=12 v-if="!imovel.disposicao.aceitaFinanciamento " class="nocheckicon"><i class="fa fa-xmark"></i> Aceita financiamento  </el-col>
                                                 <el-col :lg=8 :md=10 :sm=12 :xs=12 v-if="!imovel.disposicao.aceitaPermuta       " class="nocheckicon"><i class="fa fa-xmark"></i> Aceita permuta        </el-col>
                                                 <el-col :lg=8 :md=10 :sm=12 :xs=12 v-if="!imovel.disposicao.placa               " class="nocheckicon"><i class="fa fa-xmark"></i> Placa                 </el-col>
-                                                <el-col :lg=8 :md=10 :sm=12 :xs=12 v-if="!imovel.ativo                          " class="nocheckicon"><i class="fa fa-xmark"></i> Ativo                </el-col>
-                                                <el-col :lg=8 :md=10 :sm=12 :xs=12 v-if="!imovel.validado                       " class="nocheckicon"><i class="fa fa-xmark"></i> Válido               </el-col>
                                                 <el-col :lg=8 :md=10 :sm=12 :xs=12 v-if="!imovel.residencial                    " class="nocheckicon"><i class="fa fa-xmark"></i> Residencial          </el-col>
                                                 <el-col :lg=8 :md=10 :sm=12 :xs=12 v-if="!imovel.comercial                      " class="nocheckicon"><i class="fa fa-xmark"></i> Comercial            </el-col>
                                           </el-row>
@@ -469,6 +475,10 @@ const handleClose = function(key, keyPath){
         font-weight: normal;
     }
 
+    .checkiconstatus{
+        color:var(--s-color-green);
+    }
+
     .checkicon{
         color:var(--s-color-primary);
     }
@@ -476,6 +486,16 @@ const handleClose = function(key, keyPath){
     .nocheckicon{
         color:var(--s-color-red);
         opacity:0.5;
+    }
+
+    .active{
+        font-weight:700;
+        color:var(--s-color-primary);
+    }
+
+    .inactive{
+        font-weight:700;
+        color:var(--s-color-red);
     }
 
     img {

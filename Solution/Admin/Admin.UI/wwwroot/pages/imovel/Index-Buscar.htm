@@ -15,6 +15,11 @@
                         <div>ÍNDICE CADASTRAL<span></span></div>
                         <el-input @keyup.enter="Enviar()" v-model="imovel.documentacao.indiceCadastral" placeholder="qualquer" maxlength="38" ></el-input>
                     </el-col>
+                    <!--<el-col :xs="24" :sm="12" :md="8" :lg="6" class="s-input">
+                        <div :style="(buscaImovel.somenteExcluidos)? 'color:var(--s-color-orange)':'color:var(--s-color-primary)'">SOMENTE EXCLUÍDOS<span></span></div>
+                        <el-switch v-model="buscaImovel.somenteExcluidos" inline-prompt style="--el-switch-on-color: var(--s-color-orange); --el-switch-off-color: var(--s-color-primary)" active-text="&nbsp;&nbsp;SIM&nbsp;&nbsp;" inactive-text="&nbsp;&nbsp;NÃO&nbsp;&nbsp;"></el-switch>-->
+                        <!--<el-checkbox label="" v-model="buscaImovel.somenteExcluidos" size="large" fill="var(--s-color-orange)" text-color="orange"></el-checkbox>-->
+                    <!--</el-col>-->
                 </el-row>
                 <el-row :gutter="20">
                     <el-col :xs="24" :sm="12" :md="8" :lg="6" class="s-input">
@@ -28,6 +33,40 @@
                     <el-col :xs="24" :sm="12" :md="8" :lg="6" class="s-input">
                         <div>PROPRIETÁRIO E-MAIL<span></span></div>
                         <el-input @keyup.enter="Enviar()" v-model="buscaImovel.imovel.proprietario.email" placeholder="qualquer" maxlength="120" ref="id" input-style="text-transform:lowercase;"></el-input>
+                    </el-col>
+                </el-row>
+                <el-row :gutter="20">
+                    <el-col :xs="12" :sm="6" :md="4" :lg="3" class="s-input" style="max-width:85px">
+                        <div>ATIVOS<span></span></div>
+                        <el-switch v-model="buscaImovel.ativos" inline-prompt style="--el-switch-on-color: var(--s-color-green); --el-switch-off-color: var(--s-color-red)" active-text="&nbsp;&nbsp;SIM&nbsp;&nbsp;" inactive-text="&nbsp;&nbsp;NÃO&nbsp;&nbsp;" @change="()=>{ if(!buscaImovel.ativos && !buscaImovel.naoAtivos){ buscaImovel.naoAtivos = true; } }"></el-switch>
+                    </el-col>
+                    <el-col :xs="12" :sm="6" :md="4" :lg="4" class="s-input" style="max-width:135px">
+                        <div>INATIVOS<span></span></div>
+                        <el-switch v-model="buscaImovel.naoAtivos" inline-prompt style="--el-switch-on-color: var(--s-color-green); --el-switch-off-color: var(--s-color-red)" active-text="&nbsp;&nbsp;SIM&nbsp;&nbsp;" inactive-text="&nbsp;&nbsp;NÃO&nbsp;&nbsp;" @change="()=>{ if(!buscaImovel.ativos && !buscaImovel.naoAtivos){ buscaImovel.ativos = true; } }"></el-switch>
+                    </el-col>
+                    <el-col :xs="12" :sm="6" :md="4" :lg="4" class="s-input" style="max-width:85px">
+                        <div>VISÍVEIS<span></span></div>
+                        <el-switch v-model="buscaImovel.visiveis" inline-prompt style="--el-switch-on-color: var(--s-color-green); --el-switch-off-color: var(--s-color-red)" active-text="&nbsp;&nbsp;SIM&nbsp;&nbsp;" inactive-text="&nbsp;&nbsp;NÃO&nbsp;&nbsp;" @change="()=>{ if(!buscaImovel.visiveis && !buscaImovel.naoVisiveis){ buscaImovel.naoVisiveis = true; } }"></el-switch>
+                    </el-col>
+                    <el-col :xs="12" :sm="6" :md="4" :lg="4" class="s-input" style="max-width:135px">
+                        <div>NÃO VISÍVEIS<span> no site</span></div>
+                        <el-switch v-model="buscaImovel.naoVisiveis" inline-prompt style="--el-switch-on-color: var(--s-color-green); --el-switch-off-color: var(--s-color-red)" active-text="&nbsp;&nbsp;SIM&nbsp;&nbsp;" inactive-text="&nbsp;&nbsp;NÃO&nbsp;&nbsp;" @change="()=>{ if(!buscaImovel.visiveis && !buscaImovel.naoVisiveis){ buscaImovel.visiveis = true; } }"></el-switch>
+                    </el-col>
+                    <el-col :xs="12" :sm="6" :md="4" :lg="4" class="s-input" style="max-width:85px">
+                        <div>VALIDADOS<span></span></div>
+                        <el-switch v-model="buscaImovel.validados" inline-prompt style="--el-switch-on-color: var(--s-color-green); --el-switch-off-color: var(--s-color-red)" active-text="&nbsp;&nbsp;SIM&nbsp;&nbsp;" inactive-text="&nbsp;&nbsp;NÃO&nbsp;&nbsp;" @change="()=>{ if(!buscaImovel.validados && !buscaImovel.naoValidados){ buscaImovel.naoValidados = true; } }"></el-switch>
+                    </el-col>
+                    <el-col :xs="12" :sm="6" :md="4" :lg="4" class="s-input" style="max-width:135px">
+                        <div>NÃO VALIDADOS<span></span></div>
+                        <el-switch v-model="buscaImovel.naoValidados" inline-prompt style="--el-switch-on-color: var(--s-color-green); --el-switch-off-color: var(--s-color-red)" active-text="&nbsp;&nbsp;SIM&nbsp;&nbsp;" inactive-text="&nbsp;&nbsp;NÃO&nbsp;&nbsp;" @change="()=>{ if(!buscaImovel.validados && !buscaImovel.naoValidados){ buscaImovel.validados = true; } }"></el-switch>
+                    </el-col>
+                    <el-col :xs="12" :sm="6" :md="4" :lg="4" class="s-input" style="max-width:85px">
+                        <div>EXCLUÍDOS<span></span></div>
+                        <el-switch v-model="buscaImovel.excluidos" inline-prompt style="--el-switch-on-color: var(--s-color-green); --el-switch-off-color: var(--s-color-red)" active-text="&nbsp;&nbsp;SIM&nbsp;&nbsp;" inactive-text="&nbsp;&nbsp;NÃO&nbsp;&nbsp;" @change="()=>{ if(!buscaImovel.excluidos && !buscaImovel.naoExcluidos){ buscaImovel.naoExcluidos = true; } }"></el-switch>
+                    </el-col>
+                    <el-col :xs="12" :sm="6" :md="4" :lg="4" class="s-input" style="max-width:135px">
+                        <div>NÃO EXCLUÍDOS<span></span></div>
+                        <el-switch v-model="buscaImovel.naoExcluidos" inline-prompt style="--el-switch-on-color: var(--s-color-green); --el-switch-off-color: var(--s-color-red)" active-text="&nbsp;&nbsp;SIM&nbsp;&nbsp;" inactive-text="&nbsp;&nbsp;NÃO&nbsp;&nbsp;" @change="()=>{ if(!buscaImovel.excluidos && !buscaImovel.naoExcluidos){ buscaImovel.excluidos = true; } }"></el-switch>
                     </el-col>
                 </el-row>
                 <el-row :gutter="20">
@@ -207,12 +246,12 @@
                                 <el-row style="padding-left:20px;padding-right:20px;">
                                     <el-col :md="24">
                                         <div style="float:left">
-                                            <span style="color:var(--s-color-primary)">encontrados</span><br />
+                                            <span style="color:var(--s-color-primary)">encontrados </span><br />
                                             <span v-if="buscaImovel.total > 0">{{buscaImovel.total}}</span>
-                                            <span v-else style="color:var(--s-color-orange)">nada encontrado</span>
+                                            <span v-else style="color:var(--s-color-orange)">nada encontrado </span>
                                         </div>
                                         <div style="float:right">
-                                            <q-input v-model.number="buscaImovel.resultsPerPage" type="number" style="max-width:140px" label="RESULTADOS POR PÁGINA" stack-label :min="1" :dense="true" @keyup.enter="()=>{ if(!onrequest){ Enviar();}}" @change="()=>{ if(!onrequest){ Enviar;}}"></q-input>
+                                            <q-input v-model.number="buscaImovel.resultsPerPage" type="number" style="max-width:135px" label="RESULTADOS POR PÁGINA" stack-label :min="1" :dense="true" @keyup.enter="()=>{ if(!onrequest){ Enviar();}}" @change="()=>{ if(!onrequest){ Enviar;}}"></q-input>
                                         </div>
                                     </el-col>
                                 </el-row>
@@ -322,6 +361,8 @@
         },
         created: function () {
 
+            this.buscaImovel.excluidos   = false;
+
             this.$sdata.ObterEstados().then(res => { this.opcoes.estados = res; });
 
             for(var i=0;i<=20;i++){
@@ -362,6 +403,15 @@
                 this.totalBanheiros          = null;
                 this.totalSuites             = null;
                 this.totalVagas              = null;
+
+                this.buscaImovel.ativos      = true;
+                this.buscaImovel.naoAtivos   = true;
+                this.buscaImovel.visiveis    = true;
+                this.buscaImovel.naoVisiveis = true;
+                this.buscaImovel.validados   = true;
+                this.buscaImovel.naoValidados= true;
+                this.buscaImovel.excluidos   = false;
+                this.buscaImovel.naoExcluidos= true;
 
                 this.buscaImovel.imovel= this.$models.imovel();
 
@@ -417,7 +467,6 @@
                 this.onrequest  = true;
                 var request     = await this.$api.Post("imovel/buscar",this.buscaImovel);
                 this.onrequest  = false;
-                //c2("request",request)
                 if (request?.status?.success){
                     this.buscaImovel        =  request.result;
                     this.imoveisBuscaResult =  this.buscaImovel.result.imoveis;

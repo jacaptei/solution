@@ -159,6 +159,8 @@ namespace JaCaptei.Application{
                 filter += " AND id = " + busca.item.id.ToString();
             if(Utils.Validator.Is(busca.item.cpf))
                 filter += " AND cpf LIKE '%" + busca.item.cpf + "%' ";
+            if(Utils.Validator.Is(busca.item.cnpj))
+                filter += " AND cnpj LIKE '%" + busca.item.cnpj + "%' ";
             if(Utils.Validator.Is(busca.item.rg))
                 filter += " AND rg LIKE '%" + busca.item.rg.ToUpper() + "%' ";
             if(Utils.Validator.Is(busca.item.nome))

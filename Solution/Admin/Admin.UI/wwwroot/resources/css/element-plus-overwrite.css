@@ -728,9 +728,34 @@
 /* ************************************ */
 
 
-
-
-
+.el-switch__core .el-switch__inner {
+    width: 100%;
+    transition: all var(--el-transition-duration);
+    height: 16px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    overflow: hidden;
+    padding: 5px;
+    padding-left: 12px;
+}
+.el-switch.is-checked .el-switch__core .el-switch__inner {
+    padding: 5px;
+    padding-right: 15px;
+}
+.el-switch__core .el-switch__inner .is-text {
+    font-size: 12px;
+    color: var(--el-color-white);
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    padding: 12px;
+    text-align:center;
+}
 
 
 

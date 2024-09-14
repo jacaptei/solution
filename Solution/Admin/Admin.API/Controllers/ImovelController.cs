@@ -2,6 +2,7 @@
 using JaCaptei.Model;
 
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http.Timeouts;
 using Microsoft.AspNetCore.Mvc;
 
 using Newtonsoft.Json;
@@ -48,6 +49,7 @@ namespace JaCaptei.Administrativo.API.Controllers
         
         [HttpPost]
         [Route("[action]")]
+        [RequestTimeout(900000)]
         public async Task<IActionResult> Adicionar([FromForm] string jsonImovel, List<IFormFile> imagesFiles) {
 
             Imovel imovel = JsonConvert.DeserializeObject<Imovel>(jsonImovel);
@@ -56,17 +58,28 @@ namespace JaCaptei.Administrativo.API.Controllers
             imovel.inseridoPorId    = imovel.atualizadoPorId    = logado.id;
             imovel.inseridoPorNome  = imovel.atualizadoPorNome  = logado.nome;
 
-            if(imagesFiles is not null && imagesFiles?.Count > 0) {
-                if(imagesFiles.Count < 15 && Config.settings.environment == "PRODUCTION")
-                    appReturn.AddException("Necessário ao menos 15 imagens.");
-                else{
-                    appReturn = service.Adicionar(imovel);
-                    if(appReturn.status.success)
-                            appReturn = await ImageShackUploadImagesFiles(imovel,imagesFiles);
-                }
-            } else
-                appReturn.AddException("Necessário inserir imagens.");
-             
+            try {
+                if(imagesFiles is not null && imagesFiles?.Count > 0) {
+                    if(imagesFiles.Count < 4 && Config.settings.environment == "PRODUCTION")
+                        appReturn.AddException("Necessário ao menos 4 imagens.");
+                    else {
+                        appReturn = service.Adicionar(imovel);
+                        if(appReturn.status.success){
+                            try{
+                                appReturn = await ImageShackUploadImagesFiles(imovel,imagesFiles);
+                            }catch(Exception e){
+                                service.ExcluirFisicamente(imovel);
+                                appReturn.SetAsException("Não foi possível inserir imagens.",e);
+                            }
+
+                        }
+                    }
+                } else
+                    appReturn.AddException("Necessário inserir imagens.");
+            }catch(Exception e){
+                appReturn.SetAsException("Não foi possível inserir imóvel.",e);
+            }
+
             return Result(appReturn);
 
         }
@@ -75,6 +88,7 @@ namespace JaCaptei.Administrativo.API.Controllers
         [HttpPost]
         [Route("[action]")]
         [Authorize(Roles = "ADMIN_GOD,ADMIN_GESTOR")]
+        [RequestTimeout(900000)]
         public async Task<IActionResult> Alterar([FromForm] string jsonImovel, List<IFormFile> imagesFiles) {
 
             Imovel imovel = JsonConvert.DeserializeObject<Imovel>(jsonImovel);
@@ -83,20 +97,19 @@ namespace JaCaptei.Administrativo.API.Controllers
             imovel.atualizadoPorId   = logado.id;
             imovel.atualizadoPorNome = logado.nome;
             try {
-
-            if(imovel.imagens?.Count > 0 || imagesFiles?.Count > 0) {
-                    if(( (imagesFiles.Count + imovel.imagens.Count) < 15) && Config.settings.environment == "PRODUCTION")
-                        appReturn.AddException("Necessário ao menos 15 imagens.");
-                    else{
-                        appReturn = service.Alterar(imovel);
-                        if(appReturn.status.success && imagesFiles.Count > 0)
-                            appReturn = await ImageShackUploadImagesFiles(imovel,imagesFiles);
-                        else
-                            service.AlterarImagens(imovel);
-                    }
-            } else
-                appReturn.AddException("Necessário inserir imagens.");
-            } catch(Exception ex) { string  sex = ex.ToString(); }
+                    if(imovel.imagens?.Count > 0 || imagesFiles?.Count > 0) {
+                            if(( (imagesFiles.Count + imovel.imagens.Count) < 4) && Config.settings.environment == "PRODUCTION")
+                                appReturn.AddException("Necessário ao menos 4 imagens.");
+                            else{
+                                appReturn = service.Alterar(imovel);
+                                if(appReturn.status.success && imagesFiles.Count > 0)
+                                    appReturn = await ImageShackUploadImagesFiles(imovel,imagesFiles);
+                                else
+                                    service.AlterarImagens(imovel);
+                            }
+                    } else
+                        appReturn.AddException("Necessário inserir imagens.");
+            } catch(Exception ex) { string  e = ex.ToString(); }
 
             return Result(appReturn);
 
@@ -147,6 +160,8 @@ namespace JaCaptei.Administrativo.API.Controllers
 
             if(imagesFiles?.Count > 0) {
 
+                    if(imovel.imagens?.Count > 0)
+                        ordem = (short) imovel.imagens.Sum(i => Convert.ToInt32(i.ordem));
 
                     foreach(IFormFile imageFile in imagesFiles) {
 
@@ -169,6 +184,7 @@ namespace JaCaptei.Administrativo.API.Controllers
                                 using(HttpClient httpClient = new HttpClient()) {
                                     try {
                                         if(appReturn.status.success) {
+                                            httpClient.Timeout = TimeSpan.FromMinutes(10);
                                             //HttpResponseMessage response = await client.PostAsJsonAsync("https://post.imageshack.us/upload_api.php", requestContent);
                                             HttpResponseMessage postResponse = await httpClient.PostAsync("https://post.imageshack.us/upload_api.php", requestContent);
                                             if(postResponse.IsSuccessStatusCode) {
@@ -375,6 +391,11 @@ namespace JaCaptei.Administrativo.API.Controllers
         [HttpPost]
         [Route("[action]")]
         public async Task<IActionResult> Excluir([FromBody] Imovel entity) {
+
+            Usuario logado           = ObterUsuarioAutenticado();
+            entity.atualizadoPorId   = logado.id;
+            entity.atualizadoPorNome = logado.nome;
+
             appReturn.result = service.Excluir(entity);
             return Result(appReturn);
         }

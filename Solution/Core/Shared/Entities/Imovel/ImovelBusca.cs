@@ -15,12 +15,25 @@ namespace JaCaptei.Model {
             public double           areaMinima          {get;set;} = 0d;
             public double           areaMaxima          {get;set;} = 0d;
             public string           cepBase             {get;set;} = "";
+
             public bool             somenteAtivos       {get;set;}  = false;
             public bool             somenteNaoAativos   {get;set;}  = false;
             public bool             somenteVisiveis     {get;set;}  = false;
             public bool             somenteNaoVisiveis  {get;set;}  = false;
             public bool             somenteValidados    {get;set;}  = false;
             public bool             somenteNaoValidados {get;set;}  = false;
+            public bool             somenteExcluidos    {get;set;}  = false;
+            public bool             somenteNaoExcluidos {get;set;}  = false;
+
+            public bool             ativos              {get;set;}  = true;
+            public bool             naoAtivos           {get;set;}  = true;
+            public bool             visiveis            {get;set;}  = true;
+            public bool             naoVisiveis         {get;set;}  = true;
+            public bool             validados           {get;set;}  = true;
+            public bool             naoValidados        {get;set;}  = true;
+            public bool             excluidos           {get;set;}  = true;
+            public bool             naoExcluidos        {get;set;}  = true;
+
             public bool             somenteOutroID      {get;set;}  = false;
             public bool             usuarioGestor       {get;set;}  = false;
             public bool             usuarioGod          {get;set;}  = false;
