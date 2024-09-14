@@ -252,4 +252,48 @@ WHERE i.id = @idIntegracao;";
         var report = (await _conn.ExecuteQueryAsync<IntegracaoReport>(queryReport, new { idIntegracao })).FirstOrDefault();
         return report;
     }
+
+    internal async Task<List<EmailImoveisInativadosImoview>> GetImoveisInativados()
+    {
+        const string queryImoveisInativados = @"SELECT 
+    jsonb_build_object(
+        'IdIntegracao', i.id, 
+        'Cliente', jsonb_build_object('Id', p.id, 'Nome', p.nome, 'CpfCnpj', p.cnpj, 'Email', p.email),
+        'DataEnvio', CURRENT_DATE,
+        'Imoveis', (
+            SELECT jsonb_agg(jsonb_build_object(
+                'Id', ii.""idImovel"",
+                'CodJacaptei', ii.""codImovel"",
+                'CodImoview', ii.""imoviewResponse"" ->> 'codigo',
+                'DataInclusao', ii.""dataInclusao"",
+                'Descricao', ii.""requestBody"" ->> 'descricao',
+                'Endereco', ii.""requestBody"" ->> 'endereco'
+            ))
+            FROM ""IntegracaoBairroImoview"" ib
+            INNER JOIN ""ImportacaoBairroImoview"" ibi ON ibi.""idIntegracaoBairro"" = ib.""id""
+            INNER JOIN ""ImportacaoImovelImoview"" ii ON ii.""idImportacaoBairro"" = ibi.id
+            INNER JOIN ""Imovel"" im ON ii.""codImovel"" = im.cod
+            LEFT JOIN ""ImovelInativoEmailImoview"" iie ON ii.id = iie.""idImportacaoImoview""
+            WHERE ib.""idIntegracao"" = i.id AND ii.status = 'Concluido' AND im.ativo = false AND iie.id IS NULL
+        )
+    )
+FROM 
+    public.""IntegracaoImoview"" i 
+    INNER JOIN ""Parceiro"" p ON p.id = i.""idCliente"" 
+    INNER JOIN ""Plano"" pl ON pl.id = i.""idPlano""";
+        var res = await _conn.ExecuteQueryAsync<EmailImoveisInativadosImoview>(queryImoveisInativados);
+        return res.ToList();
+    }
+
+    internal async Task<int> SaveEmailImovelInativo(EmailInativosIntegracaoImoview email)
+    {
+        var id = await _conn.InsertAsync<EmailInativosIntegracaoImoview, int>(email);
+        return id;
+    }
+
+    internal async Task<bool> SaveImovelInativoEmail(ImovelInativoEmailImoview imovel)
+    {
+        await _conn.InsertAsync<ImovelInativoEmailImoview>(imovel);
+        return true;
+    }
 }

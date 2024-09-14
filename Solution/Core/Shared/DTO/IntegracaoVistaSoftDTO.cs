@@ -1,14 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace JaCaptei.Model.DTO.VistaSoft
+﻿namespace JaCaptei.Model.DTO.VistaSoft
 {
     public class Caracteristicas
     {
-        //public string AguaQuente { get; set; }
+        public string AguaQuente { get; set; } // CI
         public string AndarDoApto { get; set; } // CI
         public string Andares { get; set; } // CE
         public string AreaServico { get; set; } // CI
