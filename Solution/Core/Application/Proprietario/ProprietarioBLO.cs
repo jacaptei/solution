@@ -63,7 +63,7 @@ namespace JaCaptei.Application {
 
 
             if(entity is null) {
-                appReturn.SetException("Usuário não informado.");
+                appReturn.SetException("Proprietário não informado.");
                 return appReturn;
             }
 
@@ -73,8 +73,17 @@ namespace JaCaptei.Application {
             //if(Utils.Validator.Not(entity.rg))
             //    appReturn.AddException("RG","RG não informado.");
 
+            if(Utils.Validator.Not(entity.cpf) && Utils.Validator.Not(entity.cnpj))
+                appReturn.AddException("DOCUMENTO","CPF ou CNPJ não informado.");
+            else{ 
+                if(Utils.Validator.Is(entity.cpf) && !Utils.Validator.IsCPF(entity.cpf))
+                    appReturn.AddException("CPF","CPF inválido.");
+                if(Utils.Validator.Is(entity.cnpj) && !Utils.Validator.IsCNPJ(entity.cnpj))
+                    appReturn.AddException("CNPJ","CNPJ inválido.");
+            }
+
             if(Utils.Validator.Not(entity.email))
-               appReturn.AddException("E-MAIL","E-mail não informado.");
+                appReturn.AddException("E-MAIL","E-mail não informado.");
             else if(!Utils.Validator.IsEmail(entity.email))
                appReturn.AddException("E-MAIL","E-mail inválido.");
 
@@ -124,20 +133,16 @@ namespace JaCaptei.Application {
                 entity.rg               =  Utils.String.HigienizeToUpper(entity.rg);
                 entity.cpf              =  Utils.Format.CPF(entity.cpf);
                 entity.cpfNum           =  Utils.Number.ToLong(entity.cpf);
-                entity.cnpj             =  ""; //Utils.Format.CNPJ(entity.cnpj);
-                entity.cnpjNum          =  0;  //Utils.Number.ToLong(entity.cnpj);
+                entity.cnpj             =  Utils.Format.CNPJ(entity.cnpj);
+                entity.cnpjNum          =  Utils.Number.ToLong(entity.cnpj);
                 entity.email            =  Utils.String.HigienizeMail(entity.email);
 
                 if(entity.tipoPessoa == "PJ"){ 
                     entity.apelido          = Utils.String.Capitalize(entity.razao.Split(' ')[0]);
                     entity.dataNascimento   = Utils.Date.GetUnsetDefaultDateTime();
                     entity.sexo             = "NA";
-                    entity.cpf              = "";
-                    entity.cpfNum           = 0;
                 } else {
                     entity.apelido          = Utils.String.Capitalize(entity.nome.Split(' ')[0]);
-                    entity.cnpj             = "";
-                    entity.cnpjNum          = 0;
                     entity.dataNascimento   = Utils.Date.GetUnsetDefaultDateTime();
                 }
 

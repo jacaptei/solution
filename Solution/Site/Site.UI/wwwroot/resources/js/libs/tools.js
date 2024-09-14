@@ -172,7 +172,6 @@ export default class Tools {
        
     }
 
-
     Path(url) {
         return this.UrlBase + url;
     }
@@ -208,7 +207,6 @@ export default class Tools {
 
     }
 
-
     FormatMoney(value) {
         
         if (typeof value !== "number") {
@@ -220,7 +218,6 @@ export default class Tools {
             });
             return formatter.format(value);
         }
-
     }
     
     Money(value) {
@@ -229,9 +226,6 @@ export default class Tools {
     ToMoney(value) {
         return this.FormatMoney(value);
     }
-
-
-
 
     FormatFloat(value) {
 
@@ -276,7 +270,6 @@ export default class Tools {
         }
         return res;
     }
-
 
     ParseInt(n){
         var res = 0.00;
@@ -359,12 +352,9 @@ export default class Tools {
         return new date.toLocaleString("pt-BR", { month: "long" }).toUpperCase();
     }
 
-
-
     Unbind(val){ 
         return this.IsSet(val)? JSON.parse(JSON.stringify(val)) : null;
     }
-
 
     Focus(id) {
         id = "#" + id;
@@ -381,7 +371,6 @@ export default class Tools {
             this.Alert("Não foi possível converter imagem.");
         };
     }
-
 
     FormatException(exception) {
         var message = "";

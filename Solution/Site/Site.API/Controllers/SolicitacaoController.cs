@@ -71,15 +71,12 @@ namespace JaCaptei.API.Controllers
             return Result(appReturn);
         }
 
-
         [HttpGet]
         [Route("obter/logado")]
         public IActionResult ObterLogado() {
             appReturn.result = ObterUsuarioAutenticado();
             return Result(appReturn);
         }
-
-
 
         [HttpPost]
         [Route("buscar")]
@@ -89,7 +86,6 @@ namespace JaCaptei.API.Controllers
             appReturn = service.Buscar(busca);
             return Result(appReturn);
         }
-
 
         [HttpGet]
         [Route("obter/todos")]
@@ -107,7 +103,6 @@ namespace JaCaptei.API.Controllers
             return Result(appReturn);
         }
 
-
         [HttpGet]
         [Route("obter/todos/parceiro")]
         public IActionResult ObterTodosParceiro() {
@@ -119,30 +114,11 @@ namespace JaCaptei.API.Controllers
             return Result(appReturn);
         }
 
-
-
         [HttpGet]
         [Route("excluir/{id:int}")]
         public IActionResult Buscar(int id) {
             appReturn = service.Excluir(id);
             return Result(appReturn);
         }
-
-
-
-
-
-
-
     }
-
-
-
-
-
-
-
-
-
-
 }

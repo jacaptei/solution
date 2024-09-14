@@ -147,7 +147,7 @@ export default class DataHelper {
     async BuscarEndereco(postalCode) {
         postalCode = postalCode.replaceAll("-", "");
         var url = "https://viacep.com.br/ws/" + postalCode + "/json/";
-        c(url)
+        //c(url)
         var res = {
             city: "",
             address: "",

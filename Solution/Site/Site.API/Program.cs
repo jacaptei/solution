@@ -1,4 +1,5 @@
 using JaCaptei.API.Filters;
+using JaCaptei.API.Middleware;
 using JaCaptei.Model;
 
 using Microsoft.AspNetCore.Authentication.JwtBearer;
@@ -95,7 +96,6 @@ builder.Services.AddCors(options => {
 // ------------------------ JWT .NET ------------------------------
 
 
-//var key = Encoding.ASCII.GetBytes(Settings.key);
 builder.Services.AddAuthentication(x => {
     x.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
     x.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
@@ -110,10 +110,9 @@ builder.Services.AddAuthentication(x => {
     };
     x.Events = new JwtBearerEvents {
         OnChallenge = context => {
-            // Call this to skip the default logic and avoid using the default response
             context.HandleResponse();
             context.Response.StatusCode = 403;
-            context.Response.ContentType = "application/json";// and here also.
+            context.Response.ContentType = "application/json";
             var result = new AppReturn();
             result.SetAsForbidden();
             //var result = JsonSerializer.Serialize(context);
@@ -122,16 +121,13 @@ builder.Services.AddAuthentication(x => {
             return context.Response.WriteAsync(JsonSerializer.Serialize(result));
         },
         OnForbidden = context => {
-            context.Response.ContentType = "application/json";// and here also.
+            context.Response.ContentType = "application/json";
             var result = new AppReturn();
             context.Response.StatusCode = 403;
             result.SetAsForbidden();
             return context.Response.WriteAsync(JsonSerializer.Serialize(result));
         }
-
     };
-
-
 });
 
 
@@ -169,6 +165,8 @@ app.UseRouting();
 
 app.UseCors("AllowAll");
 //app.UseCors("AllowSites");
+
+app.UseMiddleware<JwtValidationMiddleware>();
 
 app.UseAuthentication();
 app.UseAuthorization();
