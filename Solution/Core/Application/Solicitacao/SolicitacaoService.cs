@@ -25,9 +25,11 @@ namespace JaCaptei.Application{
             entity.dataConsiderada      =   Utils.Date.GetLocalDateTime();
 
             short dayWeek = (short)entity.data.DayOfWeek;
-            if(dayWeek == 7 || entity.data.Hour >= 17 ||  (dayWeek == 6 && entity.data.Hour >= 11)) {
-                appReturn.AddException("O atendimento das solicitações de hoje já foram encerradas (favor enviar suas solicitações no próximo dia útil)");
-                return appReturn;
+            if(entity.idImovel == 0) { // nao veio do agendamento da pagina do imovel
+                if(dayWeek == 7 || entity.data.Hour >= 17 ||  (dayWeek == 6 && entity.data.Hour >= 11)) {
+                    appReturn.AddException("O atendimento das solicitações de hoje já foram encerradas (favor enviar suas solicitações no próximo dia útil)");
+                    return appReturn;
+                }
             }
 
             appReturn = BLO.Validar(entity);

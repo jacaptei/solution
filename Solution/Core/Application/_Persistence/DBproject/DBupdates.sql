@@ -1,4 +1,7 @@
 
 ALTER TABLE "Imovel" ADD COLUMN "motivoInativacao" VARCHAR(100) DEFAULT '';
-
 ALTER TABLE "Imovel" ADD COLUMN excluido BOOLEAN DEFAULT FALSE;
+
+ALTER TABLE "Solicitacao" ADD COLUMN "idImovel"       INTEGER DEFAULT 0;
+ALTER TABLE "Solicitacao" ADD COLUMN "codImovel"      VARCHAR(20);
+
