@@ -29,6 +29,7 @@ namespace JaCaptei.Model {
             public string           status              {get;set;}  =   "Aguardando captador";
 
             public string           url                 {get;set;}  =   "";
+            public string           titulo              {get;set;}  =   "";
             public string           descricao           {get;set;}  =   "";
             public string           avaliacao           {get;set;}  =   "";
 

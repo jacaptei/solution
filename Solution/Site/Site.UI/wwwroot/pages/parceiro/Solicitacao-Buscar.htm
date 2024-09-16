@@ -48,13 +48,13 @@
                                         {{$tools.FormatDayToBR(item.dataConsiderada)}} {{$tools.GetDayWeek(item.dataConsiderada)}} {{$tools.GetHours(item.dataConsiderada)}}h
                                     </span>
                                     <span v-if="item.idStatus < 9">
-                                        Averiguando
+                                       <span v-if="item.idImovel > 0">Confirmando</span> <span v-else>Averiguando</span>
                                     </span>
                                     <span v-else-if="item.idStatus == 9 || item.idStatus == 10">
-                                        Encontrado <i class="fa fa-thumbs-up" style="padding-left:10px"></i>
+                                       <span v-if="item.idImovel > 0">Realizado</span> <span v-else>Encontrado <i class="fa fa-thumbs-up" style="padding-left:10px"></i></span>
                                     </span>
                                     <span v-else-if="item.idStatus == 11">
-                                        Não encontrado <i class="fa fa-thumbs-down" style="padding-left:10px"></i>
+                                       <span v-if="item.idImovel > 0">Cancelado</span> <span v-else> Não encontrado <i class="fa fa-thumbs-down" style="padding-left:10px"></i></span>
                                     </span>
                                     <span v-else>
                                         <span></span>
@@ -75,6 +75,37 @@
 
                             <div style="margin-top:10px;font-weight:500;color:#000">
 
+                                <el-input v-if="item.idImovel > 0" v-model="item.titulo" readonly input-style="color:#000" @click="()=>{item.acao=='abrir-imovel'?  item.acao='fechar-imovel' :  item.acao='abrir-imovel';}">
+                                    <template #prepend>
+                                        <div style="text-transform:uppercase;font-weight:660;width:110px;text-align:right;cursor:pointer;" @click="()=>{item.acao=='abrir-imovel'?  item.acao='fechar-imovel' :  item.acao='abrir-imovel';}">
+                                            Imóvel <i style="padding-left:4px" class="fa fa-building"></i>
+                                        </div>
+                                    </template>
+                                    <template #append>
+                                        <q-btn icon="fa fa-copy" flat @click="$tools.CopyLink(item.titulo)" style="width:10px" :title="item.titulo"></q-btn>
+                                        <q-btn icon="fa fa-up-right-from-square" flat style="margin-left:5px;width:10px" @click="$tools.OpenLink(item.url)"></q-btn>
+                                        <div @click="()=>{item.acao=='abrir-imovel'?  item.acao='fechar-imovel' :  item.acao='abrir-imovel';}" style="cursor:pointer;text-align:center">
+                                            <q-btn icon="fa fa-caret-down" flat style="margin-left:5px;width:10px" v-if="item.acao != 'abrir-imovel'"></q-btn>
+                                            <q-btn icon="fa fa-caret-up" flat style="margin-left:5px;width:10px" v-else></q-btn>
+                                        </div>
+                                    </template>
+                                </el-input>
+                                <div v-if="item.acao=='abrir-imovel'">
+                                    <q-card>
+                                        <q-card-section>
+                                            <div style="font-size:15px">
+                                               <div><a href="javascript:void(0)" @click="$tools.Copy(item.titulo)"      style="text-decoration:none;color:var(--s-color-tex-alt)">{{item.titulo}}         <i class="fa fa-copy" style="text-decoration:none;color:#999"></i></a></div>
+                                               <div><a href="javascript:void(0)" @click="$tools.Copy(item.idImovel)"    style="text-decoration:none;color:var(--s-color-tex-alt)">ID #{{item.idImovel}}   <i class="fa fa-copy" style="text-decoration:none;color:#999"></i></a><br /></div>
+                                               <div><a href="javascript:void(0)" @click="$tools.Copy(item.codImovel)"   style="text-decoration:none;color:var(--s-color-tex-alt)">COD {{item.codImovel}}  <i class="fa fa-copy" style="text-decoration:none;color:#999"></i></a><br /></div>
+                                               <div><a href="javascript:void(0)" @click="$tools.OpenLink(item.url)"     style="text-decoration:none;color:var(--s-color-tex-alt)">ABRIR  <i class="fa fa-up-right-from-square" style="text-decoration:none;color:#999"></i></a><br /></div>
+                                            </div>
+                                        </q-card-section>
+                                    </q-card>
+                                </div>
+
+                            </div>
+
+                            <div style="margin-top:10px;font-weight:500;color:#000">
                                 <el-input :value="$validator.is(item.proprietarioCaptacao)? item.proprietarioCaptacao : '' " placeholder="aguardar" readonly input-style="color:#000">
                                     <template #prepend>
                                         <div style="text-transform:uppercase;font-weight:660;width:110px;text-align:right;cursor:pointer;" @click="()=>{item.acao=='abrir-proprietario'?  item.acao='fechar-proprietario' :  item.acao='abrir-proprietario';}">
@@ -88,7 +119,9 @@
                                         </div>
                                     </template>
                                 </el-input>
-                                <div v-if="item.acao=='abrir-proprietario'">
+                             </div>
+
+                              <div v-if="item.acao=='abrir-proprietario'">
                                     <q-card>
                                         <q-card-section>
                                             <div style="line-height:30px;font-size:15px">
@@ -105,7 +138,6 @@
                                         </q-card-section>
                                     </q-card>
                                 </div>
-                            </div>
 
 
 
