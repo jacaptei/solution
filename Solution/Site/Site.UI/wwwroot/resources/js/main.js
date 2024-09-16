@@ -377,7 +377,8 @@ $(document).ready(function () {
 
                         if (storedUser) {
                             this.usuario = JSON.parse(storedUser);
-                            return this.isAuth = true;
+                            this.SignIn();
+                            return true;
                         } else {
                             console.warn('Sessão não encontrada.');
                         }
