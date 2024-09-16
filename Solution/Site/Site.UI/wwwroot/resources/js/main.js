@@ -276,10 +276,10 @@ $(document).ready(function () {
 
             UpdateCRMsession() {
                 //c("KeepCRMsession");
-                axios.get(this.$api.BuildURL("KeepCRMsession")).then((request) => {
-                    this.usuario.sessaoCRMsystem = request.data.sessao;
+                //axios.get(this.$api.BuildURL("KeepCRMsession")).then((request) => {
+                //this.usuario.sessaoCRMsystem = request.data.sessao;
                     //c2("this.usuario.sessaoCRMsystem",this.usuario.sessaoCRMsystem);
-                });
+                //});
             },
 
             RequestLogin(mensagem = "É necessário estar logado para acessar esta área") {
@@ -346,6 +346,7 @@ $(document).ready(function () {
                         }
                     } else {
                         console.warn('Token inválido ou sessão revogada.');
+                        this.SignOut();
                         clearInterval(this.validationInterval); // Garante que o intervalo seja limpo
                     }
                 };
@@ -402,7 +403,7 @@ $(document).ready(function () {
                     if (response.status === 200) {
                         this.DeleteCookie('authToken');
                         this.userSessionIsRevoked = true;
-                        window.location.reload();
+                        //window.location.reload();
                         return;
                     } else {
                         console.error('Falha ao revogar token:', response.data);
@@ -475,13 +476,14 @@ $(document).ready(function () {
             },
 
             async SignOut() {
-                await this.RevogarToken();
                 var usr = "jcuser" + this.usuario.id;
                 this.$sdata.Storage.Set(usr, null);
                 this.$sdata.Storage.Set("utk", null);
                 this.log = this.$models.log();
                 this.usuario = this.$models.usuario();
                 this.isAuth = false;
+                axios.defaults.headers.common["Authorization"] = "";
+                await this.RevogarToken();
             },
 
             VerificarStatusSessao() {
@@ -507,6 +509,7 @@ $(document).ready(function () {
                 this.SignOut();
                 this.isAuth = false;
                 axios.defaults.headers.common["Authorization"] = "";
+                window.location.reload();
                 this.RouteTo("home");
                 //this.$sdata.Storage.Set("autoLogin", false);
             },
