@@ -1161,22 +1161,6 @@
 }
 
 
-
-.el-dropdown-menu__item {
-    display: flex;
-    align-items: center;
-    white-space: nowrap;
-    list-style: none;
-    line-height: 22px;
-    padding: 5px 16px;
-    margin: 0;
-    font-size: var(--el-font-size-base);
-    color: var(--s-text-color);
-    cursor: pointer;
-    outline: 0;
-}
-
-
 .el-pagination {
     --el-pagination-font-size: 19px;
     --el-pagination-bg-color: var(--el-fill-color-blank);

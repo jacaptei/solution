@@ -276,10 +276,10 @@ $(document).ready(function () {
 
             UpdateCRMsession() {
                 //c("KeepCRMsession");
-                axios.get(this.$api.BuildURL("KeepCRMsession")).then((request) => {
-                    this.usuario.sessaoCRMsystem = request.data.sessao;
+                //axios.get(this.$api.BuildURL("KeepCRMsession")).then((request) => {
+                //this.usuario.sessaoCRMsystem = request.data.sessao;
                     //c2("this.usuario.sessaoCRMsystem",this.usuario.sessaoCRMsystem);
-                });
+                //});
             },
 
             RequestLogin(mensagem = "É necessário estar logado para acessar esta área") {
@@ -346,6 +346,7 @@ $(document).ready(function () {
                         }
                     } else {
                         console.warn('Token inválido ou sessão revogada.');
+                        this.SignOut();
                         clearInterval(this.validationInterval); // Garante que o intervalo seja limpo
                     }
                 };
@@ -376,7 +377,8 @@ $(document).ready(function () {
 
                         if (storedUser) {
                             this.usuario = JSON.parse(storedUser);
-                            return this.isAuth = true;
+                            this.SignIn();
+                            return true;
                         } else {
                             console.warn('Sessão não encontrada.');
                         }
@@ -402,7 +404,7 @@ $(document).ready(function () {
                     if (response.status === 200) {
                         this.DeleteCookie('authToken');
                         this.userSessionIsRevoked = true;
-                        window.location.reload();
+                        //window.location.reload();
                         return;
                     } else {
                         console.error('Falha ao revogar token:', response.data);
@@ -475,13 +477,14 @@ $(document).ready(function () {
             },
 
             async SignOut() {
-                await this.RevogarToken();
                 var usr = "jcuser" + this.usuario.id;
                 this.$sdata.Storage.Set(usr, null);
                 this.$sdata.Storage.Set("utk", null);
                 this.log = this.$models.log();
                 this.usuario = this.$models.usuario();
                 this.isAuth = false;
+                axios.defaults.headers.common["Authorization"] = "";
+                await this.RevogarToken();
             },
 
             VerificarStatusSessao() {
@@ -507,6 +510,7 @@ $(document).ready(function () {
                 this.SignOut();
                 this.isAuth = false;
                 axios.defaults.headers.common["Authorization"] = "";
+                window.location.reload();
                 this.RouteTo("home");
                 //this.$sdata.Storage.Set("autoLogin", false);
             },
@@ -516,16 +520,16 @@ $(document).ready(function () {
             RouteTo(destiny, action = null) {
                 var link = { name: "home", route: "/home" };
                 if (this.$validator.IsSet(destiny) && typeof destiny === "object") {
-                    if (this.$validator.IsntSet(destiny.name)) destiny.name = link.name;
-                    if (this.$validator.IsntSet(destiny.route)) destiny.route = link.route;
-                    if (this.$validator.IsntSet(destiny.action)) destiny.action = link.action;
+                    if (this.$validator.not(destiny.name)) destiny.name = link.name;
+                    if (this.$validator.not(destiny.route)) destiny.route = link.route;
+                    if (this.$validator.not(destiny.action)) destiny.action = link.action;
                     link = destiny;
                 } else {
                     link.route = destiny;
                 }
 
-                if (this.$validator.IsSet(action))
-                    link.route += (this.$validator.IsSet(action)) ? "/" + action : "/";
+                if (this.$validator.is(action))
+                    link.route += (this.$validator.is(action)) ? "/" + action : "/";
 
                 this.$router.push({ path: link.route }).catch((e) => { console.log("RouteTo Error - " + e); });
                 //this.$router.push(link.name);
@@ -534,6 +538,11 @@ $(document).ready(function () {
                 //c("this.$router.params",this.$router.params)
                 this.$tools.ToTop();
             },
+
+            ReouteToParams(destiny="home",_params={}){
+                 this.$router.push({ path: destiny, query: _params }).catch((e) => { console.log("ReouteToParams Error - " + e); });
+            },
+
             RouteBack: function () {
                 if (this.$validator.IsSet(this.$router.go(-1)))
                     this.$router = this.$router.go(-1);
@@ -560,6 +569,7 @@ $(document).ready(function () {
                     params: { point: JSON.stringify(item) },
                 });
             },
+            
 
 //-------------------------------- MIX --------------------------------
 
@@ -674,6 +684,7 @@ $(document).ready(function () {
 	App.component("c-notes"                 , c_notes                   );
 	App.component("c-tip"                   , c_tip                     );
 	App.component("c-footer"                , c_footer                  );
+	App.component("c-agendamento"           , c_agendamento             );
 	App.component("c-schedule"              , c_schedule                );
 	App.component("c-schedules"             , c_schedules               );
 	App.component("c-favorites"             , c_favorites               );

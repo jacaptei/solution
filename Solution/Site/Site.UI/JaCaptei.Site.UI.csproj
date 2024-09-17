@@ -25,4 +25,11 @@
     <PackageReference Include="RepoDb.PostgreSql.BulkOperations" Version="1.13.1" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Content Update="wwwroot\components\c-agendamento.htm">
+      <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
+      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+    </Content>
+  </ItemGroup>
+
 </Project>
