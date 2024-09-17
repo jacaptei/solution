@@ -34,6 +34,7 @@ namespace JaCaptei.API.Controllers
                 entity = appReturn.result;
                 entity.roles = "PARCEIRO";
                 entity.tokenJWT = JWTokenService.GenerateToken(entity);
+                appReturn.result    = entity;
                 var criarSessaoResult = autenticacaoService.CriarSessao(entity, HttpContext);
                 if (criarSessaoResult is ConflictObjectResult)
                 {
@@ -54,6 +55,7 @@ namespace JaCaptei.API.Controllers
                 entity = appReturn.result;
                 entity.roles = "PARCEIRO";
                 entity.tokenJWT = JWTokenService.GenerateToken(entity);
+                appReturn.result    = entity;
                 autenticacaoService.InvalidarToken(entity, HttpContext);
                 autenticacaoService.CriarSessao(entity, HttpContext);
             }

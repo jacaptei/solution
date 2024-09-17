@@ -17,6 +17,10 @@ namespace JaCaptei.Model {
             public int              idParceiro          {get;set;}  =   0;
             public Parceiro         parceiro            {get;set;}  =   new Parceiro();
 
+            public int              idImovel            {get;set;}  =   0;
+            public string           codImovel           {get;set;}  =   "";
+            public Imovel           imovel              {get;set;}  =   new Imovel();
+
             public int              idProprietario      {get;set;}  =   0;
             public Proprietario     proprietario        {get;set;}  =   new Proprietario();
             public string           proprietarioCaptacao{get;set;}  =   "";
@@ -25,6 +29,7 @@ namespace JaCaptei.Model {
             public string           status              {get;set;}  =   "Aguardando captador";
 
             public string           url                 {get;set;}  =   "";
+            public string           titulo              {get;set;}  =   "";
             public string           descricao           {get;set;}  =   "";
             public string           avaliacao           {get;set;}  =   "";
 

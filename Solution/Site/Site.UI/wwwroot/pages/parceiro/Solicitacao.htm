@@ -2,7 +2,7 @@
 
 	<div class="row">
 		<div class="col-12">
-			<q-tabs v-model="view"
+			<q-tabs v-model="page"
 					dense
 					no-caps
 					align="left"
@@ -14,7 +14,7 @@
 				<q-tab name="buscar"		icon="fa fa-list-check"		label="ACOMPANHAR" ></q-tab>
 				<!--<q-tab name="register"	icon="fa fa-user-plus"			label="CADASTRE-SE"		style="width:115px"></q-tab>-->
 			</q-tabs>
-			<q-tab-panels v-model="view" animated>
+			<q-tab-panels v-model="page" animated>
 				
 				<q-tab-panel name="nova">
 					<page_adicionar />
@@ -43,22 +43,24 @@
 		},
 		data: function () {
 			return {
-                view: "nova"
+                page: "nova"
 			}
 		}, computed: {
 
 		},
 
 		props: {
-
+            view:		{ type: String, required: false, default: "nova" },
 		},
 		watch: {
 
 		},
 		created: function () {
-			
+			this.page = this.view;
 		},
 		mounted() {
+
+
 		},
 		methods: {
 		}
