@@ -6,8 +6,8 @@ using RepoDb.Attributes.Parameter.Npgsql;
 namespace JaCaptei.Model.Entities;
 
 
-[Map("IntegracaoBairroImoview")]
-public class IntegracaoBairroImoview : IIntegracaoBairro
+[Map("IntegracaoBairroVistaSoft")]
+public class IntegracaoBairroVistaSoft : IIntegracaoBairro
 {
     [Map("id")]
     public int Id { get; set; }

@@ -5,6 +5,7 @@ using JaCaptei.Application.DAL;
 using JaCaptei.Application.Integracao;
 using JaCaptei.Model;
 using JaCaptei.Model.DTO;
+using JaCaptei.Model.Entities;
 
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -78,7 +79,7 @@ public class ImoviewController : ControllerBase
         {
             Cliente = new ComboDTO(cliente.id, cliente.nome),
             Plano = new ComboPlanoDTO(plano.id, plano.nome, plano.totalBairros),
-            Integracao = integracao, 
+            Integracao = (IntegracaoImoview?)integracao, 
             Crms = [new(1, "Imoview"), new (2,"VistaSoft")]
         };
         return Ok(res);

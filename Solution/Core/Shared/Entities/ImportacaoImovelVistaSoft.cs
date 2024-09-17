@@ -5,8 +5,8 @@ using RepoDb.Attributes.Parameter.Npgsql;
 
 namespace JaCaptei.Model.Entities;
 
-[Map("ImportacaoImovelImoview")]
-public class ImportacaoImovelImoview : IImportacaoImovel
+[Map("ImportacaoImovelVistaSoft")]
+public class ImportacaoImovelVistaSoft : IImportacaoImovel
 {
     [Map("id")]
     public int Id { get; set; }
@@ -23,19 +23,15 @@ public class ImportacaoImovelImoview : IImportacaoImovel
     [NpgsqlDbType(NpgsqlDbType.Jsonb)]
     public string RequestBody { get; set; }
 
-    [Map("imagens")]
-    [NpgsqlDbType(NpgsqlDbType.Jsonb)]
-    public string Imagens { get; set; }
-
     [Map("status")]
     public string Status { get; set; }
 
     [Map("dataInclusao")]
     public DateTime DataInclusao { get; set; }
 
-    [Map("imoviewResponse")]
+    [Map("apiResponse")]
     [NpgsqlDbType(NpgsqlDbType.Jsonb)]
-    public string ImoviewResponse { get; set; }
+    public string ApiResponse { get; set; }
 
     [Map("dataAtualizacao")]
     public DateTime DataAtualizacao { get; set; }
