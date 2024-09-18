@@ -11,11 +11,13 @@ using JaCaptei.Model;
 using Microsoft.AspNetCore.Mvc;
 
 using System.Text;
+using Microsoft.AspNetCore.Authorization;
 
 namespace JaCaptei.Admin.API.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
+    [Authorize(Roles = "ADMIN_GOD,ADMIN_GESTOR,ADMIN_PADRAO")]
     public class VistaSoftController : ControllerBase
     {
         private readonly VistaSoftService _service;

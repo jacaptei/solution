@@ -64,7 +64,7 @@
         //public string SegurancaPatrimonial { get; set; }
     }
 
-    public class IntegracaoVistaSoftDTO
+    public class ImovelVistaSoftDTO
     {
         public string Codigo { get; set; }
         public string Categoria { get; set; } // tipo: Apartamento, Casa, etc..
@@ -93,5 +93,15 @@
         public Caracteristicas Caracteristicas { get; set; }
         public InfraEstrutura InfraEstrutura { get; set; }
         public List<FotoDTO> Fotos { get; set; }
+    }
+
+    public record ImportacaoImoveVistaSoftEvent
+    {
+        public int IdImportacaoBairro { get; init; }
+        public int IdIntegracao { get; set; }
+        public int IdCliente { get; init; }
+        public int IdImovel { get; set; }
+        public string CodImovel { set; get; }
+        public string ChaveApi { get; set; }
     }
 }

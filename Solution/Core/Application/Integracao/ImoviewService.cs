@@ -243,7 +243,7 @@ public class ImoviewService : IDisposable, IIntegracaoService
                 Mensagem = $"Problemas para comunicar com Service Bus"
             };
         }
-        await _retryPolicy.ExecuteAsync(() => _imoviewDAO.SaveIntegracao(integracao));
+        await _retryPolicy.ExecuteAsync(() => _imoviewDAO.SaveIntegracao((IntegracaoImoview)integracao));
         var integracaoEvent = new IntegracaoEvent()
         {
             IdIntegracao = integracao.Id,
@@ -500,11 +500,6 @@ public class ImoviewService : IDisposable, IIntegracaoService
             _logger?.LogInformation("{qtdErro} imoveis não enviados!", qtdErro);
         }
         return true;
-    }
-
-    public async Task<ImovelFullDTO?> ObterImovel(int id)
-    {
-        return await _imoviewDAO.GetFullImovel(id);
     }
 
     private async Task<bool> SendImportQueue(ServiceBusSender sender, ImportacaoImovelEvent importacaoImovelEvent)

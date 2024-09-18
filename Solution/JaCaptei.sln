@@ -39,6 +39,10 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ReprocessarImovelImovielFun
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NotificarImovelInativoImoviewFunction", "NotificarImovelInativoImoviewFunction\NotificarImovelInativoImoviewFunction.csproj", "{005D60EA-B821-4604-991E-23309D342F0C}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "IntegrarVistaSoftFunction", "IntegrarVistaSoftFunction\IntegrarVistaSoftFunction.csproj", "{F557C5D1-698B-4076-B33F-50CECD749077}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ImportarVistaSoftFunction", "ImportarVistaSoftFunction\ImportarVistaSoftFunction.csproj", "{3A18F079-EBC1-4E66-BE53-355E4876B339}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -130,6 +134,18 @@ Global
 		{005D60EA-B821-4604-991E-23309D342F0C}.Release|Any CPU.Build.0 = Release|Any CPU
 		{005D60EA-B821-4604-991E-23309D342F0C}.SITE|Any CPU.ActiveCfg = Debug|Any CPU
 		{005D60EA-B821-4604-991E-23309D342F0C}.SITE|Any CPU.Build.0 = Debug|Any CPU
+		{F557C5D1-698B-4076-B33F-50CECD749077}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F557C5D1-698B-4076-B33F-50CECD749077}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F557C5D1-698B-4076-B33F-50CECD749077}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F557C5D1-698B-4076-B33F-50CECD749077}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F557C5D1-698B-4076-B33F-50CECD749077}.SITE|Any CPU.ActiveCfg = Debug|Any CPU
+		{F557C5D1-698B-4076-B33F-50CECD749077}.SITE|Any CPU.Build.0 = Debug|Any CPU
+		{3A18F079-EBC1-4E66-BE53-355E4876B339}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{3A18F079-EBC1-4E66-BE53-355E4876B339}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{3A18F079-EBC1-4E66-BE53-355E4876B339}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{3A18F079-EBC1-4E66-BE53-355E4876B339}.Release|Any CPU.Build.0 = Release|Any CPU
+		{3A18F079-EBC1-4E66-BE53-355E4876B339}.SITE|Any CPU.ActiveCfg = Debug|Any CPU
+		{3A18F079-EBC1-4E66-BE53-355E4876B339}.SITE|Any CPU.Build.0 = Debug|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -149,6 +165,8 @@ Global
 		{0CD2D386-5DF9-4B22-B1B7-C71D7B17EBB8} = {A6CFBE72-06D5-4D9E-95E8-5E6A6D215AC9}
 		{DF721B19-7B43-46CD-87E9-3A3012AAB1DC} = {A6CFBE72-06D5-4D9E-95E8-5E6A6D215AC9}
 		{005D60EA-B821-4604-991E-23309D342F0C} = {A6CFBE72-06D5-4D9E-95E8-5E6A6D215AC9}
+		{F557C5D1-698B-4076-B33F-50CECD749077} = {A6CFBE72-06D5-4D9E-95E8-5E6A6D215AC9}
+		{3A18F079-EBC1-4E66-BE53-355E4876B339} = {A6CFBE72-06D5-4D9E-95E8-5E6A6D215AC9}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {DAE772A6-FB90-42A9-AF93-1D2C7C58AC0A}
