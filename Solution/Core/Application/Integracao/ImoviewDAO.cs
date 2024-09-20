@@ -1,6 +1,9 @@
 using JaCaptei.Model;
 using JaCaptei.Model.DTO;
 using JaCaptei.Model.Entities;
+
+using Newtonsoft.Json;
+
 using Npgsql;
 using RepoDb;
 
@@ -267,7 +270,7 @@ WHERE i.id = @idIntegracao;";
                 'CodImoview', ii.""imoviewResponse"" ->> 'codigo',
                 'DataInclusao', ii.""dataInclusao"",
                 'Descricao', ii.""requestBody"" ->> 'descricao',
-                'Endereco', ii.""requestBody"" ->> 'endereco'
+                'Endereco', ii.""requestBody"" -> 'endereco'
             ))
             FROM ""IntegracaoBairroImoview"" ib
             INNER JOIN ""ImportacaoBairroImoview"" ibi ON ibi.""idIntegracaoBairro"" = ib.""id""
@@ -281,8 +284,15 @@ FROM
     public.""IntegracaoImoview"" i 
     INNER JOIN ""Parceiro"" p ON p.id = i.""idCliente"" 
     INNER JOIN ""Plano"" pl ON pl.id = i.""idPlano""";
-        var res = await _conn.ExecuteQueryAsync<EmailImoveisInativadosImoview>(queryImoveisInativados);
-        return res.ToList();
+        var res = await _conn.ExecuteQueryAsync<string>(queryImoveisInativados);
+        var listD = res.ToList();
+        List<EmailImoveisInativadosImoview> list = [];
+        foreach (var item in listD)
+        {
+            var obj = JsonConvert.DeserializeObject<EmailImoveisInativadosImoview>(item.ToString());
+            list.Add(obj);
+        }
+        return list;
     }
 
     internal async Task<int> SaveEmailImovelInativo(EmailInativosIntegracaoImoview email)

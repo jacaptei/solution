@@ -1,4 +1,5 @@
 ﻿using HandlebarsDotNet;
+using HandlebarsDotNet.IO;
 
 using JaCaptei.Model;
 using JaCaptei.Model.DTO;
@@ -315,7 +316,7 @@ namespace JaCaptei.Application.Email
             <table class=""row"" style=""border-collapse: collapse; border-spacing: 0; padding: 0; position: relative; text-align: left; vertical-align: top; width: 100%;"">
               <tbody>
                 <tr style=""padding: 0; text-align: left; vertical-align: top;"">
-                  <th class=""small-12 large-6 columns first"" style=""-moz-box-sizing: border-box; -moz-hyphens: auto; -webkit-box-sizing: border-box; -webkit-hyphens: auto; Margin: 0 auto; border-collapse: collapse !important; box-sizing: border-box; color: #0a0a0a; font-family: Helvetica, Arial, sans-serif; font-size: 16px; font-weight: normal; hyphens: auto; line-height: 130%; margin: 0 auto; padding: 0; padding-bottom: 16px; padding-left: 16px; padding-right: 8px; text-align: left; vertical-align: top; width: 274px; word-wrap: break-word;"">
+                  <th class=""small-12 large-8 columns first"" style=""-moz-box-sizing: border-box; -moz-hyphens: auto; -webkit-box-sizing: border-box; -webkit-hyphens: auto; Margin: 0 auto; border-collapse: collapse !important; box-sizing: border-box; color: #0a0a0a; font-family: Helvetica, Arial, sans-serif; font-size: 16px; font-weight: normal; hyphens: auto; line-height: 130%; margin: 0 auto; padding: 0; padding-bottom: 16px; padding-left: 16px; padding-right: 8px; text-align: left; vertical-align: top; width: 274px; word-wrap: break-word;"">
                     <table style=""border-collapse: collapse; border-spacing: 0; padding: 0; text-align: left; vertical-align: top; width: 100%;"">
                       <tbody>
                         <tr style=""padding: 0; text-align: left; vertical-align: top;"">
@@ -334,13 +335,13 @@ namespace JaCaptei.Application.Email
                       </tbody>
                     </table>
                   </th>
-                  <th class=""small-12 large-6 columns last"" style=""-moz-box-sizing: border-box; -moz-hyphens: auto; -webkit-box-sizing: border-box; -webkit-hyphens: auto; Margin: 0 auto; border-collapse: collapse !important; box-sizing: border-box; color: #0a0a0a; font-family: Helvetica, Arial, sans-serif; font-size: 16px; font-weight: normal; hyphens: auto; line-height: 130%; margin: 0 auto; padding: 0; padding-bottom: 16px; padding-left: 8px; padding-right: 16px; text-align: left; vertical-align: top; width: 274px; word-wrap: break-word;"">
+                  <th class=""small-12 large-4 columns last"" style=""-moz-box-sizing: border-box; -moz-hyphens: auto; -webkit-box-sizing: border-box; -webkit-hyphens: auto; Margin: 0 auto; border-collapse: collapse !important; box-sizing: border-box; color: #0a0a0a; font-family: Helvetica, Arial, sans-serif; font-size: 16px; font-weight: normal; hyphens: auto; line-height: 130%; margin: 0 auto; padding: 0; padding-bottom: 16px; padding-left: 8px; padding-right: 16px; text-align: left; vertical-align: top; width: 274px; word-wrap: break-word;"">
                     <table style=""border-collapse: collapse; border-spacing: 0; padding: 0; text-align: left; vertical-align: top; width: 100%;"">
                       <tbody>
                         <tr style=""padding: 0; text-align: left; vertical-align: top;"">
                           <th style=""-moz-box-sizing: border-box; -moz-hyphens: auto; -webkit-box-sizing: border-box; -webkit-hyphens: auto; Margin: 0; border-collapse: collapse !important; box-sizing: border-box; color: #0a0a0a; font-family: Helvetica, Arial, sans-serif; font-size: 16px; font-weight: normal; hyphens: auto; line-height: 130%; margin: 0; padding: 0; text-align: left; vertical-align: top; word-wrap: break-word;"">
                             <p style=""Margin: 0; Margin-bottom: 10px; color: #0a0a0a; font-family: Helvetica, Arial, sans-serif; font-size: 16px; font-weight: normal; line-height: 130%; margin: 0; margin-bottom: 10px; padding: 0; text-align: left;"">
-                              <strong>Endereco</strong><br> {{Endereco.rua}}, {{Endereco.numero}}<br> {{Endereco.complemento}}, {{Endereco.bairro}}<br> {{Endereco.cidade}} - {{Endereco.uf}}<br>
+                              <strong>Endereco</strong><br> {{Endereco.rua}}, {{Endereco.numero}}<br> {{Endereco.complemento}}, {{Endereco.bairro}}<br> {{Endereco.cidade}} {{Endereco.uf}}<br>
                             </p>
                           </th>
                         </tr>
@@ -389,6 +390,10 @@ namespace JaCaptei.Application.Email
         }
         public async Task<(bool, string)> EnviarImoviewInativos(EmailImoveisInativadosImoview emailInativos)
         {
+            var format = "dd/MM/yyyy";
+            var formatter = new CustomDateTimeFormatter(format);
+            Handlebars.Configuration.FormatterProviders.Add(formatter);
+            emailInativos.Imoveis.ForEach(i => i.Descricao = i?.Descricao?.Length > 150 ? i.Descricao.Substring(0, 150) + "..." : i.Descricao);
             var template = Handlebars.Compile(TEMPLATE_IMOVIEW_INATIVOS);
             var emailContent = template(emailInativos);
             var emailTo = emailInativos.Cliente.Nome + " <" + emailInativos.Cliente.Email + ">";
@@ -413,6 +418,33 @@ namespace JaCaptei.Application.Email
                 _logger?.LogError("Erro ao enviar email para {to}. Erro {e}", emailTo, e);
                 return (false, emailContent);
             }
+        }
+    }
+
+    public sealed class CustomDateTimeFormatter : IFormatter, IFormatterProvider
+    {
+        private readonly string _format;
+
+        public CustomDateTimeFormatter(string format) => _format = format;
+
+        public void Format<T>(T value, in EncodedTextWriter writer)
+        {
+            if (!(value is DateTime dateTime))
+                throw new ArgumentException("supposed to be DateTime");
+
+            writer.Write($"{dateTime.ToString(_format)}");
+        }
+
+        public bool TryCreateFormatter(Type type, out IFormatter formatter)
+        {
+            if (type != typeof(DateTime))
+            {
+                formatter = null;
+                return false;
+            }
+
+            formatter = this;
+            return true;
         }
     }
 }

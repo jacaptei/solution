@@ -28,7 +28,7 @@ var builder = new HostBuilder()
 
         //services.AddAutoMapper(types);
         services.AddScoped<DBcontext>();
-
+        services.AddScoped<EmailService>();
         AppSettingsRecord settings = new();
         string EnvironmentSettings = ctx.Configuration.GetSection("Environment").Value;
         //var imoviewUrl = ctx.Configuration.GetSection($"{EnvironmentSettings}:imoviewUrl").Value;

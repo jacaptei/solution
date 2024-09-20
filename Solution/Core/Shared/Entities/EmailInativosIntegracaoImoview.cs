@@ -1,4 +1,7 @@
-﻿using RepoDb.Attributes;
+﻿using NpgsqlTypes;
+
+using RepoDb.Attributes;
+using RepoDb.Attributes.Parameter.Npgsql;
 
 namespace JaCaptei.Model.Entities;
 
@@ -21,5 +24,6 @@ public class EmailInativosIntegracaoImoview
     public string Mensagem { get; set; }
 
     [Map("imoveis")]
+    [NpgsqlDbType(NpgsqlDbType.Jsonb)]
     public string Imoveis { get; set; } 
 }

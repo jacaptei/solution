@@ -14,7 +14,7 @@ namespace NotificarImovelInativoImoviewFunction
         }
 
         [Function("NotificarImovelIntativoImoviewFn")]
-        public async Task Run([TimerTrigger("0 */5 * * * *")] TimerInfo myTimer)
+        public async Task Run([TimerTrigger("*/1 * * * * *")] TimerInfo myTimer)
         {
             await _service.EnviarEmailImoveisInativos();
         }

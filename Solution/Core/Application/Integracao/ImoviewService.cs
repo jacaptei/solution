@@ -75,7 +75,7 @@ public class ImoviewService : IDisposable, IIntegracaoService
         _imoviewDAO = new ImoviewDAO(_context.GetConn());
         _retryPolicy = Policy
             .Handle<Exception>()
-            .WaitAndRetryAsync(Backoff.DecorrelatedJitterBackoffV2(TimeSpan.FromSeconds(2), 3));
+            .WaitAndRetryAsync(Backoff.DecorrelatedJitterBackoffV2(TimeSpan.FromSeconds(2), 1));
         _busPolicy = Policy
         .Handle<Exception>()
         .WaitAndRetryAsync(1, retryAttempt => TimeSpan.FromSeconds(retryAttempt))
@@ -819,7 +819,7 @@ public class ImoviewService : IDisposable, IIntegracaoService
         if (_emailService == null)
             throw new Exception("Email service não configurado");
         var integracoesInativos = await _retryPolicy.ExecuteAsync(() => _imoviewDAO.GetImoveisInativados());
-        foreach (var emailInativo in integracoesInativos.Where(i => i.Imoveis.Count > 0))
+        foreach (var emailInativo in integracoesInativos.Where(i => i.Imoveis?.Count > 0))
         {
             if (emailInativo == null) continue;
             (bool res, string mensagem) = await _emailService.EnviarImoviewInativos(emailInativo);
@@ -832,7 +832,7 @@ public class ImoviewService : IDisposable, IIntegracaoService
                     DataEnvio = DateTime.UtcNow,
                     Status = StatusIntegracao.Concluido.GetDescription(),
                     Mensagem = mensagem,
-                    Imoveis = Newtonsoft.Json.JsonConvert.SerializeObject(emailInativo.Imoveis.Select(i => new { i.CodImoview, i.CodJacaptei }).ToList())
+                    Imoveis = Newtonsoft.Json.JsonConvert.SerializeObject(emailInativo.Imoveis.Select(i => new { i?.CodImoview, i?.CodJacaptei }).ToList())
                 };
                 var id = await _retryPolicy.ExecuteAsync(() => _imoviewDAO.SaveEmailImovelInativo(email));
                 var imoveis = emailInativo.Imoveis.Select(i => new ImovelInativoEmailImoview
@@ -844,7 +844,15 @@ public class ImoviewService : IDisposable, IIntegracaoService
                 });
                 foreach (var imovel in imoveis)
                 {
-                    await _retryPolicy.ExecuteAsync(() => _imoviewDAO.SaveImovelInativoEmail(imovel));
+                    try
+                    {
+                        await _retryPolicy.ExecuteAsync(() => _imoviewDAO.SaveImovelInativoEmail(imovel));
+                    }
+                    catch (Exception ex)
+                    {
+                        _logger?.LogError("Erro ao salvar imovel inativo: {ex}", ex);
+                        continue;
+                    }
                 }
             }
         }
