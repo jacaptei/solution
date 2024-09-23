@@ -36,12 +36,19 @@
 
     public class FotoDTO
     {
-        public string Codigo { get; set; } // Id ou Nome
+        //public string Codigo { get; set; } // Id ou Nome
+        public int Ordem { get; set; } 
         public string Foto { get; set; } // Url ou Data64
         public string FotoPequena { get; set; } // Thumb Url ou Data64
         public string Destaque { get; set; } // Sim ou Nao
         public string Descricao { get; set; } // Id ou Nome
         public string ExibirNoSite { get; set; } // Sim ou Nao
+    }
+
+    public class FotosAddReq
+    {
+        public int Imovel { get; set; }
+        public List<FotoDTO> Fotos { get; set; }
     }
 
     public class InfraEstrutura
@@ -68,6 +75,9 @@
     {
         public string Codigo { get; set; }
         public string Categoria { get; set; } // tipo: Apartamento, Casa, etc..
+        public string Status { get; set; } = "Venda"; // 	Venda, Vendido, Suspenso, etc.
+        public string Situacao { get; set; } = "Usado";
+        public string Ocupacao { get; set; } = "DESOCUPADO";
 
         public string Endereco { get; set; }
         public string Numero { get; set; }
@@ -78,6 +88,7 @@
         public string UF { get; set; }
         public string CEP { get; set; }
 
+        public string Moeda { get; set; } = "Reais";
         public string ValorVenda { get; set; }
         public string ValorIptu { get; set; }
         public string ValorCondominio { get; set; }
@@ -95,6 +106,39 @@
         public List<FotoDTO> Fotos { get; set; }
     }
 
+    public class ImovelVistaSoftAddDTO
+    {
+        public string Categoria { get; set; } // tipo: Apartamento, Casa, etc..
+        public string Status { get; set; } = "Venda"; // 	Venda, Vendido, Suspenso, etc.
+        public string Situacao { get; set; } = "Usado";
+        public string Ocupacao { get; set; } = "DESOCUPADO";
+
+        public string Endereco { get; set; }
+        public string Numero { get; set; }
+        public string Complemento { get; set; }
+        public string Bairro { get; set; }
+        public string Cidade { get; set; }
+        public string Bloco { get; set; }
+        public string UF { get; set; }
+        public string CEP { get; set; }
+
+        public string Moeda { get; set; } = "Reais";
+        public string ValorVenda { get; set; }
+        public string ValorIptu { get; set; }
+        public string ValorCondominio { get; set; }
+        public string ValorComissao { get; set; }
+
+        public string Dormitorios { get; set; } // CI
+        public string Suites { get; set; } // CI
+        public string Vagas { get; set; } // CE
+
+        public string AreaTotal { get; set; }
+        public string AreaPrivativa { get; set; } // CI
+
+        public Caracteristicas carac { get; set; }
+        public InfraEstrutura infra { get; set; }
+    }
+
     public record ImportacaoImoveVistaSoftEvent
     {
         public int IdImportacaoBairro { get; init; }
@@ -103,5 +147,12 @@
         public int IdImovel { get; set; }
         public string CodImovel { set; get; }
         public string ChaveApi { get; set; }
+    }
+
+    public record ImovelResponseVS
+    {
+        public int status { get; set; }
+        public string? Codigo { get; set; }
+        public object message { get; set; }
     }
 }

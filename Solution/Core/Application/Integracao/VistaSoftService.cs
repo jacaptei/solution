@@ -14,6 +14,9 @@ using Polly;
 using Polly.Contrib.WaitAndRetry;
 using Polly.Retry;
 
+using System;
+using System.Net.Http.Headers;
+
 namespace JaCaptei.Application.Integracao
 {
     public class VistaSoftService: IIntegracaoService
@@ -269,7 +272,7 @@ namespace JaCaptei.Application.Integracao
         private async Task<bool> ProcessBairros(IntegracaoVistaSoft integracao, IntegracaoEvent integracaoEvent, List<BairroDTO> bairroDTOs)
         {
             List<IntegracaoBairroVistaSoft> bairrosIntegrados = await _retryPolicy.ExecuteAsync(() => _vistaSoftDAO.GetIntegracaoBairros(integracao.Id));
-            foreach (var bairro in bairrosIntegrados)
+            foreach (var bairro in bairroDTOs)
             {
                 var bairroIntegrado = bairrosIntegrados?.FirstOrDefault(b => b.IdBairro == bairro.Id);
                 if (bairroIntegrado == null)
@@ -291,7 +294,7 @@ namespace JaCaptei.Application.Integracao
             bairroIntegrado.DataAtualizacao = DateTime.UtcNow;
         }
 
-        private IntegracaoBairroVistaSoft CreateBairroIntegrado(IntegracaoVistaSoft integracao, IntegracaoEvent integracaoEvent, IntegracaoBairroVistaSoft bairro)
+        private IntegracaoBairroVistaSoft CreateBairroIntegrado(IntegracaoVistaSoft integracao, IntegracaoEvent integracaoEvent, BairroDTO bairro)
         {
             return new IntegracaoBairroVistaSoft
             {
@@ -486,20 +489,74 @@ namespace JaCaptei.Application.Integracao
             }
         }
 
-        private async Task<object?> IncluirImovel(ImovelVistaSoftDTO imovelVistaSoftDTO, string chave)
+        private async Task<ImovelResponseVS?> IncluirImovel(ImovelVistaSoftDTO imovelVistaSoftDTO, string chave)
         {
             var client = _httpClientFactory?.CreateClient("vistasoft");
-            if (client == null) return false;
+            if (client == null) return null;
             client.DefaultRequestHeaders.Clear();
-            var builder = new UriBuilder(client.BaseAddress + "imoveis/listarcampos");
+            client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+            var builder = new UriBuilder(client.BaseAddress + "imoveis/detalhes");
             builder.Query = "key=" + Uri.EscapeDataString(chave);
             //builder.Query += "&imovel=" + Uri.EscapeDataString(imovel);
             var uriWithQuery = builder.Uri;
-            var res = await client.GetAsync(uriWithQuery);
-            if (!res.IsSuccessStatusCode) return null;
+            var reqAdd = _mapper.Map<ImovelVistaSoftAddDTO>(imovelVistaSoftDTO);
+            var jsonObj = Newtonsoft.Json.JsonConvert.SerializeObject(reqAdd);
+            var data = new FormUrlEncodedContent(
+            [
+                new KeyValuePair<string, string>("cadastro", "{\"fields\": " + jsonObj + "}")
+            ]);
+            var res = await client.PostAsync(uriWithQuery, data);
+            var resStr = await res.Content.ReadAsStringAsync();
+            var objRes = Newtonsoft.Json.JsonConvert.DeserializeObject<ImovelResponseVS>(resStr);
+            if (int.TryParse(objRes.Codigo, out int cod))
+            {
+                //// importar fotos
+                ////var fotosReq = new FotosAddReq()
+                ////{
+                ////    Imovel = cod,
+                ////    Fotos = imovelVistaSoftDTO.Fotos
+                ////};
+                //jsonObj = Newtonsoft.Json.JsonConvert.SerializeObject(imovelVistaSoftDTO.Fotos);
+                //var fotosData = new FormUrlEncodedContent(
+                //[
+                //    new KeyValuePair<string, string>("cadastro", "{\"fields\": " + jsonObj + "}")
+                //]);
+                //var builderF = new UriBuilder(client.BaseAddress + "imoveis/fotos");
+                //builderF.Query = "key=" + Uri.EscapeDataString(chave);
+                //builderF.Query += "&imovel=" + Uri.EscapeDataString(cod.ToString());
+                //var uriWithQueryF = builderF.Uri;
+                //var resf = await client.PostAsync(uriWithQueryF, fotosData);
+                //var resfStr = await resf.Content.ReadAsStringAsync();
+                //var objRes2 = Newtonsoft.Json.JsonConvert.DeserializeObject(resfStr);
+                await SendFotosInBatchesAsync(client, chave, cod, imovelVistaSoftDTO.Fotos, 5);
+            }
+            return objRes;
+        }
+
+        private async Task SendFotosInBatchesAsync(HttpClient client, string chave, int cod, List<FotoDTO> fotos, int batchSize, int batchIndex = 0)
+        {
+            if (batchIndex * batchSize >= fotos.Count)
+                return;
+
+            var batch = fotos.Skip(batchIndex * batchSize).Take(batchSize).ToList();
+            var jsonObj = Newtonsoft.Json.JsonConvert.SerializeObject(batch);
+            var fotosData = new FormUrlEncodedContent(
+            [
+                new KeyValuePair<string, string>("cadastro", "{\"fields\": " + jsonObj + "}")
+            ]);
+
+            var builder = new UriBuilder(client.BaseAddress + "imoveis/fotos");
+            builder.Query = "key=" + Uri.EscapeDataString(chave);
+            builder.Query += "&imovel=" + Uri.EscapeDataString(cod.ToString());
+            var uriWithQuery = builder.Uri;
+
+            var res = await client.PostAsync(uriWithQuery, fotosData);
             var resStr = await res.Content.ReadAsStringAsync();
             var objRes = Newtonsoft.Json.JsonConvert.DeserializeObject(resStr);
-            return objRes;
+
+            // Handle the response as needed
+
+            await SendFotosInBatchesAsync(client, chave, cod, fotos, batchSize, batchIndex + 1);
         }
 
         public Task AtualizarImoveisIntegracao()

@@ -265,7 +265,7 @@ WHERE i.id = @idIntegracao;";
         'DataEnvio', CURRENT_DATE,
         'Imoveis', (
             SELECT jsonb_agg(jsonb_build_object(
-                'Id', ii.""idImovel"",
+                'Id', ii.id,
                 'CodJacaptei', ii.""codImovel"",
                 'CodImoview', ii.""imoviewResponse"" ->> 'codigo',
                 'DataInclusao', ii.""dataInclusao"",
@@ -305,5 +305,22 @@ FROM
     {
         await _conn.InsertAsync<ImovelInativoEmailImoview>(imovel);
         return true;
+    }
+
+    internal async Task<List<EmailInativosIntegracaoImoview>> GetEmailsInativos()
+    {
+        var res = await _conn.QueryAsync<EmailInativosIntegracaoImoview>(i => i.Status == "Concluido");
+        return res.ToList();
+    }
+
+    internal async Task<int> GetIdImportacao(string cod, int idIntegracao)
+    {
+        const string queryIdImport = @"select ii.id from ""ImportacaoImovelImoview"" ii 
+INNER JOIN ""ImportacaoBairroImoview"" ibi ON ii.""idImportacaoBairro"" = ibi.""id""
+INNER JOIN ""IntegracaoBairroImoview"" ib ON ibi.""idIntegracaoBairro"" = ib.""id""
+INNER JOIN ""IntegracaoImoview"" i ON ib.""idIntegracao"" = i.id
+where ii.""codImovel"" = @cod and i.id = @idIntegracao";
+        var res = await _conn.ExecuteQueryAsync<int>(queryIdImport, new { cod, idIntegracao });
+        return res.FirstOrDefault();
     }
 }

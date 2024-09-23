@@ -29,38 +29,39 @@ public class ImoviewWorkerService : BackgroundService
             {
                 _logger.LogInformation("Worker running at: {time}", DateTimeOffset.Now);
             }
-            await Task.Delay(10000, stoppingToken);
-            string connectionString = Config.settings.AzureMQ;
-            string queueName = "integracaocliente";
-            await using var client = new ServiceBusClient(connectionString);
-            ServiceBusSender sender = client.CreateSender(queueName);
-            var req1 = new JaCaptei.Model.IntegracaoEvent()
-            {
-                IdCliente = 1,
-                IdIntegracao = 10,
-                IdOperador = 5,
-            };
-            var body1 = Newtonsoft.Json.JsonConvert.SerializeObject(req1);
-            var message = new ServiceBusMessage(body1);
-            await sender.SendMessageAsync(message, stoppingToken);
-            ServiceBusReceiver receiver = client.CreateReceiver(queueName);
+            await _service.FixEmailInativos();
+            //await Task.Delay(10000, stoppingToken);
+            //string connectionString = Config.settings.AzureMQ;
+            //string queueName = "integracaocliente";
+            //await using var client = new ServiceBusClient(connectionString);
+            //ServiceBusSender sender = client.CreateSender(queueName);
+            //var req1 = new JaCaptei.Model.IntegracaoEvent()
+            //{
+            //    IdCliente = 1,
+            //    IdIntegracao = 10,
+            //    IdOperador = 5,
+            //};
+            //var body1 = Newtonsoft.Json.JsonConvert.SerializeObject(req1);
+            //var message = new ServiceBusMessage(body1);
+            //await sender.SendMessageAsync(message, stoppingToken);
+            //ServiceBusReceiver receiver = client.CreateReceiver(queueName);
 
-            ServiceBusReceivedMessage receivedMessage = await receiver.ReceiveMessageAsync(cancellationToken: stoppingToken);
+            //ServiceBusReceivedMessage receivedMessage = await receiver.ReceiveMessageAsync(cancellationToken: stoppingToken);
 
-            if(receivedMessage != null)
-            {
-                _logger.LogInformation("Iniciar importacao");
-                var body = receivedMessage.Body.ToString();
-                var eventMsg = Newtonsoft.Json.JsonConvert.DeserializeObject<MqMessage>(body) ?? new MqMessage();
-                var req = new JaCaptei.Model.IntegracaoEvent()
-                {
-                    IdCliente = eventMsg.message.idCliente,
-                    IdIntegracao = eventMsg.message.idIntegracao,
-                    IdOperador = eventMsg.message.idOperador,
-                };
-                await _service.ImportarIntegracao(req);
-                await receiver.CompleteMessageAsync(receivedMessage, stoppingToken);
-            }
+            //if(receivedMessage != null)
+            //{
+            //    _logger.LogInformation("Iniciar importacao");
+            //    var body = receivedMessage.Body.ToString();
+            //    var eventMsg = Newtonsoft.Json.JsonConvert.DeserializeObject<MqMessage>(body) ?? new MqMessage();
+            //    var req = new JaCaptei.Model.IntegracaoEvent()
+            //    {
+            //        IdCliente = eventMsg.message.idCliente,
+            //        IdIntegracao = eventMsg.message.idIntegracao,
+            //        IdOperador = eventMsg.message.idOperador,
+            //    };
+            //    await _service.ImportarIntegracao(req);
+            //    await receiver.CompleteMessageAsync(receivedMessage, stoppingToken);
+            //}
         }
     }
 }

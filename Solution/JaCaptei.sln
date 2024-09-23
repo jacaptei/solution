@@ -37,11 +37,13 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AtualizarImportacaoFunction
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ReprocessarImovelImovielFunction", "ReprocessarImovelImovielFunction\ReprocessarImovelImovielFunction.csproj", "{DF721B19-7B43-46CD-87E9-3A3012AAB1DC}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NotificarImovelInativoImoviewFunction", "NotificarImovelInativoImoviewFunction\NotificarImovelInativoImoviewFunction.csproj", "{005D60EA-B821-4604-991E-23309D342F0C}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NotificarImovelInativoImoviewFunction", "NotificarImovelInativoImoviewFunction\NotificarImovelInativoImoviewFunction.csproj", "{005D60EA-B821-4604-991E-23309D342F0C}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "IntegrarVistaSoftFunction", "IntegrarVistaSoftFunction\IntegrarVistaSoftFunction.csproj", "{F557C5D1-698B-4076-B33F-50CECD749077}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "IntegrarVistaSoftFunction", "IntegrarVistaSoftFunction\IntegrarVistaSoftFunction.csproj", "{F557C5D1-698B-4076-B33F-50CECD749077}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ImportarVistaSoftFunction", "ImportarVistaSoftFunction\ImportarVistaSoftFunction.csproj", "{3A18F079-EBC1-4E66-BE53-355E4876B339}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ImportarVistaSoftFunction", "ImportarVistaSoftFunction\ImportarVistaSoftFunction.csproj", "{3A18F079-EBC1-4E66-BE53-355E4876B339}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ImportarImovelVistaSoftFunction", "ImportarImovelVistaSoftFunction\ImportarImovelVistaSoftFunction.csproj", "{D0A89EA6-CCB5-46CB-BCAC-0F69AF35B2F8}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -146,6 +148,12 @@ Global
 		{3A18F079-EBC1-4E66-BE53-355E4876B339}.Release|Any CPU.Build.0 = Release|Any CPU
 		{3A18F079-EBC1-4E66-BE53-355E4876B339}.SITE|Any CPU.ActiveCfg = Debug|Any CPU
 		{3A18F079-EBC1-4E66-BE53-355E4876B339}.SITE|Any CPU.Build.0 = Debug|Any CPU
+		{D0A89EA6-CCB5-46CB-BCAC-0F69AF35B2F8}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D0A89EA6-CCB5-46CB-BCAC-0F69AF35B2F8}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D0A89EA6-CCB5-46CB-BCAC-0F69AF35B2F8}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D0A89EA6-CCB5-46CB-BCAC-0F69AF35B2F8}.Release|Any CPU.Build.0 = Release|Any CPU
+		{D0A89EA6-CCB5-46CB-BCAC-0F69AF35B2F8}.SITE|Any CPU.ActiveCfg = Debug|Any CPU
+		{D0A89EA6-CCB5-46CB-BCAC-0F69AF35B2F8}.SITE|Any CPU.Build.0 = Debug|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -167,6 +175,7 @@ Global
 		{005D60EA-B821-4604-991E-23309D342F0C} = {A6CFBE72-06D5-4D9E-95E8-5E6A6D215AC9}
 		{F557C5D1-698B-4076-B33F-50CECD749077} = {A6CFBE72-06D5-4D9E-95E8-5E6A6D215AC9}
 		{3A18F079-EBC1-4E66-BE53-355E4876B339} = {A6CFBE72-06D5-4D9E-95E8-5E6A6D215AC9}
+		{D0A89EA6-CCB5-46CB-BCAC-0F69AF35B2F8} = {A6CFBE72-06D5-4D9E-95E8-5E6A6D215AC9}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {DAE772A6-FB90-42A9-AF93-1D2C7C58AC0A}

@@ -14,7 +14,6 @@ using Polly;
 using Polly.Contrib.WaitAndRetry;
 using Polly.Retry;
 
-using System.Collections.Generic;
 using System.ComponentModel;
 using System.Net;
 using System.Net.Http.Headers;
@@ -840,7 +839,7 @@ public class ImoviewService : IDisposable, IIntegracaoService
                     Id = 0,
                     IdImportacaoImoview = i.Id,
                     IdEmail = id,
-                    CodImovel = i.CodImoview
+                    CodImovel = i.CodJacaptei
                 });
                 foreach (var imovel in imoveis)
                 {
@@ -857,6 +856,33 @@ public class ImoviewService : IDisposable, IIntegracaoService
             }
         }
     }
+
+    public async Task FixEmailInativos()
+    {
+        List<EmailInativosIntegracaoImoview> emails = await _retryPolicy.ExecuteAsync(() => _imoviewDAO.GetEmailsInativos());
+        foreach (var email in emails)
+        {
+            var imoveis = Newtonsoft.Json.JsonConvert.DeserializeObject<List<ImovelImoviewInativo>>(email.Imoveis);
+            foreach (var imovel in imoveis)
+            {
+                int idImportacao = await _retryPolicy.ExecuteAsync(() => _imoviewDAO.GetIdImportacao(imovel.CodJacaptei, email.IdIntegracao));
+                var ii = new ImovelInativoEmailImoview
+                {
+                    Id = 0,
+                    IdImportacaoImoview = idImportacao,
+                    IdEmail = email.Id,
+                    CodImovel = imovel.CodJacaptei
+                };
+                await _retryPolicy.ExecuteAsync(() => _imoviewDAO.SaveImovelInativoEmail(ii));
+            }
+        }
+    }
+}
+
+public record ImovelImoviewInativo
+{
+    public string CodImoview { get; set; }
+    public string CodJacaptei { get; set; }
 }
 
 public record IntegrarClienteResponse

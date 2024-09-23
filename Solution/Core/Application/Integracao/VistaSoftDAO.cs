@@ -32,7 +32,7 @@ namespace JaCaptei.Application.Integracao
             var imovel = await _conn.QueryAsync<Imovel>(i => i.id == idImovel);
             if (imovel == null) return null;
             if (!imovel.Any()) return null;
-
+            var imovelFirst = imovel.First();   
             var (area, valores, endereco, disposicao, crsInternas, crsExternas, lazer) =
                  await _conn.QueryMultipleAsync<ImovelAreas,
                  ImovelValores, ImovelEndereco, ImovelDisposicao,
@@ -44,19 +44,24 @@ namespace JaCaptei.Application.Integracao
                  d => d.idImovel == idImovel,  // dísposicao
                  ci => ci.idImovel == idImovel,  // crsInternas
                  ce => ce.idImovel == idImovel,  // crsInternas
-                 l => l.idImovel == idImovel   // lazer 
+                 l => l.idImovel == idImovel // lazer 
              );
+
+            var tipo = await _conn.QueryAsync<ImovelTipo>(t => t.id == imovelFirst.idTipo);
+            var fotos = await _conn.QueryAsync<Model.ImovelImagem>(f => f.idImovel == idImovel);
 
             var res = new ImovelFullDTO()
             {
-                Imovel = imovel.First(),
+                Imovel = imovelFirst,
                 ImovelAreas = area.First(),
                 ImovelValores = valores.First(),
                 ImovelEndereco = endereco.First(),
                 ImovelDisposicao = disposicao.First(),
                 ImovelCaracteristicasInternas = crsInternas.First(),
                 ImovelCaracteristicasExternas = crsExternas.First(),
-                ImovelLazer = lazer.First()
+                ImovelLazer = lazer.First(),
+                ImovelTipo = tipo.First(),
+                Fotos = fotos.ToList()
             };
             return res;
         }
@@ -76,7 +81,7 @@ namespace JaCaptei.Application.Integracao
 
         internal async Task<List<ImportacaoBairroVistaSoft>> GetImportacaoBairrosPendentes(int idIntegracao)
         {
-            const string queryImportPendentes = "SELECT ibi.* FROM public.\"IntegracaoImoview\" i inner join \"IntegracaoBairroImoview\" ib on i.id = ib.\"idIntegracao\" inner join \"ImportacaoBairroImoview\" ibi on ibi.\"idIntegracaoBairro\" = ib.id where i.id = @idIntegracao and ibi.status <> @status;";
+            const string queryImportPendentes = "SELECT ibi.* FROM public.\"IntegracaoVistaSoft\" i inner join \"IntegracaoBairroVistaSoft\" ib on i.id = ib.\"idIntegracao\" inner join \"ImportacaoBairroVistaSoft\" ibi on ibi.\"idIntegracaoBairro\" = ib.id where i.id = @idIntegracao and ibi.status <> @status;";
             var res = await _conn.ExecuteQueryAsync<ImportacaoBairroVistaSoft>(queryImportPendentes, new { idIntegracao, status = StatusIntegracao.Concluido.GetDescription() });
             return res.ToList();
         }
