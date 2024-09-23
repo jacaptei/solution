@@ -21,7 +21,7 @@
 				</q-tab-panel>-->
 
 				<q-tab-panel name="solicitacao">
-					<page_solicitacao />
+					<page_solicitacao :view="viewSolicitacao" />
 				</q-tab-panel>
 
 			</q-tab-panels>
@@ -44,7 +44,8 @@
 
 		data: function () {
 			return {
-                view: "solicitacao"
+                view: "solicitacao",
+				viewSolicitacao: "nova",
 			}
 		}, computed: {
 
@@ -57,9 +58,12 @@
 
 		},
 		created: function () {
-			this.$root.SetTitle("Proprietários", "fa fa-users", null);
+			this.$root.SetTitle("Parceiros", "fa fa-users", null);
+			   if(this.$validator.is(this.$route.query?.viewSolicitacao)) 
+					this.viewSolicitacao = this.$route.query.viewSolicitacao;
 		},
 		mounted() {
+
 		},
 		methods: {
 		}

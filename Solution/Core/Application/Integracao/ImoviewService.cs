@@ -26,12 +26,13 @@ public class ImoviewService : IDisposable
     private readonly DBcontext _context;
     private readonly ImoviewDAO _imoviewDAO;
     private readonly int _imagesSendLimit;
+    private readonly int _queueDelay;
     private readonly IMapper _mapper;
     private readonly ILogger? _logger;
     private readonly AsyncRetryPolicy _retryPolicy;
     private readonly AsyncPolicy _busPolicy;
 
-    public ImoviewService(IHttpClientFactory httpClientFactory, DBcontext context, IMapper mapper, ILogger logger, ImoviewDAO imoviewDAO, int imagesSendLimit = -1)
+    public ImoviewService(IHttpClientFactory httpClientFactory, DBcontext context, IMapper mapper, ILogger logger, ImoviewDAO imoviewDAO, int imagesSendLimit = -1, int queueDelay = 1000)
     {
         _httpClientFactory = httpClientFactory;
         _context = context;
@@ -42,6 +43,7 @@ public class ImoviewService : IDisposable
             .WaitAndRetryAsync(Backoff.DecorrelatedJitterBackoffV2(TimeSpan.FromSeconds(2), 3));
         _imoviewDAO = imoviewDAO;
         _imagesSendLimit = imagesSendLimit;
+        _queueDelay = queueDelay;
         _busPolicy = Policy
         .Handle<Exception>()
         .WaitAndRetryAsync(1, retryAttempt => TimeSpan.FromSeconds(retryAttempt))
@@ -508,6 +510,7 @@ public class ImoviewService : IDisposable
         ImportacaoImovelImoview? importacaoImovel = await _retryPolicy.ExecuteAsync(() => _imoviewDAO.GetImportacaoImovel(import.IdImportacaoBairro, import.CodImovel));
         ImoviewAddImovelRequest? request = null;
         List<ImagemDTO> images = [];
+        var tipos = (await GetTipos(import.ChaveApi))?.lista;
         try
         {
             if (importacaoImovel == null)
@@ -521,6 +524,15 @@ public class ImoviewService : IDisposable
                     int.TryParse(import.CodUnidade, out int codunidade);
                     request.codigousuario = codusuario;
                     request.codigounidade = codunidade;
+                    if(tipos != null)
+                    {
+                        var tipoMapeado = tipos.FirstOrDefault(t => t.codigo == request.codigotipo);
+                        if(tipoMapeado == null)
+                        {
+                            _logger?.LogWarning("Tipo não mapeado para o imovel: {id}, tipo: {tipo}", import.CodImovel, request.codigotipo);
+                            request.codigotipo = 1;
+                        }
+                    }
                     var requestBody = Newtonsoft.Json.JsonConvert.SerializeObject(request);
                     importacaoImovel = new ImportacaoImovelImoview
                     {
@@ -552,6 +564,15 @@ public class ImoviewService : IDisposable
                     int.TryParse(import.CodUnidade, out int codunidade);
                     request.codigousuario = codusuario;
                     request.codigounidade = codunidade;
+                    if (tipos != null)
+                    {
+                        var tipoMapeado = tipos.FirstOrDefault(t => t.codigo == request.codigotipo);
+                        if (tipoMapeado == null)
+                        {
+                            _logger?.LogWarning("Tipo não mapeado para o imovel: {id}, tipo: {tipo}", import.CodImovel, request.codigotipo);
+                            request.codigotipo = 1;
+                        }
+                    }
                     var requestBody = Newtonsoft.Json.JsonConvert.SerializeObject(request);
                     importacaoImovel.RequestBody = requestBody;
                 }
@@ -617,6 +638,7 @@ public class ImoviewService : IDisposable
                 Imagens = null
             };
             await _retryPolicy.ExecuteAsync(() => _imoviewDAO.SaveImportacaoImovel(importacaoImovel));
+            await Task.Delay(1000);
             var res = await SendImportQueue(sender, import);
             return res;
         }
@@ -663,6 +685,7 @@ public class ImoviewService : IDisposable
     private async Task SaveImportacaoBairro(IntegracaoImoview integracao, IntegracaoEvent integracaoEvent, IntegracaoBairroImoview bairroIntegrado, List<ImovelEndereco> imoveisNovos)
     {
         var list = imoveisNovos.Where(i => !string.IsNullOrWhiteSpace(i.codImovel)).Select(i => new { i.idImovel, i.codImovel }).ToList();
+        if (list.Count == 0) return;
         var importacaoBairro = new ImportacaoBairroImoview
         {
             Id = 0,
@@ -692,6 +715,82 @@ public class ImoviewService : IDisposable
     public void Dispose()
     {
         _imoviewDAO.Dispose();
+    }
+
+    public async Task AtualizarImoveisIntegracao()
+    {
+        List<IntegracaoImoview> integracaoes = await _retryPolicy.ExecuteAsync(() => _imoviewDAO.GetIntegracaoes());
+        foreach (var integracao in integracaoes)
+        {
+            var integracaoEvent = new IntegracaoEvent()
+            {
+                IdCliente = integracao.IdCliente,
+                IdIntegracao = integracao.Id,
+                IdOperador = integracao.IdOperador,
+            };
+            // TODO: abrir fila ao inves de chamar diretamente
+            var res = await ImportarIntegracao(integracaoEvent);
+        }
+    }
+
+    public async Task ReprocessarImoveisPendentes()
+    {
+        List<ImportacaoImovelImoview> importacoesImovel = await _retryPolicy.ExecuteAsync(() => _imoviewDAO.GetImportacaoImovelPendentes());
+        if (importacoesImovel.Count < 1) return;
+        string connectionString = Config.settings.AzureMQ;
+        string queueName = "importacaoimovel";
+        var importBairros = importacoesImovel.Select(i => i.IdImportacaoBairro).Distinct().ToList();
+        Dictionary<int, IntegracaoImoview?> integracaoImportBairro = [];
+        foreach (var importBairro in importBairros)
+        {
+            IntegracaoImoview? integracao = await _retryPolicy.ExecuteAsync(() => _imoviewDAO.GetIntegracaoImportacaoBairro(importBairro));
+            integracaoImportBairro.Add(importBairro, integracao);
+        }
+        await using var client = new ServiceBusClient(connectionString);
+        ServiceBusSender sender = client.CreateSender(queueName);
+        int sucesso = 0, erro = 0;
+        foreach (var importacao in importacoesImovel)
+        {
+            try
+            {
+                var integracao = integracaoImportBairro[importacao.IdImportacaoBairro];
+                if(integracao == null)
+                {
+                    _logger?.LogError("Erro ao reprocessar importacao: {id}, Integração não encontrada!", importacao.Id);
+                    continue;
+                }
+                if(importacao.Status == StatusIntegracao.Aguardando.GetDescription())
+                {
+                    var dataImportacao = importacao.DataAtualizacao != null && importacao.DataAtualizacao.Year > 2024 ? importacao.DataAtualizacao : importacao.DataInclusao;
+                    var diff = (DateTime.UtcNow - dataImportacao).TotalMinutes;
+                    if(diff < 30)
+                    {
+                        _logger?.LogInformation("Postegar fila para a importação: {id}", importacao.Id);
+                        continue;
+                    }
+                }
+                var importEvent = new ImportacaoImovelEvent()
+                {
+                    ChaveApi = integracao.ChaveApi,
+                    CodImovel = importacao.CodImovel,
+                    CodUnidade = integracao.CodUnidade,
+                    CodUsuario = integracao.CodUsuario,
+                    IdCliente = integracao.IdCliente,
+                    IdImovel = importacao.IdImovel,
+                    IdImportacaoBairro = importacao.IdImportacaoBairro,
+                    IdIntegracao = integracao.Id
+                };
+                await Task.Delay(_queueDelay);
+                var res = await SendImportQueue(sender, importEvent);
+                sucesso++;
+            }
+            catch (Exception ex)
+            {
+                erro++;
+                _logger?.LogError("Erro ao reprocessar importacao: {id}, erro: {ex}", importacao.Id, ex);
+            }
+        }
+        _logger?.LogInformation("Reprocessamento concluído. {sucesso} processados com sucesso. {erro} processados com erro.", sucesso, erro);
     }
 }
 

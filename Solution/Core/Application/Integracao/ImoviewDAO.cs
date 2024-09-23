@@ -179,4 +179,27 @@ public class ImoviewDAO: IDisposable {
         var res = await _conn.QueryAsync<Parceiro>(i => i.id == idCliente);
         return res.FirstOrDefault();
     }
+
+    internal async Task<List<ImportacaoImovelImoview>> GetImportacaoImovelPendentes()
+    {
+        var res = await _conn.QueryAsync<ImportacaoImovelImoview>(i => i.Status != StatusIntegracao.Concluido.GetDescription()
+        && i.Status != StatusIntegracao.Processando.GetDescription());
+        return res.ToList();
+    }
+
+    internal async Task<IntegracaoImoview?> GetIntegracaoImportacaoBairro(int idImportBairro)
+    {
+        var importacaoBairro = (await _conn.QueryAsync<ImportacaoBairroImoview>(i => i.Id == idImportBairro)).FirstOrDefault();
+        if (importacaoBairro == null) return default;
+        var integracaoBairro = (await _conn.QueryAsync<IntegracaoBairroImoview>(i => i.Id == importacaoBairro.IdIntegracaoBairro)).FirstOrDefault();
+        if (integracaoBairro == null) return default;
+        var integracao = (await _conn.QueryAsync<IntegracaoImoview>(i => i.Id == integracaoBairro.IdIntegracao)).FirstOrDefault();
+        return integracao;
+    }
+
+    internal async Task<List<IntegracaoImoview>> GetIntegracaoes()
+    {
+        var res = await _conn.QueryAsync<IntegracaoImoview>(i => i.Status != StatusIntegracao.Processando.GetDescription());
+        return res.ToList();
+    }
 }
