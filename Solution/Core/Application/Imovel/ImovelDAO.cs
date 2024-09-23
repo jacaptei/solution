@@ -314,6 +314,75 @@ namespace JaCaptei.Application {
             return imagens;
         }
 
+        public List<ImovelList> BuscarImoveisIA()
+        {
+            List<ImovelList> imoveis = new List<ImovelList>();
+            try
+            {
+                using (var conn = DB.GetConn())
+                {
+                    string sql = @"
+                SELECT JSON_AGG(imovel_res) FROM (
+                    SELECT 
+                        i.id, 
+                        i.cod, 
+                        i.""localChaves"", 
+                        i.""totalChaves"", 
+                        i.""construtora"", 
+                        i.""construtoraNorm"", 
+                        i.""anoConstrucao"", 
+                        i.edificio, 
+                        i.""edificioNorm"", 
+                        i.nome, 
+                        i.titulo, 
+                        i.descricao,  
+                        i.destinacao, 
+                        i.venda, 
+                        i.locacao, 
+                        i.residencial, 
+                        i.comercial,
+                        i.""urlPublica"",
+                        to_json(endereco.*) AS endereco,
+                        to_json(valor.*) AS valor,
+                        to_json(area.*) AS area,
+                        to_json(lazer.*) AS lazer,
+                        to_json(interno.*) AS interno,
+                        to_json(externo.*) AS externo,
+                        to_json(disposicao.*) AS disposicao,
+                        to_json(documentacao.*) AS documentacao,
+                        to_json(tipo.*) AS tipo
+                    FROM 
+                        ""Imovel"" AS i
+                    LEFT JOIN ""ImovelEndereco"" AS endereco ON i.id = endereco.""idImovel""
+                    LEFT JOIN ""ImovelDisposicao"" AS disposicao ON i.id = disposicao.""idImovel""
+                    LEFT JOIN ""ImovelDocumentacao"" AS documentacao ON i.id = documentacao.""idImovel""
+                    LEFT JOIN ""ImovelLazer"" AS lazer ON i.id = lazer.""idImovel""
+                    LEFT JOIN ""ImovelAreas"" AS area ON i.id = area.""idImovel""
+                    LEFT JOIN ""ImovelCaracteristicasExternas"" AS externo ON i.id = externo.""idImovel""
+                    LEFT JOIN ""ImovelCaracteristicasInternas"" AS interno ON i.id = interno.""idImovel""
+                    LEFT JOIN ""ImovelValores"" AS valor ON i.id = valor.""idImovel""
+                    LEFT JOIN ""ImovelTipo"" AS tipo ON i.""idTipo"" = tipo.id
+                    WHERE 
+                        i.ativo = true
+                        AND i.validado = true
+                ) imovel_res;
+            ";
+
+                    var res = conn.ExecuteQuery(sql).FirstOrDefault();
+                    if (res?.json_agg is not null)
+                    {
+                        imoveis = JsonConvert.DeserializeObject<List<ImovelList>>(res.json_agg);
+                    }
+                }
+            }
+            catch (Exception e)
+            {
+                var msg = e.Message;
+                Console.WriteLine(msg);
+            }
+            return imoveis;
+        }
+
 
         public AppReturn Buscar(ImovelBusca busca) {
 
