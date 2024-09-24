@@ -9,7 +9,7 @@ namespace JaCaptei.Model
     public class ImovelList
     {
         public int id { get; set; }
-        public string cod { get; set; } = "";
+        public string codImovel { get; set; } = "";
         public string idChaves { get; set; } = "";
         public string localChaves { get; set; } = "";
         public short totalChaves { get; set; }
@@ -17,11 +17,9 @@ namespace JaCaptei.Model
         public ImovelTipo tipo { get; set; } = new ImovelTipo();
         public short idTipo { get; set; }
         public string construtora { get; set; } = "";
-        public string construtoraNorm { get; set; } = "";
         public short anoConstrucao { get; set; }
         public int idade { get => (Utils.Date.GetLocalDateTime().Year) - anoConstrucao; }
         public string edificio { get; set; } = "";
-        public string edificioNorm { get; set; } = "";
         public string nome { get; set; } = "";
         public string titulo { get; set; } = "";
         public string descricao { get; set; } = "";
@@ -31,7 +29,6 @@ namespace JaCaptei.Model
         public bool residencial { get; set; }
         public bool comercial { get; set; }
         public string urlPublica { get; set; } = "";
-        public string urlPrivada { get; set; } = "";
         public ImovelEndereco endereco { get; set; } = new ImovelEndereco();
         public ImovelValores valor { get; set; } = new ImovelValores();
         public ImovelAreas area { get; set; } = new ImovelAreas();

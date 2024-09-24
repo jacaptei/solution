@@ -120,8 +120,8 @@ namespace JaCaptei.API.Controllers
             return Result(appReturn);
         }
 
-        [Route("buscar/listas-inteligencia-artificial")]
-        [HttpPost]
+        [Route("inteligencia-artificial/lista")]
+        [HttpGet]
         public async Task<JsonResult> ListaImoveisIA()
         {
             var lista = await Task.Run(() => service.BuscarImoveisIA());

@@ -325,7 +325,7 @@ namespace JaCaptei.Application {
                 SELECT JSON_AGG(imovel_res) FROM (
                     SELECT 
                         i.id, 
-                        i.cod, 
+                        i.cod as codImovel, 
                         i.""localChaves"", 
                         i.""totalChaves"", 
                         i.""construtora"", 
@@ -379,6 +379,7 @@ namespace JaCaptei.Application {
             {
                 var msg = e.Message;
                 Console.WriteLine(msg);
+                throw new Exception($"An error occurred: {msg}"); 
             }
             return imoveis;
         }
