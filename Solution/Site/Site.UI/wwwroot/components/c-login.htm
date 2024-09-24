@@ -129,7 +129,7 @@
 							<div v-if="view=='fail'">
 								<q-card class="box-login">
 									<q-card-section>
-										<div class="title" style="color:var(--s-color-red)"><b><i class="fa fa-circle-xmark"></i> Falhou</b></div>
+										<div class="title" style="color: var(--s-color-orange) "><b><i class="fa-solid fa-triangle-exclamation"></i> Atenção</b></div>
 									</q-card-section>
 									<q-card-section class="q-pt-none">
 										<br /><span v-html="messageFail"></span>
@@ -253,7 +253,7 @@
                                     this.ShowView("question");
                                     return;
                                 } else if (error.response.status == 404) {
-                                    this.messageFail = "Usuário não encontrado, verifique CPF ou CNPJ ou E-Mail e Senha";
+                                    this.messageFail = "Usuário não encontrado, verifique seus dados e tente novamente!";
                                 } else {
                                     this.messageFail = "Erro desconhecido. Não foi possível autenticar.";
                                 }
