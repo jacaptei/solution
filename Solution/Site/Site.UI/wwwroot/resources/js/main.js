@@ -404,7 +404,6 @@ $(document).ready(function () {
                     if (response.status === 200) {
                         this.DeleteCookie('authToken');
                         this.userSessionIsRevoked = true;
-                        //window.location.reload();
                         return;
                     } else {
                         console.error('Falha ao revogar token:', response.data);

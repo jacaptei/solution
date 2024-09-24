@@ -169,9 +169,7 @@
             SetBuscaTitulo(buscaImovel){
 
                 var imovel = buscaImovel.imovel;
-                console.log(buscaImovel);
                 this.buscaTitulo = "";
-               
                 
                 var tipo = this.$models.tiposImoveis().filter(i => i.id == imovel.idTipo)[0];
                 var totalRendered = Math.min(buscaImovel.page * buscaImovel.resultsPerPage, buscaImovel.total);
