@@ -158,8 +158,9 @@ $(document).ready(function () {
                     if (error.response && error.response.status === 403 && this.isAuth) {
                         const errorMessage = error.response.data.error_message;
                         if (!this.hasDisplayed403) {
-                            this.hasDisplayed403 = true;
                             let message = "";
+                            this.hasDisplayed403 = true;
+                            this.userSessionIsRevoked = true;
                             if (errorMessage === "Token revogado.") {
                                 message = "Sua conta foi acessada recentemente em um novo dispositivo. Para sua segurança, faça login novamente para confirmar sua identidade.";
                             } else if (errorMessage === "Token expirado.") {
@@ -176,7 +177,6 @@ $(document).ready(function () {
                                 {
                                     confirmButtonText: "Voltar para a página inicial",
                                     callback: () => {
-                                        this.userSessionIsRevoked = true;
                                         this.SignOut();
                                         window.location.href = "/home";
                                     }
