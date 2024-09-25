@@ -176,9 +176,9 @@ $(document).ready(function () {
                                 {
                                     confirmButtonText: "Voltar para a página inicial",
                                     callback: () => {
+                                        this.userSessionIsRevoked = true;
                                         this.SignOut();
                                         window.location.href = "/home";
-                                        this.userSessionIsRevoked = true;
                                     }
                                 }
                             );
