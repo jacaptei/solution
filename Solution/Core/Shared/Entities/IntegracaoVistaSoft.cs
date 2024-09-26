@@ -39,5 +39,8 @@ namespace JaCaptei.Model.Entities
         [Map("imoveis")]
         [NpgsqlDbType(NpgsqlDbType.Jsonb)]
         public string Imoveis { get; set; }
+
+        [Map("urlApi")]
+        public string UrlApi { get; set; }
     }
 }

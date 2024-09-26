@@ -37,9 +37,9 @@ namespace JaCaptei.Admin.API.Controllers
         }
 
         [HttpGet("ValidarChave")]
-        public async Task<ActionResult<bool>> ValidarChave([FromQuery] string chave)
+        public async Task<ActionResult<bool>> ValidarChave([FromQuery] string chave, [FromQuery] string url)
         {
-            var res = await _service.ValidarChave(chave);
+            var res = await _service.ValidarChave(chave, url);
             return Ok(res);
         }
 

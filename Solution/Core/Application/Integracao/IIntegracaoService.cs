@@ -17,6 +17,6 @@ namespace JaCaptei.Application.Integracao
         Task<IntegrarClienteResponse> IntegrarCliente(IIntegracaoCRM integracao);
         Task<IIntegracaoCRM?> ObterIntegracaoCliente(Parceiro cliente);
         Task ReprocessarImoveisPendentes();
-        Task<bool> ValidarChave(string chave);
+        //Task<bool> ValidarChave(string chave);
     }
 }

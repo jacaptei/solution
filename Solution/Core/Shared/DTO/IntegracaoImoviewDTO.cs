@@ -33,6 +33,7 @@ namespace JaCaptei.Model.DTO
         public string ChaveApi { get; set; }
         public int IdPlano { get; set; }
         public List<BairroIntegracaoDTO> Bairros { get; set; }
+        public string UrlApi { get; set; }
     }
 
     public record BairroIntegracaoDTO

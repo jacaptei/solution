@@ -51,6 +51,7 @@ namespace IntegrarVistaSoftFunction
                 IdOperador = dto.IdOperador,
                 IdPlano = dto.IdPlano,
                 Bairros = JsonConvert.SerializeObject(bairros),
+                UrlApi = dto.UrlApi
             };
             var res = await _service.IntegrarCliente(integracao);
             var resStr = JsonConvert.SerializeObject(res);

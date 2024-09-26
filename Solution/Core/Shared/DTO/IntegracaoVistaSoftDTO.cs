@@ -9,7 +9,7 @@
         //public string BanheiroAuxiliar { get; set; }
         public string ChurrasqueiraCondominio { get; set; } // Lazer
         public string CircuitoFechadoTV { get; set; } // CE
-        public string Closet { get; set; } // CI
+        public string Closet { get; set; } // CI int
         //public string CopaCozinha { get; set; }
         //public string Cozinha { get; set; }
         //public string CozinhaMontada { get; set; }
@@ -18,7 +18,7 @@
         //public string EstarIntimo { get; set; }
         //public string Gabinete { get; set; }
         //public string Gradeado { get; set; }
-        public string HidroSuite { get; set; } // Lazer
+        public string HidroSuite { get; set; } // Lazer int
         public string HomeTheater { get; set; } // Lazer
         //public string Lareira { get; set; }
         public string Lavabo { get; set; } // CI
@@ -47,7 +47,7 @@
 
     public class FotosAddReq
     {
-        public int Imovel { get; set; }
+        public string Imovel { get; set; }
         public List<FotoDTO> Fotos { get; set; }
     }
 
@@ -83,6 +83,7 @@
         public string Numero { get; set; }
         public string Complemento { get; set; }
         public string Bairro { get; set; }
+        public string BairroComercial { get; set; }
         public string Cidade { get; set; }
         public string Bloco { get; set; }
         public string UF { get; set; }
@@ -117,6 +118,7 @@
         public string Numero { get; set; }
         public string Complemento { get; set; }
         public string Bairro { get; set; }
+        public string BairroComercial { get; set; }
         public string Cidade { get; set; }
         public string Bloco { get; set; }
         public string UF { get; set; }
@@ -135,8 +137,31 @@
         public string AreaTotal { get; set; }
         public string AreaPrivativa { get; set; } // CI
 
-        public Caracteristicas carac { get; set; }
-        public InfraEstrutura infra { get; set; }
+        public string AguaQuente { get; set; } // CI
+        public string AndarDoApto { get; set; } // CI
+        public string Andares { get; set; } // CE
+        public string AreaServico { get; set; } // CI
+        public string ChurrasqueiraCondominio { get; set; } // Lazer
+        public string CircuitoFechadoTV { get; set; } // CE
+        public string Closet { get; set; } // CI int
+        public string Deposito { get; set; } // CI
+        public string HidroSuite { get; set; } // Lazer int
+        public string HomeTheater { get; set; } // Lazer
+        public string Lavabo { get; set; } // CI}
+        public string Piscina { get; set; } // Lazer
+        public string Mobiliado { get; set; } // CI
+
+        public string Elevador { get; set; } // CE
+        public string Elevadores { get; set; } // CE
+        public string EspacoGourmet { get; set; } // CI
+        public string Jardim { get; set; } // CE
+        public string Lavanderia { get; set; } // CE
+        public string Playground { get; set; } // Lazer
+        public string Portaria24Hrs { get; set; } // CE
+        public string QuadraEsportes { get; set; } // Lazer
+        public string SalaFitness { get; set; } // Lazer
+        public string SalaoFestas { get; set; } // Lazer
+        public string Sauna { get; set; } // Lazer
     }
 
     public record ImportacaoImoveVistaSoftEvent
@@ -147,6 +172,7 @@
         public int IdImovel { get; set; }
         public string CodImovel { set; get; }
         public string ChaveApi { get; set; }
+        public string UrlApi { get; set; }
     }
 
     public record ImovelResponseVS

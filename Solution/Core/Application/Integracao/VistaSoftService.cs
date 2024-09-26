@@ -162,6 +162,7 @@ namespace JaCaptei.Application.Integracao
                 var import = new ImportacaoImoveVistaSoftEvent()
                 {
                     ChaveApi = integracao.ChaveApi,
+                    UrlApi = integracao.UrlApi,
                     CodImovel = imovelId.codImovel,
                     IdCliente = integracao.IdCliente,
                     IdImovel = imovelId.idImovel,
@@ -473,7 +474,9 @@ namespace JaCaptei.Application.Integracao
                     request = Newtonsoft.Json.JsonConvert.DeserializeObject<ImovelVistaSoftDTO>(importacaoImovel.RequestBody);
                 }
                 var chave = import.ChaveApi;
-                var res = await IncluirImovel(request!, chave);
+                var url = import.UrlApi;
+                // TODO: remover
+                var res = await IncluirImovel(request!, chave, url);
                 importacaoImovel!.Status = res == null ? StatusIntegracao.Erro.GetDescription() : StatusIntegracao.Concluido.GetDescription();
                 importacaoImovel.ApiResponse = Newtonsoft.Json.JsonConvert.SerializeObject(res);
                 await _retryPolicy.ExecuteAsync(() => _vistaSoftDAO.SaveImportacaoImovel(importacaoImovel));
@@ -489,15 +492,23 @@ namespace JaCaptei.Application.Integracao
             }
         }
 
-        private async Task<ImovelResponseVS?> IncluirImovel(ImovelVistaSoftDTO imovelVistaSoftDTO, string chave)
+        private async Task<ImovelResponseVS?> IncluirImovel(ImovelVistaSoftDTO imovelVistaSoftDTO, string chave, string url)
         {
-            var client = _httpClientFactory?.CreateClient("vistasoft");
+            var client = _httpClientFactory?.CreateClient("");
             if (client == null) return null;
+            client.BaseAddress = new Uri(url);
+            var categorias = await GetCategorias(chave, client);
+            if(!categorias.Any(c => c == imovelVistaSoftDTO.Categoria))
+            {
+                _logger?.LogWarning("Categoria {Categoria} não encontrada.", imovelVistaSoftDTO.Categoria);
+                imovelVistaSoftDTO.Categoria = categorias.First();
+            }
             client.DefaultRequestHeaders.Clear();
             client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
-            var builder = new UriBuilder(client.BaseAddress + "imoveis/detalhes");
-            builder.Query = "key=" + Uri.EscapeDataString(chave);
-            //builder.Query += "&imovel=" + Uri.EscapeDataString(imovel);
+            var builder = new UriBuilder(client.BaseAddress + "imoveis/detalhes")
+            {
+                Query = "key=" + Uri.EscapeDataString(chave)
+            };
             var uriWithQuery = builder.Uri;
             var reqAdd = _mapper.Map<ImovelVistaSoftAddDTO>(imovelVistaSoftDTO);
             var jsonObj = Newtonsoft.Json.JsonConvert.SerializeObject(reqAdd);
@@ -508,53 +519,37 @@ namespace JaCaptei.Application.Integracao
             var res = await client.PostAsync(uriWithQuery, data);
             var resStr = await res.Content.ReadAsStringAsync();
             var objRes = Newtonsoft.Json.JsonConvert.DeserializeObject<ImovelResponseVS>(resStr);
-            if (int.TryParse(objRes.Codigo, out int cod))
+            if (objRes.Codigo != null)
             {
-                //// importar fotos
-                ////var fotosReq = new FotosAddReq()
-                ////{
-                ////    Imovel = cod,
-                ////    Fotos = imovelVistaSoftDTO.Fotos
-                ////};
-                //jsonObj = Newtonsoft.Json.JsonConvert.SerializeObject(imovelVistaSoftDTO.Fotos);
-                //var fotosData = new FormUrlEncodedContent(
-                //[
-                //    new KeyValuePair<string, string>("cadastro", "{\"fields\": " + jsonObj + "}")
-                //]);
-                //var builderF = new UriBuilder(client.BaseAddress + "imoveis/fotos");
-                //builderF.Query = "key=" + Uri.EscapeDataString(chave);
-                //builderF.Query += "&imovel=" + Uri.EscapeDataString(cod.ToString());
-                //var uriWithQueryF = builderF.Uri;
-                //var resf = await client.PostAsync(uriWithQueryF, fotosData);
-                //var resfStr = await resf.Content.ReadAsStringAsync();
-                //var objRes2 = Newtonsoft.Json.JsonConvert.DeserializeObject(resfStr);
-                await SendFotosInBatchesAsync(client, chave, cod, imovelVistaSoftDTO.Fotos, 5);
+                await SendFotosInBatchesAsync(client, chave, objRes.Codigo, imovelVistaSoftDTO.Fotos, 5);
             }
             return objRes;
         }
 
-        private async Task SendFotosInBatchesAsync(HttpClient client, string chave, int cod, List<FotoDTO> fotos, int batchSize, int batchIndex = 0)
+        private async Task SendFotosInBatchesAsync(HttpClient client, string chave, string cod, List<FotoDTO> fotos, int batchSize, int batchIndex = 0)
         {
             if (batchIndex * batchSize >= fotos.Count)
                 return;
 
             var batch = fotos.Skip(batchIndex * batchSize).Take(batchSize).ToList();
-            var jsonObj = Newtonsoft.Json.JsonConvert.SerializeObject(batch);
+            var req = new FotosAddReq(){ Imovel = cod, Fotos = batch };
+            var jsonObj = Newtonsoft.Json.JsonConvert.SerializeObject(req);
             var fotosData = new FormUrlEncodedContent(
             [
                 new KeyValuePair<string, string>("cadastro", "{\"fields\": " + jsonObj + "}")
             ]);
 
-            var builder = new UriBuilder(client.BaseAddress + "imoveis/fotos");
-            builder.Query = "key=" + Uri.EscapeDataString(chave);
+            var builder = new UriBuilder(client.BaseAddress + "imoveis/detalhes")
+            {
+                Query = "key=" + Uri.EscapeDataString(chave)
+            };
+
             builder.Query += "&imovel=" + Uri.EscapeDataString(cod.ToString());
             var uriWithQuery = builder.Uri;
 
             var res = await client.PostAsync(uriWithQuery, fotosData);
             var resStr = await res.Content.ReadAsStringAsync();
             var objRes = Newtonsoft.Json.JsonConvert.DeserializeObject(resStr);
-
-            // Handle the response as needed
 
             await SendFotosInBatchesAsync(client, chave, cod, fotos, batchSize, batchIndex + 1);
         }
@@ -578,23 +573,52 @@ namespace JaCaptei.Application.Integracao
             throw new NotImplementedException();
         }
 
-        public async Task<bool> ValidarChave(string chave)
+        public async Task<bool> ValidarChave(string chave, string url)
         {
-            var client = _httpClientFactory?.CreateClient("vistasoft");
+            var client = _httpClientFactory?.CreateClient("");
             if (client == null) return false;
+            client.BaseAddress = new Uri(url);
             client.DefaultRequestHeaders.Clear();
-            var builder = new UriBuilder(client.BaseAddress + "imoveis/listarcampos");
-            builder.Query = "key=" + Uri.EscapeDataString(chave);
-            //builder.Query += "&imovel=" + Uri.EscapeDataString(imovel);
+            client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+            var builder = new UriBuilder(client.BaseAddress + "imoveis/listarcampos")
+            {
+                Query = "key=" + Uri.EscapeDataString(chave)
+            };
             var uriWithQuery = builder.Uri;
             var res = await client.GetAsync(uriWithQuery);
             return res.IsSuccessStatusCode;
-          ;
+        }
+
+        public async Task<List<string>> GetCategorias(string chave, HttpClient? client = null)
+        {
+            client = client == null ? _httpClientFactory?.CreateClient("vistasoft") : client;
+            if (client == null) return [];
+            client.DefaultRequestHeaders.Clear();
+            client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+            var builder = new UriBuilder(client.BaseAddress + "imoveis/listarConteudo")
+            {
+                Query = "key=" + Uri.EscapeDataString(chave)
+            };
+            builder.Query += "&pesquisa=" + Uri.EscapeDataString(@"{""fields"":[""Categoria""]}");
+            var uriWithQuery = builder.Uri;
+            var res = await client.GetAsync(uriWithQuery);
+            if (res.IsSuccessStatusCode)
+            {
+                var categoriasStr = await res.Content.ReadAsStringAsync();
+                var categorias = Newtonsoft.Json.JsonConvert.DeserializeObject<CategoriasVS>(categoriasStr);
+                return categorias?.Categoria ?? [];
+            }
+            return [];
         }
 
         public void Dispose()
         {
             _vistaSoftDAO.Dispose();
         }
+    }
+
+    public record CategoriasVS
+    {
+        public List<string> Categoria { get; set; }
     }
 }
