@@ -116,6 +116,10 @@ $(document).ready(function () {
             this.RestoreSession();
             this.localidade.estados = this.$sdata.forms.states;
 
+            if(!this.isAuth) {
+                this.DeleteCookie('authToken');
+                localStorage.clear();
+            }
 //-------------------------- SETUP ROUTES --------------------------
             this.routing.title = this.title;
             this.routing.menuIndex = "01-00-00-00";
@@ -151,11 +155,12 @@ $(document).ready(function () {
                     return response;
                 },
                 error => {
-                    if (error.response && error.response.status === 403) {
+                    if (error.response && error.response.status === 403 && this.isAuth) {
                         const errorMessage = error.response.data.error_message;
                         if (!this.hasDisplayed403) {
-                            this.hasDisplayed403 = true;
                             let message = "";
+                            this.hasDisplayed403 = true;
+                            this.userSessionIsRevoked = true;
                             if (errorMessage === "Token revogado.") {
                                 message = "Sua conta foi acessada recentemente em um novo dispositivo. Para sua segurança, faça login novamente para confirmar sua identidade.";
                             } else if (errorMessage === "Token expirado.") {
@@ -174,7 +179,6 @@ $(document).ready(function () {
                                     callback: () => {
                                         this.SignOut();
                                         window.location.href = "/home";
-                                        this.userSessionIsRevoked = true;
                                     }
                                 }
                             );
@@ -340,7 +344,7 @@ $(document).ready(function () {
                             console.log('Resposta:', response.data);
                         } catch (error) {
                             this.userSessionIsRevoked = true;
-                            this.DeleteCookie('authToken');
+                            this.clearUserData();
                             console.error('Erro na requisição:', error);
                             clearInterval(this.validationInterval); // Para o intervalo quando o erro ocorre
                         }
@@ -353,7 +357,8 @@ $(document).ready(function () {
 
                 if (authToken) {
                     await validate();
-                    if (!this.userSessionIsRevoked) { // Somente inicia o setInterval se a sessão não estiver revogada
+                    // Somente inicia o setInterval se a sessão não estiver revogada
+                    if (!this.userSessionIsRevoked) {
                         this.validationInterval = setInterval(validate, interval);
                     }
                 }
@@ -402,9 +407,9 @@ $(document).ready(function () {
                     });
 
                     if (response.status === 200) {
+                        localStorage.clear();
                         this.DeleteCookie('authToken');
                         this.userSessionIsRevoked = true;
-                        //window.location.reload();
                         return;
                     } else {
                         console.error('Falha ao revogar token:', response.data);
@@ -477,14 +482,23 @@ $(document).ready(function () {
             },
 
             async SignOut() {
-                var usr = "jcuser" + this.usuario.id;
-                this.$sdata.Storage.Set(usr, null);
-                this.$sdata.Storage.Set("utk", null);
+                await this.RevogarToken();
+                this.isAuth = false;
                 this.log = this.$models.log();
                 this.usuario = this.$models.usuario();
-                this.isAuth = false;
-                axios.defaults.headers.common["Authorization"] = "";
-                await this.RevogarToken();
+                this.clearUserData();
+            },
+
+            clearUserData() {
+                delete axios.defaults.headers.common["Authorization"];
+                this.DeleteCookie('authToken');
+                localStorage.clear();
+            },
+
+            clearStorage(key) {
+                if (this.$sdata.Storage.Get(key)) {
+                    this.$sdata.Storage.Set(key, null);
+                }
             },
 
             VerificarStatusSessao() {
@@ -508,11 +522,7 @@ $(document).ready(function () {
 
             Exit() {
                 this.SignOut();
-                this.isAuth = false;
-                axios.defaults.headers.common["Authorization"] = "";
-                window.location.reload();
                 this.RouteTo("home");
-                //this.$sdata.Storage.Set("autoLogin", false);
             },
 
 //-------------------------------- ROUTING --------------------------------

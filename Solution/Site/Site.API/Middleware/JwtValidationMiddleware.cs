@@ -69,7 +69,7 @@ namespace JaCaptei.API.Middleware
         private static readonly HashSet<string> RotasPermitidasSemAutenticacao = new HashSet<string>
         {
             "/imovel/buscar/unidade",
-            "/registro",
+            "/imovel/buscar/listas-inteligencia-artificial",
             "/esqueci-senha"
         };
     }
