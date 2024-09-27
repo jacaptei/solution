@@ -47,7 +47,7 @@
                             <span class="text-h10">
                                 <span style="float:right;">
                                     <span style="font-weight:300;padding-right:20px">
-                                        {{$tools.FormatDayToBR(item.dataConsiderada)}} {{$tools.GetDayWeek(item.dataConsiderada)}} {{$tools.GetHours(item.dataConsiderada)}}h
+                                        {{$tools.FormatDayToBR(item.data)}} {{$tools.GetDayWeek(item.data)}} {{$tools.GetHours(item.data)}}h
                                     </span>
                                     <span v-if="item.idStatus < 9">
                                        <span v-if="item.idImovel > 0">Confirmando</span> <span v-else>Averiguando</span>
@@ -379,12 +379,19 @@
 
                         this.results.forEach(i => {
 
-                            i.dataVisita        = new Date(new Date(i.dataVisita        ).toISOString());
-                            i.dataAgendamento   = new Date(new Date(i.dataAgendamento   ).toISOString());
-                            i.dataReagendamento = new Date(new Date(i.dataVisita        ).toISOString());
-                            i.dataConfirmado    = new Date(new Date(i.dataConfirmado    ).toISOString());
-                            i.dataVisitado      = new Date(new Date(i.dataVisitado      ).toISOString());
-                            i.dataConcluido     = new Date(new Date(i.dataConcluido     ).toISOString());
+                            i.data              = this.$tools.DateFix(i.data             );
+                            i.dataVisita        = this.$tools.DateFix(i.dataVisita       );
+                            i.dataAgendamento   = this.$tools.DateFix(i.dataAgendamento  );
+                            i.dataReagendamento = this.$tools.DateFix(i.dataReagendamento);
+                            i.dataConfirmado    = this.$tools.DateFix(i.dataConfirmado   );
+                            i.dataVisitado      = this.$tools.DateFix(i.dataVisitado     );
+                            i.dataConcluido     = this.$tools.DateFix(i.dataConcluido    );
+                            //i.dataVisita        = new Date(new Date(i.dataVisita        ).toISOString());
+                            //i.dataAgendamento   = new Date(new Date(i.dataAgendamento   ).toISOString());
+                            //i.dataReagendamento = new Date(new Date(i.dataVisita        ).toISOString());
+                            //i.dataConfirmado    = new Date(new Date(i.dataConfirmado    ).toISOString());
+                            //i.dataVisitado      = new Date(new Date(i.dataVisitado      ).toISOString());
+                            //i.dataConcluido     = new Date(new Date(i.dataConcluido     ).toISOString());
 
                             i.acaocard = 'fechar-card' + i.id;
                             i.agendado = (i.dataVisita.getFullYear() > 1900);

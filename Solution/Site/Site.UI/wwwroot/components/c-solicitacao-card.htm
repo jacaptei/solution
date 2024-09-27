@@ -452,18 +452,19 @@
                 if (this.$validator.is(item.dataVisita)) {
                     var data = item.dataVisita;
                     //return data.format("dd/mm/yyyy, ddd, HH:MM'h'");
-                    return (data.getFullYear() > 1900) ? data.format("dd/mm/yyyy, ddd, HH:MM'h'") : "sem visita agendada";
+                    return (data.getFullYear() > 2000) ? data.format("dd/mm/yyyy, ddd, HH:MM'h'") : "sem visita agendada";
                 }
                 return "";
             },
 
             FormatarData(data){
-                c2("data",data);
-                var res = "";
-                try{
-                    res = data.format("dd/mm/yyyy, HH:MM'h'");
-                }catch(e){ console.log(e);}
-                return res;
+                return this.$tools.FormatDateHour(data);
+                //c2("data",data);
+                //var res = "";
+                //try{
+                //    res = data.format("dd/mm/yyyy, HH:MM'h'");
+                //}catch(e){ console.log(e);}
+                //return res;
             },
 
             FormatarEndereco(){
