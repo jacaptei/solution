@@ -46,9 +46,14 @@ CREATE	TABLE "Solicitacao"(
 	
 	-- --------------------------------------
 
+	imovelJC	                    BOOLEAN			    DEFAULT FALSE,
 	ativo	                    	BOOLEAN			    DEFAULT TRUE,
 	liberado                    	BOOLEAN			    DEFAULT FALSE,
 	agendado                    	BOOLEAN			    DEFAULT FALSE,
+	reagendado                    	BOOLEAN			    DEFAULT FALSE,
+	confirmado                    	BOOLEAN			    DEFAULT FALSE,
+	visitado	                  	BOOLEAN			    DEFAULT FALSE,
+	concluido	                  	BOOLEAN			    DEFAULT FALSE,
 
 	token 						 	VARCHAR(200)		UNIQUE NOT NULL,
 	"tokenNum"						BIGINT				UNIQUE NOT NULL,
@@ -60,12 +65,24 @@ CREATE	TABLE "Solicitacao"(
 	"atualizadoPorNome"   			 VARCHAR(120) 		DEFAULT 'SITE',
     "atualizadoPorPerfil"  			 VARCHAR(25) 		DEFAULT 'PARCEIRO',
 
-	obs  		                    VARCHAR(1200)        DEFAULT '',
+	obs  							 VARCHAR(1200)        DEFAULT '',
+	"obsAgendado"	                 VARCHAR(1200)        DEFAULT '',
+	"obsReagendado"	                 VARCHAR(1200)        DEFAULT '',
+	"obsConfirmado"					 VARCHAR(1200)        DEFAULT '',
+	"obsVisitado"					 VARCHAR(1200)        DEFAULT '',
+	"obsConcluido"					 VARCHAR(1200)        DEFAULT '',
+	logs							 VARCHAR(1200)        DEFAULT '',
 
-	"dataVisita"				    TIMESTAMP           WITHOUT TIME ZONE		,
-	"dataConsiderada"				TIMESTAMP           WITHOUT TIME ZONE		,
-	"dataAtualizacao"				TIMESTAMP           WITHOUT TIME ZONE		,
-	data 							TIMESTAMP           WITHOUT TIME ZONE		DEFAULT CURRENT_TIMESTAMP 
+	"dataVisita"				    TIMESTAMP           WITHOUT TIME ZONE ,
+	"dataAgendado"					TIMESTAMP           WITHOUT TIME ZONE ,
+	"dataReagendado"			    TIMESTAMP           WITHOUT TIME ZONE ,
+	"dataConfirmado"			    TIMESTAMP           WITHOUT TIME ZONE ,
+	"dataVisitado"				    TIMESTAMP           WITHOUT TIME ZONE ,
+	"dataConcluido"				    TIMESTAMP           WITHOUT TIME ZONE ,
+																		  
+	"dataConsiderada"				TIMESTAMP           WITHOUT TIME ZONE ,
+	"dataAtualizacao"				TIMESTAMP           WITHOUT TIME ZONE ,
+	data 							TIMESTAMP           WITHOUT TIME ZONE DEFAULT CURRENT_TIMESTAMP 
 	
 );
 

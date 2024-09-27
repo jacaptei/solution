@@ -23,6 +23,8 @@
         public int[]            mins            { get; set; } = new int[10];
         public int[]            maxs            { get; set; } = new int[10];
 
+        public bool             todos           { get; set; } = false;
+
         public DateTime[]       datesIn         { get; set;} = new DateTime[10];
         public DateTime[]       datesOut        { get; set;} = new DateTime[10];        
 

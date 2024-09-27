@@ -400,8 +400,11 @@ namespace JaCaptei.Application {
                         filter += " AND imovel.ativo = FALSE ";
                 }
 
+
                 if(busca.somenteValidados)
                     filter += " AND imovel.validado = TRUE ";
+                else if(busca.somenteNaoValidados)
+                    filter += " AND imovel.validado = FALSE ";
                 else if(busca.validados ^ busca.naoValidados) {
                     if(busca.validados)
                         filter += " AND imovel.validado = TRUE ";
@@ -411,12 +414,15 @@ namespace JaCaptei.Application {
 
                 if(busca.somenteVisiveis)
                     filter += " AND imovel.visivel = TRUE ";
+                else if(busca.somenteNaoVisiveis)
+                    filter += " AND imovel.visivel = FALSE ";
                 else if(busca.visiveis ^ busca.naoVisiveis) {
                     if(busca.visiveis)
                         filter += " AND imovel.visivel = TRUE ";
                     else if(busca.naoVisiveis)
                         filter += " AND imovel.visivel = FALSE ";
                 }
+
 
                 if(busca.somenteNaoExcluidos)
                     filter += " AND imovel.excluido = FALSE ";

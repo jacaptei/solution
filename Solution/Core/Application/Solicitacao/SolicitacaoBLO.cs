@@ -87,7 +87,6 @@ namespace JaCaptei.Application {
                 entity.data                 =   
                 entity.dataAtualizacao      = 
                 entity.dataConsiderada      =   Utils.Date.GetLocalDateTime();
-                entity.dataVisita           =   Utils.Date.GetLocalDateTime(entity.dataVisita);
                 
                 entity.token                =   Utils.Key.CreateToken();
                 entity.tokenNum             =   Utils.Key.CreateTokenNum();

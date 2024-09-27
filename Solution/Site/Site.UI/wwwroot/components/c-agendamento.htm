@@ -13,6 +13,7 @@
 
                                 <el-col :md="24" style="width:100%;text-align:center;font-weight:600;font-size:16pt;">
 								            Agendar visita
+                                    <q-btn  label="ACOMPANHAR" color="white" outline		style="float:none;font-size:15px;width:calc(100% - 40px);margin:10px;height:20px;border-radius:10px" @click="$root.ReouteToParams('parceiros',{show:'/parceiro/solicitacao/visita/buscar'})"></q-btn>
                                 </el-col>
                                 
 
@@ -56,7 +57,7 @@
 													</span> 	
 												</el-col>
 												<el-col :md="24"> 
-													<el-input    v-model="solicitacao.descricao"    maxlength="400"    placeholder="Observações"    show-word-limit :autosize="{ minRows: 4, maxRows: 16 }" type="textarea" ></el-input>
+													<el-input    v-model="solicitacao.obsAgendamento"    maxlength="400"    placeholder="Observações"    show-word-limit :autosize="{ minRows: 4, maxRows: 16 }" type="textarea" ></el-input>
 												</el-col>
 										</el-row>
 
@@ -83,7 +84,7 @@
 											    <span style="font-weight:bold">Visita agendada!</span>
                                             </div>
                                             Além das notificações por e-mail, poderá acompanhar o andamento do agendamento na área de solicitações.
-											<q-btn  label="ACOMPANHAR" color="white" outline		style="float:none;font-size:15px;width:calc(100% - 40px);margin:10px;height:20px;border-radius:10px" @click="$root.ReouteToParams('parceiros',{viewSolicitacao:'buscar'})"></q-btn>
+											<q-btn  label="ACOMPANHAR" color="white" outline		style="float:none;font-size:15px;width:calc(100% - 40px);margin:10px;height:20px;border-radius:10px" @click="$root.ReouteToParams('parceiros',{show:'/parceiro/solicitacao/visita/buscar'})"></q-btn>
 											<q-btn  label="Ok" color="secondary"		style="float:right;font-size:18px;width:100%;height:50px;border-radius:20px;margin-bottom:10px;" @click="ShowView('calendar')"></q-btn>
 								</div>
 							
@@ -160,6 +161,9 @@
         watch: {},
         created: function () {
 
+            if(this.$validator.not(this.solicitacao))
+                this.solicitacao = {};
+
             this.solicitacao.dataVisita = new Date(1900, 0, 1, 0, 0, 0, 0);
 
             this.dateRangeInit.setHours(0, 0, 0, 0);
@@ -229,23 +233,23 @@
 
             ProcessarDataVisita() {
  
-                //this.solicitacao.dataVisita = new Date( Date.UTC(
-                //    parseInt(this.dia.split("/")[0]), 
-                //    (parseInt(this.dia.split("/")[1]) - 1), 
-                //    parseInt(this.dia.split("/")[2]), 
-                //    parseInt(this.hora.split(":")[0]), 
-                //    parseInt(this.hora.split(":")[1]), 
-                //    0, 0)
-                //);
-                
-                this.solicitacao.dataVisita = new Date(
+                this.solicitacao.dataVisita = new Date( Date.UTC(
                     parseInt(this.dia.split("/")[0]), 
                     (parseInt(this.dia.split("/")[1]) - 1), 
                     parseInt(this.dia.split("/")[2]), 
                     parseInt(this.hora.split(":")[0]), 
                     parseInt(this.hora.split(":")[1]), 
-                    0, 0
+                    0, 0)
                 );
+                
+                //this.solicitacao.dataVisita = new Date(
+                //    parseInt(this.dia.split("/")[0]), 
+                //    (parseInt(this.dia.split("/")[1]) - 1), 
+                //    parseInt(this.dia.split("/")[2]), 
+                //    parseInt(this.hora.split(":")[0]), 
+                //    parseInt(this.hora.split(":")[1]), 
+                //    0, 0
+                //);
 
             },
 
@@ -272,11 +276,10 @@
                 this.solicitacao.titulo         =   this.imovel.titulo + ", ID #" + this.imovel.id + ", COD " + this.imovel.cod;
                 this.solicitacao.imovel         =   this.imovel;
                 this.solicitacao.cep            =   this.imovel.endereco.cep;
-                this.solicitacao.cep            =   this.imovel.endereco.cep;
                 this.solicitacao.estado         =   this.imovel.endereco.estado;
                 this.solicitacao.cidade         =   this.imovel.endereco.cidade;
                 this.solicitacao.bairro         =   this.imovel.endereco.bairro;
-                this.solicitacao.logradouro     =   this.imovel.endereco.cidade;
+                this.solicitacao.logradouro     =   this.imovel.endereco.logradouro;
                 this.solicitacao.numero         =   this.imovel.endereco.numero;
                 this.solicitacao.complemento    =   this.imovel.endereco.complementoTipo +" "+this.imovel.endereco.complemento;
                 if(this.$validator.is(this.imovel.endereco.andar && this.imovel.endereco.andar > 0))

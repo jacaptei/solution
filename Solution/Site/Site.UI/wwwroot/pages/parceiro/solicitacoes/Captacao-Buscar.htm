@@ -367,7 +367,8 @@
 
                     this.view = "request";
 
-                    var request = await this.$api.Get("solicitacao/obter/todos/parceiro");
+                    //var request = await this.$api.Get("solicitacao/obter/todos/parceiro");
+                    var request = await this.$api.Get("solicitacao/obter/solicitacoes/parceiro");
 
                     if (request?.status?.success){
                         this.results = request.result;
@@ -376,7 +377,14 @@
 
 
                         this.results.forEach(i => {
-                            i.dataVisita = new Date(i.dataVisita);
+                            
+                            i.dataVisita        = new Date(new Date(i.dataVisita        ).toISOString());
+                            i.dataAgendamento   = new Date(new Date(i.dataAgendamento   ).toISOString());
+                            i.dataReagendamento = new Date(new Date(i.dataVisita        ).toISOString());
+                            i.dataConfirmado    = new Date(new Date(i.dataConfirmado    ).toISOString());
+                            i.dataVisitado      = new Date(new Date(i.dataVisitado      ).toISOString());
+                            i.dataConcluido     = new Date(new Date(i.dataConcluido     ).toISOString());
+
                             i.acaocard = 'fechar-card' + i.id;
                             i.agendado = (i.dataVisita.getFullYear() > 1900);
                             // i.proprietarioCaptacao = "Teste, (11) 98498-4894, paulogneto@gmail.com";
