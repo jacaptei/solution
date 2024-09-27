@@ -22,6 +22,31 @@ namespace JaCaptei.Application
             DAO = new ParceiroDAO(context);
         }
 
+        public AppReturn ObterContaPorId(int idConta)
+        {
+            if (idConta == 0)
+            {
+                appReturn.SetAsBadRequest("ID não informado.");
+                return appReturn;
+            }
+
+            var entities = DAO.ObterContaPorId(idConta);
+
+            if (entities == null || !entities.Any())
+            {
+                appReturn.SetAsNotFound();
+            }
+            else
+            {
+                foreach (var entity in entities)
+                {
+                    entity.RemoverDadosSensiveis(); // Remover dados sensíveis de cada parceiro
+                }
+                appReturn.result = entities; // Atribui a coleção de parceiros
+            }
+
+            return appReturn;
+        }
 
         public AppReturn ObterPeloId(int id)
         {

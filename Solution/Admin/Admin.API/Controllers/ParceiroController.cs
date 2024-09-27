@@ -27,8 +27,7 @@ namespace JaCaptei.Administrativo.API.Controllers {
         }
 
 
-
-
+        
 
         [HttpGet]
         [Route("pendentes")]
@@ -157,14 +156,21 @@ namespace JaCaptei.Administrativo.API.Controllers {
             return Result(appReturn);
         }
 
-
         [HttpGet]
         [Route("[action]/{id}")]
+        [Authorize(Roles = "ADMIN_GOD,ADMIN_GESTOR")]
         public IActionResult Obter(string id) {
             appReturn = service.ObterPeloId(int.Parse(id));
             return Result(appReturn);
         }
 
+        [HttpGet]
+        [Route("[action]/{idConta}")]
+        public IActionResult ObterContaPorId(string idConta)
+        {
+            appReturn = service.ObterContaPorId(int.Parse(idConta));
+            return Result(appReturn);
+        }
 
 
         [HttpPost]

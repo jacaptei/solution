@@ -1,11 +1,6 @@
 ﻿<template>
-
-
-
 	<div>
-
 		<div>
-
 			<el-row justify="center" v-if="onloading">
 				<el-col :md="24" style="color:var(--s-color-primary)">
 					<c-loading padding="20px"></c-loading>
@@ -331,11 +326,11 @@
 		},
 		created: function () {
 			this.opcoes.sexos = this.$sdata.opcoes.sexos;
-			this.$sdata.ObterEstados().then(res => { this.opcoes.estados = res; });
+            this.$sdata.ObterEstados().then(res => { this.opcoes.estados = res; });
+            this.Obter(this.id);
 		},
 		mounted() {
-		//	window.setTimeout(() => this.$refs.nome.focus(), 500);
-			this.Obter(this.id);
+			
 		},
 		methods: {
 
@@ -347,7 +342,7 @@
 
 				if(request?.status?.success) {
 
-                    this.parceiro = request.result;
+                    this.$root.parceiroRow = this.parceiro = request.result;
                     
 					this.carregandoCidades = true; 
                     this.carregandoBairros = true; 

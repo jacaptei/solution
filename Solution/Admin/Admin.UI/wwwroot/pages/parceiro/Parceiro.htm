@@ -12,10 +12,10 @@
                         indicator-color="primary">
                     <q-tab name="alterar" icon="fa fa-edit" label="EDITAR"></q-tab>
                     <q-tab name="solicitacoes" icon="fa fa-bell-concierge" label="SOLICITAÇÕES" style="width:115px"></q-tab>
-                    <q-btn label="VOLTAR" outline color="primary" @click="$root.RouteTo('/parceiros')" style="margin-left:20px"></q-btn>
+                    <q-tab name="operadoresvinculados" icon="fa fa-bell-concierge" label="OPERADORES VINCULADOS" style="width:180px"></q-tab>
+                    <q-btn label="VOLTAR" outline color="primary" @click="$root.RouteTo('/parceiros')" style="margin-left:40px"></q-btn>
                 </q-tabs>
                 <q-tab-panels v-model="tab" animated>
-
                     <q-tab-panel name="alterar">
                         <page_alterar :id="$route.params.id" ></page_alterar>
                     </q-tab-panel>
@@ -24,6 +24,9 @@
                         <page_solicitacoes :id="$route.params.id" ></page_solicitacoes>
                     </q-tab-panel>
 
+                    <q-tab-panel name="operadoresvinculados" v-if="this.visibilidadeTela">
+                        <page_operadores_vinculados :id="$route.params.id"></page_operadores_vinculados>
+                    </q-tab-panel>
                 </q-tab-panels>
             </div>
         </div>
@@ -33,42 +36,40 @@
 
 
 <script>
-	module.exports = {
-
+    module.exports = {
         name: 'JCAdminParceiro',
-
         components: {
-            page_alterar:       LoadComponent("/pages/parceiro/Parceiro-Alterar.htm"),
-            page_solicitacoes:  LoadComponent("/pages/parceiro/Parceiro-Solicitacoes.htm")
+            page_alterar: LoadComponent("/pages/parceiro/Parceiro-Alterar.htm"),
+            page_solicitacoes: LoadComponent("/pages/parceiro/Parceiro-Solicitacoes.htm"),
+            page_operadores_vinculados: LoadComponent("/pages/parceiro/Operadores-Vinculados.htm")
         },
 
-		data: function () {
+        data: function () {
             return {
                 tab: "alterar",
-                id:0
-			}
-		}, computed: {
-
-		},
-
-		props: {
-           
-		},
-		watch: {
-
-		},
-		created: function () {
-		},
-		mounted() {
-            this.id = this.$route.params.id;
-            this.$root.SetTitle("Parceiro #"+this.id, "fa fa-user-alt", null);
+                id: 0,
+                visibilidadeTela: {}
+            }
         },
-		methods: {
-		}
+        computed: {
 
-	}
+        },
+        props: {
 
+        },
+        watch: {
 
+        },
+        created: function () {
+        },
+        mounted() {
+            this.id = this.$route.params.id;
+            this.$root.SetTitle("Parceiro #" + this.id, "fa fa-user-alt", null);
+            this.visibilidadeTela = setTimeout(() => { this.$root.parceiroRow.donoConta }, 500); 
+        },
+        methods: {
+        }
+    }
 </script>
 
 

@@ -408,7 +408,6 @@ namespace JaCaptei.Application{
 
             using(var conn = new DBcontext().GetConn()) 
                     entityDB = conn.Query<Parceiro>(e => e.token == token).FirstOrDefault();
-
             return entityDB;
         }
 
@@ -513,9 +512,15 @@ namespace JaCaptei.Application{
             return entityDB;
         }
 
+        public IEnumerable<Parceiro> ObterContaPorId(int idConta)
+        {
+            using (var conn = new DBcontext().GetConn())
+            {
+                return conn.Query<Parceiro>(e => e.idConta == idConta);
+            }
+        }
 
-
-       public List<Parceiro> ObterPendentesValidacao() {
+        public List<Parceiro> ObterPendentesValidacao() {
             List<Parceiro> entities = null;
             using(var conn = new DBcontext().GetConn()) {
                 entities = conn.Query<Parceiro>(e => e.validado == false,orderBy: OrderField.Parse(new { data = Order.Descending }) ).ToList();

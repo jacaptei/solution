@@ -1,14 +1,8 @@
 ﻿<template>
-	<div>
-
-
-
-
-		<el-row>
-			<el-col :md="24">
-
+    <div>
+        <el-row>
+            <el-col :md="24">
                 <el-row :gutter="20">
-
                     <el-col :xs="24" :sm="12" :md="8" :lg="8" class="s-input">
                         <div>NOME<span></span></div>
                         <el-input @keyup.enter="Buscar()" v-model="busca.item.nome" placeholder="qualquer" maxlength="120" ref="nome" input-style="text-transform:uppercase;"></el-input>
@@ -49,7 +43,7 @@
                         <div>CONTA ID<span></span></div>
                         <el-input-number @keyup.enter="Buscar()" v-model="idConta" placeholder="qualquer" maxlength="20" ref="contaid" :controls="false" input-style="text-transform:uppercase;"></el-input-number>
                     </el-col>
-                    <el-col :xs="24" :sm="12" :md="8" :lg="11"  class="s-input" style="max-width:unset">
+                    <el-col :xs="24" :sm="12" :md="8" :lg="11" class="s-input" style="max-width:unset">
                         <div>CONTA TOKEN <span></span></div>
                         <el-input @keyup.enter="Buscar()" v-model="busca.item.conta.token" placeholder="qualquer" maxlength="500" ref="contatoken" input-style="text-transform:none;"></el-input>
                     </el-col>
@@ -61,115 +55,90 @@
                     </el-col>
                 </el-row>
 
+                <el-row justify="center" v-if="onrequest">
+                    <el-col :md="24" style="color:var(--s-color-primary)">
+                        <el-divider style="margin:10px;"><!--resultado--></el-divider>
+                        <c-loading padding="20px"></c-loading>
+                    </el-col>
+                </el-row>
 
+                <el-row v-else>
+                    <el-col :md="24">
+                        <el-row>
+                            <el-col :md="24">
+                                <el-divider style="margin:10px"><!--resultado--></el-divider>
 
-
-
-
-
-
-		    <el-row justify="center" v-if="onrequest">
-                <el-col :md="24" style="color:var(--s-color-primary)">
-                    <el-divider style="margin:10px;"><!--resultado--></el-divider>
-                    <c-loading padding="20px"></c-loading>
-                </el-col>
-		    </el-row>
-
-                
-		    <el-row v-else>
-                <el-col :md="24">
-
-
-
-                    <el-row>
-                        <el-col :md="24">
-                            <el-divider style="margin:10px"><!--resultado--></el-divider>
-
-                            <el-row style="padding-left:20px;padding-right:20px;">
-                                <el-col :md="24">
-                                    <div style="float:left">
-                                        <span style="color:var(--s-color-primary)">encontrados</span><br />
-                                        <span v-if="busca.total > 0">{{busca.total}}</span>
-                                        <span v-else style="color:var(--s-color-orange)">nada encontrado</span>
-                                    </div>
-                                    <div style="float:right">
-                                        <q-input v-model.number="busca.resultsPerPage" type="number" style="max-width:140px" label="RESULTADOS POR PÁGINA" stack-label :min="1" :dense="true" @keyup.enter="()=>{ if(!onrequest){ Buscar(1);}}" ></q-input>
-                                    </div>
-                                </el-col>
-                            </el-row>
-
-                            <el-divider style="margin:10px"></el-divider>
-                        </el-col>
-                    </el-row>
-
-
-                    <el-row v-if="exibirDadosConta">
-                        <el-col :md="24">
-
-                            <el-row>
-                                <el-col :md="24" style="padding-left:20px">
-                                    <div style="color:var(--s-color-primary)">
-                                        <i class="fa fa-arrow-alt-circle-left" style="cursor:pointer" @click="()=>{ idConta = null; Buscar(); }"></i>
-                                        <b style="padding-left:10px">CONTA</b>
-                                    </div>
-                                    <div>
-                                        <div style="width:80px;margin-right:10px;display:inline-block;text-align:right">ID:</div>
-                                        <b>{{conta.id}}</b>
-                                    </div>
-                                    <div>
-                                        <div style="width:80px;margin-right:10px;display:inline-block;text-align:right">Plano:</div>
-                                        <b v-if="conta.idPlano == 2">CORRETOR AUTÔNOMO ESSENCIAL</b>
-                                        <b v-else-if="conta.idPlano == 3">IMOBILIÁRIA 03 USUÁRIOS</b>
-                                        <b v-else-if="conta.idPlano == 4">IMOBILIÁRIA 05 USUÁRIOS</b>
-                                    </div>
-                                    <div>
-                                        <div style="width:80px;margin-right:10px;display:inline-block;text-align:right">Token:</div>
-                                        <b>{{conta.token}}</b>
-                                    </div>
-                                    <div>
-                                        <div style="width:80px;margin-right:10px;display:inline-block;text-align:right">Titular:</div>
-                                        <b>{{conta.nome}}</b>
-                                    </div>
-                                    <div v-if="$validator.is(conta.razao)">
-                                        <div style="width:80px;margin-right:10px;display:inline-block;text-align:right">Razão:</div>
-                                        <b>{{conta.razao}}</b>
-                                    </div>
-                                    <div v-if="$validator.is(conta.responsavel)">
-                                        <div style="width:80px;margin-right:10px;display:inline-block;text-align:right">Responsável:</div>
-                                        <b>{{conta.responsavel}}</b>
-                                    </div>
-                                </el-col>
-                            </el-row>
-
-                            <el-divider style="margin:10px"></el-divider>
-                        </el-col>
-                    </el-row>
-
-
-
-
-
-                    <el-row v-if="$validator.is(data)">
-                        <el-col :md="24">
-
-                            <!--TABLE-->
-
-                            <el-table :data="data" style="width: 100%" max-height="380" v-loading="ontablequest" :table-layout="auto">
-
-                                <el-table-column fixed="left" label="Ações" width="122">
-
-                                    <template #default="scope" style="border-right:1px solid #000">
-
-                                        <div v-if="scope.row.onrequest">
-                                            <c-loading></c-loading>
+                                <el-row style="padding-left:20px;padding-right:20px;">
+                                    <el-col :md="24">
+                                        <div style="float:left">
+                                            <span style="color:var(--s-color-primary)">encontrados</span><br />
+                                            <span v-if="busca.total > 0">{{busca.total}}</span>
+                                            <span v-else style="color:var(--s-color-orange)">nada encontrado</span>
                                         </div>
-                                        <div v-else>
+                                        <div style="float:right">
+                                            <q-input v-model.number="busca.resultsPerPage" type="number" style="max-width:140px" label="RESULTADOS POR PÁGINA" stack-label :min="1" :dense="true" @keyup.enter="()=>{ if(!onrequest){ Buscar(1);}}"></q-input>
+                                        </div>
+                                    </el-col>
+                                </el-row>
+                                <el-divider style="margin:10px"></el-divider>
+                            </el-col>
+                        </el-row>
+
+                        <el-row v-if="exibirDadosConta">
+                            <el-col :md="24">
+                                <el-row>
+                                    <el-col :md="24" style="padding-left:20px">
+                                        <div style="color:var(--s-color-primary)">
+                                            <i class="fa fa-arrow-alt-circle-left" style="cursor:pointer" @click="()=>{ idConta = null; Buscar(); }"></i>
+                                            <b style="padding-left:10px">CONTA</b>
+                                        </div>
+                                        <div>
+                                            <div style="width:80px;margin-right:10px;display:inline-block;text-align:right">ID:</div>
+                                            <b>{{conta.id}}</b>
+                                        </div>
+                                        <div>
+                                            <div style="width:80px;margin-right:10px;display:inline-block;text-align:right">Plano:</div>
+                                            <b v-if="conta.idPlano == 2">CORRETOR AUTÔNOMO ESSENCIAL</b>
+                                            <b v-else-if="conta.idPlano == 3">IMOBILIÁRIA 03 USUÁRIOS</b>
+                                            <b v-else-if="conta.idPlano == 4">IMOBILIÁRIA 05 USUÁRIOS</b>
+                                        </div>
+                                        <div>
+                                            <div style="width:80px;margin-right:10px;display:inline-block;text-align:right">Token:</div>
+                                            <b>{{conta.token}}</b>
+                                        </div>
+                                        <div>
+                                            <div style="width:80px;margin-right:10px;display:inline-block;text-align:right">Titular:</div>
+                                            <b>{{conta.nome}}</b>
+                                        </div>
+                                        <div v-if="$validator.is(conta.razao)">
+                                            <div style="width:80px;margin-right:10px;display:inline-block;text-align:right">Razão:</div>
+                                            <b>{{conta.razao}}</b>
+                                        </div>
+                                        <div v-if="$validator.is(conta.responsavel)">
+                                            <div style="width:80px;margin-right:10px;display:inline-block;text-align:right">Responsável:</div>
+                                            <b>{{conta.responsavel}}</b>
+                                        </div>
+                                    </el-col>
+                                </el-row>
+                                <el-divider style="margin:10px"></el-divider>
+                            </el-col>
+                        </el-row>
+
+                        <el-row v-if="$validator.is(data)">
+                            <el-col :md="24">
+                                <!--TABLE-->
+                                <el-table :data="data" style="width: 100%" max-height="380" v-loading="ontablequest" :table-layout="auto">
+                                    <el-table-column fixed="left" label="Ações" width="122">
+                                        <template #default="scope" style="border-right:1px solid #000">
+                                            <div v-if="scope.row.onrequest">
+                                                <c-loading></c-loading>
+                                            </div>
+                                            <div v-else>
 
                                                 <div v-if="scope.row.excluido" style="color:#666;font-weight:bold;display:inline-block;cursor:pointer" @click="Alterar(scope)">
                                                     <i class="fa fa-edit"></i> Excluído
                                                 </div>
                                                 <div v-else style="display:inline-block">
-
 
                                                     <div style="display:inline-block">
                                                         <el-popconfirm width="220"
@@ -185,187 +154,150 @@
                                                         </el-popconfirm>
                                                     </div>
 
-
                                                     <div style="width:32px;display:inline-block;margin-left:20px;">
                                                         <el-switch v-model="scope.row.ativo" @click="ToggleAtivar(scope)" size="small" style="--el-switch-on-color:var(--s-color-primary); --el-switch-off-color:var(--s-color-red)" title="ativar/desativar"></el-switch>
                                                     </div>
 
-                                                <div style="display:inline-block;margin-left:15px;cursor:pointer;font-size:16px;" @click="Alterar(scope)" title="editar">
-                                                    <i class="fa fa-edit" :style="(scope.row.ativo)? 'color:var(--s-color-primary)' : (scope.row.excluido)? 'cursor:pointer;color:#555' : 'color:var(--s-color-red)'"></i>
+                                                    <div style="display:inline-block;margin-left:15px;cursor:pointer;font-size:16px;" @click="Alterar(scope)" title="editar">
+                                                        <i class="fa fa-edit" :style="(scope.row.ativo)? 'color:var(--s-color-primary)' : (scope.row.excluido)? 'cursor:pointer;color:#555' : 'color:var(--s-color-red)'"></i>
+                                                    </div>
                                                 </div>
+                                            </div>
+                                        </template>
+                                    </el-table-column>
 
-                                                </div>
+                                    <el-table-column prop="id" label="ID" width="60">
+                                        <template #default="scope">
+                                            <b @click="Alterar(scope)" :style="(scope.row.ativo)? 'cursor:pointer;color:var(--s-color-primary)' : (scope.row.excluido)? 'cursor:pointer;color:#999' : 'cursor:pointer;color:var(--s-color-red)'">{{scope.row.id}}</b>
+                                        </template>
+                                    </el-table-column>
 
-                                        </div>
+                                    <el-table-column label="CONTA ID" width="90">
+                                        <template #default="scope">
+                                            <a href="javascript:void(0)" @click="()=>{ idConta = scope.row.conta.id; Buscar(); }" :style="(scope.row.ativo)? 'text-decoration:none;color:var(--s-color-primary);cursor:pointer'  : (scope.row.excluido)? 'text-decoration:none;color:#999;cursor:pointer' : 'text-decoration:none;color:var(--s-color-red);cursor:pointer'"><i class="fa fa-search"></i> {{scope.row.conta.id}}  </a>
+                                        </template>
+                                    </el-table-column>
 
-                                    </template>
-                                </el-table-column>
+                                    <el-table-column label="NOME" width="300">
+                                        <template #default="scope">
+                                            <div style="color:var(--el-color-primary);text-decoration:none">
+                                                <i class="fa fa-crown" v-if="scope.row.donoConta" title="titular da conta" :style="(scope.row.ativo)? 'margin-right: 10px;color: var(--s-color-primary)' : (scope.row.excluido)? 'cursor:pointer;color:#999' : 'margin-right: 10px;color:var(--s-color-red)'"></i>
+                                                <b @click="Alterar(scope)" :style="(scope.row.ativo)? 'cursor:pointer;color:var(--s-color-primary)' : (scope.row.excluido)? 'cursor:pointer;color:#999' : 'cursor:pointer;color:var(--s-color-red)'">{{scope.row.nome}}</b>
+                                            </div>
+                                        </template>
+                                    </el-table-column>
 
+                                    <el-table-column label="CPF" width="150">
+                                        <template #default="scope">
+                                            <a v-if="$validator.is(scope.row.cpf)" href="javascript:void(0)" @click="$tools.Copy(scope.row.cpf)" style="text-decoration:none;color:var(--s-color-tex-alt)"><i class="fa fa-copy" style="padding-right:3px;color:#666;text-decoration:none"></i> {{scope.row.cpf}}  </a>
+                                            <span v-else>-</span>
+                                        </template>
+                                    </el-table-column>
 
+                                    <el-table-column label="CNPJ" width="180">
+                                        <template #default="scope">
+                                            <a v-if="$validator.is(scope.row.cnpj)" href="javascript:void(0)" @click="$tools.Copy(scope.row.cnpj)" style="text-decoration:none;color:var(--s-color-tex-alt)"><i class="fa fa-copy" style="padding-right:3px;color:#666;text-decoration:none"></i> {{scope.row.cnpj}}  </a>
+                                            <span v-else>-</span>
+                                        </template>
+                                    </el-table-column>
 
+                                    <el-table-column label="E-Mail" width="300">
+                                        <template #default="scope">
+                                            <a :href="'mailto:'+scope.row.email" target="_blank" :style="(scope.row.excluido)? 'color:#999;text-decoration:none' : 'color:var(--el-color-primary);text-decoration:none'"><i class="fa fa-envelope"></i>&nbsp; {{scope.row.email}}</a>
+                                        </template>
+                                    </el-table-column>
 
+                                    <el-table-column label="TELEFONE" width="150">
+                                        <template #default="scope">
+                                            <a v-if="!scope.row.excluido" :href="$tools.BuildWhatsappLink(scope.row.telefone,'Olá '+scope.row.apelido)" target="_blank" :style="(scope.row.excluido)? 'color:#999;text-decoration:none' : 'color:var(--s-color-green);text-decoration:none' "><i class="fab fa-whatsapp" style="padding-right:3px;"></i> {{scope.row.telefone}}</a>
+                                        </template>
+                                    </el-table-column>
 
+                                    <el-table-column label="CONTA TOKEN" width="280">
+                                        <template #default="scope">
+                                            <a href="javascript:void(0)" @click="$tools.Copy(scope.row.conta.token)" style="text-decoration:none;color:var(--s-color-tex-alt)"><i class="fa fa-copy" style="padding-right:3px;color:#666;text-decoration:none"></i> {{scope.row.conta.token}}  </a>
+                                        </template>
+                                    </el-table-column>
 
+                                    <el-table-column label="ENDEREÇO" width="400">
+                                        <template #default="scope">
+                                            <div v-if="!scope.row.excluido">
+                                                <a v-if="$validator.is(scope.row.logradouro)" href="javascript:void(0)" @click="$tools.Copy((scope.row.logradouro+','+scope.row.numero+','+($validator.is(scope.row.complemento)? scope.row.complemento+',':'')+scope.row.bairro+','+scope.row.cidade+','+scope.row.estado))" style="text-decoration:none;color:var(--s-color-tex-alt);margin-right:10px"><i class="fa fa-copy" style="padding-right:3px;color:#555;text-decoration:none"></i></a>
+                                                <a :href="$tools.BuildMapLink(scope.row)" target="_blank" style="color:var(--s-text-color);text-decoration:none;margin-right:6px">
+                                                    <i style="color:#555;margin-right:6px" class="fa fa-location-dot"></i>
+                                                    {{scope.row.logradouro}}, {{scope.row.numero}}
+                                                    <span v-if="$validator.is(scope.row.complemento)"> , {{scope.row.complemento}}</span>,
+                                                    {{scope.row.bairro}},
+                                                    {{scope.row.cidade}}, {{scope.row.estado}}, CEP: {{scope.row.cep}}
+                                                </a>
+                                            </div>
+                                        </template>
+                                    </el-table-column>
 
+                                    <el-table-column prop="data" label="DATA" width="140">
+                                        <template #default="scope">
+                                            {{$tools.FormatDateToBR(new Date(scope.row.data))}}
+                                        </template>
+                                    </el-table-column>
 
-                                <el-table-column prop="id" label="ID" width="60">
-                                    <template #default="scope">
-                                        <b @click="Alterar(scope)" :style="(scope.row.ativo)? 'cursor:pointer;color:var(--s-color-primary)' : (scope.row.excluido)? 'cursor:pointer;color:#999' : 'cursor:pointer;color:var(--s-color-red)'">{{scope.row.id}}</b>
-                                    </template>
-                                </el-table-column>
+                                    <el-table-column label="OBS" width="60">
+                                        <template #default="scope">
+                                            <a v-if="$validator.is(scope.row.obs)" href="javascript:void(0)" @click="$tools.Alert(scope.row.obs,'OBSERVAÇÕES')" style="color:var(--s-color-primary);text-decoration:none"><i class="fa fa-message"></i></a>
+                                            <a v-else href="javascript:void(0)" @click="$tools.Message('sem observações')" style="color:var(--s-color-grey);text-decoration:none"><i class="fa fa-message"></i></a>
+                                        </template>
+                                    </el-table-column>
+                                </el-table>
 
-                                <el-table-column label="CONTA ID" width="90">
-                                    <template #default="scope">
-                                        <a href="javascript:void(0)" @click="()=>{ idConta = scope.row.conta.id; Buscar(); }"  :style="(scope.row.ativo)? 'text-decoration:none;color:var(--s-color-primary);cursor:pointer'  : (scope.row.excluido)? 'text-decoration:none;color:#999;cursor:pointer' : 'text-decoration:none;color:var(--s-color-red);cursor:pointer'"><i class="fa fa-search" ></i> {{scope.row.conta.id}}  </a>
-                                    </template>
-                                </el-table-column>
-
-                                <el-table-column label="NOME" width="300">
-                                    <template #default="scope">
-                                        <div style="color:var(--el-color-primary);text-decoration:none">
-                                            <i class="fa fa-crown" v-if="scope.row.donoConta" title="titular da conta" :style="(scope.row.ativo)? 'margin-right: 10px;color: var(--s-color-primary)' : (scope.row.excluido)? 'cursor:pointer;color:#999' : 'margin-right: 10px;color:var(--s-color-red)'"></i>
-                                            <b @click="Alterar(scope)"  :style="(scope.row.ativo)? 'cursor:pointer;color:var(--s-color-primary)' : (scope.row.excluido)? 'cursor:pointer;color:#999' : 'cursor:pointer;color:var(--s-color-red)'">{{scope.row.nome}}</b>
-                                        </div>
-                                    </template>
-                                </el-table-column>
-                                <el-table-column label="CPF" width="150">
-                                    <template #default="scope">
-                                        <a v-if="$validator.is(scope.row.cpf)" href="javascript:void(0)" @click="$tools.Copy(scope.row.cpf)" style="text-decoration:none;color:var(--s-color-tex-alt)"><i class="fa fa-copy" style="padding-right:3px;color:#666;text-decoration:none"></i> {{scope.row.cpf}}  </a>
-                                        <span v-else>-</span>
-                                    </template>
-                                </el-table-column>
-                                <el-table-column label="CNPJ" width="180">
-                                    <template #default="scope">
-                                        <a v-if="$validator.is(scope.row.cnpj)" href="javascript:void(0)" @click="$tools.Copy(scope.row.cnpj)" style="text-decoration:none;color:var(--s-color-tex-alt)"><i class="fa fa-copy" style="padding-right:3px;color:#666;text-decoration:none"></i> {{scope.row.cnpj}}  </a>
-                                        <span v-else>-</span>
-                                    </template>
-                                </el-table-column>
-                                <el-table-column label="E-Mail" width="300">
-                                    <template #default="scope">
-                                        <a :href="'mailto:'+scope.row.email" target="_blank" :style="(scope.row.excluido)? 'color:#999;text-decoration:none' : 'color:var(--el-color-primary);text-decoration:none'"><i class="fa fa-envelope"></i>&nbsp; {{scope.row.email}}</a>
-                                    </template>
-                                </el-table-column>
-                                <el-table-column label="TELEFONE" width="150">
-                                    <template #default="scope">
-                                        <a v-if="!scope.row.excluido" :href="$tools.BuildWhatsappLink(scope.row.telefone,'Olá '+scope.row.apelido)" target="_blank" :style="(scope.row.excluido)? 'color:#999;text-decoration:none' : 'color:var(--s-color-green);text-decoration:none' "><i class="fab fa-whatsapp" style="padding-right:3px;"></i> {{scope.row.telefone}}</a>
-                                    </template>
-                                </el-table-column>
-                                <el-table-column label="CONTA TOKEN" width="280">
-                                    <template #default="scope">
-                                        <a href="javascript:void(0)" @click="$tools.Copy(scope.row.conta.token)" style="text-decoration:none;color:var(--s-color-tex-alt)"><i class="fa fa-copy" style="padding-right:3px;color:#666;text-decoration:none"></i> {{scope.row.conta.token}}  </a>
-                                    </template>
-                                </el-table-column>
-                                <!--</el-table-column>
-                <el-table-column label="CONTATO">-->
-                                <el-table-column label="ENDEREÇO" width="400">
-                                    <template #default="scope">
-                                        <div v-if="!scope.row.excluido">
-                                            <a v-if="$validator.is(scope.row.logradouro)" href="javascript:void(0)" @click="$tools.Copy((scope.row.logradouro+','+scope.row.numero+','+($validator.is(scope.row.complemento)? scope.row.complemento+',':'')+scope.row.bairro+','+scope.row.cidade+','+scope.row.estado))" style="text-decoration:none;color:var(--s-color-tex-alt);margin-right:10px"><i class="fa fa-copy" style="padding-right:3px;color:#555;text-decoration:none"></i></a>
-                                            <a :href="$tools.BuildMapLink(scope.row)" target="_blank" style="color:var(--s-text-color);text-decoration:none;margin-right:6px">
-                                                <i style="color:#555;margin-right:6px" class="fa fa-location-dot"></i>
-                                                {{scope.row.logradouro}}, {{scope.row.numero}}
-                                                <span v-if="$validator.is(scope.row.complemento)"> , {{scope.row.complemento}}</span>,
-                                                {{scope.row.bairro}},
-                                                {{scope.row.cidade}}, {{scope.row.estado}}, CEP: {{scope.row.cep}}
-                                            </a>
-                                        </div>
-                                    </template>
-                                </el-table-column>
-
-
-                                <el-table-column prop="data" label="DATA" width="140">
-                                    <template #default="scope">
-                                        {{$tools.FormatDateToBR(new Date(scope.row.data))}}
-                                    </template>
-                                </el-table-column>
-
-                                <el-table-column label="OBS" width="60">
-                                    <template #default="scope">
-                                        <a v-if="$validator.is(scope.row.obs)" href="javascript:void(0)" @click="$tools.Alert(scope.row.obs,'OBSERVAÇÕES')" style="color:var(--s-color-primary);text-decoration:none"><i class="fa fa-message"></i></a>
-                                        <a v-else href="javascript:void(0)" @click="$tools.Message('sem observações')" style="color:var(--s-color-grey);text-decoration:none"><i class="fa fa-message"></i></a>
-                                    </template>
-                                </el-table-column>
-
-
-
-
-
-                            </el-table>
-
-
-
-                        </el-col>
-                        <el-col :md="24">
-
-                            <div class="q-pa-lg flex flex-center">
-                                <el-pagination layout="prev, pager, next" :total="busca.total" :page-size="busca.resultsPerPage" v-model:current-page="busca.page" @current-change="Buscar"></el-pagination>
-                            </div>
-
-                        </el-col>
-                    </el-row>
-
-
-                    <el-row>
-                    </el-row>
-
-
-                </el-col>
-		    </el-row>
-
-
-			</el-col>
-	</el-row>
-	</div>
+                            </el-col>
+                            <el-col :md="24">
+                                <div class="q-pa-lg flex flex-center">
+                                    <el-pagination layout="prev, pager, next" :total="busca.total" :page-size="busca.resultsPerPage" v-model:current-page="busca.page" @current-change="Buscar"></el-pagination>
+                                </div>
+                            </el-col>
+                        </el-row>
+                    </el-col>
+                </el-row>
+            </el-col>
+        </el-row>
+    </div>
 </template>
 
 
-
-
 <script>
-	module.exports = {
-
-		name: 'JCAdminParceiroBuscar',
-
-		components: {
-
-		},
-
-		data: function () {
-			return {
-				onrequest       : false,
-                ontablequest    : false,
-                busca           : this.$models.busca(),
-                data            : null,
-                idConta         : null,
-                idParceiro      : null,
-                conta           : {},
-                acessos         : 0,
+    module.exports = {
+        name: 'JCAdminParceiroBuscar',
+        components: {
+        },
+        data: function () {
+            return {
+                onrequest: false,
+                ontablequest: false,
+                busca: this.$models.busca(),
+                data: null,
+                idConta: null,
+                idParceiro: null,
+                conta: {},
+                acessos: 0,
                 exibirDadosConta: false,
-                status: [{value: 0,nome: "qualquer"},{value: 1,nome: "ATIVOS"},{value: 2,nome: "INATIVOS"},{value: 12,nome: "EXCLUÍDOS"}]
-			}
-		}, computed: {
-
-		},
-
-		props: {
-
-		},
-		watch: {
-
-		},
-		created: function () {
+                status: [{ value: 0, nome: "qualquer" }, { value: 1, nome: "ATIVOS" }, { value: 2, nome: "INATIVOS" }, { value: 12, nome: "EXCLUÍDOS" }]
+            }
+        },
+        computed: {
+        },
+        props: {
+        },
+        watch: {
+        },
+        created: function () {
             this.busca.item = this.$models.parceiro();
-		},
-		mounted() {
-           // this.$refs.contatoken.focus();
+        },
+        mounted() {
             this.Buscar();
-		},
-		methods: {
-
-
-            Reset(){
+        },
+        methods: {
+            Reset() {
                 this.idParceiro = null;
-                this.idConta    = null;
+                this.idConta = null;
                 this.busca.item = this.$models.parceiro();
                 this.busca.item.id = -1;
                 this.busca.idStatus = 0;
@@ -373,104 +305,81 @@
                 this.Buscar();
             },
 
-            tableRowClassName(scope){
-                if(!scope.row.ativo)
+            tableRowClassName(scope) {
+                if (!scope.row.ativo)
                     return "inactive-row";
             },
 
-
-            Alterar(scope){
+            Alterar(scope) {
                 this.$root.RouteTo('parceiro/' + scope.row.id)
             },
 
-
             ToggleAtivar(scope) {
-
-                var item=this.data.filter(i => i.id==scope.row.id)[0];
-
-                if(scope.row.ativo)
+                var item = this.data.filter(i => i.id == scope.row.id)[0];
+                if (scope.row.ativo)
                     this.Ativar(item);
                 else
                     this.Desativar(item);
             },
 
             async Ativar(item) {
-                
-                item.onrequest  = true;
-                var request     = await this.$api.Post("parceiro/ativar",item);
-                item.onrequest  = false;
-                
-                if (request?.status?.success) 
+                item.onrequest = true;
+                var request = await this.$api.Post("parceiro/ativar", item);
+                item.onrequest = false;
+
+                if (request?.status?.success)
                     this.$tools.MessageSuccess("Parceiro ativado!");
 
             },
 
             async Desativar(item) {
-                
-                item.onrequest  = true;
-                var request     = await this.$api.Post("parceiro/desativar",item);
-                item.onrequest  = false;
-                
-                if (request?.status?.success) 
-                    this.$tools.MessageSuccess("Parceiro desativado!");
+                item.onrequest = true;
+                var request = await this.$api.Post("parceiro/desativar", item);
+                item.onrequest = false;
 
+                if (request?.status?.success)
+                    this.$tools.MessageSuccess("Parceiro desativado!");
             },
 
 
             async Excluir(scope) {
+                var item = this.data.filter(i => i.id == scope.row.id)[0];
 
-                var item=this.data.filter(i => i.id==scope.row.id)[0];
-                
-                item.onrequest  = true;
-                var request     = await this.$api.Post("parceiro/excluir",item);
-                item.onrequest  = false;
-                
-                if(request?.status?.success) {
-                    scope.row.excluido=true;
+                item.onrequest = true;
+                var request = await this.$api.Post("parceiro/excluir", item);
+                item.onrequest = false;
+
+                if (request?.status?.success) {
+                    scope.row.excluido = true;
                     this.$tools.MessageSuccess("Parceiro excluído!");
                 }
-
             },
 
+            async Buscar(page = 1) {
+                this.busca.item.id = this.$validator.is(this.idParceiro) ? this.idParceiro : 0;
+                this.busca.item.conta.id = this.$validator.is(this.idConta) ? this.idConta : 0;
 
+                if (this.acessos == 0)
+                    this.busca.item.id = -1;
 
+                this.busca.page = page;
+                this.busca.result = [];
+                this.data = null;
+                this.onrequest = true;
+                var request = await this.$api.Post("parceiro/buscar", this.busca);
+                this.onrequest = false;
 
-
-            async Buscar(page=1){
-
-
-                       this.busca.item.id       = this.$validator.is(this.idParceiro)? this.idParceiro  : 0;
-                       this.busca.item.conta.id = this.$validator.is(this.idConta   )? this.idConta     : 0;
-
-                        if(this.acessos == 0)
-                            this.busca.item.id = -1 ;
-
-                        this.busca.page     = page;
-                        this.busca.result   = [];
-                        this.data           = null;
-                        this.onrequest      = true;
-                        var request         = await this.$api.Post("parceiro/buscar",this.busca);
-                        this.onrequest      = false;
-
-                        if (request?.status?.success){
-                            this.busca = request.result;
-                            this.data=this.busca.result;
-                            this.data.forEach(d => {d.onrequest=false;});
-                            this.conta = this.data[0].conta;
-                            this.acessos++;
-                            this.exibirDadosConta = (this.$validator.is(this.busca.item.conta.token) || this.$validator.is(this.busca.item.conta.id));
-                        } 
-
-			}
-
-
-
-
-		}
-
-	}
-
-
+                if (request?.status?.success) {
+                    this.busca = request.result;
+                    this.data = this.busca.result;
+                    this.data.forEach(d => { d.onrequest = false; });
+                    this.conta = this.data[0].conta;
+                    this.acessos++;
+                    this.exibirDadosConta = (this.$validator.is(this.busca.item.conta.token) || this.$validator.is(this.busca.item.conta.id));
+                }
+            }
+        }
+    }
 </script>
 
 

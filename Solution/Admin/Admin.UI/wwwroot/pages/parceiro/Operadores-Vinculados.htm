@@ -1,0 +1,83 @@
+﻿<template>
+    <div class="parceiros-relacionados">
+        <el-collapse v-model="activeNames">
+            <el-collapse-item v-for="(item, index) in collapseItems"
+                              :key="index"
+                              :name="item.id"
+                              :title="item.title"
+                               style="padding: 0px">
+                <!-- Tabela exibida dentro do el-collapse-item -->
+                <el-table :data="item.tableData" style="width: 100%" max-height="250">
+                    <el-table-column prop="id" label="ID" />
+                    <el-table-column prop="idPlano" label="ID do Plano" />
+                    <el-table-column prop="idConta" label="ID da Conta" />
+                    <el-table-column prop="conta.nome" label="Nome da Conta" />
+                    <el-table-column prop="settings.someSetting" label="Configuração" />
+                </el-table>
+            </el-collapse-item>
+        </el-collapse>
+    </div>
+</template>
+
+<script>
+    import { ref, onMounted, getCurrentInstance } from 'vue';
+    export default {
+        name: 'JCAdminParceirosRelacionados',
+        setup() {
+            const activeNames = ref(['1']);
+            const operadoresRelacionados = ref([]);
+            const instance = getCurrentInstance();
+            const collapseItems = ref([]);
+            const buildUrlForOperadoresRelacionados = () => {
+                if (instance && instance.proxy.$root.parceiroRow) {
+                    const idConta = instance.proxy.$root.parceiroRow.idConta;
+                    console.log(instance.proxy.$root.parceiroRow.idConta);
+                    const url = "parceiro/obtercontaporid/" + idConta;
+                    return url;
+                } else {
+                    console.error("parceiroRow não está definido.");
+                    return null;
+                }
+            };
+
+            const ObterContaPorId = async () => {
+                const url = buildUrlForOperadoresRelacionados();
+                if (instance) {
+                    console.log(url);
+                }
+                if (!url) {
+                    console.error("URL não pode ser construída.");
+                    return;
+                }
+
+                try {
+                    const response = await instance.proxy.$api.Get(url);
+                    console.log(response.result);
+                    collapseItems.value = response.result.map((item, index) => ({
+                        name: (index + 1).toString(), // Nome do item de colapso
+                        title: item.nome, 
+                        tableData: [{ // Estrutura da tabela, ajuste conforme necessário
+                            id: item.id,
+                            idPlano: item.idPlano,
+                            idConta: item.idConta,
+                            contaNome: item.conta.nome, // Supondo que 'nome' seja uma propriedade válida
+                            someSetting: item.settings.someSetting // Substitua pelo que você precisa
+                        }]
+                    }));                    console.log(collapseItems);
+                } catch (error) {
+                    console.error('Erro ao buscar operadores relacionados:', error);
+                }
+            };
+
+            onMounted(() => {
+                ObterContaPorId();
+            });
+
+            return {
+                activeNames,
+                collapseItems,
+                operadoresRelacionados
+            };
+        }
+    };
+</script>
