@@ -170,6 +170,11 @@ namespace JaCaptei.Application{
             return DAO.Buscar(busca);
         }
 
+        public List<ImovelList> BuscarImoveisIA()
+        {
+            return DAO.BuscarImoveisIA();
+        }
+
 
         public AppReturn BuscarParaSite(ImovelBusca busca) {
             //busca.somenteValidados = true;

@@ -1,168 +1,121 @@
 ﻿@{
-    IgnoreBody(); 
-    var title   =      (ViewBag.title is null)? "JaCaptei"                        : ViewBag.title ;
-    var desc    =      (ViewBag.desc  is null)? "sua plataforma de imóveis"       : ViewBag.desc  ;
-    var img     =      (ViewBag.img   is null)? "https://jacaptei.com.br/resources/images/icons/JaCaptei150px.png" : ViewBag.img   ;
+    IgnoreBody();
+    var title = (ViewBag.title is null) ? "JaCaptei" : ViewBag.title;
+    var desc = (ViewBag.desc is null) ? "sua plataforma de imóveis" : ViewBag.desc;
+    var img = (ViewBag.img is null) ? "https://jacaptei.com.br/resources/images/icons/JaCaptei150px.png" : ViewBag.img;
+    string version = DateTime.Now.Ticks.ToString();
 }
 <!DOCTYPE html>
 <html lang="pt-BR" xml:lang="pt-BR" class="notranslate" translate="no">
-    <head>
-        <meta charset="utf-8" />
-        <meta name="google" content="notranslate" />
+<head>
+    <meta charset="utf-8" />
+    <meta name="google" content="notranslate" />
+    <meta name="description" content="@desc" />
+    <meta name="keywords" content="Imóvel, Imóveis, Busca, Gestão, Compra, Venda, Seguro, Assessoria Jurídica, Avaliação Mercadológica" />
+    <meta name="author" content="JáCaptei" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="icon" href="https://admin.jacaptei.com.br/resources/images/icons/JaCaptei150px.png" sizes="32x32" />
+    <link rel="icon" href="https://admin.jacaptei.com.br/resources/images/icons/JaCaptei300px.png" sizes="192x192" />
+    <link rel="apple-touch-icon" href="https://admin.jacaptei.com.br/resources/images/icons/JaCaptei300px.png" />
+    <link rel="canonical" href="https://admin.jacaptei.com.br" />
 
-        <meta name="description"    content="JáCaptei - sua plataforma de imóveis" />
-        <meta name="keywords"       content="Imóvel, Imóveis, Busca, Gestão, Compra, Venda, Seguro, Assessoria Jurídica, Avaliação Mercadológica" />
-        <meta name="author"         content="JáCaptei" />
+    <meta property="og:url" content="https://jacaptei.com.br" />
+    <meta property="og:site_name" content="JaCaptei" />
+    <meta property="og:title" content="@title" />
+    <meta property="og:description" content="@desc" />
+    <meta property="og:image" content="@img" itemprop="image" />
+    <meta property="og:image:width" content="640" />
+    <meta property="og:image:height" content="480" />
+    <meta property="og:type" content="website" />
 
-        <meta name="viewport"       content="width=device-width, initial-scale=1.0" />
+    <title>JáCaptei . Admin</title>
 
-        <meta name="msapplication-TileImage"  content="https://admin.jacaptei.com.br/resources/images/icons/JaCaptei150px.png" />
-        <link rel="icon"                         href="https://admin.jacaptei.com.br/resources/images/icons/JaCaptei150px.png" sizes="32x32" />
-        <link rel="icon"                         href="https://admin.jacaptei.com.br/resources/images/icons/JaCaptei300px.png" sizes="192x192" />
-        <link rel="apple-touch-icon"             href="https://admin.jacaptei.com.br/resources/images/icons/JaCaptei300px.png" />
-        <link rel="canonical"                    href="https://admin.jacaptei.com.br" />
+    <!-- CSS Styles -->
+    <link href="./resources/fonts/fontawesome/css/all.min.css?v=@version" rel="stylesheet" />
+    <link href="./resources/fonts/materialdesign/materialdesignicons.min.css?v=@version" rel="stylesheet" />
+    <link href="./resources/frameworks/quasar/animate.min.css?v=@version" rel="stylesheet" />
+    <link href="./resources/frameworks/quasar/quasar.css?v=@version" rel="stylesheet" />
+    <link href="./resources/frameworks/element/element-plus.min.css?v=@version" rel="stylesheet" />
+    <link href="./resources/css/quasar-overwrite.css?v=@version" rel="stylesheet" />
+    <link href="./resources/css/element-plus-overwrite.css?v=@version" rel="stylesheet" />
+    <link href="./resources/css/main.css?v=@version" rel="stylesheet" />
 
-        <meta name="msapplication-TileImage" content="@img" />
-        <meta property="og:url"              content="https://jacaptei.com.br" />
-        <meta property="og:site_name"        content="JaCaptei">
-        <meta property="og:title"            content="@title" />
-        <meta property="og:description"      content="@desc" />
-        <meta property="og:image"            content="@img" itemprop="image">
-        <meta property="og:image:width"      content="640" />
-        <meta property="og:image:height"     content="480" />
-        <meta property="og:type"             content="website" />
-        @*<meta property="og:updated_time"     content="1440432930" />*@
-	    
-        <title>JáCaptei . Admin</title>
+    <!-- JavaScript Scripts -->
+    <script src="./resources/libs/jquery/jquery.min.js?v=@version"></script>
+    <script src="./resources/libs/axios/axios.min.js?v=@version"></script>
+    <script src="./resources/js/libs/locations.js?v=@version"></script>
+    <script src="./resources/js/libs/sdata.js?v=@version" type="module"></script>
+    <script src="./resources/js/libs/helpers.js?v=@version"></script>
+    <script src="./resources/js/libs/prototypes.js?v=@version"></script>
+    <script src="./resources/js/libs/dateFormat.js?v=@version"></script>
+    <script src="./resources/vue/vue.js?v=@version"></script>
+    <script src="./resources/vue/vue3-sfc-loader.js?v=@version"></script>
+    <script src="./resources/vue/vue-loader.js?v=@version"></script>
+    <script src="./resources/vue/vue-router.js?v=@version"></script>
+    <script src="./resources/js/libs/loader-components-help.js?v=@version"></script>
+    <script src="./resources/js/libs/maska.js?v=@version"></script>
+    <script src="./resources/js/libs/vmoney3.js?v=@version"></script>
+    <script src="./resources/js/configs/routes.js?v=@version"></script>
+    <script src="./resources/js/configs/components.js?v=@version"></script>
+    <script src="./resources/js/main.js?v=@version" type="module"></script>
+    <!--<script src="https://cdn.jsdelivr.net/npm/maska@@2/dist/maska.umd.js"></script>-->
+    <!--<script src="./resources/libs/jquery/jquery.qtip.min.js"></script>
+    <link href="./resources/libs/jquery/jquery.qtip.min.css" rel="stylesheet" />-->
+</head>
+<body>
+    <div id="app">
+        <div id="top">
+            <el-container :class="isAuth? 'base-layout':'login-layout'">
+                <el-header class="header" v-if="isAuth">
+                    <c-header></c-header>
+                </el-header>
 
-        <script src="./resources/libs/jquery/jquery.min.js"                 ></script>
-        <script src="./resources/libs/axios/axios.min.js"                   ></script>
-
-        <script src="./resources/js/libs/locations.js"                      ></script>
-        <script src="./resources/js/libs/sdata.js"     type="module"        ></script>
-
-        <script src="./resources/js/libs/helpers.js"                        ></script>
-        <script src="./resources/js/libs/prototypes.js"                  ></script>
-        <script src="./resources/js/libs/dateFormat.js"                  ></script>
-
-        <script src="./resources/vue/vue.js"                                ></script>
-        <script src="./resources/vue/vue3-sfc-loader.js"                    ></script>
-        <script src="./resources/vue/vue-loader.js"                         ></script>
-        <script src="./resources/vue/vue-router.js"                         ></script>
-        <script src="./resources/js/libs/loader-components-help.js"         ></script>
-
-
-
-        <link href="./resources/fonts/fontawesome/css/all.min.css"                  rel="stylesheet" />
-        <link href="./resources/fonts/materialdesign/materialdesignicons.min.css"   rel="stylesheet" />
-
-        <link href="./resources/frameworks/quasar/animate.min.css"          rel="stylesheet" />
-        <link href="./resources/frameworks/quasar/quasar.css"               rel="stylesheet" />
-        <link href="./resources/frameworks/element/element-plus.min.css"    rel="stylesheet" />
- 
-
-        <link href="./resources/css/quasar-overwrite.css"                   rel="stylesheet" />
-        <link href="./resources/css/element-plus-overwrite.css"             rel="stylesheet" />
-
-        <link href="./resources/css/main.css"                              rel="stylesheet" />
-
-        <!--<script src="https://cdn.jsdelivr.net/npm/maska@@2/dist/maska.umd.js"></script>-->
-        <script src="./resources/js/libs/maska.js"                          ></script>
-        <script src="./resources/js/libs/vmoney3.js"                        ></script>
-
-        <script src="./resources/js/configs/routes.js"></script>
-        <script src="./resources/js/configs/components.js"></script>
-        <script src="./resources/js/main.js" type="module"></script>
-
-        <!--<script src="./resources/libs/jquery/jquery.qtip.min.js"></script>
-        <link href="./resources/libs/jquery/jquery.qtip.min.css" rel="stylesheet" />-->
-
-
-    </head>
-    <body>
-        <div id="app">
-
-
-
-
-              <div id="top">
-
-                <el-container :class="isAuth? 'base-layout':'login-layout'">
-
-                    <el-header class="header" v-if="isAuth">
-                            <c-header></c-header>
-                    </el-header>
- 
-                  <el-container>
-
+                <el-container>
                     <div :style="$root.menu.isCollapse? 'margin-right:60px;':'margin-right:200px;'" v-if="isAuth">
                         <el-aside style="background: #07459f; margin-top:80px;position:fixed;height:100%">
-                          <c-menu></c-menu>
+                            <c-menu></c-menu>
                         </el-aside>
                     </div>
-
                     <el-container style="min-height:100%; margin-top:80px;" v-cloak v-if="!status.mainLoading">
                         <el-main style="background-color:#fff;" id="content">
                             <div :class="isAuth? 'content':'content-login'">
-                                    <div v-if="pageLoading" style="position:absolute">
-                                        <c-loading-page></c-loading-page>
-                                    </div>
-                                    <div :style="pageLoading? 'opacity:0':'opacity:1'">
-                                            <c-title  :label="$root.title.label" :icon="$root.title.icon" :actionback="$root.title.actionBack" :visible="$root.title.visible" v-if="isAuth"></c-title>
-                                            <router-view v-slot="{ Component }">
-                                              <div :style="pageLoading? 'opacity:0':'opacity:1'">
-                                                   <Transition name="fade" mode="out-in">
-                                                        <component :is="Component"></component>
-                                                  </Transition>
-                                               </div>
-                                            </router-view>
-                                    </div>
-                             </div>
-
+                                <div v-if="pageLoading" style="position:absolute">
+                                    <c-loading-page></c-loading-page>
+                                </div>
+                                <div :style="{ opacity: pageLoading ? '0' : '1' }">
+                                    <c-title :label="$root.title.label" :icon="$root.title.icon" :actionback="$root.title.actionBack" :visible="$root.title.visible" v-if="isAuth"></c-title>
+                                    <router-view v-slot="{ Component }">
+                                        <div :style="pageLoading? 'opacity:0':'opacity:1'">
+                                            <Transition name="fade" mode="out-in">
+                                                <component :is="Component"></component>
+                                            </Transition>
+                                        </div>
+                                    </router-view>
+                                </div>
+                            </div>
                         </el-main>
-          
                     </el-container>
-                 </el-container>
-              </el-container>
-
-
-              </div>
-
-            <!--<el-footer >
-                <c-footer></c-footer>
-            </el-footer>-->
-
-
+                </el-container>
+            </el-container>
         </div>
+        <!--<el-footer >
+            <c-footer></c-footer>
+        </el-footer>-->
+    </div>
 
-        <footer>
-
-
-            <script src="./resources/frameworks/quasar/quasar.umd.prod.js"></script>
-            <!--<script src="./resources/frameworks/quasar/fontawesome-v6.umd.prod.js"  ></script>-->
-            <script src="./resources/frameworks/element/element-plus.prod.js"></script>
-            <!--<script src="//cdn.jsdelivr.net/npm/element-plus"></script>-->
-
-            <script src="./resources/libs/apexcharts/apexcharts-cdn.js"></script>
-
-            <script src="./resources/frameworks/quasar/quasar.umd.prod.js"></script>
-            <script src="./resources/frameworks/quasar/fontawesome-v6.umd.prod.js"></script>
-            @* <script src="https://cdn.jsdelivr.net/npm/quasar@@v2.11.10/dist/icon-set/fontawesome-v6.umd.prod.js"></script> *@
-
-            <script src="./resources/frameworks/element/element-plus.prod.js"></script>
-            <script src="./resources/frameworks/element/element-plus-icons.prod.js"></script>
-            @* <script src="https://unpkg.com/@@element-plus/icons-vue@@2.1.0/dist/index.iife.min.js"></script> *@
-
-@* 
-            <script src="https://unpkg.com/@@element-plus/icons-vue@@2.1.0/dist/index.iife.min.js"></script>
-            <script src="https://cdn.jsdelivr.net/npm/quasar@@v2/dist/icon-set/fontawesome-v6.umd.prod.js"></script>
-
- *@
-
-
-
-        </footer>
-
-    </body>
+    <footer>
+        <script src="./resources/frameworks/quasar/quasar.umd.prod.js?v=@version"></script>
+        <script src="./resources/frameworks/element/element-plus.prod.js?v=@version"></script>
+        <script src="./resources/libs/apexcharts/apexcharts-cdn.js?v=@version"></script>
+        <script src="./resources/frameworks/quasar/quasar.umd.prod.js?v=@version"></script>
+        <script src="./resources/frameworks/quasar/fontawesome-v6.umd.prod.js?v=@version"></script>
+        <script src="./resources/frameworks/element/element-plus.prod.js?v=@version"></script>
+        <script src="./resources/frameworks/element/element-plus-icons.prod.js?v=@version"></script>
+        @*
+        <script src="https://unpkg.com/@@element-plus/icons-vue@@2.1.0/dist/index.iife.min.js"></script>
+        <script src="https://cdn.jsdelivr.net/npm/quasar@@v2/dist/icon-set/fontawesome-v6.umd.prod.js"></script>
+        *@
+    </footer>
+</body>
 </html>
 

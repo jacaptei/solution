@@ -1,10 +1,10 @@
 ﻿<template>
     <div>
         <div v-if="$root.isAuth">
-            <el-container :style="$root.onRequest? 'cursor:wait' : 'cursor:default'">
+            <el-container :style="$root.onRequest ? 'cursor:wait' : 'cursor:default'">
 
-                <c-imovel-busca-form :show="showForm" @buscarimoveis="Buscar"  v-if="$validator.is($root.buscaImovel?.imovel)" :style="$root.onRequest? 'pointer-events: none;opacity:0.4;cursor:wait' : ''"></c-imovel-busca-form>
-                
+                <c-imovel-busca-form :show="showForm" @buscarimoveis="Buscar" v-if="$validator.is($root.buscaImovel?.imovel)" :style="$root.onRequest? 'pointer-events: none;opacity:0.4;cursor:wait' : ''"></c-imovel-busca-form>
+
                 <el-container style="cursor:default">
 
                     <div class="row" style="width:100%;margin-bottom:40px;display:block">
@@ -31,31 +31,31 @@
 
                             <div class="q-pa-lg flex flex-center">
                                 <!--<el-pagination layout="prev, pager, next" :total="totalNav" :page-count="Math.ceil(totalNav/20)" v-model:current-page="page" @current-change="Nav"></el-pagination>-->
-                                    <el-pagination layout="prev, pager, next" :total="$root.buscaImovel.total" :page-size="$root.buscaImovel.resultsPerPage" v-model:current-page="page" @current-change="Buscar"></el-pagination>
+                                <el-pagination layout="prev, pager, next" :total="$root.buscaImovel.total" :page-size="$root.buscaImovel.resultsPerPage" v-model:current-page="page" @current-change="Buscar"></el-pagination>
                             </div>
 
                             <!--
-                        <q-btn label="Anterior" color="primary" icon="fa fa-caret-left" @click="NavTemp(-1)" :disabled="$root.imovelBusca.page == 0"></q-btn>
-                        &nbsp;&nbsp;<div style="display:inline-block;width:100px;text-align:center;font-size:24px;color:var(--s-accent-color)">{{page}}</div>&nbsp;&nbsp;
+                <q-btn label="Anterior" color="primary" icon="fa fa-caret-left" @click="NavTemp(-1)" :disabled="$root.imovelBusca.page == 0"></q-btn>
+                &nbsp;&nbsp;<div style="display:inline-block;width:100px;text-align:center;font-size:24px;color:var(--s-accent-color)">{{page}}</div>&nbsp;&nbsp;
 
 
-                            <q-btn label="Próximo" color="primary" icon-right="fa fa-caret-right" @click="NavTemp(1)"></q-btn>
-                        <br /><br />
-                        <el-pagination layout="prev, pager, next" :total="totalResults" @prev-click="Nav(-1)" @next-click="Nav(1)" v-model:current-page="page" @current-change="NavTo"></el-pagination>
-                        <br /><br />
-                        <div class="q-pa-lg flex flex-center">
-                            <q-pagination
-                              v-model="page"
-                              :max="totalResults"
-                              :max-pages="10"
-                              direction-links
-                              boundary-links
-                              icon-prevt="fa fa-caret-left"
-                              icon-next="fa fa-caret-right"
-                              icon-firs="fa fa-backward"
-                              icon-last="fa fa-forward"
-                            />
-                          </div>-->
+                    <q-btn label="Próximo" color="primary" icon-right="fa fa-caret-right" @click="NavTemp(1)"></q-btn>
+                <br /><br />
+                <el-pagination layout="prev, pager, next" :total="totalResults" @prev-click="Nav(-1)" @next-click="Nav(1)" v-model:current-page="page" @current-change="NavTo"></el-pagination>
+                <br /><br />
+                <div class="q-pa-lg flex flex-center">
+                    <q-pagination
+                      v-model="page"
+                      :max="totalResults"
+                      :max-pages="10"
+                      direction-links
+                      boundary-links
+                      icon-prevt="fa fa-caret-left"
+                      icon-next="fa fa-caret-right"
+                      icon-firs="fa fa-backward"
+                      icon-last="fa fa-forward"
+                    />
+                  </div>-->
 
                         </div>
 
@@ -115,26 +115,21 @@
 
         },
         watch: {
-            //"pct":function(){ this.updateLabels(); }
         },
         created: function () {
             this.$root.onRequest = true;
-            //for(var i=0;i<8;i++)
-            //    this.results.push({name:"card"+i});
         },
         async mounted() {
             const sessionRestored = await this.$root.RestoreSession();
             if (sessionRestored)
              this.Buscar();
-           else
+            else if (!this.$root.userSessionIsRevoked)
              this.$root.RequestLogin();
         },
         methods: {
 
             Nav(page){
-                 //c(`current page: ${page}`)
                 if(this.$root.imovelBusca.page != (page-1)){
-                    //this.page = page;
                     if( (this.$root.imovelBusca.page + page) < 0){
                         this.$root.imovelBusca.page = 0;
                     }else{
@@ -169,21 +164,23 @@
             SetBuscaTitulo(buscaImovel){
 
                 var imovel = buscaImovel.imovel;
-
                 this.buscaTitulo = "";
-               
                 
-                var tipo = this.$models.tiposImoveis().filter(i=>i.id == imovel.idTipo)[0];
-                this.buscaTitulo += this.$validator.is(tipo)? tipo.label : "Imóveis";
-                
+                var tipo = this.$models.tiposImoveis().filter(i => i.id == imovel.idTipo)[0];
+                var totalRendered = Math.min(buscaImovel.page * buscaImovel.resultsPerPage, buscaImovel.total);
+
+                this.buscaTitulo += this.$validator.is(tipo) ?
+                    tipo.label :
+                    `Visualizando ${totalRendered} de ${buscaImovel.total} imóveis`;     
+                    
                 this.buscaTitulo += " à venda" ;
 
                 this.buscaTitulo += (imovel.interno.totalQuartos)? (", "+imovel.interno.totalQuartos + " quartos ") :"";
 
                 if(this.$validator.is(imovel.endereco.estado)){
-                    this.buscaTitulo += " em ";
-                    this.buscaTitulo += (this.$validator.is(buscaImovel.bairros.length == 1))? (buscaImovel.bairros[0]+", ") : (this.$validator.is(buscaImovel.bairros.length > 1))? (buscaImovel.bairros.length +" bairros de ") : "";
-                    this.buscaTitulo +=  this.$validator.is(imovel.endereco.cidade)? (imovel.endereco.cidade+", "+imovel.endereco.estado) : imovel.endereco.estado;
+                    this.buscaTitulo += buscaImovel.bairros.length === 1 ? " no bairro " : " em ";
+                    this.buscaTitulo += (this.$validator.is(buscaImovel.bairros.length == 1)) ? (buscaImovel.bairros[0] + ", ") : (this.$validator.is(buscaImovel.bairros.length > 1)) ? (buscaImovel.bairros.length + " bairros de ") : "";
+                    this.buscaTitulo +=  this.$validator.is(imovel.bairros)? (imovel.endereco.cidade+", "+imovel.endereco.estado) : imovel.endereco.estado;
                 }
                 
 
