@@ -475,7 +475,7 @@ namespace JaCaptei.Application.Integracao
                 }
                 var chave = import.ChaveApi;
                 var url = import.UrlApi;
-                // TODO: remover
+
                 var res = await IncluirImovel(request!, chave, url);
                 importacaoImovel!.Status = res == null ? StatusIntegracao.Erro.GetDescription() : StatusIntegracao.Concluido.GetDescription();
                 importacaoImovel.ApiResponse = Newtonsoft.Json.JsonConvert.SerializeObject(res);
@@ -544,7 +544,7 @@ namespace JaCaptei.Application.Integracao
                 Query = "key=" + Uri.EscapeDataString(chave)
             };
 
-            builder.Query += "&imovel=" + Uri.EscapeDataString(cod.ToString());
+            //builder.Query += "&imovel=" + Uri.EscapeDataString(cod.ToString());
             var uriWithQuery = builder.Uri;
 
             var res = await client.PostAsync(uriWithQuery, fotosData);
