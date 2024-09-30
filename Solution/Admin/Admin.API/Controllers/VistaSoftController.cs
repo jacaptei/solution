@@ -87,7 +87,7 @@ namespace JaCaptei.Admin.API.Controllers
             var content = new StringContent(jsonInString, Encoding.UTF8, "application/json");
             var client = _httpClientFactory.CreateClient("");
             client.DefaultRequestHeaders.Add("Accept", "application/json");
-            var url = Config.settings.IntegracaoAzureUrl;
+            var url = Config.settings.IntegracaoVSAzureUrl;
             var result = await client.PostAsync(url, content);
             var res = await result.Content.ReadAsStringAsync();
             return Ok(res);
