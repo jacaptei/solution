@@ -1,4 +1,6 @@
-﻿function getVersionedUrl(path) {
+﻿// CACHE BUSTING
+// -------------------------------------------
+function getVersionedUrl(path) {
     const version = new Date().getTime(); 
     return `${path}?v=${version}`;
 }

@@ -20,6 +20,7 @@ namespace JaCaptei.Model {
             public int              idImovel            {get;set;}  =   0;
             public string           codImovel           {get;set;}  =   "";
             public Imovel           imovel              {get;set;}  =   new Imovel();
+            public bool             imovelJC            {get;set;}  =   false;
 
             public int              idProprietario      {get;set;}  =   0;
             public Proprietario     proprietario        {get;set;}  =   new Proprietario();
@@ -65,13 +66,27 @@ namespace JaCaptei.Model {
             public bool             validadoProprietario{get;set;}  =   true;
 
             public string           acao                {get;set;}  =   "";
+            public bool             notificar           {get;set;}  =   false;
             public bool             ativo               {get;set;}  =   false;
             public bool             liberado            {get;set;}  =   false;
             public bool             agendado            {get;set;}  =   false;
+            public bool             reagendado          {get;set;}  =   false;
+            public bool             confirmado          {get;set;}  =   false;
+            public bool             visitado	        {get;set;}  =   false;
+            public bool             concluido           {get;set;}  =   false;
+            public bool             visita              {get;set;}  =   false;
+            public bool             captacao            {get;set;}  =   false;
+
             public string           token               {get;set;}  =   "";
             public long             tokenNum            {get;set;}  =   0;
 
             public string           obs                 {get;set;}  =   "";
+            public string           obsAgendamento      {get;set;}  =   "";
+            public string           obsReagendamento    {get;set;}  =   "";
+            public string           obsConfirmado	    {get;set;}  =   "";
+            public string           obsVisitado	        {get;set;}  =   "";
+            public string           obsConcluido	    {get;set;}  =   "";
+            public string           logs                {get;set;}  =   "";
 
             public int              inseridoPorId       {get;set;}
             public string           inseridoPorNome     {get;set;}  =   "";
@@ -81,6 +96,12 @@ namespace JaCaptei.Model {
             public string           atualizadoPorPerfil {get;set;}  =   "";
 
             public DateTime         dataVisita          {get;set;}  = Utils.Date.GetLocalDateTime();
+            public DateTime         dataAgendamento     {get;set;}  = Utils.Date.GetLocalDateTime();
+            public DateTime         dataReagendamento   {get;set;}  = Utils.Date.GetLocalDateTime();
+            public DateTime         dataConfirmado      {get;set;}  = Utils.Date.GetLocalDateTime();
+            public DateTime         dataVisitado        {get;set;}  = Utils.Date.GetLocalDateTime();
+            public DateTime         dataConcluido       {get;set;}  = Utils.Date.GetLocalDateTime();
+
             public DateTime         dataConsiderada     {get;set;}  = Utils.Date.GetLocalDateTime();
             public DateTime         dataAtualizacao     {get;set;}  = Utils.Date.GetLocalDateTime();
             public DateTime         data                {get;set;}  = Utils.Date.GetLocalDateTime();

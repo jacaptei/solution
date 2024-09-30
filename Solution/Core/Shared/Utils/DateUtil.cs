@@ -9,8 +9,12 @@ namespace JaCaptei.Model {
         private TimeZoneInfo ZONE = TimeZoneInfo.CreateCustomTimeZone("BRASILSP", new TimeSpan(-3, 0, 0), "BRASILSP", "BRASILSP");
         //TimeZoneInfo.ConvertTimeFromUtc(utcTime, ZONE);
 
-        public DateTime GetDateTime() {
+        public DateTime GetUTCDateTime() {
             return DateTime.UtcNow;
+        }
+
+        public DateTime GetDateTime() {
+            return DateTime.Now;
         }
 
         public DateTime GetUnsetDefaultDateTime() {

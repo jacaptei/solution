@@ -10,18 +10,18 @@
 					class="text-grey"
 					active-color="primary"
 					indicator-color="primary">
-				<q-tab name="nova"			icon="fa fa-plus"			label="NOVO IMÓVEL"></q-tab>
-				<q-tab name="buscar"		icon="fa fa-list-check"		label="ACOMPANHAR" ></q-tab>
+				<q-tab name="visita"	icon="fa fa-calendar"	label="VISITAS"></q-tab>
+				<q-tab name="captacao"	icon="fa fa-magnet"		label="CAPTAÇÕES"></q-tab>
 				<!--<q-tab name="register"	icon="fa fa-user-plus"			label="CADASTRE-SE"		style="width:115px"></q-tab>-->
 			</q-tabs>
 			<q-tab-panels v-model="page" animated>
 				
-				<q-tab-panel name="nova">
-					<page_adicionar />
+				<q-tab-panel name="visita">
+					<page_visita :show="show" />
 				</q-tab-panel>
 
-				<q-tab-panel name="buscar">
-					<page_buscar />
+				<q-tab-panel name="captacao">
+					<page_captacao :show="show" />
 				</q-tab-panel>
 
 			</q-tab-panels>
@@ -35,31 +35,33 @@
 <script>
 	module.exports = {
 
-		name: 'JaCapteiParceiroSolicitacao8989',
+		name: 'JaCapteiParceiroIndex777154',
 
 		components: {
-            page_adicionar:	LoadComponent("./pages/parceiro/Solicitacao-Adicionar.htm"),
-            page_buscar:	LoadComponent("./pages/parceiro/Solicitacao-Buscar.htm")
+			page_visita:	LoadComponent("./pages/parceiro/solicitacoes/Visita.htm"),
+            page_captacao:	LoadComponent("./pages/parceiro/solicitacoes/Captacao.htm")
 		},
+
 		data: function () {
 			return {
-                page: "nova"
+                page: "visita",
 			}
 		}, computed: {
 
 		},
 
 		props: {
-            view:		{ type: String, required: false, default: "nova" },
+            show:		{ type: String, required: false, default: null },
 		},
 		watch: {
 
 		},
 		created: function () {
-			this.page = this.view;
+			this.$root.SetTitle("Parceiros", "fa fa-users", null);
+			if(this.$validator.is(this.show))
+				this.page = this.show.split("/")[3];
 		},
 		mounted() {
-
 
 		},
 		methods: {

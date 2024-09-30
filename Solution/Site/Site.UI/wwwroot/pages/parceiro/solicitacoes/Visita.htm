@@ -10,19 +10,23 @@
 					class="text-grey"
 					active-color="primary"
 					indicator-color="primary">
-				<q-tab name="solicitacao"	icon="fa fa-bell-concierge" label="SOLICITAÇÕES"></q-tab>
+				<q-tab name="nova"			icon="fa fa-plus"			label="AGENDAR"></q-tab>
+				<q-tab name="buscar"		icon="fa fa-list-check"		label="ACOMPANHAR" ></q-tab>
 				<!--<q-tab name="register"	icon="fa fa-user-plus"			label="CADASTRE-SE"		style="width:115px"></q-tab>-->
 			</q-tabs>
 			<q-tab-panels v-model="page" animated>
 				
-				<q-tab-panel name="solicitacao">
-					<page_solicitacao :show="show" />
+				<q-tab-panel name="nova">
+					<page_adicionar />
+				</q-tab-panel>
+
+				<q-tab-panel name="buscar">
+					<page_buscar />
 				</q-tab-panel>
 
 			</q-tab-panels>
 		</div>
 	</div>
-
 </template>
 
 
@@ -31,33 +35,32 @@
 <script>
 	module.exports = {
 
-		name: 'JaCapteiParceiroIndex777154',
+		name: 'JaCapteiParceiroSolicitacao8989',
 
 		components: {
-            page_solicitacao:	LoadComponent("./pages/parceiro/solicitacoes/Index.htm")
+            page_adicionar:	LoadComponent("./pages/parceiro/solicitacoes/Visita-Adicionar.htm"),
+            page_buscar:	LoadComponent("./pages/parceiro/solicitacoes/Visita-Buscar.htm")
 		},
-
 		data: function () {
 			return {
-                page: "solicitacao",
-				show: null,
+                page: "nova"
 			}
 		}, computed: {
 
 		},
 
 		props: {
-
+            show:		{ type: String, required: false, default: null },
 		},
 		watch: {
 
 		},
 		created: function () {
-			this.$root.SetTitle("Parceiros", "fa fa-users", null);
-			   if(this.$validator.is(this.$route.query?.show)) 
-					this.show = this.$route.query.show;
+			if(this.$validator.is(this.show))
+				this.page = this.show.split("/")[4];
 		},
 		mounted() {
+
 
 		},
 		methods: {

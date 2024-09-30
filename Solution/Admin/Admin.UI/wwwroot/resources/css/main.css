@@ -254,8 +254,8 @@ article{
 
 
 .title{
-    font-size:28px;
-    color:var(--s-text-color);
+    font-size:15px;
+    color:var(--s-color-primary);
     font-weight:600;
 }
 

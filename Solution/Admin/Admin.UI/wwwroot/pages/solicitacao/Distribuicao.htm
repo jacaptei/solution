@@ -16,21 +16,21 @@
 
 
                 <el-table :data="admins" style="width: 100%" max-height="380" v-loading="ontablequest" :table-layout="auto" :row-class-name="tableRowClassName">
-                    <el-table-column label="Habilitados a receber solicitações" width="300">
+                    <el-table-column label="Habilitados a receber solicitações de:" width="300">
                         <template #default="scope">
                             <div style="cursor:pointer" @click="AlterarTodaDisponibilidade(scope)">
                                 <b :style="(scope.row.settings.receberSolicitacaoAgendada && scope.row.settings.receberSolicitacaoNaoAgendada)? 'color:var(--s-color-green)' : (!scope.row.settings.receberSolicitacaoAgendada && !scope.row.settings.receberSolicitacaoNaoAgendada)? 'color:var(--s-color-red)' : 'color:var(--s-color-orange)' ">{{scope.row.nome}}</b>
                             </div>
                         </template>
                     </el-table-column>
-                    <el-table-column fixed="right" label="Agendadas" width="200" style="color:orange">
+                    <el-table-column fixed="right" label="Visitas" width="200" style="color:orange">
                         <template #default="scope">
                             <div style="display:inline-block;margin-left:8px;margin-right:20px">
                                 <el-switch v-model="scope.row.settings.receberSolicitacaoAgendada" class="ml-2" style="--el-switch-on-color: var(--s-color-green); --el-switch-off-color:var(--s-color-red)" @change="AlterarDisponibilidade(scope)"></el-switch>
                             </div>
                         </template>
                     </el-table-column>
-                    <el-table-column fixed="right" label="Não Agendadas" width="200" style="color:orange">
+                    <el-table-column fixed="right" label="Captações" width="200" style="color:orange">
                         <template #default="scope">
                             <div style="display:inline-block;margin-left:8px;margin-right:20px">
                                 <el-switch v-model="scope.row.settings.receberSolicitacaoNaoAgendada" class="ml-2" style="--el-switch-on-color: var(--s-color-green); --el-switch-off-color:var(--s-color-red)" @change="AlterarDisponibilidade(scope)"></el-switch>

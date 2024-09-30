@@ -556,6 +556,23 @@ body.desktop .q-btn  .q-focus-helper {
 }
 
 
+.q-timeline__subtitle{
+    /*color:var(--s-color-primary);*/
+    opacity:1;
+}
+.q-timeline__title{
+    /*color:var(--s-color-primary);*/
+    font-weight:800;
+    margin-bottom:4px;
+}
+.q-timeline__content{
+    font-size:15px;
+    padding-left:15px;
+}
+.q-timeline h6{
+    font-size:15px;
+}
+
 
 /* ******************************************************* */
 /*                       //FIELD                           */

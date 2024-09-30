@@ -676,7 +676,7 @@ export default class Tools {
 
     GetHours(d) {
         if(this.IsNotSet(d)) return "";
-        d = new Date(d + "");
+        d = this.DateFix(d);
         return (d.getHours() < 10 ? "0" + d.getHours() : d.getHours()) + ":" +
             (d.getMinutes() < 10 ? "0" + d.getMinutes() : d.getMinutes());
     }
@@ -684,7 +684,7 @@ export default class Tools {
     GetDateHour(d) {
         if(this.IsNotSet(d)) return "";
         var days = ["Dom", "Seg", "Ter", "Qua", "Qui", "Sex", "Sáb"];
-        d = new Date(d);
+        d = this.DateFix(d);
         var dia = d.getDate() < 10 ? "0" + d.getDate() : d.getDate();
         var mes = (d.getMonth() + 1) < 10 ? "0" + (d.getMonth() + 1) : (d.getMonth() + 1);
         var ano = d.getFullYear();
@@ -698,7 +698,7 @@ export default class Tools {
     FormatDate(d) {
         if(this.IsNotSet(d)) return "";
         var days = ["Dom", "Seg", "Ter", "Qua", "Qui", "Sex", "Sáb"];
-        d = new Date(d);
+        d = this.DateFix(d);
         var dia = d.getDate() < 10 ? "0" + d.getDate() : d.getDate();
         var mes = (d.getMonth() + 1) < 10 ? "0" + (d.getMonth() + 1) : (d.getMonth() + 1);
         var ano = d.getFullYear();
@@ -726,20 +726,53 @@ export default class Tools {
     }
 
 
+    DateUTC(dt){
+        return DateFix(dt);
+    }
+    DateFix(dt){
+        if(this.IsNotSet(dt)) 
+            return dt;
+        var fix = dt.toString().includes("Z");
+        var d = new Date(dt.toString().replaceAll("Z","").replaceAll("z",""));
+        var fixHours = d.getHours() - 3;
+        dt = new Date(Date.UTC( d.getFullYear(), d.getMonth(), d.getDate(),d.getHours(),d.getMinutes(),d.getSeconds(),0,0 ) );
+        if(fix)
+            dt.setHours(fixHours);
+        return dt;
+    }
+
+    
     FormatDateHour(d) {
-        if(this.IsNotSet(d)) return "";
+        if(!d) 
+            return "";
         var days = ["Dom", "Seg", "Ter", "Qua", "Qui", "Sex", "Sáb"];
+        var hours = 0;
+        if(!d.toString().includes("Z"))
+          hours += 3; 
         d = new Date(d);
+        hours = d.getHours() + hours;
         var dia = d.getDate() < 10 ? "0" + d.getDate() : d.getDate();
         var mes = (d.getMonth() + 1) < 10 ? "0" + (d.getMonth() + 1) : (d.getMonth() + 1);
         var ano = d.getFullYear();
-        var hora = (d.getHours() < 10 ? "0" + d.getHours() : d.getHours()) + ":" + (d.getMinutes() < 10 ? "0" + d.getMinutes() : d.getMinutes()) + "h";
+        var hora = (hours < 10 ? "0" + hours : hours) + ":" + (d.getMinutes() < 10 ? "0" + d.getMinutes() : d.getMinutes()) + "h";
         var diaSemana = days[d.getDay()];
 
         return dia + "/" + mes + "/" + ano + " "+ diaSemana + " " + hora;
 
     }
+        
+    FormatHour(d) {
+        if(!d) 
+            return "";
+        d = this.DateFix(d);
+        var hours = d.getHours();
+        if(!d.toString().includes("Z"))
+          hours = hours + 3; 
+        var hora = (hours < 10 ? "0" + hours : hours) + ":" + (d.getMinutes() < 10 ? "0" + d.getMinutes() : d.getMinutes()) + "h";
 
+        return hora;
+
+    }
 
 
     GetDayWeek(d) {
