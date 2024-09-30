@@ -1,6 +1,7 @@
 ﻿using JaCaptei.Model;
 using JaCaptei.Application.Services;
 using JaCaptei.Application.DAL;
+using Microsoft.Extensions.Logging;
 
 namespace JaCaptei.Application
 {
@@ -427,18 +428,28 @@ namespace JaCaptei.Application
 
         }
 
-
-
+        public async Task<List<ParceiroList>> ObterParceirosAtivos()
+        {
+            try
+            {
+                var parceirosAtivos = await DAO.ObterParceirosAtivos();
+                if (parceirosAtivos == null || !parceirosAtivos.Any())
+                {
+                    return new List<ParceiroList>();
+                }
+                return parceirosAtivos;
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("Ocorreu um erro ao obter parceiros ativos.", ex);
+            }
+        }
 
         public AppReturn ObterInativos()
         {
-
             List<Parceiro> entities = DAO.ObterInativos();
-
             appReturn.result = entities;
-
             return appReturn;
-
         }
 
 

@@ -514,6 +514,35 @@ namespace JaCaptei.Application{
         }
 
 
+        public async Task<List<ParceiroList>> ObterParceirosAtivos()
+        {
+            List<ParceiroList> entities = new List<ParceiroList>();
+            using (var conn = DB.GetConn())
+            {
+                string sql = @"
+                    SELECT json_agg(parceiro) 
+                    FROM (
+                        SELECT 
+                            p.id, 
+                            p.nome AS nomeParceiro, 
+                            p.telefone AS telefoneParceiro,
+                            p.cpf AS cpfParceiro,
+                            p.cnpj AS cnpjParceiro,
+                            c.nome AS imobiliaria
+                        FROM ""Parceiro"" p
+                        INNER JOIN ""Conta"" c ON p.""idConta"" = c.Id
+                        WHERE p.ativo = true
+                    ) AS parceiro";
+                var res = await conn.ExecuteQueryAsync(sql);
+                var jsonResult = res.FirstOrDefault()?.json_agg;
+                if (!string.IsNullOrEmpty(jsonResult))
+                {
+                    entities = JsonConvert.DeserializeObject<List<ParceiroList>>(jsonResult);
+                }
+            }
+            return entities;
+        }
+
 
        public List<Parceiro> ObterPendentesValidacao() {
             List<Parceiro> entities = null;
