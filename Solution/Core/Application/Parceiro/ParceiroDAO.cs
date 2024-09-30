@@ -516,7 +516,20 @@ namespace JaCaptei.Application{
         {
             using (var conn = new DBcontext().GetConn())
             {
-                return conn.Query<Parceiro>(e => e.idConta == idConta);
+                string sql = @"
+                    SELECT 
+                        p.id,
+                        p.nome AS nomeParceiro,
+                        p.""idConta"",
+                        c.nome AS nomeConta
+                    FROM 
+                        Parceiro p
+                    INNER JOIN 
+                        Conta c ON p.""idConta"" = c.id
+                    WHERE 
+                        p.""idConta"" = @idConta";
+                var resultado = conn.Query<Parceiro>(sql, new { idConta }).ToList();
+                return resultado;
             }
         }
 
@@ -533,8 +546,6 @@ namespace JaCaptei.Application{
             return entities;
         }
 
-
-
        public List<Parceiro> ObterInativos() {
             List<Parceiro> entities = null;
             using(var conn = new DBcontext().GetConn())
@@ -542,11 +553,6 @@ namespace JaCaptei.Application{
                 //entities = conn.Query<Parceiro>(e => e.ativo == false && e.confirmado == true).ToList();
             return entities;
         }
-
-
-
-
-
 
 
         //                              FUNCOES ADMIN

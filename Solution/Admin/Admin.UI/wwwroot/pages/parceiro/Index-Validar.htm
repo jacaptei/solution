@@ -1,171 +1,169 @@
 ﻿<template>
-
-
     <div>
+        <div class="row" style="width:100%;margin-bottom:40px;display:block">
 
-                <div class="row" style="width:100%;margin-bottom:40px;display:block">
+            <div class="col-12" v-if="onrequest">
+                <c-loading></c-loading>
+            </div>
+            <div class="col-12" style="width:100%" v-else>
 
-                    <div class="col-12" v-if="onrequest">
-                        <c-loading ></c-loading>
-                    </div>
-                    <div class="col-12" style="width:100%" v-else>
+                <div class="col-12">
+                    <div style="cursor:pointer;margin:20px;margin-top:0px;color:var(--s-color-green)" @click="BuscarPendentes"><i class="fa fa-refresh"></i> atualizar</div>
+                </div>
 
-                        <div class="col-12">
-                            <div style="cursor:pointer;margin:20px;margin-top:0px;color:var(--s-color-green)" @click="BuscarPendentes"><i class="fa fa-refresh"></i> atualizar</div>
-                        </div>
-
-                        <div v-if="results.length == 0" style="margin:20px">
-                            não há parceiros pendentes de validação
-                        </div>
-                        <div v-else class="col-12" v-for="(item,index) in results" style="margin:20px">
+                <div v-if="results.length == 0" style="margin:20px">
+                    não há parceiros pendentes de validação
+                </div>
+                <div v-else class="col-12" v-for="(item,index) in results" style="margin:20px">
 
 
-                            <q-card style="width:100%;color:#fff;margin-bottom:5px">
-                                <q-card-section :class="item.ativo? 'bg-teal': item.confirmado? 'bg-primary':'bg-orange'">
-                                    <div class="text-h10">
-                                        <span class="text-h10">
-                                            <b style="margin-right:10px;"><span v-if="item.donoConta" style="color:#fff312;margin-right:5px"><i class="fa fa-crown" title="titular da conta"></i> </span>  {{item.nome}}</b> <span style="opacity:0.88;padding-right:20px">{{$tools.FormatDateHour(item.data)}}</span>
-                                        </span>
-                                        <span class="text-h10">
-                                            <span style="float:right;font-weight:700;padding-right:5px">
-                                                <span v-if="item.ativo">Ativo</span>
-                                                <span v-else-if="item.confirmado">Confirmado . Inativo</i></span>
-                                                <span v-else>Não confirmado <i class="fa fa-warning"></i></span>
-                                            </span>
-                                        </span>
-                                    </div>
-                                </q-card-section>
+                    <q-card style="width:100%;color:#fff;margin-bottom:5px">
+                        <q-card-section :class="item.ativo? 'bg-teal': item.confirmado? 'bg-primary':'bg-orange'">
+                            <div class="text-h10">
+                                <span class="text-h10">
+                                    <b style="margin-right:10px;"><span v-if="item.donoConta" style="color:#fff312;margin-right:5px"><i class="fa fa-crown" title="titular da conta"></i> </span>  {{item.nome}}</b> <span style="opacity:0.88;padding-right:20px">{{$tools.FormatDateHour(item.data)}}</span>
+                                </span>
+                                <span class="text-h10">
+                                    <span style="float:right;font-weight:700;padding-right:5px">
+                                        <span v-if="item.ativo">Ativo</span>
+                                        <span v-else-if="item.confirmado">Confirmado . Inativo</i></span>
+                                        <span v-else>Não confirmado <i class="fa fa-warning"></i></span>
+                                    </span>
+                                </span>
+                            </div>
+                        </q-card-section>
 
-                                <q-card-section style="margin-bottom:15px">
+                        <q-card-section style="margin-bottom:15px">
 
+                            <div>
+
+
+                                <div style="font-weight:500;color:#000">
                                     <div>
+                                        <q-card>
+                                            <q-card-section>
+                                                <el-row :gutter="20">
+                                                    <el-col :md="11" :sm="24">
+                                                        <div style="line-height:30px;font-size:15px">
+                                                            <div style="color:#000">
+                                                                <b><span v-if="item.tipoPessoa=='PF'">PESSOA FÍSICA</span><span v-else>PESSOA JURÍDICA</span></b> <span style="font-weight:700;color:#000">ID# {{item.id}}</span>
+                                                                <span v-if="item.donoConta" style="margin-left:20px;color:var(--s-color-orange)"><i class="fa fa-crown"></i> Titular da Conta</span>
+                                                            </div>
+                                                            <div style="color:var(--s-color-primary);font-weight:700">
+                                                                <i class="fa fa-user-alt" v-if="item.tipoPessoa=='PF'"></i><i v-else class="fa fa-building"></i>  {{item.nome}}
+                                                            </div>
+                                                            <div>
+                                                                <a :href="$tools.BuildWhatsappLink(item.telefone,'Olá '+item.apelido)" target="_blank" style="color:var(--s-color-green);margin-right:20px;"><i class="fab fa-whatsapp"></i> {{item.telefone}}</a>
+                                                                <a :href="'mailto:'+item.email" target="_blank" style="color:var(--el-color-primary);text-decoration:none"><i class="fa fa-envelope"></i>&nbsp; {{item.email}}</a>
+                                                            </div>
+
+                                                            <div style="cursor:pointer">
+                                                                <div v-if="$validator.IsCPF(item.cpf)" @click="$tools.Copy(item.cpf)" style="margin-right:20px;display:inline-block;text-align:right;color:var(--s-color-primary)"><i class="fa fa-copy" style="text-decoration:none;font-size:8pt"></i> CPF: <span style="color:#000">{{item.cpf}}</span></div>
+                                                                <div v-else @click="$tools.Copy(item.cnpj)" style="margin-right:20px;display:inline-block;text-align:right;color:var(--s-color-primary)"><i class="fa fa-copy" style="text-decoration:none;font-size:8pt"></i> CNPJ:  <span style="color:#000">{{item.cnpj}}</span></div>
+                                                                <div @click="$tools.Copy(item.creci)" style="margin-right:10px;display:inline-block;text-align:right;color:var(--s-color-primary)"><i class="fa fa-copy" style="text-decoration:none;font-size:8pt"></i> CRECI: <span style="color:#000">{{item.creci}} ({{item.creciEstado}})</span></div>
+                                                            </div>
 
 
-                                        <div style="font-weight:500;color:#000">
-                                            <div>
-                                                <q-card>
-                                                    <q-card-section>
-                                                        <el-row :gutter="20">
-                                                            <el-col :md="11" :sm="24">
-                                                                <div style="line-height:30px;font-size:15px">
-                                                                    <div style="color:#000">
-                                                                        <b><span v-if="item.tipoPessoa=='PF'">PESSOA FÍSICA</span><span v-else>PESSOA JURÍDICA</span></b> <span style="font-weight:700;color:#000">ID# {{item.id}}</span>
-                                                                        <span v-if="item.donoConta" style="margin-left:20px;color:var(--s-color-orange)"><i class="fa fa-crown"></i> Titular da Conta</span>
-                                                                    </div>
-                                                                    <div style="color:var(--s-color-primary);font-weight:700">
-                                                                        <i class="fa fa-user-alt" v-if="item.tipoPessoa=='PF'"></i><i v-else class="fa fa-building"></i>  {{item.nome}}
-                                                                    </div>
-                                                                    <div>
-                                                                        <a :href="$tools.BuildWhatsappLink(item.telefone,'Olá '+item.apelido)" target="_blank" style="color:var(--s-color-green);margin-right:20px;"><i class="fab fa-whatsapp"></i> {{item.telefone}}</a>
-                                                                        <a :href="'mailto:'+item.email" target="_blank" style="color:var(--el-color-primary);text-decoration:none"><i class="fa fa-envelope"></i>&nbsp; {{item.email}}</a>
-                                                                    </div>
+                                                            <div style="font-weight:400;color:#666;margin-top:5px;cursor:pointer" @click="OpenMap(item)">
+                                                                <i class="fa fa-map-marker-alt"></i> &nbsp;
+                                                                <span>
 
-                                                                    <div style="cursor:pointer">
-                                                                        <div v-if="$validator.IsCPF(item.cpf)" @click="$tools.Copy(item.cpf)" style="margin-right:20px;display:inline-block;text-align:right;color:var(--s-color-primary)"><i class="fa fa-copy" style="text-decoration:none;font-size:8pt"></i> CPF: <span style="color:#000">{{item.cpf}}</span></div>
-                                                                        <div v-else @click="$tools.Copy(item.cnpj)" style="margin-right:20px;display:inline-block;text-align:right;color:var(--s-color-primary)"><i class="fa fa-copy" style="text-decoration:none;font-size:8pt"></i> CNPJ:  <span style="color:#000">{{item.cnpj}}</span></div>
-                                                                        <div @click="$tools.Copy(item.creci)" style="margin-right:10px;display:inline-block;text-align:right;color:var(--s-color-primary)"><i class="fa fa-copy" style="text-decoration:none;font-size:8pt"></i> CRECI: <span style="color:#000">{{item.creci}} ({{item.creciEstado}})</span></div>
-                                                                    </div>
-
-
-                                                                    <div style="font-weight:400;color:#666;margin-top:5px;cursor:pointer" @click="OpenMap(item)">
-                                                                        <i class="fa fa-map-marker-alt"></i> &nbsp;
-                                                                        <span>
                                                                             <!--{{item.logradouro}}, {{item.numero}},  <span v-if="$validator.is(item.complemento)">Comp. {{item.complemento}}, </span>-->
                                                                             {{item.bairro}}, {{item.cidade}}, {{item.estado}}
-                                                                            <i class="fa fa-up-right-from-square" style="font-size:9pt;margin-left:10px"></i>
-                                                                        </span>
-                                                                    </div>
+                                                                    <i class="fa fa-up-right-from-square" style="font-size:9pt;margin-left:10px"></i>
+                                                                </span>
+                                                            </div>
 
 
 
-                                                                    <div>
-                                                                        <el-row>
-                                                                            <el-col :xs="24" :sm="12" :md="12" class="s-input">
-                                                                                <div>CRM username<span></span></div>
-                                                                                <el-input @keyup.enter="Validar(item,index)" v-model="item.usernameCRM" placeholder="CRM username" maxlength="40" style="max-width:200px;margin-right:20px"></el-input>
-                                                                            </el-col>
-                                                                            <el-col :xs="24" :sm="12" :md="12" class="s-input">
-                                                                                <div>CRM senha<span></span></div>
-                                                                                <el-input @keyup.enter="Validar(item,index)" v-model="item.senhaCRM" type="password" placeholder="CRM senha" maxlength="20" show-password style="max-width:200px;margin-right:20px"></el-input>
-                                                                            </el-col>
-                                                                        </el-row>
-                                                                    </div>
+                                                            <div>
+                                                                <el-row>
+                                                                    <el-col :xs="24" :sm="12" :md="12" class="s-input">
+                                                                        <div>CRM username<span></span></div>
+                                                                        <el-input @keyup.enter="Validar(item,index)" v-model="item.usernameCRM" placeholder="CRM username" maxlength="40" style="max-width:200px;margin-right:20px"></el-input>
+                                                                    </el-col>
+                                                                    <el-col :xs="24" :sm="12" :md="12" class="s-input">
+                                                                        <div>CRM senha<span></span></div>
+                                                                        <el-input @keyup.enter="Validar(item,index)" v-model="item.senhaCRM" type="password" placeholder="CRM senha" maxlength="20" show-password style="max-width:200px;margin-right:20px"></el-input>
+                                                                    </el-col>
+                                                                </el-row>
+                                                            </div>
 
 
-                                                                </div>
-                                                            </el-col>
-                                                            <div class="md-1  xs-hide sm-hide" style="padding:0;border-left:1px solid var(--s-color-primary);"></div>
-                                                            <div class="sm-12 md-hide lg-hide xl-hide" style="margin:4px;width:100%;border-bottom: 1px solid var(--s-color-primary);"></div>
-                                                            <el-col :md="11" :sm="24">
-                                                                <div style="line-height:30px;font-size:15px">
-                                                                    <div style="color:#000"><b>CONTA</b> <span style="font-weight:700;color:#000">ID# {{item.conta.id}}</span></div>
+                                                        </div>
+                                                    </el-col>
+                                                    <div class="md-1  xs-hide sm-hide" style="padding:0;border-left:1px solid var(--s-color-primary);"></div>
+                                                    <div class="sm-12 md-hide lg-hide xl-hide" style="margin:4px;width:100%;border-bottom: 1px solid var(--s-color-primary);"></div>
+                                                    <el-col :md="11" :sm="24">
+                                                        <div style="line-height:30px;font-size:15px">
+                                                            <div style="color:#000"><b>CONTA</b> <span style="font-weight:700;color:#000">ID# {{item.conta.id}}</span></div>
 
-                                                                    <div>
-                                                                        <div style="width:60px;margin-right:10px;display:inline-block;text-align:right;color:var(--s-color-primary)">Plano:</div>
-                                                                        <span v-if="item.conta.idPlano == 2">CORRETOR AUTÔNOMO ESSENCIAL</span>
-                                                                        <span v-else-if="item.conta.idPlano == 3">IMOBILIÁRIA 03 USUÁRIOS</span>
-                                                                        <span v-else-if="item.conta.idPlano == 4">IMOBILIÁRIA 05 USUÁRIOS</span>
-                                                                    </div>
+                                                            <div>
+                                                                <div style="width:60px;margin-right:10px;display:inline-block;text-align:right;color:var(--s-color-primary)">Plano:</div>
+                                                                <span v-if="item.conta.idPlano == 2">CORRETOR AUTÔNOMO ESSENCIAL</span>
+                                                                <span v-else-if="item.conta.idPlano == 3">IMOBILIÁRIA 03 USUÁRIOS</span>
+                                                                <span v-else-if="item.conta.idPlano == 4">IMOBILIÁRIA 05 USUÁRIOS</span>
+                                                            </div>
 
-                                                                    <div>
-                                                                        <div style="width:60px;margin-right:10px;display:inline-block;text-align:right;color:var(--s-color-primary)">Titular:</div>
-                                                                        <span>{{item.conta.nome}}</span>
-                                                                    </div>
-                                                                    <div v-if="$validator.is(item.conta.razao)">
-                                                                        <div style="width:60px;margin-right:10px;display:inline-block;text-align:right;color:var(--s-color-primary)">Razão:</div>
-                                                                        <span>{{item.conta.razao}}</span>
-                                                                    </div>
-                                                                    <div v-if="$validator.is(item.conta.responsavel)">
-                                                                        <div style="width:60px;margin-right:10px;display:inline-block;text-align:right;color:var(--s-color-primary)">Resp.:</div>
-                                                                        <span>{{item.conta.responsavel}}</span>
-                                                                    </div>
-
-
-                                                                    <div v-if="$validator.IsCPF(item.conta.cpf)" @click="$tools.Copy(item.conta.cpf)" style="cursor:pointer">
-                                                                        <div style="width:60px;margin-right:10px;display:inline-block;text-align:right;color:var(--s-color-primary)"><i class="fa fa-copy" style="text-decoration:none;font-size:8pt"></i> CPF:</div>{{item.conta.cpf}}
-                                                                    </div>
-
-                                                                    <div v-else @click="$tools.Copy(item.cnpj)" style="cursor:pointer">
-                                                                        <div style="width:60px;margin-right:10px;display:inline-block;text-align:right;color:var(--s-color-primary)"><i class="fa fa-copy" style="text-decoration:none;font-size:8pt"></i> CNPJ:</div>{{item.conta.cnpj}}
-                                                                    </div>
-
-                                                                    <div @click="$tools.Copy(item.conta.token)" style="cursor:pointer">
-                                                                        <div style="width:60px;margin-right:10px;display:inline-block;text-align:right;color:var(--s-color-primary)"><i class="fa fa-copy" style="text-decoration:none;font-size:8pt;"></i> Token:</div> <span style="color:var(--s-color-green)">{{item.conta.token}}</span>
-                                                                    </div>
-
-                                                                </div>
-                                                            </el-col>
-                                                        </el-row>
-                                                    </q-card-section>
+                                                            <div>
+                                                                <div style="width:60px;margin-right:10px;display:inline-block;text-align:right;color:var(--s-color-primary)">Titular:</div>
+                                                                <span>{{item.conta.nome}}</span>
+                                                            </div>
+                                                            <div v-if="$validator.is(item.conta.razao)">
+                                                                <div style="width:60px;margin-right:10px;display:inline-block;text-align:right;color:var(--s-color-primary)">Razão:</div>
+                                                                <span>{{item.conta.razao}}</span>
+                                                            </div>
+                                                            <div v-if="$validator.is(item.conta.responsavel)">
+                                                                <div style="width:60px;margin-right:10px;display:inline-block;text-align:right;color:var(--s-color-primary)">Resp.:</div>
+                                                                <span>{{item.conta.responsavel}}</span>
+                                                            </div>
 
 
-                                                    <q-card-section>
-                                                        <el-row :gutter="20">
-                                                            <el-col :md="24" style="width:100%;text-align:left;margin-bottom:4px;font-weight:800;color:var(--s-color-green)" v-if="item.ativo">
-                                                              <i class="fa fa-check-circle"></i>  ATIVADO
-                                                            </el-col>
-                                                            <el-col :md="24" style="width:100%;text-align:center;margin-bottom:4px" v-else>
-                                                                <c-loading v-if="requests[index]"></c-loading>
-                                                                <q-btn v-else :label="item.ativo? 'Salvar': item.confirmado? 'Validar & Ativar' : 'Confirmar & Ativar' " :color="item.ativo? 'teal': item.confirmado? 'primary' : 'orange'" @click="Validar(item,index)" style="width:200px;height:20px"></q-btn>
-                                                            </el-col>
-                                                        </el-row>
-                                                    </q-card-section>
+                                                            <div v-if="$validator.IsCPF(item.conta.cpf)" @click="$tools.Copy(item.conta.cpf)" style="cursor:pointer">
+                                                                <div style="width:60px;margin-right:10px;display:inline-block;text-align:right;color:var(--s-color-primary)"><i class="fa fa-copy" style="text-decoration:none;font-size:8pt"></i> CPF:</div>{{item.conta.cpf}}
+                                                            </div>
+
+                                                            <div v-else @click="$tools.Copy(item.cnpj)" style="cursor:pointer">
+                                                                <div style="width:60px;margin-right:10px;display:inline-block;text-align:right;color:var(--s-color-primary)"><i class="fa fa-copy" style="text-decoration:none;font-size:8pt"></i> CNPJ:</div>{{item.conta.cnpj}}
+                                                            </div>
+
+                                                            <div @click="$tools.Copy(item.conta.token)" style="cursor:pointer">
+                                                                <div style="width:60px;margin-right:10px;display:inline-block;text-align:right;color:var(--s-color-primary)"><i class="fa fa-copy" style="text-decoration:none;font-size:8pt;"></i> Token:</div> <span style="color:var(--s-color-green)">{{item.conta.token}}</span>
+                                                            </div>
+
+                                                        </div>
+                                                    </el-col>
+                                                </el-row>
+                                            </q-card-section>
 
 
-                                                </q-card>
-                                            </div>
-                                        </div>
+                                            <q-card-section>
+                                                <el-row :gutter="20">
+                                                    <el-col :md="24" style="width:100%;text-align:left;margin-bottom:4px;font-weight:800;color:var(--s-color-green)" v-if="item.ativo">
+                                                        <i class="fa fa-check-circle"></i>  ATIVADO
+                                                    </el-col>
+                                                    <el-col :md="24" style="width:100%;text-align:center;margin-bottom:4px" v-else>
+                                                        <c-loading v-if="requests[index]"></c-loading>
+                                                        <q-btn v-else :label="item.ativo? 'Salvar': item.confirmado? 'Validar & Ativar' : 'Confirmar & Ativar' " :color="item.ativo? 'teal': item.confirmado? 'primary' : 'orange'" @click="Validar(item,index)" style="width:200px;height:20px"></q-btn>
+                                                    </el-col>
+                                                </el-row>
+                                            </q-card-section>
 
+
+                                        </q-card>
                                     </div>
+                                </div>
 
-                                </q-card-section>
-                            </q-card>
+                            </div>
 
-                        </div>
+                        </q-card-section>
+                    </q-card>
 
-
-                    </div>
                 </div>
+
+
+            </div>
+        </div>
 
 
 
@@ -214,7 +212,7 @@
             //    this.results.push({name:"card"+i});
         },
         mounted() {
-           this.BuscarPendentes();
+            this.BuscarPendentes();
         },
         methods: {
 
@@ -243,7 +241,7 @@
                     var request = await this.$api.Get("parceiro/pendentes");
                     this.onrequest = false;
 
-                        c2("request", request)
+                    c2("request", request)
 
 
                     if (request?.status?.success) {
@@ -261,58 +259,58 @@
                             this.message = "Sem leads a ativar";
 
 
-                        } 
                     }
+                }
 
-                    /*
-                    var url = this.$api.BuildURL("parceiro/pendentes");
-                    axios.get(url).then((request) => {
+                /*
+                var url = this.$api.BuildURL("parceiro/pendentes");
+                axios.get(url).then((request) => {
 
-                        this.message = "";
+                    this.message = "";
 
-                        if (request.data.status.success) {
+                    if (request.data.status.success) {
 
-                            var res = request.data.result;
-
-
-                            if (this.$validator.is(res)) {
-                                for (var i = 0; i < res.length; i++) {
-                                    this.results.push(res[i]);
-                                    this.requests[i] = false;
-                                }
-                                this.message = (res.length > 0) ? "Sem leads a ativar" : "";
-                            } else
-                                this.message = "Sem leads a ativar";
+                        var res = request.data.result;
 
 
-                        } else {
-
-
-                            this.$tools.AlertNotes(request.data.result);
-
-                            if (request.data.messages == "Token inválido") {
-                                this.token = null;
-                                this.message = "Token inválido";
+                        if (this.$validator.is(res)) {
+                            for (var i = 0; i < res.length; i++) {
+                                this.results.push(res[i]);
+                                this.requests[i] = false;
                             }
-
-                        }
-                    }).catch((error) => {
-
-
-                        if (error.response) {
-                            this.$tools.AlertNotes(error.response.data);
+                            this.message = (res.length > 0) ? "Sem leads a ativar" : "";
                         } else
-                            this.$tools.Alert("Não foi possível atender a requisição");
+                            this.message = "Sem leads a ativar";
 
 
-                        this.message = "Não foi possível atender a requisição";
+                    } else {
 
-                    }).finally(() => {
-                        this.onrequest = false;
-                    });
-                } else
-                    this.$tools.Alert("<b>Acesso inválido</b><br>necessário token de acesso na URL");
-                    */
+
+                        this.$tools.AlertNotes(request.data.result);
+
+                        if (request.data.messages == "Token inválido") {
+                            this.token = null;
+                            this.message = "Token inválido";
+                        }
+
+                    }
+                }).catch((error) => {
+
+
+                    if (error.response) {
+                        this.$tools.AlertNotes(error.response.data);
+                    } else
+                        this.$tools.Alert("Não foi possível atender a requisição");
+
+
+                    this.message = "Não foi possível atender a requisição";
+
+                }).finally(() => {
+                    this.onrequest = false;
+                });
+            } else
+                this.$tools.Alert("<b>Acesso inválido</b><br>necessário token de acesso na URL");
+                */
 
 
             },
@@ -322,23 +320,23 @@
             Validar(item, index) {
 
 
-                    this.requests[index] = true;
+                this.requests[index] = true;
 
-                    axios.post(this.$api.BuildURL("parceiro/validar"), item).then((request) => {
-                        
-                        if (request.data.status.success)
-                            item.ativo = true;
-                        else
-                            this.$tools.AlertNotes(request.data.result);
+                axios.post(this.$api.BuildURL("parceiro/validar"), item).then((request) => {
 
-                    }).catch((error) => {
-                        this.$tools.Alert("Não foi possível ativar");
-                        ce(error);
-                        if (error.response)
-                            ce(error.response);
-                    }).finally(() => {
-                        this.requests[index] = false;
-                    });
+                    if (request.data.status.success)
+                        item.ativo = true;
+                    else
+                        this.$tools.AlertNotes(request.data.result);
+
+                }).catch((error) => {
+                    this.$tools.Alert("Não foi possível ativar");
+                    ce(error);
+                    if (error.response)
+                        ce(error.response);
+                }).finally(() => {
+                    this.requests[index] = false;
+                });
 
             },
 
@@ -483,8 +481,6 @@
     .q-card__section--vert {
         padding: 10px;
     }
-
-
 </style>
 
 

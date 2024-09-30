@@ -289,7 +289,8 @@
 		data: function () {
 			return {
 				onloading: true,
-				onrequest: false,
+                onrequest: false,
+                nomeParceiro: false,
 				view: "form",
 				content: "",
 				DiaNascimento: 0,
@@ -313,25 +314,28 @@
 					bairros: [],
 					sexos: [],
 				},
-				parceiro: this.$models.parceiro()
+				parceiro: this.$models.parceiro(),
 			}
 		}, computed: {
-
-		},
-
+        },
+        watch: {
+            'parceiro.nome': function (newValue) {
+                this.$root.SetTitle("Parceiro #" + newValue, "fa fa-user-alt", null);
+            }
+        },
 		props: {
             id: { type: Number, required: true, default: 0 },
 		},
 		watch: {
 		},
-		created: function () {
-			this.opcoes.sexos = this.$sdata.opcoes.sexos;
-            this.$sdata.ObterEstados().then(res => { this.opcoes.estados = res; });
-            this.Obter(this.id);
-		},
-		mounted() {
-			
-		},
+        created: async function () {
+            await this.Obter(this.id);
+            this.opcoes.sexos = this.$sdata.opcoes.sexos;
+            this.opcoes.estados = await this.$sdata.ObterEstados();
+            this.$root.SetTitle("Parceiro #" + this.parceiro.nome, "fa fa-user-alt", null);
+        },
+        mounted() {
+        },
 		methods: {
 
 			async Obter(id){
@@ -342,8 +346,7 @@
 
 				if(request?.status?.success) {
 
-                    this.$root.parceiroRow = this.parceiro = request.result;
-                    
+                    this.parceiro = request.result;
 					this.carregandoCidades = true; 
                     this.carregandoBairros = true; 
                     this.$sdata.ObterCidades(this.parceiro.idEstado).then(res => { this.opcoes.cidades = res; this.carregandoCidades = false; });
@@ -357,12 +360,7 @@
 					this.DiaNascimento = this.parceiro.diaNascimento;
 					this.MesNascimento = this.parceiro.mesNascimento;
 					this.AnoNascimento = this.parceiro.anoNascimento;
-
-
 				}
-
-
-
 			},
 
 

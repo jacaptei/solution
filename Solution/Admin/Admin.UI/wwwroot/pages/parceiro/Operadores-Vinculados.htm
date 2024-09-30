@@ -54,14 +54,14 @@
                     const response = await instance.proxy.$api.Get(url);
                     console.log(response.result);
                     collapseItems.value = response.result.map((item, index) => ({
-                        name: (index + 1).toString(), // Nome do item de colapso
+                        name: (index + 1).toString(),
                         title: item.nome, 
-                        tableData: [{ // Estrutura da tabela, ajuste conforme necessário
+                        tableData: [{
                             id: item.id,
                             idPlano: item.idPlano,
                             idConta: item.idConta,
-                            contaNome: item.conta.nome, // Supondo que 'nome' seja uma propriedade válida
-                            someSetting: item.settings.someSetting // Substitua pelo que você precisa
+                            contaNome: item.conta.nome,
+                            someSetting: item.settings.someSetting
                         }]
                     }));                    console.log(collapseItems);
                 } catch (error) {

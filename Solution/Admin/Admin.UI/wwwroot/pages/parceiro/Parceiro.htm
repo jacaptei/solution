@@ -32,9 +32,6 @@
         </div>
 </template>
 
-
-
-
 <script>
     module.exports = {
         name: 'JCAdminParceiro',
@@ -46,26 +43,21 @@
 
         data: function () {
             return {
-                tab: "alterar",
                 id: 0,
+                tab: "alterar",
                 visibilidadeTela: {}
             }
         },
         computed: {
-
         },
         props: {
-
         },
         watch: {
-
         },
         created: function () {
         },
         mounted() {
             this.id = this.$route.params.id;
-            this.$root.SetTitle("Parceiro #" + this.id, "fa fa-user-alt", null);
-            this.visibilidadeTela = setTimeout(() => { this.$root.parceiroRow.donoConta }, 500); 
         },
         methods: {
         }

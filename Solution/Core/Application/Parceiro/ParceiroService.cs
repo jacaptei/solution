@@ -36,6 +36,7 @@ namespace JaCaptei.Application
             {
                 appReturn.SetAsNotFound();
             }
+
             else
             {
                 foreach (var entity in entities)
