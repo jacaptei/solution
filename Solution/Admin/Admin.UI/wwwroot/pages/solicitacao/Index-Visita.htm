@@ -369,7 +369,7 @@
                                                 <div class="text-h10">
                                                     <span class="text-h10">
                                                         <b style="margin-right:10px;">ID# {{item.id}}</b>
-                                                        <span v-if="item.visita">
+                                                        <span v-if="item.visita" style="font-size:14px">
                                                             <span >
                                                                 <i title="agendado" style="padding-left:10px;padding-right:10px;color:#fff;font-size:17px;" class="fa fa-calendar"></i>
                                                                 {{$tools.FormatDateHour(item.dataVisita)}}
@@ -381,13 +381,13 @@
                                                                  VISITADO <i class="fa fa-thumbs-up"></i> 
                                                             </span>
                                                             <span v-else-if="item.confirmado" style="margin-left:20px; background-color: #3cff3c; padding: 6px; border-radius: 10px; color: #003900;">
-                                                                <i class="fa fa-check-double"></i> CONFIRMADO
+                                                                <i class="fa fa-check-double"></i> VISITA CONFIRMADA
                                                             </span>
                                                             <span v-else="!item.confirmado" style="margin-left:20px; background-color: #feff7b; padding: 6px; border-radius: 10px; color: #533800;">
-                                                                <i class="fa fa-warning"></i> NÃO CONFIRMADO
+                                                                <i class="fa fa-warning"></i> VISITA NÃO CONFIRMADA
                                                             </span>
                                                             <span v-if="item.reagendado && !item.visitado && !item.concluido" style="margin-left:20px; background-color: #ffc13c; padding: 6px; border-radius: 10px; color: #533800;">
-                                                               REAGENDADO
+                                                                VISITA REAGENDADA
                                                             </span>
                                                         </span>
                                                         <i v-else-if="!item.validadoProprietario|| !item.validadaURL || !item.validadoEndereco" title="há dados invalidados" style="padding-left:4px;color:#fff;font-size:20px;" class="fa fa-warning"></i>
@@ -436,7 +436,7 @@
                                                                 <q-card>
                                                                     <q-card-section>
                                                                         <div v-if="!item.reagendado">
-                                                                            <div class="title"><el-checkbox  v-model="item.confirmado" label="CONFIRMAR"  @change="()=>{ if(item.confirmado){ item.reagendado = false; } }" ></el-checkbox> <div style="padding-left:15px;display:inline-block;margin-top:-4px">{{$tools.FormatDateHour(item.dataVisita)}}</div></div> 
+                                                                            <div class="title"><el-checkbox  v-model="item.confirmado" label="CONFIRMADA"  @change="()=>{ if(item.confirmado){ item.reagendado = false; } }" ></el-checkbox> <div style="padding-left:15px;display:inline-block;margin-top:-4px">{{$tools.FormatDateHour(item.dataVisita)}}</div></div> 
                                                                             <div v-if="$validator.is(item.obsAgendamento)" style="margin-bottom:4px;">
                                                                                 <el-input placeholder="" :value="item.obsAgendamento" readonly>
                                                                                     <template #prepend>
@@ -454,7 +454,7 @@
 
                                                                         <div style="margin-top:10px">
                                                                             <div class="title">
-                                                                                <el-checkbox v-model="item.reagendado" label="REAGENDAR" @change="()=>{ if(item.reagendado){ item.confirmado = false; } }"></el-checkbox>
+                                                                                <el-checkbox v-model="item.reagendado" label="REAGENDADA" @change="()=>{ if(item.reagendado){ item.confirmado = false; } }"></el-checkbox>
                                                                                 <el-checkbox  v-model="item.confirmado" label="CONFIRMADO REAGENDAMENTO"  v-if="item.reagendado" ></el-checkbox> 
                                                                             </div>
                                                                             <div v-if="item.reagendado">
@@ -471,16 +471,21 @@
                                                                             </div>
                                                                         </div>
                                                                         <div style="margin-top:10px">
-                                                                            <div class="title"><el-checkbox v-model="item.visitado" label="VISITADO"></el-checkbox></div>
+                                                                            <div class="title"><el-checkbox v-model="item.visitado" label="VISITADO"  @change="()=>{if(item.visitado){item.imovelVendido = false; item.imovelNaoEncontrado = false; }}"></el-checkbox></div>
                                                                             <div v-if="item.visitado">
                                                                                 <el-input v-model="item.obsVisitado" placeholder="obs visita" type="textarea" :autosize="{ minRows: 2, maxRows: 3 }"></el-input>
                                                                             </div>
                                                                         </div>
                                                                         <div style="margin-top:10px">
                                                                             <div class="title"><el-checkbox v-model="item.concluido" label="CONCLUÍDO"  ></el-checkbox></div>
-                                                                            <div v-if="item.concluido">
+                                                                            <div v-if="item.concluido"v style="margin-bottom:10px">
+                                                                                <el-checkbox v-model="item.imovelNaoEncontrado" label="IMÓVEL NÃO ENCONTRADO"   @change="()=>{if(item.imovelNaoEncontrado){item.imovelVendido = false; item.visitado = false; }}" ></el-checkbox> <el-checkbox v-model="item.imovelVendido" label="IMÓVEL VENDIDO" @change="()=>{if(item.imovelVendido){item.imovelNaoEncontrado = false; item.visitado = false; }}" ></el-checkbox>
+                                                                                <br />
                                                                                 <el-input v-model="item.obsConcluido" placeholder="obs conclusão" type="textarea" :autosize="{ minRows: 2, maxRows: 3 }"></el-input>
                                                                             </div>
+                                                                        </div>
+                                                                        <div style="text-align:right;">
+                                                                            <q-btn label="SALVAR" color="primary" text-color="white" @click="Alterar(item)" :loading="item.acao=='alterar'" style="width:160px;margin-left:00px"></q-btn>
                                                                         </div>
                                                                     </q-card-section>
                                                                 </q-card>
@@ -528,7 +533,7 @@
 
                                                     <div style="font-weight:500;color:#000">
 
-                                                        <el-input :value="'#'+item.parceiro.id + ', '+item.parceiro.apelido + ', '+item.parceiro.telefone + ', '+item.parceiro.email" readonly>
+                                                        <el-input :value="'#'+item.parceiro.id + ', '+item.parceiro.apelido + ', '+item.parceiro.telefone + ', '+item.parceiro.email" readonly  @click="item.acao='abrir-parceiro'">
                                                             <template #prepend>
                                                                 <div style="text-transform:uppercase;font-weight:660;width:110px;text-align:right;cursor:pointer" @click="()=>{item.acao=='abrir-parceiro'?  item.acao='fechar-parceiro' :  item.acao='abrir-parceiro';}">
                                                                     Parceiro  <i style="padding-left:10px" class="fa fa-user-alt"></i>
@@ -562,7 +567,7 @@
 
                                                     <div style="margin-top:10px;font-weight:500;color:#000">
 
-                                                        <el-input :value="$validator.is(item.proprietarioCaptacao)? item.proprietarioCaptacao : 'não informado'" readonly>
+                                                        <el-input :value="$validator.is(item.proprietarioCaptacao)? item.proprietarioCaptacao : 'não informado'" readonly @click="item.acao='abrir-proprietario'">
                                                             <template #prepend>
                                                                 <div style="text-transform:uppercase;font-weight:660;width:110px;text-align:right;cursor:pointer;" @click="()=>{item.acao=='abrir-proprietario'?  item.acao='fechar-proprietario' :  item.acao='abrir-proprietario';}">
                                                                     Proprietário <i v-if="!item.validadoProprietario" title="dados inválidos" style="padding-left:4px;color:#ff0000;font-size:17px;" class="fa fa-warning"></i><i v-else style="padding-left:4px" class="fa fa-house-user"></i>
@@ -624,7 +629,7 @@
 
 
                                                     <div style="margin-top:10px;font-weight:500;cursor:pointer;color:#000">
-                                                        <el-input v-model="item.url" readonly input-style="text-transform:lowercase;">
+                                                        <el-input v-model="item.url" readonly input-style="text-transform:lowercase;" @click="item.acao='abrir-url'">
                                                             <template #prepend>
                                                                 <div style="text-transform:uppercase;font-weight:660;width:110px;text-align:right;cursor:pointer" @click="$tools.OpenLink(item.url)">
                                                                     URL    <i v-if="!item.validadaURL" title="URL inválida" style="padding-left:4px;color:#ff0000;font-size:17px;" class="fa fa-warning"></i><i v-else style="padding-left:10px" class="fa fa-link"></i>
@@ -649,7 +654,7 @@
 
 
                                                     <div style="margin-top:10px;font-weight:500;cursor:pointer;color:#000">
-                                                        <el-input placeholder="" :value="$tools.BuildAddress(item)" readonly>
+                                                        <el-input placeholder="" :value="$tools.BuildAddress(item)" readonly @click="item.acao='abrir-endereco'">
                                                             <template #prepend>
                                                                 <div style="text-transform:uppercase;font-weight:660;width:110px;text-align:right;cursor:pointer" @click="$tools.OpenMap(item.url)">
                                                                     Local   <i v-if="!item.validadoEndereco" title="endereço inválido" style="padding-left:4px;color:#ff0000;font-size:17px;" class="fa fa-warning"></i><i v-else style="padding-left:10px" class="fa fa-map-marker-alt"></i>
@@ -750,7 +755,7 @@
 
 
                                                     <div style="margin-top:10px;font-weight:500;color:#000">
-                                                        <el-input placeholder="" :value="item.descricao">
+                                                        <el-input placeholder="" :value="item.descricao" @click="item.acao='abrir-descricao'">
                                                             <template #prepend>
                                                                 <div style="text-transform:uppercase;font-weight:700;width:110px;text-align:right;cursor:pointer" @click="()=>{item.acao=='abrir-descricao'?  item.acao='fechar-descricao' :  item.acao='abrir-descricao';}">
                                                                     Descrição <i style="padding-left:10px" class="fa fa-message"></i>
@@ -1492,6 +1497,7 @@
                             i.dataConcluido     = this.$tools.DateFix(i.dataConcluido    );
 
                             i.agendado = (i.dataVisita.getFullYear() > 2000);
+                            i.acao     =   'abrir-agenda';
                             i.acaocard = 'fechar-card' + i.id;
 
                             i.dia  = i.dataVisita.format('yyyy/mm/dd');

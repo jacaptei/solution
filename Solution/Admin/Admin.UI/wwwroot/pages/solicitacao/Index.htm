@@ -269,6 +269,7 @@
 
                     var request = await this.$api.Get(url);
 
+                    var count=0;
 
                     if (request.status.success) {
 
@@ -288,8 +289,8 @@
                             i.dataVisitado      = this.$tools.DateFix(i.dataVisitado     );
                             i.dataConcluido     = this.$tools.DateFix(i.dataConcluido    );
 
-                            i.agendado = (i.dataVisita.getFullYear() > 2000);
-                            i.acaocard = 'fechar-card' + i.id;
+                            i.acao      =   'abrir-agenda';
+                            i.acaocard  =   'fechar-card'  + i.id;
 
                             i.dia  = i.dataVisita.format('yyyy/mm/dd');
                             i.hora = this.$tools.FormatHour(i.dataVisita);

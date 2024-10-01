@@ -285,6 +285,7 @@ namespace JaCaptei.Application {
                 entityDB.validadaURL         = entity.validadaURL;
                 entityDB.validadoEndereco    = entity.validadoEndereco;
                 entityDB.validadoProprietario= entity.validadoProprietario;
+                entityDB.proprietarioNaoEncontrado= entity.proprietarioNaoEncontrado;
 
                 if((!entityDB.confirmado && entity.confirmado) || (!entityDB.reagendado && entity.reagendado))
                     entity.notificar = true;
@@ -303,6 +304,11 @@ namespace JaCaptei.Application {
                 entityDB.concluido           = entity.concluido;
                 entityDB.dataConcluido       = entity.dataConcluido;
                 entityDB.obsConcluido        = entity.obsConcluido;
+
+                entityDB.imovelIndisponivel  = entity.imovelIndisponivel ;
+                entityDB.imovelNaoEncontrado = entity.imovelNaoEncontrado;
+                entityDB.imovelVendido       = entity.imovelVendido      ;
+
 
                 conn.Update<Solicitacao>(entityDB);
 
@@ -654,7 +660,7 @@ namespace JaCaptei.Application {
 
             if(busca.item?.id > 0)
                 filter += " AND s.id = " + busca.item.id.ToString();
-            else{
+            else {
 
                 if(busca.item?.idAdmin > 0)
                     filter += " AND s.\"idAdmin\" = " + busca.item.idAdmin.ToString();
@@ -662,25 +668,25 @@ namespace JaCaptei.Application {
                 if(busca.item?.idParceiro > 0)
                     filter += " AND s.\"idParceiro\" = " + busca.item.idParceiro.ToString();
 
-                if(!busca.todos){
+                if(!busca.todos) {
                     if(busca.item?.visita)
                         filter += " AND s.visita = 'TRUE' ";
                     else
                         filter += " AND s.visita = 'FALSE' ";
                 }
 
-                if(busca.item?.idStatus > 0){
-                       if(busca.item.idStatus == 9)
-                            filter += " AND s.\"idStatus\" >= 9 ";
-                       else
-                            filter += " AND s.\"idStatus\" = " + busca.item.idStatus.ToString();
+                if(busca.item?.idStatus > 0) {
+                    if(busca.item.idStatus == 9)
+                        filter += " AND s.\"idStatus\" >= 9 ";
+                    else
+                        filter += " AND s.\"idStatus\" = " + busca.item.idStatus.ToString();
                 }
 
                 if(busca.dateFrom.Year <= 1900) {
                     if(Utils.Validator.IsDateTime(busca.item?.data))
                         filter += " AND date_trunc('day', s.\"dataConsiderada\") = '" + busca.item.data.ToString("yyyy-MM-dd") + "' ";
-                }else
-                        filter += " AND date_trunc('day', s.\"dataConsiderada\") >= '" + busca.dateFrom.ToString("yyyy-MM-dd") + "' AND date_trunc('day',s.\"dataConsiderada\") <= '" + busca.dateTo.ToString("yyyy-MM-dd") + "' ";
+                } else
+                    filter += " AND date_trunc('day', s.\"dataConsiderada\") >= '" + busca.dateFrom.ToString("yyyy-MM-dd") + "' AND date_trunc('day',s.\"dataConsiderada\") <= '" + busca.dateTo.ToString("yyyy-MM-dd") + "' ";
 
 
             }

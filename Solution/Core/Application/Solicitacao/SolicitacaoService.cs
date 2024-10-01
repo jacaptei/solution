@@ -379,6 +379,8 @@ namespace JaCaptei.Application{
         public AppReturn Finalizar(Solicitacao entity) {
             //entity.idStatus     = 9;
             //entity.status       = "Finalizada";
+
+            entity.proprietarioNaoEncontrado = !Utils.Validator.Is(entity.proprietarioCaptacao);
             appReturn = DAO.Alterar(entity);
 
             if(appReturn.status.success) {
@@ -400,7 +402,7 @@ namespace JaCaptei.Application{
                 } else {
                     mail.message += "<br><br><b>Proprietário:</b>";
                     if(Utils.Validator.Is(entity.proprietarioCaptacao)) {
-                        mail.message    += "<br>"+(Utils.Validator.Is(entity.proprietarioCaptacao) ? entity.proprietarioCaptacao.Replace(",","<br>") : "não encontrado");
+                        mail.message    += "<br>"+ ((entity.proprietarioNaoEncontrado)? entity.proprietarioCaptacao.Replace(",","<br>") : "não encontrado");
                         //if(!entity.validadoProprietario)
                         //    mail.message += "<br><b style='color:#ff3333'>Proprietário inválido</b>";
                     } else

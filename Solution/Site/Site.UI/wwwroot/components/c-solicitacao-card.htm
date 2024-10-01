@@ -7,7 +7,7 @@
                         <div class="text-h10" style="font-size:16px">
                             <span class="text-h10">
                                 <b style="margin-right:10px;">ID# {{item.id}}</b> 
-                                <span v-if="!item.concluido">
+                                <span v-if="!item.concluido" style="font-size:14px">
                                         <span >
                                             <i title="agendado" style="padding-left:10px;padding-right:10px;color:#fff;font-size:17px;" class="fa fa-calendar"></i>
                                             {{$tools.FormatDateHour(item.dataVisita)}}
@@ -16,13 +16,13 @@
                                             <i class="fa fa-warning"></i> REAGENDAMENTO SOLICITADO
                                         </span>
                                         <span v-else-if="item.confirmado" style="margin-left:20px; background-color: #3cff3c; padding: 6px; border-radius: 10px; color: #003900;">
-                                            <i class="fa fa-check-double"></i> CONFIRMADO
+                                            <i class="fa fa-check-double"></i> VISITA CONFIRMADA
                                         </span>
                                         <span v-else="!item.confirmado" style="margin-left:20px; background-color: #feff7b; padding: 6px; border-radius: 10px; color: #533800;">
-                                            <i class="fa fa-warning"></i> NÃO CONFIRMADO
+                                            <i class="fa fa-warning"></i> VISITA NÃO CONFIRMADA
                                         </span>
                                         <span v-else-if="item.reagendado && !item.visitado && !item.concluido" style="margin-left:20px; background-color: #ffc13c; padding: 6px; border-radius: 10px; color: #533800;">
-                                            REAGENDADO
+                                            VISITA REAGENDADA
                                         </span>
                                 </span>
                             </span>
@@ -305,7 +305,7 @@
 
 
                                                     <div style="margin-top:10px;font-weight:500;cursor:pointer;color:#000">
-                                                        <el-input v-model="item.url" readonly input-style="color:#000;text-transform:lowercase;">
+                                                        <el-input v-model="item.url" readonly input-style="color:#000;text-transform:lowercase;" @click="item.acao='abrir-url'">
                                                             <template #prepend>
                                                                 <div style="text-transform:uppercase;font-weight:660;width:110px;text-align:right;cursor:pointer" @click="$tools.OpenLink(item.url)">
                                                                     URL    <i v-if="!item.validadaURL" title="URL inválida" style="padding-left:4px;color:#ff0000;font-size:17px;" class="fa fa-warning"></i><i v-else style="padding-left:10px" class="fa fa-link"></i>
@@ -362,7 +362,7 @@
                                                                 </div>
                                                             </template>
                                                             <template #append>
-                                                                <q-btn icon="fa fa-copy" flat @click="()=>{ item.dataVisita.getFullYear() > 1900? $tools.Copy(item.dataVisita.format('dd/mm/yyyy, ddd, HH:MM\'h\'')) : $tools.MessageAlert('Data não especificada'); }" style="width:10px"></q-btn>
+                                                                <q-btn icon="fa fa-copy" flat @click="()=>{ item.dataVisita.getFullYear() > 2000? $tools.Copy($tools.FormatDateHour(item.dataVisita)) : $tools.MessageAlert('Data não especificada'); }" style="width:10px"></q-btn>
                                                                 <q-btn icon="fa fa-up-right-from-square" flat style="margin-left:5px;width:10px" @click="$tools.OpenCalendar(item.dataVisita)"></q-btn>
                                                             </template>
                                                         </el-input>

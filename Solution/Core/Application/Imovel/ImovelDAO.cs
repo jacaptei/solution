@@ -508,7 +508,7 @@ namespace JaCaptei.Application {
                 else if(busca.imovel.id > 0)
                     filter += " AND imovel.id = " + busca.imovel.id.ToString() + " ";
                 else if(Utils.Validator.Is(busca.imovel.cod))
-                    filter += " AND imovel.cod = '" + busca.imovel.cod + "' ";
+                    filter += " AND imovel.cod = '" + busca.imovel.cod.ToUpper() + "' ";
 
 
                 if(!System.String.IsNullOrWhiteSpace(busca.imovel.documentacao.indiceCadastral))
