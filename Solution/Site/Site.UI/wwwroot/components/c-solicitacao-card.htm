@@ -218,8 +218,10 @@
                                                         <div v-if="$validator.is(item.titulo) && item.imovelJC">{{item.titulo}}</div>
                                                     </div>
                                                     <div>
-                                                        <span v-if="$validator.is(item.obsConcluido)" style="color:var(--s-text-color)">{{item.obsConcluido}}</span>
-                                                        <span v-else style="color:#c1c1c1">[ sem obs ]</span>
+                                                        <div v-if="item.imovelNaoEncontrado"><b>Imóvel não encontrado</b></div>
+                                                        <div v-else-if="item.imovelVendido"><b>Imóvel vendido</b></div>
+                                                        <div v-if="$validator.is(item.obsConcluido)" style="color:var(--s-text-color)">{{item.obsConcluido}}</div>
+                                                        <div v-else style="color:#c1c1c1">[ sem obs ]</div>
                                                     </div>
                                                   </q-timeline-entry>
 

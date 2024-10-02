@@ -336,7 +336,7 @@
                                                         <span class="text-h10">
                                                             <b style="margin-right:10px;">ID# {{item.id}}</b>
 
-                                                            <span v-if="item.visita">
+                                                            <span v-if="item.visita" style="font-size:14px;">
                                                                 <span >
                                                                     <i title="agendado" style="padding-left:10px;padding-right:10px;color:#fff;font-size:17px;" class="fa fa-calendar"></i>
                                                                     {{$tools.FormatDateHour(item.dataVisita)}}
@@ -348,13 +348,13 @@
                                                                      VISITADO <i class="fa fa-thumbs-up"></i> 
                                                                 </span>
                                                                 <span v-else-if="item.confirmado" style="margin-left:20px; background-color: #3cff3c; padding: 6px; border-radius: 10px; color: #003900;">
-                                                                    <i class="fa fa-check-double"></i> CONFIRMADO
+                                                                    <i class="fa fa-check-double"></i> VISITA CONFIRMADA
                                                                 </span>
                                                                 <span v-else="!item.confirmado" style="margin-left:20px; background-color: #feff7b; padding: 6px; border-radius: 10px; color: #533800;">
-                                                                    <i class="fa fa-warning"></i> NÃO CONFIRMADO
+                                                                    <i class="fa fa-warning"></i> VISITA NÃO CONFIRMADA
                                                                 </span>
                                                                 <span v-if="item.reagendado && !item.visitado && !item.concluido" style="margin-left:20px; background-color: #ffc13c; padding: 6px; border-radius: 10px; color: #533800;">
-                                                                   REAGENDADO
+                                                                   VISITA REAGENDADA
                                                                 </span>
                                                             </span>
                                                             <i v-else-if="!item.validadoProprietario|| !item.validadaURL || !item.validadoEndereco" title="há dados invalidados" style="padding-left:4px;color:#fff;font-size:20px;" class="fa fa-warning"></i>
@@ -408,7 +408,7 @@
                                                                     <q-card>
                                                                         <q-card-section>
                                                                             <div v-if="!item.reagendado">
-                                                                                <div class="title"><el-checkbox  v-model="item.confirmado" label="CONFIRMAR"  @change="()=>{ if(item.confirmado){ item.reagendado = false; } }" ></el-checkbox> <div style="padding-left:15px;display:inline-block;margin-top:-4px">{{$tools.FormatDateHour(item.dataVisita)}}</div></div> 
+                                                                                <div class="title"><el-checkbox  v-model="item.confirmado" label="CONFIRMADA"  @change="()=>{ if(item.confirmado){ item.reagendado = false; } }" ></el-checkbox> <div style="padding-left:15px;display:inline-block;margin-top:-4px">{{$tools.FormatDateHour(item.dataVisita)}}</div></div> 
                                                                                 <div v-if="$validator.is(item.obsAgendamento)" style="margin-bottom:4px;">
                                                                                     <el-input placeholder="" :value="item.obsAgendamento" readonly>
                                                                                         <template #prepend>
@@ -426,7 +426,7 @@
 
                                                                             <div style="margin-top:10px">
                                                                                 <div class="title">
-                                                                                    <el-checkbox v-model="item.reagendado" label="REAGENDAR" @change="()=>{ if(item.reagendado){ item.confirmado = false; } }"></el-checkbox>
+                                                                                    <el-checkbox v-model="item.reagendado" label="REAGENDADA" @change="()=>{ if(item.reagendado){ item.confirmado = false; } }"></el-checkbox>
                                                                                     <el-checkbox  v-model="item.confirmado" label="CONFIRMADO REAGENDAMENTO"  v-if="item.reagendado" ></el-checkbox> 
                                                                                 </div>
                                                                                 <div v-if="item.reagendado">
@@ -443,15 +443,20 @@
                                                                                 </div>
                                                                             </div>
                                                                             <div style="margin-top:10px">
-                                                                                <div class="title"><el-checkbox v-model="item.visitado" label="VISITADO"></el-checkbox></div>
+                                                                                <div class="title"><el-checkbox v-model="item.visitado" label="VISITADO"  @change="()=>{if(item.visitado){item.imovelVendido = false; item.imovelNaoEncontrado = false; }}"></el-checkbox></div>
                                                                                 <div v-if="item.visitado">
                                                                                     <el-input v-model="item.obsVisitado" placeholder="obs visita" type="textarea" :autosize="{ minRows: 2, maxRows: 3 }"></el-input>
                                                                                 </div>
                                                                             </div>
                                                                             <div style="margin-top:10px">
                                                                                 <div class="title"><el-checkbox v-model="item.concluido" label="CONCLUÍDO"  ></el-checkbox></div>
-                                                                                <div v-if="item.concluido">
+                                                                                <div v-if="item.concluido"v style="margin-bottom:10px">
+                                                                                    <el-checkbox v-model="item.imovelNaoEncontrado" label="IMÓVEL NÃO ENCONTRADO"   @change="()=>{if(item.imovelNaoEncontrado){item.imovelVendido = false; item.visitado = false; }}" ></el-checkbox> <el-checkbox v-model="item.imovelVendido" label="IMÓVEL VENDIDO" @change="()=>{if(item.imovelVendido){item.imovelNaoEncontrado = false; item.visitado = false; }}" ></el-checkbox>
+                                                                                    <br />
                                                                                     <el-input v-model="item.obsConcluido" placeholder="obs conclusão" type="textarea" :autosize="{ minRows: 2, maxRows: 3 }"></el-input>
+                                                                                    <div style="text-align:right;">
+                                                                                        <q-btn label="SALVAR" color="primary" text-color="white" @click="Alterar(item)" :loading="item.acao=='alterar'" style="width:160px;margin-left:00px"></q-btn>
+                                                                                    </div>
                                                                                 </div>
                                                                             </div>
                                                                         </q-card-section>
@@ -1389,6 +1394,9 @@
 
                         i.agendado = (i.dataVisita.getFullYear() > 1900);
                         i.acaocard = 'fechar-card' + i.id;
+                        
+                        if(i.visita)
+                            i.acao     =   'abrir-agenda';
 
                         i.dia  = i.dataVisita.format('yyyy/mm/dd');
                         i.hora = this.$tools.FormatHour(i.dataVisita);

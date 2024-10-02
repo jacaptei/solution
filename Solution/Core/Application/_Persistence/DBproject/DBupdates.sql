@@ -15,10 +15,10 @@ ALTER TABLE "Solicitacao" ADD COLUMN confirmado       BOOLEAN		    DEFAULT FALSE
 ALTER TABLE "Solicitacao" ADD COLUMN visitado	      BOOLEAN		    DEFAULT FALSE;
 ALTER TABLE "Solicitacao" ADD COLUMN concluido	      BOOLEAN		    DEFAULT FALSE;
 
-ALTER TABLE "Solicitacao" ADD COLUMN imovelIndisponivel			BOOLEAN		DEFAULT FALSE;
-ALTER TABLE "Solicitacao" ADD COLUMN imovelNaoEncontrado		BOOLEAN		DEFAULT FALSE;
-ALTER TABLE "Solicitacao" ADD COLUMN imovelVendido				BOOLEAN		DEFAULT FALSE;
-ALTER TABLE "Solicitacao" ADD COLUMN proprietarioNaoEncontrado	BOOLEAN		DEFAULT FALSE;
+ALTER TABLE "Solicitacao" ADD COLUMN "imovelIndisponivel"			BOOLEAN		DEFAULT FALSE;
+ALTER TABLE "Solicitacao" ADD COLUMN "imovelNaoEncontrado"			BOOLEAN		DEFAULT FALSE;
+ALTER TABLE "Solicitacao" ADD COLUMN "imovelVendido"				BOOLEAN		DEFAULT FALSE;
+ALTER TABLE "Solicitacao" ADD COLUMN "proprietarioNaoEncontrado"	BOOLEAN		DEFAULT FALSE;
 
 ALTER TABLE "Solicitacao" ADD COLUMN "obsAgendamento"	 VARCHAR(1200)        DEFAULT '';
 ALTER TABLE "Solicitacao" ADD COLUMN "obsReagendamento"  VARCHAR(1200)        DEFAULT '';

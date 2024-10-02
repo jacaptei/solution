@@ -926,6 +926,20 @@
 
 
 
+                                                    <div style="margin-bottom:10px;font-weight:500;color:#000" v-if="item.visita">
+                                                        <el-input placeholder="" :value="$tools.FormatDateHour(item.dataVisita)" readonly>
+                                                            <template #prepend>
+                                                                <div style="text-transform:uppercase;font-weight:660;width:110px;text-align:right;cursor:pointer" @click="$tools.OpenCalendar(item.dataVisita)">
+                                                                    Visita   <i style="padding-left:10px" class="fa fa-calendar" title="visita agendada"></i>
+                                                                </div>
+                                                            </template>
+                                                            <template #append>
+                                                                        <q-btn icon="fa fa-copy" flat @click="()=>{ item.dataVisita.getFullYear() > 2000? $tools.Copy(item.dataVisita.format('dd/mm/yyyy, ddd, HH:MM\'h\'')) : $tools.MessageAlert('Data não especificada'); }" style="width:10px"></q-btn>
+                                                                        <q-btn icon="fa fa-up-right-from-square" flat style="margin-left:5px;width:10px" @click="$tools.OpenCalendar(item.dataVisita)"></q-btn>
+                                                            </template>
+                                                        </el-input>
+                                                    </div>
+                                                    
 
 
                                                     <div style="font-weight:500;color:#000;margin-bottom:10px">
@@ -1153,18 +1167,26 @@
 
 
 
-                                                    <div style="margin-top:10px;font-weight:500;color:#000" v-if="item.visita">
-                                                        <el-input placeholder="" :value="$tools.FormatDateHour(item.dataVisita)" readonly>
+
+                                                    <div style="margin-top:10px;font-weight:500;color:#000">
+                                                        <el-input placeholder="" :value="FormatarConclusao(item)" @click="item.acao='abrir-conclusao'">
                                                             <template #prepend>
-                                                                <div style="text-transform:uppercase;font-weight:660;width:110px;text-align:right;cursor:pointer" @click="$tools.OpenCalendar(item.dataVisita)">
-                                                                    Visita   <i style="padding-left:10px" class="fa fa-calendar" title="visita agendada"></i>
+                                                                <div style="text-transform:uppercase;font-weight:700;width:110px;text-align:right;cursor:pointer" @click="()=>{item.acao=='abrir-conclusao'?  item.acao='fechar-conclusao' :  item.acao='abrir-conclusao';}">
+                                                                    Conclusão <i style="padding-left:10px" class="fa fa-message"></i>
                                                                 </div>
                                                             </template>
                                                             <template #append>
-                                                                        <q-btn icon="fa fa-copy" flat @click="()=>{ item.dataVisita.getFullYear() > 2000? $tools.Copy(item.dataVisita.format('dd/mm/yyyy, ddd, HH:MM\'h\'')) : $tools.MessageAlert('Data não especificada'); }" style="width:10px"></q-btn>
-                                                                        <q-btn icon="fa fa-up-right-from-square" flat style="margin-left:5px;width:10px" @click="$tools.OpenCalendar(item.dataVisita)"></q-btn>
+                                                                <div @click="()=>{item.acao=='abrir-conclusao'?  item.acao='fechar-conclusao' :  item.acao='abrir-conclusao';}" style="cursor:pointer;text-align:center">
+                                                                    <q-btn icon="fa fa-caret-down" flat style="margin-left:5px;width:10px" v-if="item.acao != 'abrir-conclusao'"></q-btn>
+                                                                    <q-btn icon="fa fa-caret-up" flat style="margin-left:5px;width:10px" v-else></q-btn>
+                                                                </div>
                                                             </template>
                                                         </el-input>
+                                                        <div v-if="item.acao=='abrir-conclusao'">
+                                                            <div v-if="item.imovelNaoEncontrado"><b>Imóvel não encontrado</b></div>
+                                                            <div v-else-if="item.imovelVendido"><b>Imóvel vendido</b></div>
+                                                            <el-input v-model="item.obsConcluido" placeholder="" type="textarea" readonly :autosize="{ minRows: 3, maxRows: 5}" style="font-size:12pt"></el-input>
+                                                        </div>
                                                     </div>
 
 
@@ -1601,9 +1623,11 @@
                 if (request?.status?.success) {
                     item.acao = 0;
                     this.$tools.MessageSuccess("SOLICITAÇÃO #" + item.id + " captada em verificação!");
+                    request.result.data             = this.$tools.DateFix(request.result.data);
                     request.result.dataVisita       = this.$tools.DateFix(request.result.dataVisita);
                     request.result.dataAgendamento  = this.$tools.DateFix(request.result.dataAgendamento);
                     request.result.dataReagendamento= this.$tools.DateFix(request.result.dataReagendamento);
+                    request.result.acao     = 'abrir-agenda';
                     request.result.acaocard = 'abrir-card' + request.result.id;
                     this.resultsVerificando.unshift(request.result);
                     this.totalAguardando--;
@@ -1920,7 +1944,15 @@
                     }
                 },
 
-
+                FormatarConclusao(item){
+                    var res = "";
+                    if(item.imovelVendido)
+                        res = "[ Imóvel Vendido ]";
+                    else if(item.imovelNaoEncontrado)
+                        res = "[ Imóvel Não Encontrado ]";
+                    res += " " + (this.$validator.is(item.obsConcluido)? item.obsConcluido : "");
+                    return res;
+                },
         }
 
     }

@@ -393,7 +393,17 @@ namespace JaCaptei.Application{
 
                 if(entity.idStatus == 11){
                     mail.message += "<br><br>";
-                    mail.message += (entity.visita)? "<b style='color:#ff3333'>Visita não concretizada.</b>" : "<b style='color:#ff3333'>Infelizmente não foi possível encontrar o imóvel solicitado.</b>";
+                    if(entity.visita){
+                        mail.message +="<b style='color:#ff3333'>Visita não concretizada.</b>";
+                        if(entity.imovelVendido)
+                            mail.message += "<br>Imóvel vendido.";
+                        else if(entity.imovelNaoEncontrado)
+                            mail.message += "<br>Imóvel não encontrado.";
+                        //if(Utils.Validator.Is(entity.obsConcluido))
+                        //    mail.message += "<br><br>Obs: " + entity.obsConcluido;
+                    }
+                    else
+                        mail.message += "<b style='color:#ff3333'>Infelizmente não foi possível encontrar o imóvel solicitado.</b>";
                 }
 
                 if(entity.visita) {

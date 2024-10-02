@@ -357,7 +357,7 @@
 
 
             ChecarCodImovelJaCaptei(){
-                if(this.$validator.is(this.codImovel) && this.codImovel != this.solicitacao.codImovel){
+                if(this.$validator.is(this.solicitacao.codImovel) && this.codImovel != this.solicitacao.codImovel){
                     this.codImovel = this.solicitacao.codImovel;
                     try{
                         this.BuscarImovel(0,this.solicitacao.codImovel);
