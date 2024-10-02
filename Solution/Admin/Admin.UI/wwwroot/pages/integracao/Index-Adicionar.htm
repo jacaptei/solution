@@ -246,19 +246,39 @@
         watch: {
             documento() {
                 this.isDocumentCheckFieldDisabled = false;
-                if (!this.documento) {
+                if (this.documento == "") {
                     this.LimparCamposIntegracao();
                     this.isDocumentCheckFieldDisabled = true;
                     this.disableFieldsForPartnerValidation = true;
+                } else if (this.opcoes.crm != "") {
+                    this.unidades = [];
+                    this.qntdBairros = 0;
+                    this.locationGroups = [];
+                    this.integracao.bairros = [];
+                    this.integracao.idPlano = [];
+                    this.integracao.idCliente = 0;
+                    this.integracao.idCliente = 0;
+                    this.integracao.chaveApi = "";
+                    this.integracao.codUsuario = "";
+                    this.integracao.codUnidade = "";
+                    this.VerificarInformacoesCliente();
                 }
             },
             async locationGroups(newValue) {
-                for (const [index, group] of newValue.entries()) {
-                    await this.ObterCidades(group.selectedEstado, index);
-                    await new Promise(resolve => setTimeout(resolve, 400));
-                    await this.ObterBairros(group.selectedCities, index);
-                    await new Promise(resolve => setTimeout(resolve, 400));
-                    this.locationGroups[index].enableFilterButton = true;
+                try {
+                    for (const [index, group] of newValue.entries()) {
+                    this.fullscreenLoading = true;
+                        await this.ObterCidades(group.selectedEstado, index);
+                        await new Promise(resolve => setTimeout(resolve, 400)); // Delay opcional de 400ms
+                        await this.ObterBairros(group.selectedCities, index);
+                        await new Promise(resolve => setTimeout(resolve, 400)); // Delay opcional de 400ms
+
+                        this.locationGroups[index].enableFilterButton = true; // Habilitar o botão ao finalizar
+                    }
+                } catch (error) {
+                    console.error("Erro ao carregar cidades e bairros:", error);
+                } finally {
+                    this.fullscreenLoading = false;
                 }
             }
         },
@@ -644,6 +664,7 @@
                             if (request.data && request.data.status === 'Sucesso') {
                                 this.$tools.MessageAlert("Integração em fila de processamento!", 100);
                                 this.fullscreenLoading = false;
+                                this.VerificarInformacoesCliente(this.documento);
                             } else {
                                 console.error(request.data.mensagem);
                                 throw new Error(request.data.mensagem || 'Erro desconhecido');
