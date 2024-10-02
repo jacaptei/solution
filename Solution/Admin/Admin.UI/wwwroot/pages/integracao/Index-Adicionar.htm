@@ -107,21 +107,43 @@
 
                             <el-col :xs="24" :sm="24" :md="12" :lg="8" class="register-input">
                                 <div><p>CIDADE</p></div>
-                                <div style="height:40px" v-if="this.locationGroups[index].carregandoEstados">
+                                <div style="height:40px" v-if="this.locationGroups[index].carregandoCidades">
                                     <c-loading size="30px" style="padding-left:5px"></c-loading>
                                 </div>
-                                <el-select v-else :disabled="this.locationGroups[index].bairrosExistentesIntegracao" v-model="this.locationGroups[index].selectedCities" filterable class="m-4" placeholder="Selecionar" size="large" style="width:100%" @change="(cities) => ObterBairros(cities, index)">
-                                    <el-option v-for="item in group.cidades" :key="item.id" :label="item.label" :value="item.id"></el-option>
+                                <el-select v-else
+                                           :disabled="this.locationGroups[index].bairrosExistentesIntegracao"
+                                           v-model="this.locationGroups[index].selectedCities"
+                                           filterable
+                                           class="m-4"
+                                           placeholder="Selecionar"
+                                           size="large"
+                                           style="width:100%"
+                                           @change="(cities) => ObterBairros(cities, index)">
+                                    <el-option v-for="item in this.locationGroups[index].cidades"
+                                               :key="item.id"
+                                               :label="item.label"
+                                               :value="item.id"></el-option>
                                 </el-select>
                             </el-col>
 
                             <el-col :xs="24" :sm="24" :md="12" :lg="8" class="register-input">
+                                <div><p>BAIRROS</p></div>
                                 <div style="height:40px" v-if="this.locationGroups[index].carregandoBairros">
                                     <c-loading size="30px" style="padding-left:5px"></c-loading>
                                 </div>
-                                <div><p>BAIRROS</p></div>
-                                <el-select v-else :disabled="this.locationGroups[index].bairrosExistentesIntegracao" v-model="this.locationGroups[index].selectedBairros" filterable class="m-4" placeholder="Selecionar" size="large" style="width:100%" @change="(selectedBairros) => handleBairrosChange(selectedBairros, group, index)">
-                                    <el-option v-for="item in this.locationGroups[index].bairros" :key="item.id" :label="item.label" :value="this.locationGroups[index].bairrosExistentesIntegracao ? item.id : item"></el-option>
+                                <el-select v-else
+                                           :disabled="this.locationGroups[index].bairrosExistentesIntegracao"
+                                           v-model="this.locationGroups[index].selectedBairros"
+                                           filterable
+                                           class="m-4"
+                                           placeholder="Selecionar"
+                                           size="large"
+                                           style="width:100%"
+                                           @change="(selectedBairros) => handleBairrosChange(selectedBairros, group, index)">
+                                    <el-option v-for="item in this.locationGroups[index].bairros"
+                                               :key="item.id"
+                                               :label="item.label"
+                                               :value="this.locationGroups[index].bairrosExistentesIntegracao ? item.id : item"></el-option>
                                 </el-select>
                             </el-col>
                         </div>
@@ -295,8 +317,8 @@
                         selectedBairros: bairro.Id,
                         enableFilterButton: true,
                         carregandoEstados: false,
-                        carregandoCidades: false,
-                        carregandoBairros: false,
+                        carregandoCidades: true,
+                        carregandoBairros: true,
                         cidades: [],
                         bairros: []
                     };
@@ -364,15 +386,6 @@
                 return '_' + Math.random().toString(36).substr(2, 9);
             },
 
-            ObterCidades(estadoId, groupIndex) {
-                this.idEstado = estadoId;
-                this.locationGroups[groupIndex].carregandoCidades = true;
-                this.$sdata.ObterCidades(estadoId).then(res => {
-                    this.locationGroups[groupIndex].cidades = res;
-                    this.locationGroups[groupIndex].carregandoCidades = false;
-                });
-            },
-
             ValidarCampoUnidades() {
                 if (this.disabledUnidade || this.disableFieldsForPartnerValidation) {
                     return true
@@ -382,24 +395,37 @@
 
             },
 
-            ObterBairros(cidade, groupIndex) {
+            async ObterCidades(estadoId, groupIndex) {
+                this.idEstado = estadoId;
+                this.locationGroups[groupIndex].carregandoCidades = true;
+
+                try {
+                    const res = await this.$sdata.ObterCidades(estadoId);
+                    this.locationGroups[groupIndex].cidades = res;
+                } catch (error) {
+                    console.error("Erro ao obter cidades:", error);
+                } finally {
+                    this.locationGroups[groupIndex].carregandoCidades = false;
+                }
+            },
+
+            async ObterBairros(cidade, groupIndex) {
                 this.group = this.locationGroups[groupIndex];
-                this.group.carregandoCidades = true;
+                this.group.carregandoBairros = true;
+                const idCidade = cidade.id ? cidade.id : cidade;
 
-                var idCidade = cidade.id ? cidade.id : cidade
-
-                this.$sdata.ObterBairros(idCidade).then(res => {
-                    this.group.bairros = res;
-                    this.group.bairros = this.group.bairros.map(bairro => ({
+                try {
+                    const res = await this.$sdata.ObterBairros(idCidade);
+                    this.group.bairros = res.map(bairro => ({
                         ...bairro,
                         idCidade: idCidade,
                         idEstado: this.idEstado
                     }));
-                    this.group.carregandoCidades = false;
-                }).catch(error => {
+                } catch (error) {
                     console.error("Erro ao obter bairros:", error);
-                    this.group.carregandoCidades = false;
-                });
+                } finally {
+                    this.group.carregandoBairros = false;
+                }
             },
 
             handleBairrosChange(selectedBairros, group, index) {
@@ -462,35 +488,52 @@
                 try {
                     this.fullscreenLoading = true;
                     var chaveApiString = this.integracao.chaveApi;
-
-                    // Formatar a URL
-                    if (!urlVistaSoft.startsWith('http://')) {
-                        urlVistaSoft = 'http://' + urlVistaSoft; // Adiciona http:// se não estiver presente
-                    }
-
-                    if (!urlVistaSoft.endsWith('/')) {
-                        urlVistaSoft += '/'; // Adiciona uma barra no final se não estiver presente
-                    }
+                    this.integracao.urlApi = this.FormatUrl(urlVistaSoft);
 
                     if (this.$validator.is(chaveApiString)) {
                         var chaveApiEncoded = encodeURIComponent(chaveApiString);
-                        var url = this.$api.BuildURL(`api/vistasoft/validarchave?chave=${chaveApiEncoded}&url=${urlVistaSoft}`);
+                        var url = this.$api.BuildURL(`api/vistasoft/validarchave?chave=${chaveApiEncoded}&url=${this.integracao.urlApi}`);
                         var response = await axios.get(url);
                         if (response) {
                             this.fullscreenLoading = false;
+                            ElementPlus.ElMessage({
+                                showClose: true,
+                                message: 'Chave Api e URL Valida!',
+                                type: 'success',
+                            });
                         }
                         return response;
                     } else {
                         this.integracao.codUnidade = "";
                         this.fullscreenLoading = false;
-                        this.$tools.MessageAlert("Chave API inválida");
+                        this.$tools.MessageAlert("URL inválida");
                     }
                 } catch (error) {
-                    console.error("Erro ao verificar a chave API:", error);
-                    this.$tools.MessageAlert("Erro ao validar a URL ou chave API.");
-                    this.integracao.codUnidade = "";
+                    if (error.response && error.response.status === 400) {
+                        ElementPlus.ElMessage({
+                            showClose: true,
+                            message: 'Chave API ou a URL está inválida. Por favor, verifique se os dados estão corretos e tente novamente.',
+                            type: 'warning',
+                            duration: 3000
+                        });
+                        this.integracao.codUnidade = "";
+                    } else {
+                        console.error("Erro ao verificar a chave API:", error);
+                        this.$tools.MessageAlert("Erro ao validar a URL ou chave API.");
+                    }
+                } finally {
                     this.fullscreenLoading = false;
                 }
+            },
+
+            FormatUrl(url) {
+                if (!url.startsWith('http://') && !url.startsWith('https://')) {
+                    url = 'http://' + url;
+                }
+                if (!url.endsWith('/')) {
+                    url += '/';
+                }
+                return url;
             },
 
             applyMask() {
