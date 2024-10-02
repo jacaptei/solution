@@ -463,9 +463,17 @@
                     this.fullscreenLoading = true;
                     var chaveApiString = this.integracao.chaveApi;
 
+                    // Formatar a URL
+                    if (!urlVistaSoft.startsWith('http://')) {
+                        urlVistaSoft = 'http://' + urlVistaSoft; // Adiciona http:// se não estiver presente
+                    }
+
+                    if (!urlVistaSoft.endsWith('/')) {
+                        urlVistaSoft += '/'; // Adiciona uma barra no final se não estiver presente
+                    }
+
                     if (this.$validator.is(chaveApiString)) {
                         var chaveApiEncoded = encodeURIComponent(chaveApiString);
-                        var urlVistaSoftEncoded = encodeURIComponent(urlVistaSoft);
                         var url = this.$api.BuildURL(`api/vistasoft/validarchave?chave=${chaveApiEncoded}&url=${urlVistaSoft}`);
                         var response = await axios.get(url);
                         if (response) {
@@ -539,7 +547,7 @@
                 this.integracao.idCliente = this.perfilIntegracaoCadastro.cliente.id
                 this.integracao.idPlano = perfilIntegracaoCadastro.plano.id;
                 this.qntdBairros = this.perfilIntegracaoCadastro.plano.qtdBairros;
-                this.integracao.urlApi = this.perfilIntegracaoCadastro.integracao.urlApi;
+                this.integracao.urlApi = this.perfilIntegracaoCadastro.integracao?.urlApi;
                 if (perfilIntegracaoCadastro && perfilIntegracaoCadastro.integracao?.bairros) {
                     this.integracao.bairros = JSON.parse(perfilIntegracaoCadastro.integracao?.bairros);
                     this.carregarDadosIniciais(this.integracao.bairros);
