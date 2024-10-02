@@ -8,8 +8,19 @@
                         <el-input style="width:100%"
                                   v-model="documento"
                                   :placeholder="placeholderText"
-                                  @input="applyMask"
-                                  @change="VerificarInformacoesCliente()"></el-input>
+                                  @input="applyMask"></el-input>
+                    </el-col>
+
+                    <el-col :xs="24" :sm="12" :md="8" :lg="8" class="register-input">
+                        <div>CRM<span></span></div>
+                        <el-select v-model="opcoes.crm" filterable :disabled="isDocumentCheckFieldDisabled" placeholder="SELECIONE O CRM" :clearable="true" :value-key="'id'" class="m-4" size="large" style="width: 100%" @change="VerificarInformacoesCliente()">
+                            <el-option v-for="item in crms"
+                                       :key="item.id"
+                                       :disable="true"
+                                       :label="item.nome"
+                                       :value="item.id">
+                            </el-option>
+                        </el-select>
                     </el-col>
 
                     <el-col :xs="24" :sm="12" :md="8" :lg="8" class="register-input">
@@ -34,20 +45,8 @@
                                       :disabled="disableFieldsForPartnerValidation"
                                       v-model="integracao.chaveApi"
                                       placeholder="Insira sua Chave API"
-                                      @change="(value) => BuscarUnidades(value)"></el-input>
+                                      @change="handleChange"></el-input>
                         </el-form-item>
-                    </el-col>
-
-                    <el-col :xs="24" :sm="12" :md="8" :lg="8" class="register-input">
-                        <div>CRM<span></span></div>
-                        <el-select v-model="opcoes.crm" filterable :disabled="disableFieldsForPartnerValidation" placeholder="SELECIONE O CRM" :clearable="true" :value-key="'id'" class="m-4" size="large" style="width: 100%">
-                            <el-option v-for="item in crms"
-                                       :key="item.id"
-                                       :disable="true"
-                                       :label="item.nome"
-                                       :value="item.id">
-                            </el-option>
-                        </el-select>
                     </el-col>
 
                     <el-col v-if="isImoview" :xs="24" :sm="12" :md="8" :lg="8" class="register-input">
@@ -71,11 +70,12 @@
 
                     <el-col v-if="isVistaSoft" :xs="24" :sm="24" :md="16" :lg="16" class="register-input">
                         <div>URL VISTASOFT<span></span></div>
-                        <el-form-item prop="urlVistaSoft">
+                        <el-form-item prop="urlApi">
                             <el-input style="width:100%"
                                       :disabled="disableFieldsForPartnerValidation"
-                                      v-model="integracao.urlVistaSoft"
-                                      :placeholder="placeholderUrlVistaSoft"></el-input>
+                                      v-model="integracao.urlApi"
+                                      :placeholder="placeholderUrlVistaSoft"
+                                      @change="(value) => ValidarUrl(value)"></el-input>
                         </el-form-item>
                     </el-col>
                 </el-row>
@@ -159,6 +159,7 @@
                 carregandoCidades: false,
                 disableButtonIntegration: false,
                 disableFieldsForPartnerValidation: true,
+                isDocumentCheckFieldDisabled: true,
                 disabledUnidade: true,
                 totalBairrosPermitidos: 0,
                 documento: "",
@@ -205,18 +206,25 @@
                     chaveApi: "",
                     idPlano: this.$root.perfilIntegracao?.plano || [],
                     bairros: [],
-                    urlVistaSoft: ""
+                    urlApi: ""
                 },
                 rules: {
                     chaveApi: [{ required: true, message: 'Por favor, insira a Chave API', trigger: 'blur' }],
                     codUnidade: [{ required: true, message: 'Por favor, selecione a Unidade', trigger: 'blur' }],
                     codUsuario: [{ required: true, message: 'Por favor, insira o Código de Usuário', trigger: 'blur' }],
-                    urlVistaSoft: [{ required: true, message: 'Por favor, insira a URL de Integração', trigger: 'blur' }],
+                    urlApi: [{ required: true, message: 'Por favor, insira a URL de Integração', trigger: 'blur' }],
                 },
                 fullscreenLoading: ref(false),
             };
         },
         watch: {
+            documento() {
+                this.isDocumentCheckFieldDisabled = false;
+                if (!this.documento) {
+                    this.LimparCamposIntegracao();
+                    this.isDocumentCheckFieldDisabled = true;
+                }
+            },
             async locationGroups(newValue) {
                 for (const [index, group] of newValue.entries()) {
                     await this.ObterCidades(group.selectedEstado, index);
@@ -309,7 +317,7 @@
             },
 
             LimparCamposIntegracao() {
-                this.crm = [];
+                this.opcoes.crm = [];
                 this.unidades = [];
                 this.qntdBairros = 0;
                 this.locationGroups = [];
@@ -404,6 +412,20 @@
                 }
             },
 
+            handleChange(value) {
+                switch (this.opcoes.crm) {
+                    case 1:
+                        // Chama a função BuscarUnidades quando CRM for igual a 1
+                        return this.BuscarUnidades(value);
+                    case 2:
+                        // CRM 2 não requer nenhuma ação, então apenas retorna
+                        return;
+                    default:
+                        // Lança um erro se o CRM não for válido
+                        throw new Error('CRM inválido');
+                }
+            },
+
             async BuscarUnidades(chaveApi) {
                 try {
                     this.fullscreenLoading = true;
@@ -436,6 +458,33 @@
                 }
             },
 
+            async ValidarUrl(urlVistaSoft) {
+                try {
+                    this.fullscreenLoading = true;
+                    var chaveApiString = this.integracao.chaveApi;
+
+                    if (this.$validator.is(chaveApiString)) {
+                        var chaveApiEncoded = encodeURIComponent(chaveApiString);
+                        var urlVistaSoftEncoded = encodeURIComponent(urlVistaSoft);
+                        var url = this.$api.BuildURL(`api/vistasoft/validarchave?chave=${chaveApiEncoded}&url=${urlVistaSoft}`);
+                        var response = await axios.get(url);
+                        if (response) {
+                            this.fullscreenLoading = false;
+                        }
+                        return response;
+                    } else {
+                        this.integracao.codUnidade = "";
+                        this.fullscreenLoading = false;
+                        this.$tools.MessageAlert("Chave API inválida");
+                    }
+                } catch (error) {
+                    console.error("Erro ao verificar a chave API:", error);
+                    this.$tools.MessageAlert("Erro ao validar a URL ou chave API.");
+                    this.integracao.codUnidade = "";
+                    this.fullscreenLoading = false;
+                }
+            },
+
             applyMask() {
                 this.valorInserido = this.documento.replace(/\D/g, '');
                 if (this.valorInserido.length <= 11) {
@@ -450,12 +499,22 @@
                 }
             },
 
-            async VerificarInformacoesCliente() {
+            CrmValidationEndpoint(crm) {
+                switch (crm) {
+                    case 1:
+                        return this.$api.BuildURL('api/imoview/integracao/cliente');
+                    case 2:
+                        return this.$api.BuildURL('api/vistasoft/integracao/cliente');
+                    default:
+                        throw new Error('CRM inválido');
+                }
+            },
+
+            async VerificarInformacoesCliente(documento) {
                 if (this.$validator.is(this.documento)) {
                     this.fullscreenLoading = true;
                     try {
-                        this.LimparCamposIntegracao();
-                        var url = this.$api.BuildURL('api/imoview/integracao/cliente');
+                        var url = this.CrmValidationEndpoint(this.opcoes.crm);
                         var request = await axios.post(url, { cpfCnpj: this.documento });
                         if (request.data && request.status === 200) {
                             this.disableFieldsForPartnerValidation = false;
@@ -477,19 +536,19 @@
 
             AtualizarCamposCadastro(perfilIntegracaoCadastro) {
                 this.integracao.codUsuario = this.perfilIntegracaoCadastro.integracao?.codUsuario;
-                var imoviewCrm = this.perfilIntegracaoCadastro.crms.filter(crm => crm.nome === 'Imoview');
                 this.integracao.idCliente = this.perfilIntegracaoCadastro.cliente.id
                 this.integracao.idPlano = perfilIntegracaoCadastro.plano.id;
-                this.crm = imoviewCrm[0].id;
                 this.qntdBairros = this.perfilIntegracaoCadastro.plano.qtdBairros;
-
+                this.integracao.urlApi = this.perfilIntegracaoCadastro.integracao.urlApi;
                 if (perfilIntegracaoCadastro && perfilIntegracaoCadastro.integracao?.bairros) {
                     this.integracao.bairros = JSON.parse(perfilIntegracaoCadastro.integracao?.bairros);
                     this.carregarDadosIniciais(this.integracao.bairros);
                 }
                 if (perfilIntegracaoCadastro && perfilIntegracaoCadastro.integracao) {
                     this.integracao.chaveApi = perfilIntegracaoCadastro.integracao.chaveApi || "";
-                    this.BuscarUnidades(this.integracao.chaveApi);
+                    if (this.opcoes.crm === 1) {
+                        this.BuscarUnidades(this.integracao.chaveApi);
+                    }
                 } else {
                     this.integracao.chaveApi = "";
                     this.unidades = [];
@@ -499,11 +558,9 @@
             getIntegrationUrl(crm) {
                 switch (crm) {
                     case 1:
-                        console.log(this.$api.BuildURL('api/imoview/integracao/cliente/integrar'));
                         return this.$api.BuildURL('api/imoview/integracao/cliente/integrar');
                     case 2:
-                        console.log(this.$api.BuildURL('api/vistasoft'));
-                        return this.$api.BuildURL('api/vistasoft');
+                        return this.$api.BuildURL('api/vistasoft/integracao/cliente/integrar');
                     default:
                         throw new Error('CRM inválido');
                 }
