@@ -618,7 +618,8 @@ namespace JaCaptei.Application {
                          "              \"Solicitacao\"  s JOIN \"Admin\"      a ON (s.\"idAdmin\"    = a.id) " +
                          "                                 JOIN \"Parceiro\"   p ON (s.\"idParceiro\" = p.id) ";
 
-            string  filter  = " WHERE s.ativo = 'TRUE' AND s.visita = 'TRUE' AND s.\"idStatus\" < 9 AND s.\"idParceiro\" = " + entity.idParceiro.ToString();
+            string  filter  = " WHERE s.ativo = 'TRUE' AND s.visita = 'TRUE' AND s.\"idStatus\" < 9 ";
+                    filter += " AND s.\"idParceiro\" = " + entity.idParceiro.ToString();
             string  sql     = "SELECT JSON_AGG(res) FROM  ( " + select + filter  + " ORDER BY s.\"dataConsiderada\" DESC ) res ";
 
             string filterFinalizados = " WHERE s.ativo = 'TRUE' AND s.visita = 'TRUE' AND s.\"idStatus\" > 9 AND s.\"idParceiro\" = " + entity.idParceiro.ToString(); // + " AND s.\"dataConsiderada\" >= '" + finalizadosAPartirDe.ToString("yyyy-MM-dd HH:mm:ss") + "' ";

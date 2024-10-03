@@ -532,6 +532,35 @@
 
 
 
+                                                    <div style="font-weight:500;color:#000;margin-bottom:10px" v-if="item.imovelJC">
+                                                        <el-input v-model="item.titulo" readonly input-style="color:#000" @click="()=>{item.acao=='abrir-imovel'?  item.acao='fechar-imovel' :  item.acao='abrir-imovel';}">
+                                                            <template #prepend>
+                                                                <div style="text-transform:uppercase;font-weight:660;width:110px;text-align:right;cursor:pointer;" @click="()=>{item.acao=='abrir-imovel'?  item.acao='fechar-imovel' :  item.acao='abrir-imovel';}">
+                                                                    Imóvel JC <i style="padding-left:4px" class="fa fa-building"></i>
+                                                                </div>
+                                                            </template>
+                                                            <template #append>
+                                                                <q-btn icon="fa fa-copy" flat @click="$tools.CopyLink(item.titulo)" style="width:10px" :title="item.titulo"></q-btn>
+                                                                <q-btn icon="fa fa-up-right-from-square" flat style="margin-left:5px;width:10px" @click="$tools.OpenLink(item.url)"></q-btn>
+                                                                <div @click="()=>{item.acao=='abrir-imovel'?  item.acao='fechar-imovel' :  item.acao='abrir-imovel';}" style="cursor:pointer;text-align:center">
+                                                                    <q-btn icon="fa fa-caret-down" flat style="margin-left:5px;width:10px" v-if="item.acao != 'abrir-imovel'"></q-btn>
+                                                                    <q-btn icon="fa fa-caret-up" flat style="margin-left:5px;width:10px" v-else></q-btn>
+                                                                </div>
+                                                            </template>
+                                                        </el-input>
+                                                        <div v-if="item.acao=='abrir-imovel'">
+                                                            <q-card>
+                                                                <q-card-section>
+                                                                    <div style="font-size:15px">
+                                                                       <div><a href="javascript:void(0)" @click="$tools.Copy(item.titulo)"      style="text-decoration:none;color:var(--s-color-tex-alt)">{{item.titulo}}         <i class="fa fa-copy" style="text-decoration:none;color:#999"></i></a></div>
+                                                                       <div><a href="javascript:void(0)" @click="$tools.Copy(item.idImovel)"    style="text-decoration:none;color:var(--s-color-tex-alt)">ID #{{item.idImovel}}   <i class="fa fa-copy" style="text-decoration:none;color:#999"></i></a><br /></div>
+                                                                       <div><a href="javascript:void(0)" @click="$tools.Copy(item.codImovel)"   style="text-decoration:none;color:var(--s-color-tex-alt)">COD {{item.codImovel}}  <i class="fa fa-copy" style="text-decoration:none;color:#999"></i></a><br /></div>
+                                                                       <div><a href="javascript:void(0)" @click="$tools.OpenLink(item.url)"     style="text-decoration:none;color:var(--s-color-tex-alt)">ABRIR  <i class="fa fa-up-right-from-square" style="text-decoration:none;color:#999"></i></a><br /></div>
+                                                                    </div>
+                                                                </q-card-section>
+                                                            </q-card>
+                                                        </div>
+                                                    </div>
 
                                                     <div style="margin-top:10px;font-weight:500;cursor:pointer;color:#000">
                                                         <el-input v-model="item.url" readonly input-style="text-transform:lowercase;">
