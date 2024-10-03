@@ -1,0 +1,557 @@
+<template>
+    <div>
+
+                <q-card style="width:100%;color:#fff" v-if="item.ativo">
+
+                    <q-card-section v-if="item.visita" style="cursor:pointer" @click="()=>{item.acaocard==('abrir-card'+item.id)?  item.acaocard=('fechar-card'+item.id) :  item.acaocard=('abrir-card'+item.id);}" :class="(item.concluido && !item.visitado)? 'bg-red' : (item.concluido && item.visitado)? 'bg-teal' : 'bg-orange-6' ">
+                        <div class="text-h10" style="font-size:16px">
+                            <span class="text-h10">
+                                <b style="margin-right:10px;">ID# {{item.id}}</b> 
+                                <span v-if="!item.concluido" style="font-size:14px">
+                                        <span >
+                                            <i title="agendado" style="padding-left:10px;padding-right:10px;color:#fff;font-size:17px;" class="fa fa-calendar"></i>
+                                            {{$tools.FormatDateHour(item.dataVisita)}}
+                                        </span>
+                                        <span v-if="!item.confirmado && item.reagendado" style="margin-left:20px; background-color: #ff0000; padding: 6px; border-radius: 10px; color: #fff;">
+                                            <i class="fa fa-warning"></i> REAGENDAMENTO SOLICITADO
+                                        </span>
+                                        <span v-else-if="item.confirmado" style="margin-left:20px; background-color: #3cff3c; padding: 6px; border-radius: 10px; color: #003900;">
+                                            <i class="fa fa-check-double"></i> VISITA CONFIRMADA
+                                        </span>
+                                        <span v-else="!item.confirmado" style="margin-left:20px; background-color: #feff7b; padding: 6px; border-radius: 10px; color: #533800;">
+                                            <i class="fa fa-warning"></i> VISITA NÃO CONFIRMADA
+                                        </span>
+                                        <span v-else-if="item.reagendado && !item.visitado && !item.concluido" style="margin-left:20px; background-color: #ffc13c; padding: 6px; border-radius: 10px; color: #533800;">
+                                            VISITA REAGENDADA
+                                        </span>
+                                </span>
+                            </span>
+                            <span class="text-h10" v-if="item.visita">
+                                <span style="float:right;">
+                                    <span style="font-weight:300;padding-right:20px">
+                                       solicitado em {{$tools.FormatDateHour(item.data)}}
+                                    </span>
+                                    <span v-if="item.concluido && !item.visitado" style="padding: 6px; border-radius: 10px; color: #fff;">
+                                            NÃO VISITADO <i class="fa fa-thumbs-down"></i> 
+                                    </span>
+                                    <span v-else-if="item.visitado" style="padding: 6px; border-radius: 10px; color: #fff;">
+                                            VISITADO <i class="fa fa-thumbs-up"></i> 
+                                    </span>
+                                    <span v-else-if="item.idStatus < 9">
+                                       Agendado
+                                    </span>
+                                    <span v-else>
+                                        <span></span>
+                                    </span>
+                                    <span style="margin-left:15px;">
+                                        <i class="fa fa-caret-down" v-if="item.acaocard != ('abrir-card'+item.id)"></i>
+                                        <i class="fa fa-caret-up" v-else></i>
+                                    </span>
+                                </span>
+                            </span>
+                            <span class="text-h10" v-else>
+                                <span style="float:right;">
+                                    <span style="font-weight:300;padding-right:20px">
+                                       solicitado em {{$tools.FormatDateHour(item.data)}}
+                                    </span>
+                                    <span v-if="item.idStatus < 9">
+                                      Averiguando
+                                    </span>
+                                    <span v-else-if="item.idStatus == 9 || item.idStatus == 10">
+                                       Encontrado <i class="fa fa-thumbs-up" style="padding-left:10px"></i>
+                                    </span>
+                                    <span v-else-if="item.idStatus == 11">
+                                       Não encontrado <i class="fa fa-thumbs-down" style="padding-left:10px"></i>
+                                    </span>
+                                    <span v-else>
+                                        <span></span>
+                                    </span>
+                                    <span style="margin-left:15px;">
+                                        <i class="fa fa-caret-down" v-if="item.acaocard != ('abrir-card'+item.id)"></i>
+                                        <i class="fa fa-caret-up" v-else></i>
+                                    </span>
+                                </span>
+                            </span>
+                        </div>
+                    </q-card-section>
+
+
+                    <q-card-section v-else style="cursor:pointer" @click="()=>{item.acaocard==('abrir-card'+item.id)?  item.acaocard=('fechar-card'+item.id) :  item.acaocard=('abrir-card'+item.id);}" :class="ObterStatusClass(item)">
+                        <div class="text-h10">
+                            <span class="text-h10">
+                                <b style="margin-right:10px;">ID# {{item.id}}</b>
+                                <i v-if="!item.validadoProprietario|| !item.validadaURL || !item.validadoEndereco" title="há dados invalidados" style="padding-left:4px;color:#fff;font-size:20px;" class="fa fa-warning"></i>
+                                <span v-if="item.agendado">
+                                    <i title="agendado" style="padding-left:10px;padding-right:10px;color:#fff;font-size:17px;" class="fa fa-calendar"></i>
+                                    {{$tools.FormatDateHour(item.dataVisita)}}
+                                </span>
+                            </span>
+                            <span class="text-h10">
+                                <span style="float:right">
+                                    Verificando inserida em
+                                    <span style="font-weight:300;font-size:15px;padding-right:20px">
+                                        {{$tools.FormatDateHour(item.data)}}
+                                    </span>
+                                    <span style="font-weight:600;font-size:17px">
+                                        <span v-if="item.horas == 0">há {{item.minutos}}min</span>
+                                        <span v-else-if="item.dias == 0">há {{item.horas}}h</span>
+                                        <span v-else-if="item.dias == 1">Ontem às {{$tools.GetHours(item.data)}}h</span>
+                                        <span v-else>Há {{item.dias}} dias</span>
+                                    </span>
+                                    <span style="margin-left:15px;">
+                                        <i class="fa fa-caret-down" v-if="item.acaocard != ('abrir-card'+item.id)"></i>
+                                        <i class="fa fa-caret-up" v-else></i>
+                                    </span>
+                                </span>
+                            </span>
+                        </div>
+                    </q-card-section>
+
+
+
+                    <q-card-section :id="'content'+item.id" v-if="item.acaocard==('abrir-card'+item.id)" style="margin-bottom:5px">
+
+        	                        <q-tabs v-model="view"
+					                        dense
+					                        no-caps
+					                        align="left"
+					                        narrow-indicator
+					                        class="text-grey"
+					                        active-color="primary"
+					                        indicator-color="primary">
+				                        <q-tab name="status"		label="STATUS"></q-tab>
+				                        <q-tab name="details"		label="DETALHES" ></q-tab>
+				                        <!--<q-tab name="register"	icon="fa fa-user-plus"			label="CADASTRE-SE"		style="width:115px"></q-tab>-->
+			                        </q-tabs>
+			                        <q-tab-panels v-model="view" animated>
+				
+				                        <q-tab-panel name="status">
+                                              <div class="q-px-lg q-py-md" style="color:var(--s-text-color)">
+                                                  
+                                                <q-timeline color="primary">
+                                                  <!--<q-timeline-entry heading>
+                                                    Timeline heading
+                                                  </q-timeline-entry>-->
+
+
+
+                                                  <q-timeline-entry title=""    subtitle="Agendamento solicitado" color="primary" style="color:var(--s-color-primary)" v-if="!item.reagendado && !item.confirmado">
+                                                    <div class="timetitle">
+                                                        <div><i class="fa fa-calendar"></i> <b>{{FormatarData(item.dataAgendamento)}}</b></div>
+                                                        <div><i class="fa fa-map-marker-alt"></i> <b>{{FormatarEndereco()}}</b></div>
+                                                        <div v-if="$validator.is(item.titulo) && item.imovelJC">{{item.titulo}}</div>
+                                                    </div>
+                                                    <div>
+                                                        <div v-if="$validator.is(item.obsAgendamento) && $validator.is(item.obsConfirmado)" style="color:var(--s-text-color)">
+                                                            <div>obs agendamento: {{item.obsAgendamento}}</div>
+                                                            <div>obs confirmação: {{item.obsConfirmado}}</div>
+                                                        </div>
+                                                        <span v-else-if="$validator.is(item.obsAgendamento)" style="color:var(--s-text-color)">{{item.obsAgendamento}}</span>
+                                                        <span v-else-if="$validator.is(item.obsConfirmado)" style="color:var(--s-text-color)">{{item.obsConfirmado}}</span>
+                                                        <span v-else style="color:#c1c1c1">[ sem obs ]</span>
+                                                    </div>
+                                                  </q-timeline-entry>
+
+                                                    
+                                                  <q-timeline-entry title=""    subtitle="Reagendamento solicitado" color="primary" style="color:var(--s-color-primary)" v-if="item.reagendado && !item.confirmado">
+                                                    <div class="timetitle">
+                                                        <div><i class="fa fa-calendar"></i> <b>{{FormatarData(item.dataReagendamento)}}</b></div>
+                                                        <div><i class="fa fa-map-marker-alt"></i> <b>{{FormatarEndereco()}}</b></div>
+                                                        <div v-if="$validator.is(item.titulo) && item.imovelJC">{{item.titulo}}</div>
+                                                    </div>
+                                                    <div>
+                                                        <span v-if="$validator.is(item.obsReagendamento)" style="color:var(--s-text-color)">{{item.obsReagendamento}}</span>
+                                                        <span v-else style="color:#c1c1c1">[ sem obs ]</span>
+                                                    </div>
+                                                    <div style="margin-top:10px">
+                                                        <q-btn color="green" label="ACEITAR REAGENDAMENTO" @click="AceitarReagendamento" :loading="onRequest"></q-btn>
+                                                    </div>
+                                                  </q-timeline-entry>
+
+                                                  <q-timeline-entry title=""    :subtitle="(item.confirmado && item.reagendado)? 'Reagendamento confirmado' : 'Agendamento confirmado'" v-if="item.confirmado" color="green" style="color:#4caf50">
+                                                    <div class="timetitle">
+                                                        <div><i class="fa fa-calendar"></i> <b>{{FormatarData(item.dataVisita)}}</b></div>
+                                                        <div><i class="fa fa-map-marker-alt"></i> <b>{{FormatarEndereco()}}</b></div>
+                                                        <div v-if="$validator.is(item.titulo) && item.imovelJC">{{item.titulo}}</div>
+                                                    </div>
+                                                    <div v-if="!item.reagendado">
+                                                        <div v-if="$validator.is(item.obsAgendamento) && $validator.is(item.obsConfirmado)" style="color:var(--s-text-color)">
+                                                            <div>obs agendamento: {{item.obsAgendamento}}</div>
+                                                            <div>obs confirmação: {{item.obsConfirmado}}</div>
+                                                        </div>
+                                                        <span v-else-if="$validator.is(item.obsAgendamento)" style="color:var(--s-text-color)">{{item.obsAgendamento}}</span>
+                                                        <span v-else-if="$validator.is(item.obsConfirmado)" style="color:var(--s-text-color)">{{item.obsConfirmado}}</span>
+                                                        <span v-else style="color:#c1c1c1">[ sem obs ]</span>
+                                                    </div>
+                                                    <div v-else>
+                                                        <div v-if="$validator.is(item.obsReagendamento) && $validator.is(item.obsConfirmado)" style="color:var(--s-text-color)">
+                                                            <div>obs reagendamento: {{item.obsReagendamento}}</div>
+                                                            <div>obs confirmação: {{item.obsConfirmado}}</div>
+                                                        </div>
+                                                        <span v-else-if="$validator.is(item.obsReagendamento)" style="color:var(--s-text-color)">{{item.obsReagendamento}}</span>
+                                                        <span v-else-if="$validator.is(item.obsConfirmado)" style="color:var(--s-text-color)">{{item.obsConfirmado}}</span>
+                                                        <span v-else style="color:#c1c1c1">[ sem obs ]</span>
+                                                    </div>
+                                                  </q-timeline-entry>
+
+
+                                                <q-timeline-entry title=""    subtitle="Aguardando visita" v-if="!item.visitado"style="color:var(--s-color-primary)"></q-timeline-entry>
+                                                <q-timeline-entry title=""    subtitle="Visita realizada" v-if="item.visitado" color="green" style="color:#4caf50">
+                                                    <div class="timetitle">
+                                                        <div><i class="fa fa-calendar"></i> <b>{{FormatarData(item.dataVisita)}}</b></div>
+                                                        <div><i class="fa fa-map-marker-alt"></i> <b>{{FormatarEndereco()}}</b></div>
+                                                        <div v-if="$validator.is(item.titulo) && item.imovelJC">{{item.titulo}}</div>
+                                                    </div>
+                                                    <div>
+                                                        <span v-if="$validator.is(item.obsVisitado)" style="color:var(--s-text-color)">{{item.obsVisitado}}</span>
+                                                        <span v-else style="color:#c1c1c1">[ sem obs ]</span>
+                                                    </div>
+                                                  </q-timeline-entry>
+
+                                                    
+
+                                                <q-timeline-entry title=""    subtitle="Aguardando conclusão" v-if="!item.concluido"style="color:var(--s-color-primary)"></q-timeline-entry>
+                                                  <q-timeline-entry title=""    subtitle="Visita concluída" v-if="item.concluido" color="green" style="color:#4caf50">
+                                                    <div class="timetitle">
+                                                        <div><i class="fa fa-calendar"></i> <b>{{FormatarData(item.dataVisita)}}</b></div>
+                                                        <div><i class="fa fa-map-marker-alt"></i> <b>{{FormatarEndereco()}}</b></div>
+                                                        <div v-if="$validator.is(item.titulo) && item.imovelJC">{{item.titulo}}</div>
+                                                    </div>
+                                                    <div>
+                                                        <div v-if="item.imovelNaoEncontrado"><b>Imóvel não encontrado</b></div>
+                                                        <div v-else-if="item.imovelVendido"><b>Imóvel vendido</b></div>
+                                                        <div v-if="$validator.is(item.obsConcluido)" style="color:var(--s-text-color)">{{item.obsConcluido}}</div>
+                                                        <div v-else style="color:#c1c1c1">[ sem obs ]</div>
+                                                    </div>
+                                                  </q-timeline-entry>
+
+
+
+
+                                                </q-timeline>
+                                              </div>				
+                                        </q-tab-panel>
+
+				                        <q-tab-panel name="details">
+
+                                                <div>
+
+
+                                                    <div style="margin-top:10px;font-weight:500;color:#000">
+
+                                                        <el-input v-if="item.idImovel > 0" v-model="item.titulo" readonly input-style="color:#000" @click="()=>{item.acao=='abrir-imovel'?  item.acao='fechar-imovel' :  item.acao='abrir-imovel';}">
+                                                            <template #prepend>
+                                                                <div style="text-transform:uppercase;font-weight:660;width:110px;text-align:right;cursor:pointer;" @click="()=>{item.acao=='abrir-imovel'?  item.acao='fechar-imovel' :  item.acao='abrir-imovel';}">
+                                                                    Imóvel JC <i style="padding-left:4px" class="fa fa-building"></i>
+                                                                </div>
+                                                            </template>
+                                                            <template #append>
+                                                                <q-btn icon="fa fa-copy" flat @click="$tools.CopyLink(item.titulo)" style="width:10px" :title="item.titulo"></q-btn>
+                                                                <q-btn icon="fa fa-up-right-from-square" flat style="margin-left:5px;width:10px" @click="$tools.OpenLink(item.url)"></q-btn>
+                                                                <div @click="()=>{item.acao=='abrir-imovel'?  item.acao='fechar-imovel' :  item.acao='abrir-imovel';}" style="cursor:pointer;text-align:center">
+                                                                    <q-btn icon="fa fa-caret-down" flat style="margin-left:5px;width:10px" v-if="item.acao != 'abrir-imovel'"></q-btn>
+                                                                    <q-btn icon="fa fa-caret-up" flat style="margin-left:5px;width:10px" v-else></q-btn>
+                                                                </div>
+                                                            </template>
+                                                        </el-input>
+                                                        <div v-if="item.acao=='abrir-imovel'">
+                                                            <q-card>
+                                                                <q-card-section>
+                                                                    <div style="font-size:15px">
+                                                                       <div><a href="javascript:void(0)" @click="$tools.Copy(item.titulo)"      style="text-decoration:none;color:var(--s-color-tex-alt)">{{item.titulo}}         <i class="fa fa-copy" style="text-decoration:none;color:#999"></i></a></div>
+                                                                       <div><a href="javascript:void(0)" @click="$tools.Copy(item.idImovel)"    style="text-decoration:none;color:var(--s-color-tex-alt)">ID #{{item.idImovel}}   <i class="fa fa-copy" style="text-decoration:none;color:#999"></i></a><br /></div>
+                                                                       <div><a href="javascript:void(0)" @click="$tools.Copy(item.codImovel)"   style="text-decoration:none;color:var(--s-color-tex-alt)">COD {{item.codImovel}}  <i class="fa fa-copy" style="text-decoration:none;color:#999"></i></a><br /></div>
+                                                                       <div><a href="javascript:void(0)" @click="$tools.OpenLink(item.url)"     style="text-decoration:none;color:var(--s-color-tex-alt)">ABRIR  <i class="fa fa-up-right-from-square" style="text-decoration:none;color:#999"></i></a><br /></div>
+                                                                    </div>
+                                                                </q-card-section>
+                                                            </q-card>
+                                                        </div>
+
+                                                    </div>
+
+                                                    <!--<div style="margin-top:10px;font-weight:500;color:#000">
+                                                        <el-input :value="$validator.is(item.proprietarioCaptacao)? item.proprietarioCaptacao : '' " placeholder="aguardar" readonly input-style="color:#000">
+                                                            <template #prepend>
+                                                                <div style="text-transform:uppercase;font-weight:660;width:110px;text-align:right;cursor:pointer;" @click="()=>{item.acao=='abrir-proprietario'?  item.acao='fechar-proprietario' :  item.acao='abrir-proprietario';}">
+                                                                    Proprietário <i style="padding-left:4px" class="fa fa-house-user"></i>
+                                                                </div>
+                                                            </template>
+                                                            <template #append>
+                                                                <div @click="()=>{item.acao=='abrir-proprietario'?  item.acao='fechar-proprietario' :  item.acao='abrir-proprietario';}" style="cursor:pointer;text-align:center">
+                                                                    <q-btn icon="fa fa-caret-down" flat style="margin-left:5px;width:10px" v-if="item.acao != 'abrir-proprietario'"></q-btn>
+                                                                    <q-btn icon="fa fa-caret-up" flat style="margin-left:5px;width:10px" v-else></q-btn>
+                                                                </div>
+                                                            </template>
+                                                        </el-input>
+                                                     </div>-->
+
+                                                      <div v-if="item.acao=='abrir-proprietario'">
+                                                            <q-card>
+                                                                <q-card-section>
+                                                                    <div style="line-height:30px;font-size:15px">
+                                                                        <el-row>
+                                                                            <el-col :xs="24" :md="24" style="line-height:40px" v-if="$validator.is(item.proprietarioCaptacao)">
+                                                                                <div v-if="$validator.is(item.proprietario.nome)" style="font-weight:500;color:var(--s-color-primary)"><i class="fa fa-user"></i> {{item.proprietario.nome}} <q-btn icon="fa fa-copy" flat @click="$tools.Copy(item.proprietario.nome)" color="grey" style="width:10px"></q-btn></div>
+                                                                                <div v-if="$validator.is(item.proprietario.email)"><a :href="'mailto:'+item.proprietario.email" target="_blank" style="color:var(--el-color-primary);text-decoration:none"><i class="fa fa-envelope"></i>&nbsp; {{item.proprietario.email}}</a>  <q-btn icon="fa fa-copy" flat @click="$tools.Copy(item.proprietario.email)" color="grey" style="width:10px"></q-btn></div>
+                                                                                <div v-if="$validator.is(item.proprietario.telefone)"><a :href="$tools.BuildWhatsappLink(item.proprietario.telefone  ,('Olá '+ $tools.Capitalize(item.proprietario.nome)) )" target="_blank" style="color:var(--s-color-green);text-decoration:none"><i class="fab fa-whatsapp"></i> {{item.proprietario.telefone}}</a>    <q-btn icon="fa fa-copy" flat @click="$tools.Copy(item.proprietario.telefone)" color="grey" style="width:10px"></q-btn> </div>
+                                                                                <div v-if="$validator.is(item.proprietario.telefone2)"><a :href="$tools.BuildWhatsappLink(item.proprietario.telefone2,('Olá '+ $tools.Capitalize(item.proprietario.nome)) )" target="_blank" style="color:var(--s-color-green);text-decoration:none"><i class="fab fa-whatsapp"></i> {{item.proprietario.telefone2}}</a>  <q-btn icon="fa fa-copy" flat @click="$tools.Copy(item.proprietario.telefone2)" color="grey" style="width:10px"></q-btn> </div>
+                                                                                <div v-if="$validator.is(item.proprietario.telefone3)"><a :href="$tools.BuildWhatsappLink(item.proprietario.telefone3,('Olá '+ $tools.Capitalize(item.proprietario.nome)) )" target="_blank" style="color:var(--s-color-green);text-decoration:none"><i class="fab fa-whatsapp"></i> {{item.proprietario.telefone3}}</a>  <q-btn icon="fa fa-copy" flat @click="$tools.Copy(item.proprietario.telefone3)" color="grey" style="width:10px"></q-btn> </div>
+                                                                            </el-col>
+                                                                        </el-row>
+                                                                    </div>
+                                                                </q-card-section>
+                                                            </q-card>
+                                                        </div>
+
+
+
+
+                                                    <div style="margin-top:10px;font-weight:500;cursor:pointer;color:#000">
+                                                        <el-input v-model="item.url" readonly input-style="color:#000;text-transform:lowercase;" @click="item.acao='abrir-url'">
+                                                            <template #prepend>
+                                                                <div style="text-transform:uppercase;font-weight:660;width:110px;text-align:right;cursor:pointer" @click="$tools.OpenLink(item.url)">
+                                                                    URL    <i v-if="!item.validadaURL" title="URL inválida" style="padding-left:4px;color:#ff0000;font-size:17px;" class="fa fa-warning"></i><i v-else style="padding-left:10px" class="fa fa-link"></i>
+                                                                </div>
+                                                            </template>
+                                                            <template #append>
+                                                                <q-btn icon="fa fa-copy" flat @click="$tools.CopyLink(item.url)" style="width:10px" :title="item.url"></q-btn>
+                                                                <q-btn icon="fa fa-up-right-from-square" flat style="margin-left:5px;width:10px" @click="$tools.OpenLink(item.url)"></q-btn>
+                                                                <q-btn icon="fa fa-caret-down" flat style="margin-left:5px;width:10px" @click="item.acao='abrir-url'" v-if="item.acao != 'abrir-url'"></q-btn>
+                                                                <q-btn icon="fa fa-caret-up" flat style="margin-left:5px;width:10px" @click="item.acao='fechar'" v-else></q-btn>
+                                                            </template>
+                                                        </el-input>
+                                                        <div v-if="item.acao=='abrir-url'">
+                                                            <q-card>
+                                                                <q-card-section>
+                                                                    <el-input v-model="item.url" placeholder="" type="textarea" :autosize="{ minRows: 2, maxRows: 4 }" style="font-size:12pt"></el-input>
+                                                                </q-card-section>
+                                                            </q-card>
+                                                        </div>
+                                                    </div>
+
+
+                                                    <div style="margin-top:10px;font-weight:500;cursor:pointer;color:#000">
+                                                        <el-input placeholder="" :value="$tools.BuildAddress(item)" readonly input-style="color:#000">
+                                                            <template #prepend>
+                                                                <div style="text-transform:uppercase;font-weight:660;width:110px;text-align:right;cursor:pointer" @click="$tools.OpenMap(item)">
+                                                                    Local   <i v-if="!item.validadoEndereco" title="endereço inválido" style="padding-left:4px;color:#ff0000;font-size:17px;" class="fa fa-warning"></i><i v-else style="padding-left:10px" class="fa fa-map-marker-alt"></i>
+                                                                </div>
+                                                            </template>
+                                                            <template #append>
+                                                                <q-btn icon="fa fa-copy" flat @click="$tools.Copy($tools.BuildAddress(item))" style="width:10px"></q-btn>
+                                                                <q-btn icon="fa fa-up-right-from-square" flat style="margin-left:5px;width:10px" @click="$tools.OpenMap(item)"></q-btn>
+                                                                <!--<q-btn icon="fa fa-caret-down" flat style="margin-left:5px;width:10px" @click="AbrirEdicaoEndereco(item)" v-if="item.acao != 'abrir-endereco'"></q-btn>
+                                                    <q-btn icon="fa fa-caret-up" flat style="margin-left:5px;width:10px" @click="item.acao='fechar'" v-else></q-btn>-->
+                                                            </template>
+                                                        </el-input>
+                                                        <div v-if="item.acao=='abrir-endereco'">
+                                                            <q-card>
+
+                                                                <q-card-section>
+
+                                                                </q-card-section>
+                                                            </q-card>
+                                                        </div>
+                                                    </div>
+
+
+
+                                                    <div style="margin-top:10px;font-weight:500;color:#000">
+                                                        <el-input placeholder="" :value="ObterDataVisita(item)" readonly input-style="color:#000">
+                                                            <template #prepend>
+                                                                <div style="text-transform:uppercase;font-weight:660;width:110px;text-align:right;cursor:pointer" @click="$tools.OpenCalendar(item.dataVisita)">
+                                                                    Visita   <i style="padding-left:10px" class="fa fa-calendar" title="visita agendada"></i>
+                                                                </div>
+                                                            </template>
+                                                            <template #append>
+                                                                <q-btn icon="fa fa-copy" flat @click="()=>{ item.dataVisita.getFullYear() > 2000? $tools.Copy($tools.FormatDateHour(item.dataVisita)) : $tools.MessageAlert('Data não especificada'); }" style="width:10px"></q-btn>
+                                                                <q-btn icon="fa fa-up-right-from-square" flat style="margin-left:5px;width:10px" @click="$tools.OpenCalendar(item.dataVisita)"></q-btn>
+                                                            </template>
+                                                        </el-input>
+                                                    </div>
+
+
+
+                                                    <div style="margin-top:10px;font-weight:500;color:#000" v-if="!item.visita">
+                                                        <el-input placeholder="" :value="item.descricao" input-style="color:#000">
+                                                            <template #prepend>
+                                                                <div style="text-transform:uppercase;font-weight:700;width:110px;text-align:right;cursor:pointer" @click="()=>{item.acao=='abrir-descricao'?  item.acao='fechar-descricao' :  item.acao='abrir-descricao';}">
+                                                                    OBS <i style="padding-left:10px" class="fa fa-message"></i>
+                                                                </div>
+                                                            </template>
+                                                            <template #append>
+                                                                <div @click="()=>{item.acao=='abrir-descricao'?  item.acao='fechar-descricao' :  item.acao='abrir-descricao';}" style="cursor:pointer;text-align:center">
+                                                                    <q-btn icon="fa fa-caret-down" flat style="margin-left:5px;width:10px" v-if="item.acao != 'abrir-descricao'"></q-btn>
+                                                                    <q-btn icon="fa fa-caret-up" flat style="margin-left:5px;width:10px" v-else></q-btn>
+                                                                </div>
+                                                            </template>
+                                                        </el-input>
+                                                        <div v-if="item.acao=='abrir-descricao'">
+                                                            <el-input v-model="item.descricao" placeholder="" type="textarea" readonly input-style="color:#000" :autosize="{ minRows: 2, maxRows: 4 }" style="font-size:12pt"></el-input>
+                                                        </div>
+                                                    </div>
+
+
+                                                    <div style="margin-top:10px;font-weight:500;color:#000">
+                                                        <el-input placeholder="" :value="item.avaliacao" input-style="color:#000">
+                                                            <template #prepend>
+                                                                <div style="text-transform:uppercase;font-weight:700;width:110px;text-align:right;cursor:pointer" @click="()=>{item.acao=='abrir-avaliacao'?  item.acao='fechar-avaliacao' :  item.acao='abrir-avaliacao';}">
+                                                                    Avaliação <i style="padding-left:10px" class="fa fa-house-circle-check"></i>
+                                                                </div>
+                                                            </template>
+                                                            <template #append>
+                                                                <div @click="()=>{item.acao=='abrir-avaliacao'?  item.acao='fechar-avaliacao' :  item.acao='abrir-avaliacao';}" style="cursor:pointer;text-align:center">
+                                                                    <q-btn icon="fa fa-caret-down" flat style="margin-left:5px;width:10px" v-if="item.acao != 'abrir-avaliacao'"></q-btn>
+                                                                    <q-btn icon="fa fa-caret-up" flat style="margin-left:5px;width:10px" v-else></q-btn>
+                                                                </div>
+                                                            </template>
+                                                        </el-input>
+                                                        <div v-if="item.acao=='abrir-avaliacao'">
+                                                            <el-input v-model="item.avaliacao" placeholder="" type="textarea" readonly input-style="color:#000" :autosize="{ minRows: 3, maxRows: 5}" style="font-size:12pt"></el-input>
+                                                        </div>
+                                                    </div>
+
+                                                </div>
+				                        </q-tab-panel>
+
+			                        </q-tab-panels>
+
+                    </q-card-section>
+                </q-card>
+
+
+
+
+    </div>
+</template>
+
+<script>
+    module.exports = {
+        name: 'JaCapteiParceiroSolicitacaoVisitaCard',
+        components: {},
+        data: function () {
+            return {
+                view: "status",
+                onRequest:false,
+                item:this.$models.solicitacao(),
+            }
+        },
+        computed: {},
+        props: {
+            solicitacao:	{ type: Object, required: false, default: {}},
+        },
+        watch: {},
+        created: function () {
+            this.item = this.solicitacao;
+        },
+        mounted() {
+          //  c2("dataAgendamento"    , this.item.dataAgendamento);
+          //  c2("dataReagendamento"  , this.item.dataReagendamento);
+        },
+        methods: {
+
+            ObterDataVisita(item) {
+                if (this.$validator.is(item.dataVisita)) {
+                    var data = item.dataVisita;
+                    //return data.format("dd/mm/yyyy, ddd, HH:MM'h'");
+                    return (data.getFullYear() > 2000) ? data.format("dd/mm/yyyy, ddd, HH:MM'h'") : "sem visita agendada";
+                }
+                return "";
+            },
+
+            FormatarData(data){
+                return this.$tools.FormatDateHour(data);
+                //c2("data",data);
+                //var res = "";
+                //try{
+                //    res = data.format("dd/mm/yyyy, HH:MM'h'");
+                //}catch(e){ console.log(e);}
+                //return res;
+            },
+
+            FormatarEndereco(){
+                var res = this.item.logradouro + ", " + this.item.numero + ", " + this.item.complemento + ", " + this.item.bairro + ", " + this.item.cidade + ", " + this.item.estado;
+                return res;
+            },
+
+
+            async AceitarReagendamento(){
+
+                if(!this.onRequest){
+
+                    this.onRequest = true;
+
+                    var request = await this.$api.Post("solicitacao/agenda/confirmar", this.item);
+
+                    if (request?.status?.success) {
+                        this.item.confirmado = true;
+                    } else {
+                        //c(request);
+                       this.$tools.Alert("Não foi possível confirmar reagendamento.")
+                    }
+
+                    this.onRequest = false;
+                }
+
+            },
+
+            ObterStatusClass(item) {
+                var classcolor = "";
+                if (item.agendado) {
+                    if (item.idStatus == 5)
+                        classcolor = 'bg-primary';
+                    else if (item.idStatus == 3) {
+                        if (item.horas < 0)
+                            classcolor = 'bg-orange-6';
+                        if (item.horas > 4)
+                            classcolor = 'bg-black';
+                        else if (item.horas >= 2)
+                            classcolor = 'bg-red-9';
+                        else
+                            classcolor = 'bg-orange-9';
+                    } else
+                        classcolor = 'bg-orange-9';
+                }
+                else {
+                    if (item.idStatus == 5)
+                        classcolor = 'bg-primary';
+                    else if (item.idStatus == 3) {
+                        if (item.horas < 0)
+                            classcolor = 'bg-orange-6';
+                        if (item.horas > 24)
+                            classcolor = 'bg-black';
+                        else if (item.horas >= 18)
+                            classcolor = 'bg-red-9';
+                        else
+                            classcolor = 'bg-orange-9';
+                    } else
+                        classcolor = 'bg-orange-9';
+                }
+                return classcolor;
+            },
+
+
+        }
+
+    }
+
+</script>
+
+
+<style scoped>
+    .timetitle{
+        margin-bottom: 5px; 
+        line-height: 28px;
+    }
+    .s-input {
+        margin-bottom: 20px;
+    }
+    ul {
+      list-style-type: none;
+    }
+    li {
+      list-style-type: none;
+    }
+</style>
+
+

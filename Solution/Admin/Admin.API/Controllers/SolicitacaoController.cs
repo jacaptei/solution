@@ -82,7 +82,7 @@ namespace JaCaptei.Administrativo.API.Controllers {
         [Authorize(Roles = "ADMIN_GOD,ADMIN_GESTOR")]
         [HttpGet]
         [Route("obter/distribuicoes")]
-        public IActionResult Captar() {
+        public IActionResult ObterDistribuicoes() {
             appReturn = service.ObterDistribuicoes();
             return Result(appReturn);
         }
@@ -99,7 +99,7 @@ namespace JaCaptei.Administrativo.API.Controllers {
             entity.admin.nome   = logado.nome;
 
             var dateUtil = new DateUtil();
-            entity.dataVisita = dateUtil.ConvertToLocalDateTime(entity.dataVisita);
+            //entity.dataVisita = dateUtil.ConvertToLocalDateTime(entity.dataVisita);
 
             appReturn = service.Captar(entity);
             return Result(appReturn);
@@ -165,7 +165,7 @@ namespace JaCaptei.Administrativo.API.Controllers {
             entity.admin.nome   = logado.nome;
 
             var dateUtil = new DateUtil();
-            entity.dataVisita = dateUtil.ConvertToLocalDateTime(entity.dataVisita);
+            //entity.dataVisita = dateUtil.ConvertToLocalDateTime(entity.dataVisita);
 
             appReturn = service.Finalizar(entity);
             return Result(appReturn);
@@ -229,6 +229,38 @@ namespace JaCaptei.Administrativo.API.Controllers {
             appReturn = service.ObterTodosAdmin(logado);
             return Result(appReturn);
         }
+
+
+        [Authorize(Roles = "ADMIN_GOD,ADMIN_GESTOR,ADMIN_PADRAO")]
+        [HttpGet]
+        [Route("obter/solicitacoes/admin/{id:int}")]
+        public IActionResult ObterSolicitacoesAdmin(int id) {
+
+            Model.Admin logado = ObterAdminAutenticado();
+            if(logado.god || logado.gestor)
+                logado.id = id;
+
+            appReturn = service.ObterSolicitacoesAdmin(logado);
+            return Result(appReturn);
+        }
+
+
+        [Authorize(Roles = "ADMIN_GOD,ADMIN_GESTOR,ADMIN_PADRAO")]
+        [HttpGet]
+        [Route("obter/visitas/admin/{id:int}")]
+        public IActionResult ObterVisitasAdmin(int id) {
+
+            Model.Admin logado = ObterAdminAutenticado();
+            if(logado.god || logado.gestor)
+                logado.id = id;
+
+            appReturn = service.ObterVisitasAdmin(logado);
+            return Result(appReturn);
+        }
+
+
+
+
 
 
         [HttpGet]

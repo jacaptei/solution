@@ -46,6 +46,38 @@ namespace JaCaptei.API.Controllers
             return Result(appReturn);
         }
 
+        
+        [HttpPost]
+        [Route("agendar")]
+        public IActionResult Agendar([FromBody] Solicitacao entity) {
+
+
+            if(entity is null) {
+                appReturn.AddException("Agendamento inexistente ou inválido");
+                return Result(appReturn);
+            }
+
+            bool dayoff = false;
+            if(dayoff) {
+                appReturn.AddException("O atendimento dos agendamentos de hoje estão suspensas ou já foram encerrados.");
+                return Result(appReturn);
+            }
+
+            Usuario logado = ObterUsuarioAutenticado();
+
+            if(logado is null) {
+                appReturn.AddException("Erro ao atender requisição.<br>Atualize o site limpando o cache de seu navegador e/ou tentando com CTRL + F5 (se o problema persistir favor entrar em contato).");
+                //appReturn.result = HttpContext.User.FindFirst(ClaimTypes.Name).Value;
+                return Result(appReturn);
+            }
+
+            entity.idParceiro           = entity.inseridoPorId        = entity.atualizadoPorId      = logado.id;
+            entity.inseridoPorNome      = entity.atualizadoPorNome    = logado.nome;
+
+            appReturn = service.Agendar(entity);
+            return Result(appReturn);
+        }
+
 
         [HttpPost]
         [Route("alterar")]
@@ -60,6 +92,22 @@ namespace JaCaptei.API.Controllers
             entity.atualizadoPorNome    = logado.nome;
 
             appReturn = service.Alterar(entity);
+            return Result(appReturn);
+        }
+        
+        [HttpPost]
+        [Route("agenda/confirmar")]
+        public IActionResult ConfirmarAgendaVisita([FromBody] Solicitacao entity) {
+            if(entity is null || entity?.id == 0 || entity?.idParceiro == 0) {
+                appReturn.AddException("Solicitação inexistente ou inválida");
+                return Result(appReturn);
+            }
+
+            Usuario logado              = ObterUsuarioAutenticado();
+            entity.atualizadoPorId      = logado.id;
+            entity.atualizadoPorNome    = logado.nome;
+
+            appReturn = service.ConfirmarAgendaVisita(entity);
             return Result(appReturn);
         }
 
@@ -113,6 +161,32 @@ namespace JaCaptei.API.Controllers
             appReturn = service.ObterTodosParceiro(entity);
             return Result(appReturn);
         }
+
+        [HttpGet]
+        [Route("obter/solicitacoes/parceiro")]
+        public IActionResult ObterTodosSemVisitaParceiro() {
+            Solicitacao entity = new Solicitacao();
+            Usuario logado = ObterUsuarioAutenticado();
+            entity.idParceiro = logado.id;
+
+            appReturn = service.ObterTodosSemVisitaParceiro(entity);
+            return Result(appReturn);
+        }
+
+
+        [HttpGet]
+        [Route("obter/visitas/parceiro")]
+        public IActionResult ObterTodosComVisitaParceiro() {
+            Solicitacao entity = new Solicitacao();
+            Usuario logado = ObterUsuarioAutenticado();
+            entity.idParceiro = logado.id;
+
+            appReturn = service.ObterTodosComVisitaParceiro(entity);
+            return Result(appReturn);
+        }
+
+
+
 
         [HttpGet]
         [Route("excluir/{id:int}")]

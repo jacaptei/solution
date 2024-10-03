@@ -11,18 +11,18 @@
                 <el-row :gutter="20">
                     <el-col :xs="24" :sm="24" :md="24" :lg="24" style="color:var(--s-color-primary)">
                         <ul>
-                            <li>O processamento será no mesmo dia quando agendado de <b>Segunda à Sexta das 08h às 17h</b> e <b>Sábado até 11h</b>.</li>
-                            <li>Sem agendamento a data do processamento será no próximo dia útil.</li>
+                            <li>O processamento iniciará no mesmo dia quando agendado de <b>Segunda à Sexta das 08h às 17h</b> e <b>Sábado até 11h</b>.</li>
+                            <li>Fora deste prazo, a data do processamento passa a contar no próximo dia útil.</li>
                             <li><b>URL</b> ou <b>endereço</b> são necessários.</li>
                         </ul>
                     </el-col>
                 </el-row>
 
-                <el-row :gutter="20" v-if="!bloqueadoEnvio && bloqueadoEnvioNaoAgendado">
+                <!--<el-row :gutter="20" v-if="!bloqueadoEnvio && bloqueadoEnvioNaoAgendado">
                     <el-col :md="24" style="width:100%;text-align:center;margin-bottom:10px;margin-top:20px">
                         <el-alert style="background-color:#fff1d3;color:var(--s-color-primary)" title="Solicitações hoje apenas com agendamento." type="info" show-icon />
                     </el-col>
-                </el-row>
+                </el-row>-->
 
                 <el-row :gutter="20" v-if="bloqueadoEnvio">
                     <el-col :md="24" style="width:100%;margin-top:20px">
@@ -33,13 +33,16 @@
 
                 <el-row :gutter="20" :style="bloqueadoEnvio? 'opacity:0.5;pointer-events:none;':'opacity:1'">
                     <el-col :xs="24" :sm="24" :md="24" :lg="24" class="s-input" style="max-width:1700px;margin-top:10px">
-                        <div>URL<span></span></div>
-                        <el-input @keyup.enter="Enviar()" v-model="solicitacao.url" placeholder="" maxlength="400" ref="url" input-style="text-transform:lowercase;"></el-input>
+                        <div>URL<span></span>  <div style="color:#0bdb13;display:inline-block;padding-left:5px" v-if="solicitacao.imovelJC"><i class="fa fa-check-circle"></i> imóvel JáCaptei</div></div>
+                        <el-input @keyup.enter="Enviar()" v-model="solicitacao.url" placeholder="" maxlength="400" ref="url" input-style="text-transform:lowercase;" @keyup="ChecarUrlImovelJaCaptei"></el-input>
                     </el-col>
                 </el-row>
-
-                <el-row :gutter="20" :style="bloqueadoEnvio? 'opacity:0.5;pointer-events:none;':'opacity:1'">
-
+                <el-row :gutter="20" :style="bloqueadoEnvio? 'opacity:0.5;pointer-events:none;':'opacity:1'" v-if="carregandoImovel">
+                    <el-col :xs="24" :sm="24" :md="24" :lg="24" class="s-input" style="max-width:1700px;margin-top:10px">
+                        <c-loading></c-loading>
+                    </el-col>
+                </el-row>
+                <el-row :gutter="20" :style="(bloqueadoEnvio || carregandoImovel)? 'opacity:0.5;pointer-events:none;':'opacity:1'" >
                     <el-col :xs="24" :sm="12" :md="8" :lg="8" class="s-input">
                         <div><p>CEP</p><span></span></div>
                         <el-input v-model="cep.numero" placeholder="" ref="postalCode" v-maska data-maska="#####-###" @keyup="()=>{  if(cep.numero.length>=9){BuscarEndereco();} }">
@@ -105,7 +108,8 @@
                         <el-input @keyup.enter="Enviar()" v-model="solicitacao.complemento" placeholder="" maxlength="80" input-style="text-transform:uppercase;"></el-input>
                     </el-col>
 
-                    <el-col :xs="24" :sm="24" :md="9" :lg="9" class="s-input">
+
+                    <!--<el-col :xs="24" :sm="24" :md="9" :lg="9" class="s-input">
                         <div>AGENDAR VISITA <span> opcional exceto aos sábados</span></div>
                         <el-time-picker v-model="agenda.hora" placeholder="horário" size="large" @change="ProcessarDataVisita" style="max-width:140px"></el-time-picker>
                         <span style="padding-left:30px;">
@@ -114,11 +118,12 @@
                         <br />
                         <q-date v-model="agenda.data" style="text-align:left" minimal @click="ProcessarDataVisita" :options="(date)=>{ return date >= dateRangeInit.format('yyyy/mm/dd'); }"></q-date>
                     </el-col>
-
+-->
                     <el-col :xs="24" :sm="24" :md="15" :lg="15" class="s-input" style="max-width:1000px">
                         <div>OBSERVAÇÕES<span></span></div>
                         <el-input @keyup.enter="Enviar()" v-model="solicitacao.descricao" placeholder="" type="textarea" maxlength="4500" :autosize="{ minRows: 8, maxRows: 16 }" ref="desc"></el-input>
                     </el-col>
+
                 </el-row>
 
                 <el-row :gutter="20" style="margin-top:10px">
@@ -159,6 +164,7 @@
                 view: "form",
                 messageSuccess: "Cadastrado!",
                 messageAlert: "",
+                carregandoImovel: false,
                 carregandoCEP: false,
                 carregandoEstados: false,
                 carregandoCidades: false,
@@ -177,6 +183,8 @@
                 },
                 solicitacao: this.$models.solicitacao(),
                 city: "",
+                dia:"",
+                hora:"",
                 dataVisitalabel: "sem agenda",
                 agenda: { data: new Date(1900, 1, 0, 0, 0, 0, 0), hora: null, obs: "" },
                 dateRangeInit: new Date(),
@@ -221,7 +229,7 @@
                 var dayoff = false;
                 this.dateNow = new Date();
                 this.bloqueadoEnvio = (dayoff || this.$tools.GetDayWeek(this.dateNow) == "Dom" || this.dateNow.getHours() < 8 || this.dateNow.getHours() >= 17 || (this.$tools.GetDayWeek(this.dateNow) == "Sáb" && this.dateNow.getHours() >= 11));
-                this.bloqueadoEnvioNaoAgendado = (this.$tools.GetDayWeek(this.dateNow) == "Sáb" && this.solicitacao.dataVisita.getFullYear() == 1900);
+                this.bloqueadoEnvioNaoAgendado = true;// (this.$tools.GetDayWeek(this.dateNow) == "Sáb" && this.solicitacao.dataVisita.getFullYear() == 1900);
             },
 
             VerificarSeBloqueiaEnvioAlert() {
@@ -303,6 +311,73 @@
             },
 
 
+            ChecarUrlImovelJaCaptei(){
+               
+                if(this.url != this.solicitacao.url){
+                    this.url = this.solicitacao.url;
+                    //var url = "https://localhost:52240/imovel?cod=9601&id=1202&cid=3&cnome=TESTE2&ctelefone=(11)+33515-1651&cemail=prvgnt02@gmail.com&ctipo=PF&crazao=&cfantasia=&title=JaCaptei+.+cod+9601&desc=Apartamento,+3+quartos,+1+suites,+2+vagas+em+&img=https://imagizer.imageshack.com/v2/640x480q70/922/tHBkG5.jpg&tag=imovel&r=000000";
+                    //    url = "https://jacaptei.com.br/imovel?cod=JC1388&id=1388&cid=55&cnome=TESTE+PJ&ctelefone=(11)+97530-3200&cemail=paulont@live.com&ctipo=PJ&crazao=TESTE+PJ+LTDA+ME&cfantasia=Teste&title=JaCaptei+.+cod+JC1388&desc=Apartamento,+4+quartos,+2+suites,+3+vagas+em+&img=https://imagizer.imageshack.com/v2/640x480q70/922/dKNulE.jpg&tag=imovel&r=000000";
+                    try{
+                        var baseURL = this.solicitacao.url.split("/")[2].split(":")[0];
+                        if(baseURL == "localhost" || baseURL == "jacaptei.com.br" || baseURL == "homolog.jacaptei.com.br"){
+                                var idImovel = parseInt(this.solicitacao.url.split("id=")[1].split("&")[0]);
+                                this.BuscarImovel(idImovel);
+                        }
+                        //c(this.solicitacao.url.split("/")[2].split(":")[0]); // localhost
+                        //c(this.solicitacao.url.split("id=")[1].split("&")[0]); // 1202
+                    }catch(e){ce(e);}
+                }
+            },
+
+
+            async BuscarImovel(id){
+
+                        var buscaImovel = {imovel:{}};
+                        
+                        buscaImovel.imovel.id = id;
+                        buscaImovel.usuario   =   this.$root.usuario;
+        
+                        this.carregandoImovel = true;
+
+                        var request = await this.$api.Post("imovel/buscar/unidade",buscaImovel);
+
+                        if (request?.status?.success){
+                            buscaImovel                     =  request.result;
+                            this.solicitacao.imovel         =   buscaImovel.result.imoveis[0];
+                            this.solicitacao.imovelJC       =   true;
+                            this.solicitacao.idParceiro     =   this.$root.usuario.id;
+                            this.solicitacao.parceiro       =   this.$root.usuario;
+                            this.solicitacao.idProprietario =   this.solicitacao.imovel.idProprietario;
+                            this.solicitacao.proprietario   =   this.solicitacao.imovel.proprietario;
+                            this.solicitacao.idImovel       =   this.solicitacao.imovel.id;
+                            this.solicitacao.codImovel      =   this.solicitacao.imovel.cod;
+                            this.solicitacao.titulo         =   this.solicitacao.imovel.titulo + ", ID #" + this.solicitacao.imovel.id + ", COD " + this.solicitacao.imovel.cod;
+                            this.solicitacao.imovel         =   this.solicitacao.imovel;
+                            this.solicitacao.cep            =   this.cep.numero     =   this.solicitacao.imovel.endereco.cep;
+                            this.solicitacao.estado         =   this.solicitacao.imovel.endereco.estado;
+                            this.solicitacao.idEstado       =   this.solicitacao.imovel.endereco.idEstado;
+                            this.solicitacao.cidade         =   this.solicitacao.imovel.endereco.cidade;
+                            this.solicitacao.idCidade       =   this.solicitacao.imovel.endereco.idCidade;
+                            this.solicitacao.bairro         =   this.solicitacao.imovel.endereco.bairro;
+                            this.solicitacao.idBairro       =   this.solicitacao.imovel.endereco.idBairro;
+                            this.solicitacao.logradouro     =   this.solicitacao.imovel.endereco.logradouro;
+                            this.solicitacao.numero         =   this.solicitacao.imovel.endereco.numero;
+                            this.solicitacao.complemento    =   this.solicitacao.imovel.endereco.complementoTipo +" "+this.solicitacao.imovel.endereco.complemento;
+                            if(this.$validator.is(this.solicitacao.imovel.endereco.andar && this.solicitacao.imovel.endereco.andar > 0))
+                                this.solicitacao.complemento += ", " + this.solicitacao.imovel.endereco.andar +"º andar";
+                        }
+                        this.carregandoImovel = false;
+                        this.$refs.desc.focus();
+                        //c2("this.solicitacao.imovel",this.solicitacao.imovel)
+            },
+
+
+
+
+
+
+
+
 
 
             async Enviar() {
@@ -313,7 +388,7 @@
                 //c2("this.solicitacao.dataVisita", this.solicitacao.dataVisita);
 
                 if (this.$tools.GetDayWeek(this.dateNow) == "Sáb" && this.solicitacao.dataVisita.getFullYear() == 1900)
-                    msg[0] += "<b>Não é possível fazer solicitações sem agendamento no dia de hoje.</b><br><br>";
+                    msg[0] += "<b>Não é possível fazer solicitações de captações no dia de hoje.</b><br><br>";
 
 
 

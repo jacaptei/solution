@@ -452,9 +452,22 @@ namespace JaCaptei.Application
             return appReturn;
 
         }
-
-
-
+        public async Task<List<ParceiroList>> ObterParceirosAtivos()
+        {
+            try
+            {
+                var parceirosAtivos = await DAO.ObterParceirosAtivos();
+                if (parceirosAtivos == null || !parceirosAtivos.Any())
+                {
+                    return new List<ParceiroList>();
+                }
+                return parceirosAtivos;
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("Ocorreu um erro ao obter parceiros ativos.", ex);
+            }
+        }
 
         public AppReturn ObterInativos()
         {

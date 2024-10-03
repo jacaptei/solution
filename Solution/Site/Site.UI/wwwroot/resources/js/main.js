@@ -695,6 +695,7 @@ $(document).ready(function () {
 	App.component("c-tip"                   , c_tip                     );
 	App.component("c-footer"                , c_footer                  );
 	App.component("c-agendamento"           , c_agendamento             );
+	App.component("c-solicitacao-card"      , c_solicitacao_card        );
 	App.component("c-schedule"              , c_schedule                );
 	App.component("c-schedules"             , c_schedules               );
 	App.component("c-favorites"             , c_favorites               );
