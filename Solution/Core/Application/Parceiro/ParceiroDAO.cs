@@ -540,24 +540,32 @@ namespace JaCaptei.Application{
             return entityDB;
         }
 
-        public IEnumerable<Parceiro> ObterContaPorId(int idConta)
+        public List<Parceiro> ObterContaPorId(int idConta)
         {
-            using (var conn = new DBcontext().GetConn())
+            const string sql = @"
+                SELECT 
+                    p.*,
+                    c.*,
+                    pl.*
+                FROM 
+                    ""Parceiro"" p
+                INNER JOIN 
+                    ""Conta"" c ON p.""idConta"" = c.id
+                INNER JOIN
+                    ""Plano"" pl ON p.""idPlano"" = pl.id
+                WHERE 
+                    p.""idConta"" = @idConta";
+            try
             {
-                string sql = @"
-                    SELECT 
-                        p.id,
-                        p.nome AS nomeParceiro,
-                        p.""idConta"",
-                        c.nome AS nomeConta
-                    FROM 
-                        Parceiro p
-                    INNER JOIN 
-                        Conta c ON p.""idConta"" = c.id
-                    WHERE 
-                        p.""idConta"" = @idConta";
-                var resultado = conn.Query<Parceiro>(sql, new { idConta }).ToList();
-                return resultado;
+                using (var conn = new DBcontext().GetConn())
+                {
+                    var resultado = conn.ExecuteQuery<Parceiro>(sql, new { idConta }).ToList();
+                    return resultado;
+                }
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("Erro ao obter parceiro por ID da conta", ex);
             }
         }
 

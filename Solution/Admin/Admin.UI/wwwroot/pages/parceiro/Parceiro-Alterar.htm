@@ -278,6 +278,7 @@
 </template>
 
 <script>
+    import { ref, getCurrentInstance } from 'vue';
 	module.exports = {
 
         name: 'JCAdminParceiroAlterar',
@@ -300,7 +301,8 @@
 				carregandoCEP: false,
 				carregandoEstados: false,
 				carregandoCidades: false,
-				carregandoBairros: false,
+                carregandoBairros: false,
+                instance: getCurrentInstance(),
 				novaSenha:"",
 				cep: {
 					numero: "",
@@ -330,12 +332,12 @@
 		},
         created: async function () {
             await this.Obter(this.id);
+            await this.$root.SetTitle("Parceiro #" + this.parceiro.nome, "fa fa-user-alt", null);
             this.opcoes.sexos = this.$sdata.opcoes.sexos;
             this.opcoes.estados = await this.$sdata.ObterEstados();
-            this.$root.SetTitle("Parceiro #" + this.parceiro.nome, "fa fa-user-alt", null);
+            this.instance.proxy.$root.parceiroRow = this.parceiro;
         },
-        mounted() {
-        },
+        mounted() {},
 		methods: {
 
 			async Obter(id){
