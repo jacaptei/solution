@@ -412,7 +412,7 @@ namespace JaCaptei.Application{
                 } else {
                     mail.message += "<br><br><b>Proprietário:</b>";
                     if(Utils.Validator.Is(entity.proprietarioCaptacao)) {
-                        mail.message    += "<br>"+ ((entity.proprietarioNaoEncontrado)? entity.proprietarioCaptacao.Replace(",","<br>") : "não encontrado");
+                        mail.message    += "<br>"+ ((entity.proprietarioNaoEncontrado) ? "não encontrado" : entity.proprietarioCaptacao.Replace(",","<br>") );
                         //if(!entity.validadoProprietario)
                         //    mail.message += "<br><b style='color:#ff3333'>Proprietário inválido</b>";
                     } else
