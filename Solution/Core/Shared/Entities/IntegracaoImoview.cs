@@ -6,7 +6,7 @@ using RepoDb.Attributes.Parameter.Npgsql;
 namespace JaCaptei.Model.Entities
 {
     [Map("IntegracaoImoview")]
-    public class IntegracaoImoview
+    public class IntegracaoImoview : IIntegracaoCRM
     {
         [Map("id")]
         public int Id { get; set; }

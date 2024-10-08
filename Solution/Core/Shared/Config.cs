@@ -44,6 +44,7 @@
         public string AzureMQ                       { get; set; }
 
         public string IntegracaoAzureUrl            { get; set; }
+        public string IntegracaoVSAzureUrl { get; set; }
 
         public void CopyToStaticSettings() {
             Config.settings = this;

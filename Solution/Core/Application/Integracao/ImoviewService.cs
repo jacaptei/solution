@@ -3,6 +3,7 @@
 using Azure.Messaging.ServiceBus;
 
 using JaCaptei.Application.DAL;
+using JaCaptei.Application.Email;
 using JaCaptei.Model;
 using JaCaptei.Model.DTO;
 using JaCaptei.Model.Entities;
@@ -13,21 +14,21 @@ using Polly;
 using Polly.Contrib.WaitAndRetry;
 using Polly.Retry;
 
-using System.Collections.Generic;
 using System.ComponentModel;
 using System.Net;
 using System.Net.Http.Headers;
 
 namespace JaCaptei.Application.Integracao;
 
-public class ImoviewService : IDisposable
+public class ImoviewService : IDisposable, IIntegracaoService
 {
-    private readonly IHttpClientFactory _httpClientFactory;
+    private readonly IHttpClientFactory? _httpClientFactory;
     private readonly DBcontext _context;
+    private readonly EmailService? _emailService;
     private readonly ImoviewDAO _imoviewDAO;
     private readonly int _imagesSendLimit;
     private readonly int _queueDelay;
-    private readonly IMapper _mapper;
+    private readonly IMapper? _mapper;
     private readonly ILogger? _logger;
     private readonly AsyncRetryPolicy _retryPolicy;
     private readonly AsyncPolicy _busPolicy;
@@ -65,10 +66,25 @@ public class ImoviewService : IDisposable
         .WrapAsync(Policy.TimeoutAsync(TimeSpan.FromSeconds(3)));
     }
 
-    //public string Chave { get => _chave; set => _chave = value; }
+    public ImoviewService(DBcontext context, ILogger logger, EmailService emailService)
+    {
+        _logger = logger;
+        _context = context;
+        _emailService = emailService;
+        _imoviewDAO = new ImoviewDAO(_context.GetConn());
+        _retryPolicy = Policy
+            .Handle<Exception>()
+            .WaitAndRetryAsync(Backoff.DecorrelatedJitterBackoffV2(TimeSpan.FromSeconds(2), 1));
+        _busPolicy = Policy
+        .Handle<Exception>()
+        .WaitAndRetryAsync(1, retryAttempt => TimeSpan.FromSeconds(retryAttempt))
+        .WrapAsync(Policy.TimeoutAsync(TimeSpan.FromSeconds(3)));
+    }
+
     private async Task<CamposImoview?> GetCampos(string url, string chave)
     {
-        var client = _httpClientFactory.CreateClient("imoview");
+        var client = _httpClientFactory?.CreateClient("imoview");
+        if (client == null) return null;
         client.DefaultRequestHeaders.Clear();
         client.DefaultRequestHeaders.Add("chave", chave);
 
@@ -84,7 +100,8 @@ public class ImoviewService : IDisposable
 
     public async Task<CamposImoview?> GetUnidades(string chave)
     {
-        var client = _httpClientFactory.CreateClient("imoview");
+        var client = _httpClientFactory?.CreateClient("imoview");
+        if (client == null) return null;
         client.DefaultRequestHeaders.Clear();
         client.DefaultRequestHeaders.Add("chave", chave);
 
@@ -110,12 +127,13 @@ public class ImoviewService : IDisposable
 
     public async Task<ImoviewIncluirResponse?> IncluirImovel(ImoviewAddImovelRequest req, List<ImagemDTO> imagens, string chave)
     {
-        var client = _httpClientFactory.CreateClient("imoview");
+        var client = _httpClientFactory?.CreateClient("imoview");
+        if (client == null) return null;
         client.DefaultRequestHeaders.Clear();
         client.DefaultRequestHeaders.Add("chave", chave);
         using var content = new MultipartFormDataContent();
         var jsonParameters = Newtonsoft.Json.JsonConvert.SerializeObject(req);
-        var builder = new UriBuilder(client.BaseAddress+"Imovel/IncluirImovel")
+        var builder = new UriBuilder(client.BaseAddress + "Imovel/IncluirImovel")
         {
             Query = "parametros=" + Uri.EscapeDataString(jsonParameters)
         };
@@ -147,7 +165,8 @@ public class ImoviewService : IDisposable
 
     public async Task<bool> ValidarChave(string chave)
     {
-        var client = _httpClientFactory.CreateClient("imoview");
+        var client = _httpClientFactory?.CreateClient("imoview");
+        if (client == null) return false;
         client.DefaultRequestHeaders.Clear();
         client.DefaultRequestHeaders.Add("chave", chave);
         var res = await client.GetAsync("Imovel/RetornarListaFinalidades");
@@ -155,12 +174,12 @@ public class ImoviewService : IDisposable
         return chaveOk;
     }
 
-    public async Task<IntegracaoImoview?> ObterIntegracaoCliente(Parceiro cliente)
+    public async Task<IIntegracaoCRM?> ObterIntegracaoCliente(Parceiro cliente)
     {
         return await _imoviewDAO.GetIntegracao(cliente.id);
     }
 
-    public async Task<IntegrarClienteResponse> IntegrarCliente(IntegracaoImoview integracao)
+    public async Task<IntegrarClienteResponse> IntegrarCliente(IIntegracaoCRM integracao)
     {
         var cliente = await _retryPolicy.ExecuteAsync(() => _imoviewDAO.ObterCliente(integracao.IdCliente));
         if (cliente == null)
@@ -223,7 +242,7 @@ public class ImoviewService : IDisposable
                 Mensagem = $"Problemas para comunicar com Service Bus"
             };
         }
-        await _retryPolicy.ExecuteAsync(() => _imoviewDAO.SaveIntegracao(integracao));
+        await _retryPolicy.ExecuteAsync(() => _imoviewDAO.SaveIntegracao((IntegracaoImoview)integracao));
         var integracaoEvent = new IntegracaoEvent()
         {
             IdIntegracao = integracao.Id,
@@ -263,10 +282,10 @@ public class ImoviewService : IDisposable
     {
         _logger?.LogInformation("Iniciando importação service...");
         var integracao = await _retryPolicy.ExecuteAsync(() => _imoviewDAO.GetIntegracao(integracaoEvent.IdCliente));
-        if (integracao == null) 
+        if (integracao == null)
         {
             _logger?.LogWarning("Integração na fila não cadastrada! {integracaoEvent}", integracaoEvent);
-            return false; 
+            return false;
         }
         try
         {
@@ -313,18 +332,12 @@ public class ImoviewService : IDisposable
         return true;
     }
 
-    public async Task<object?> ObterStatusIntegracao(Parceiro cliente)
-    {
-        // TODO: Obter o status atual da integracao do cliente
-        return new { };
-    }
-
     private async Task<List<ImagemDTO>> GetImageFiles(int id)
     {
         var res = await _imoviewDAO.ObterImagensImovel(id);
         var list = new List<ImagemDTO>();
-        var client = _httpClientFactory.CreateClient();
-
+        var client = _httpClientFactory?.CreateClient();
+        if (client == null) return list;
         if (_imagesSendLimit > 0)
         {
             await DownloadImages(res, list, client);
@@ -488,11 +501,6 @@ public class ImoviewService : IDisposable
         return true;
     }
 
-    public async Task<ImovelFullDTO?> ObterImovel(int id)
-    {
-        return await _imoviewDAO.GetFullImovel(id);
-    }
-
     private async Task<bool> SendImportQueue(ServiceBusSender sender, ImportacaoImovelEvent importacaoImovelEvent)
     {
         await _busPolicy.ExecuteAsync(async () =>
@@ -519,15 +527,16 @@ public class ImoviewService : IDisposable
                 images = await GetImageFiles(import.IdImovel);
                 if (imovelFull != null)
                 {
-                    request = _mapper.Map<ImoviewAddImovelRequest>(imovelFull);
+                    request = _mapper?.Map<ImoviewAddImovelRequest>(imovelFull);
                     int.TryParse(import.CodUsuario, out int codusuario);
                     int.TryParse(import.CodUnidade, out int codunidade);
+                    if (request == null) throw new Exception("Erro ao mapear o imovel");
                     request.codigousuario = codusuario;
                     request.codigounidade = codunidade;
-                    if(tipos != null)
+                    if (tipos != null)
                     {
                         var tipoMapeado = tipos.FirstOrDefault(t => t.codigo == request.codigotipo);
-                        if(tipoMapeado == null)
+                        if (tipoMapeado == null)
                         {
                             _logger?.LogWarning("Tipo não mapeado para o imovel: {id}, tipo: {tipo}", import.CodImovel, request.codigotipo);
                             request.codigotipo = 1;
@@ -559,9 +568,10 @@ public class ImoviewService : IDisposable
                 if (importacaoImovel.RequestBody == null)
                 {
                     var imovelFull = await _retryPolicy.ExecuteAsync(() => _imoviewDAO.GetFullImovel(import.IdImovel));
-                    request = _mapper.Map<ImoviewAddImovelRequest>(imovelFull);
+                    request = _mapper?.Map<ImoviewAddImovelRequest>(imovelFull);
                     int.TryParse(import.CodUsuario, out int codusuario);
                     int.TryParse(import.CodUnidade, out int codunidade);
+                    if (request == null) throw new Exception("Erro ao mapear o imovel");
                     request.codigousuario = codusuario;
                     request.codigounidade = codunidade;
                     if (tipos != null)
@@ -578,7 +588,7 @@ public class ImoviewService : IDisposable
                 }
                 request = Newtonsoft.Json.JsonConvert.DeserializeObject<ImoviewAddImovelRequest>(importacaoImovel.RequestBody);
                 images = await GetImageFiles(import.IdImovel);
-                if(importacaoImovel.Imagens == null)
+                if (importacaoImovel.Imagens == null)
                 {
                     importacaoImovel.Imagens = Newtonsoft.Json.JsonConvert.SerializeObject(images.Select(i => new { i.Nome, i.Url }));
                 }
@@ -602,7 +612,7 @@ public class ImoviewService : IDisposable
 
     private async Task<bool?> ProcessSingleImportacaoImovel(IntegracaoImoview integracao, ImportacaoBairroImoview importacaoBairro, ImovelListDTO imovelId, ServiceBusSender sender)
     {
-        if(string.IsNullOrWhiteSpace(imovelId.codImovel))
+        if (string.IsNullOrWhiteSpace(imovelId.codImovel))
         {
             _logger?.LogWarning("Imovel sem cod: {id}", imovelId.idImovel);
         }
@@ -754,16 +764,16 @@ public class ImoviewService : IDisposable
             try
             {
                 var integracao = integracaoImportBairro[importacao.IdImportacaoBairro];
-                if(integracao == null)
+                if (integracao == null)
                 {
                     _logger?.LogError("Erro ao reprocessar importacao: {id}, Integração não encontrada!", importacao.Id);
                     continue;
                 }
-                if(importacao.Status == StatusIntegracao.Aguardando.GetDescription())
+                if (importacao.Status == StatusIntegracao.Aguardando.GetDescription())
                 {
                     var dataImportacao = importacao.DataAtualizacao != null && importacao.DataAtualizacao.Year > 2024 ? importacao.DataAtualizacao : importacao.DataInclusao;
                     var diff = (DateTime.UtcNow - dataImportacao).TotalMinutes;
-                    if(diff < 30)
+                    if (diff < 30)
                     {
                         _logger?.LogInformation("Postegar fila para a importação: {id}", importacao.Id);
                         continue;
@@ -792,6 +802,87 @@ public class ImoviewService : IDisposable
         }
         _logger?.LogInformation("Reprocessamento concluído. {sucesso} processados com sucesso. {erro} processados com erro.", sucesso, erro);
     }
+
+    public async Task<List<IntegracaoComboDTO>> GetIntegracoes()
+    {
+        return await _imoviewDAO.GetIntegracoes();
+    }
+
+    public async Task<IntegracaoReport?> GetReportIntegracao(IntegracaoComboDTO integracao)
+    {
+        return await _imoviewDAO.GetReportIntegracao(integracao.Integracao);
+    }
+
+    public async Task EnviarEmailImoveisInativos()
+    {
+        if (_emailService == null)
+            throw new Exception("Email service não configurado");
+        var integracoesInativos = await _retryPolicy.ExecuteAsync(() => _imoviewDAO.GetImoveisInativados());
+        foreach (var emailInativo in integracoesInativos.Where(i => i.Imoveis?.Count > 0))
+        {
+            if (emailInativo == null) continue;
+            (bool res, string mensagem) = await _emailService.EnviarImoviewInativos(emailInativo);
+            if (res)
+            {
+                EmailInativosIntegracaoImoview email = new()
+                {
+                    Id = 0,
+                    IdIntegracao = emailInativo.IdIntegracao,
+                    DataEnvio = DateTime.UtcNow,
+                    Status = StatusIntegracao.Concluido.GetDescription(),
+                    Mensagem = mensagem,
+                    Imoveis = Newtonsoft.Json.JsonConvert.SerializeObject(emailInativo.Imoveis.Select(i => new { i?.CodImoview, i?.CodJacaptei }).ToList())
+                };
+                var id = await _retryPolicy.ExecuteAsync(() => _imoviewDAO.SaveEmailImovelInativo(email));
+                var imoveis = emailInativo.Imoveis.Select(i => new ImovelInativoEmailImoview
+                {
+                    Id = 0,
+                    IdImportacaoImoview = i.Id,
+                    IdEmail = id,
+                    CodImovel = i.CodJacaptei
+                });
+                foreach (var imovel in imoveis)
+                {
+                    try
+                    {
+                        await _retryPolicy.ExecuteAsync(() => _imoviewDAO.SaveImovelInativoEmail(imovel));
+                    }
+                    catch (Exception ex)
+                    {
+                        _logger?.LogError("Erro ao salvar imovel inativo: {ex}", ex);
+                        continue;
+                    }
+                }
+            }
+        }
+    }
+
+    public async Task FixEmailInativos()
+    {
+        List<EmailInativosIntegracaoImoview> emails = await _retryPolicy.ExecuteAsync(() => _imoviewDAO.GetEmailsInativos());
+        foreach (var email in emails)
+        {
+            var imoveis = Newtonsoft.Json.JsonConvert.DeserializeObject<List<ImovelImoviewInativo>>(email.Imoveis);
+            foreach (var imovel in imoveis)
+            {
+                int idImportacao = await _retryPolicy.ExecuteAsync(() => _imoviewDAO.GetIdImportacao(imovel.CodJacaptei, email.IdIntegracao));
+                var ii = new ImovelInativoEmailImoview
+                {
+                    Id = 0,
+                    IdImportacaoImoview = idImportacao,
+                    IdEmail = email.Id,
+                    CodImovel = imovel.CodJacaptei
+                };
+                await _retryPolicy.ExecuteAsync(() => _imoviewDAO.SaveImovelInativoEmail(ii));
+            }
+        }
+    }
+}
+
+public record ImovelImoviewInativo
+{
+    public string CodImoview { get; set; }
+    public string CodJacaptei { get; set; }
 }
 
 public record IntegrarClienteResponse

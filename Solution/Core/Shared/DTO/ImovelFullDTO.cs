@@ -12,4 +12,7 @@ public class ImovelFullDTO
     public ImovelEndereco ImovelEndereco { get; set; }
     public ImovelLazer ImovelLazer { get; set; }
     public ImovelValores ImovelValores { get; set; }
+
+    public ImovelTipo ImovelTipo { get; set; }
+    public List<ImovelImagem> Fotos { get; set; } = [];
 }

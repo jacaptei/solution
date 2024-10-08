@@ -10,13 +10,14 @@
   <ItemGroup>
     <PackageReference Include="AutoMapper.Extensions.Microsoft.DependencyInjection" Version="12.0.0" />
     <PackageReference Include="Azure.Messaging.ServiceBus" Version="7.18.0" />
+    <PackageReference Include="Handlebars.Net" Version="2.1.6" />
     <PackageReference Include="Json.Net" Version="1.0.33" />
     <PackageReference Include="Microsoft.Data.SqlClient" Version="5.2.1" />
     <PackageReference Include="Microsoft.Extensions.Http" Version="8.0.0" />
     <PackageReference Include="NETCore.MailKit" Version="2.1.0" />
-    <PackageReference Include="Newtonsoft.Json" Version="13.0.1" />
+    <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
     <PackageReference Include="Npgsql" Version="8.0.3" />
-    <PackageReference Include="Polly" Version="8.4.0" />
+    <PackageReference Include="Polly" Version="8.4.1" />
     <PackageReference Include="Polly.Contrib.WaitAndRetry" Version="1.1.1" />
     <PackageReference Include="RepoDb.PostgreSql" Version="1.13.1" />
     <PackageReference Include="RepoDb.PostgreSql.BulkOperations" Version="1.13.1" />
