@@ -202,7 +202,7 @@ namespace JaCaptei.API.Controllers
 
         [HttpGet]
         [Route("excluir/{id:int}")]
-        public IActionResult Buscar(int id) {
+        public IActionResult Excluir(int id) {
             appReturn = service.Excluir(id);
             return Result(appReturn);
         }

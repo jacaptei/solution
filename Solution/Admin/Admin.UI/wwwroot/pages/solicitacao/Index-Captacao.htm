@@ -839,7 +839,7 @@
                                         <div style="font-size:20px;font-weight:700;color:var(--s-color-primary);margin-top:20px">Sem solicitações em verificação.</div>
                                     </el-col>-->
                                     <el-col :md="24">
-                                        <div style="color:var(--s-color-primary);font-weight:700;height:40px;padding-left:12px;margin-top:-20px;float:left">{{totalFinalizadas}} <span>das últimas finalizadas<span style="color:#c9c9c9"></span></span> <span v-if="idAdminSelecionado > 0" style="color:#222222;font-weight:normal">de {{adminSelecionado.nome}} </span></div>
+                                        <div style="color:var(--s-color-primary);font-weight:700;height:40px;padding-left:12px;margin-top:-20px;float:left"><span>últimas finalizadas<span style="color:#c9c9c9"></span></span> <span v-if="idAdminSelecionado > 0" style="color:#222222;font-weight:normal">de {{adminSelecionado.nome}} </span></div>
                                     </el-col>
 
                                     <el-col v-if="totalFinalizadas > 0" :md="24" v-for="(item,index) in resultsFinalizadas">
@@ -1407,7 +1407,7 @@
                             return data.format("dd/mm/yyyy, ddd, HH:MM'h'");
                         }
                     } else {
-                        return (data.getFullYear() > 1900) ? data.format("dd/mm/yyyy, ddd, HH:MM'h'") : "sem visita agendada";
+                        return (data.getFullYear() > 2000) ? data.format("dd/mm/yyyy, ddd, HH:MM'h'") : "sem visita agendada";
                     }
                 }
                 return "";
@@ -1427,12 +1427,24 @@
                         this.view = "request";
                     }
 
+
                     var url = "solicitacao/obter/solicitacoes/admin/" + this.idAdminSelecionado;
 
                     var request = await this.$api.Get(url);
 
 
                     if (request.status.success) {
+
+                        this.results            = []; 
+                        this.resultsAguardando  = [];
+                        this.resultsVerificando = [];
+                        this.resultsFinalizadas = [];
+                        this.totalAguardando    = 0;
+                        this.totalVerificando   = 0;
+                        this.totalFinalizadas   = 0;
+
+                        this.resultsAgendadas   = [];
+                        this.totalAgendadas     = 0;
 
                         this.results = request.result;
 
@@ -1482,7 +1494,7 @@
                         this.totalFinalizadas = this.resultsFinalizadas.length;
 
                         this.resultsAgendadas = this.resultsAguardando.filter(r => r.agendado == true);
-                        this.totalAgendadas = this.resultsAgendadas.length;
+                        this.totalAgendadas   = this.resultsAgendadas.length;
 
                         if (!this.update.inBG) {
                             this.somenteAgendadas = false;
