@@ -133,6 +133,26 @@ namespace JaCaptei.Application.Integracao
             return true;
         }
 
+        internal async Task<bool> UpdateImportacaoImovel(ImportacaoImovelVistaSoft importacaoImovel)
+        {
+            if (importacaoImovel.Id > 0)
+            {
+                var fields = Field.Parse<ImportacaoImovelVistaSoft>(e => new { e.Status, e.ApiResponse, e.RequestBody });
+                await _conn.UpdateAsync<ImportacaoImovelVistaSoft>(importacaoImovel, fields);
+            }
+            return true;
+        }
+
+        internal async Task<bool> UpdateDateImportacaoImovel(ImportacaoImovelVistaSoft importacaoImovel)
+        {
+            if (importacaoImovel.Id > 0)
+            {
+                var fields = Field.Parse<ImportacaoImovelVistaSoft>(e => new { e.DataAtualizacao });
+                await _conn.UpdateAsync<ImportacaoImovelVistaSoft>(importacaoImovel, fields);
+            }
+            return true;
+        }
+
         internal async Task<bool> SaveImportacaoImovel(ImportacaoImovelVistaSoft importacaoImovel)
         {
             if (importacaoImovel.Id > 0)
@@ -149,7 +169,7 @@ namespace JaCaptei.Application.Integracao
         {
             if (integracao.Id > 0)
             {
-                var fields = Field.Parse<IntegracaoVistaSoft>(e => new { e.Status, e.DataAtualizacao, e.Bairros });
+                var fields = Field.Parse<IntegracaoVistaSoft>(e => new { e.Status, e.DataAtualizacao, e.Bairros, e.UrlApi, e.ChaveApi });
                 await _conn.UpdateAsync<IntegracaoVistaSoft>(integracao, fields);
             }
             else
@@ -167,6 +187,21 @@ namespace JaCaptei.Application.Integracao
             else
                 await _conn.InsertAsync<IntegracaoBairroVistaSoft>(bairroIntegrado);
             return true;
+        }
+
+        internal async Task<List<ImportacaoImovelVistaSoft>> GetImportacaoImovelPendentes()
+        {
+            throw new NotImplementedException();
+        }
+
+        internal async Task<IntegracaoVistaSoft?> GetIntegracaoImportacaoBairro(int importBairro)
+        {
+            throw new NotImplementedException();
+        }
+
+        internal async Task<DateTime?> ObterUltimaAtualizacao()
+        { 
+            return await _conn.ExecuteScalarAsync<DateTime>("SELECT max(\"dataAtualizacao\") FROM \"ImportacaoImovelVistaSoft\";");
         }
     }
 }

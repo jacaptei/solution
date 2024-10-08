@@ -14,7 +14,7 @@ namespace JaCaptei.Application.Integracao
         //Task<bool> ImportarImovel(ImportacaoImovelEvent import);
         Task<bool> ImportarIntegracao(IntegracaoEvent integracaoEvent);
         //Task<ImoviewIncluirResponse?> IncluirImovel(ImoviewAddImovelRequest req, List<ImagemDTO> imagens, string chave);
-        Task<IntegrarClienteResponse> IntegrarCliente(IIntegracaoCRM integracao);
+        //Task<IntegrarClienteResponse> IntegrarCliente(IIntegracaoCRM integracao);
         Task<IIntegracaoCRM?> ObterIntegracaoCliente(Parceiro cliente);
         Task ReprocessarImoveisPendentes();
         //Task<bool> ValidarChave(string chave);

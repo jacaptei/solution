@@ -324,7 +324,7 @@ namespace JaCaptei.Application.Integracao
             return validStatuses.Any(s => s == integracao.Status);
         }
 
-        public async Task<IntegrarClienteResponse> IntegrarCliente(IIntegracaoCRM integracao)
+        public async Task<IntegrarClienteResponse> IntegrarCliente(IntegracaoVistaSoft integracao)
         {
             var cliente = await _retryPolicy.ExecuteAsync(() => _vistaSoftDAO.ObterCliente(integracao.IdCliente));
             if (cliente == null)
@@ -387,7 +387,7 @@ namespace JaCaptei.Application.Integracao
                     Mensagem = $"Problemas para comunicar com Service Bus"
                 };
             }
-            await _retryPolicy.ExecuteAsync(() => _vistaSoftDAO.SaveIntegracao((IntegracaoVistaSoft)integracao));
+            await _retryPolicy.ExecuteAsync(() => _vistaSoftDAO.SaveIntegracao(integracao));
             var integracaoEvent = new IntegracaoEvent()
             {
                 IdIntegracao = integracao.Id,
@@ -462,7 +462,7 @@ namespace JaCaptei.Application.Integracao
                         return false;
                     importacaoImovel.DataAtualizacao = DateTime.UtcNow;
                     importacaoImovel.Status = StatusIntegracao.Processando.GetDescription();
-                    await _retryPolicy.ExecuteAsync(() => _vistaSoftDAO.SaveImportacaoImovel(importacaoImovel));
+                    await _retryPolicy.ExecuteAsync(() => _vistaSoftDAO.UpdateImportacaoImovel(importacaoImovel));
                     if (importacaoImovel.RequestBody == null)
                     {
                         var imovelFull = await _retryPolicy.ExecuteAsync(() => _vistaSoftDAO.GetFullImovel(import.IdImovel));
@@ -476,8 +476,8 @@ namespace JaCaptei.Application.Integracao
                 var chave = import.ChaveApi;
                 var url = import.UrlApi;
 
-                var res = await IncluirImovel(request!, chave, url);
-                importacaoImovel!.Status = res == null ? StatusIntegracao.Erro.GetDescription() : StatusIntegracao.Concluido.GetDescription();
+                var res = await IncluirImovel(request!, chave, url, importacaoImovel);
+                importacaoImovel!.Status = res == null || (res != null && res.status == 400) ? StatusIntegracao.Erro.GetDescription() : StatusIntegracao.Concluido.GetDescription();
                 importacaoImovel.ApiResponse = Newtonsoft.Json.JsonConvert.SerializeObject(res);
                 await _retryPolicy.ExecuteAsync(() => _vistaSoftDAO.SaveImportacaoImovel(importacaoImovel));
                 return true;
@@ -492,7 +492,7 @@ namespace JaCaptei.Application.Integracao
             }
         }
 
-        private async Task<ImovelResponseVS?> IncluirImovel(ImovelVistaSoftDTO imovelVistaSoftDTO, string chave, string url)
+        private async Task<ImovelResponseVS?> IncluirImovel(ImovelVistaSoftDTO imovelVistaSoftDTO, string chave, string url, ImportacaoImovelVistaSoft? import = null)
         {
             var client = _httpClientFactory?.CreateClient("");
             if (client == null) return null;
@@ -500,8 +500,9 @@ namespace JaCaptei.Application.Integracao
             var categorias = await GetCategorias(chave, client);
             if(!categorias.Any(c => c == imovelVistaSoftDTO.Categoria))
             {
-                _logger?.LogWarning("Categoria {Categoria} não encontrada.", imovelVistaSoftDTO.Categoria);
-                imovelVistaSoftDTO.Categoria = categorias.First();
+                _logger?.LogError("Categoria {Categoria} não encontrada.", imovelVistaSoftDTO.Categoria);
+                //imovelVistaSoftDTO.Categoria = categorias.First();
+                return new ImovelResponseVS() { status = 400, Codigo = "", message = "Categoria não encontrada" };
             }
             client.DefaultRequestHeaders.Clear();
             client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
@@ -516,6 +517,29 @@ namespace JaCaptei.Application.Integracao
             [
                 new KeyValuePair<string, string>("cadastro", "{\"fields\": " + jsonObj + "}")
             ]);
+            var count = 0;
+            bool ok = false;
+            do
+            {
+                DateTime? lastUpdate = await _retryPolicy.ExecuteAsync(() => _vistaSoftDAO.ObterUltimaAtualizacao());
+                var now = DateTime.UtcNow;
+
+                if (lastUpdate.HasValue)
+                {
+                    var diff = now - lastUpdate.Value;
+                    if (diff.TotalSeconds > 5)
+                    {
+                        break;
+                    }
+                }
+                await Task.Delay(5000);
+                count++;
+            } while (count < 12 && !ok);
+            if(import != null)
+            {
+                import.DataAtualizacao = DateTime.UtcNow;
+                await _retryPolicy.ExecuteAsync(() => _vistaSoftDAO.UpdateDateImportacaoImovel(import));
+            }
             var res = await client.PostAsync(uriWithQuery, data);
             var resStr = await res.Content.ReadAsStringAsync();
             var objRes = Newtonsoft.Json.JsonConvert.DeserializeObject<ImovelResponseVS>(resStr);
@@ -568,9 +592,63 @@ namespace JaCaptei.Application.Integracao
         {
             throw new NotImplementedException();
         }
-        public Task ReprocessarImoveisPendentes()
+        public async Task ReprocessarImoveisPendentes()
         {
-            throw new NotImplementedException();
+            List<ImportacaoImovelVistaSoft> importacoesImovel = await _retryPolicy.ExecuteAsync(() => _vistaSoftDAO.GetImportacaoImovelPendentes());
+            if (importacoesImovel.Count < 1) return;
+            string connectionString = Config.settings.AzureMQ;
+            string queueName = "importacaoimovelvistasoft";
+            var importBairros = importacoesImovel.Select(i => i.IdImportacaoBairro).Distinct().ToList();
+            Dictionary<int, IntegracaoVistaSoft?> integracaoImportBairro = [];
+            foreach (var importBairro in importBairros)
+            {
+                IntegracaoVistaSoft? integracao = await _retryPolicy.ExecuteAsync(() => _vistaSoftDAO.GetIntegracaoImportacaoBairro(importBairro));
+                integracaoImportBairro.Add(importBairro, integracao);
+            }
+            await using var client = new ServiceBusClient(connectionString);
+            ServiceBusSender sender = client.CreateSender(queueName);
+            int sucesso = 0, erro = 0;
+            foreach (var importacao in importacoesImovel)
+            {
+                try
+                {
+                    var integracao = integracaoImportBairro[importacao.IdImportacaoBairro];
+                    if (integracao == null)
+                    {
+                        _logger?.LogError("Erro ao reprocessar importacao: {id}, Integração não encontrada!", importacao.Id);
+                        continue;
+                    }
+                    if (importacao.Status == StatusIntegracao.Aguardando.GetDescription())
+                    {
+                        var dataImportacao = importacao.DataAtualizacao != null && importacao.DataAtualizacao.Year > 2024 ? importacao.DataAtualizacao : importacao.DataInclusao;
+                        var diff = (DateTime.UtcNow - dataImportacao).TotalMinutes;
+                        if (diff < 30)
+                        {
+                            _logger?.LogInformation("Postegar fila para a importação: {id}", importacao.Id);
+                            continue;
+                        }
+                    }
+                    var importEvent = new ImportacaoImoveVistaSoftEvent()
+                    {
+                        ChaveApi = integracao.ChaveApi,
+                        CodImovel = importacao.CodImovel,
+                        UrlApi = integracao.UrlApi,
+                        IdCliente = integracao.IdCliente,
+                        IdImovel = importacao.IdImovel,
+                        IdImportacaoBairro = importacao.IdImportacaoBairro,
+                        IdIntegracao = integracao.Id
+                    };
+                    await Task.Delay(_queueDelay);
+                    var res = await SendImportQueue(sender, importEvent);
+                    sucesso++;
+                }
+                catch (Exception ex)
+                {
+                    erro++;
+                    _logger?.LogError("Erro ao reprocessar importacao: {id}, erro: {ex}", importacao.Id, ex);
+                }
+            }
+            _logger?.LogInformation("Reprocessamento concluído. {sucesso} processados com sucesso. {erro} processados com erro.", sucesso, erro);
         }
 
         public async Task<bool> ValidarChave(string chave, string url)

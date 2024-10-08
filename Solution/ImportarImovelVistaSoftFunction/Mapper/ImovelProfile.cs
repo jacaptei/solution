@@ -3,6 +3,8 @@
 using JaCaptei.Model.DTO;
 using JaCaptei.Model.DTO.VistaSoft;
 
+using Microsoft.AspNetCore.Routing.Constraints;
+
 using System.Globalization;
 
 namespace JaCaptei.Application.Mapper;
@@ -16,7 +18,7 @@ public class ImovelDTOProfile : Profile
 
             .ForMember(dest => dest.Endereco,                opt => opt.MapFrom(src => src.ImovelEndereco.logradouro))
             .ForMember(dest => dest.Numero,                  opt => opt.MapFrom(src => src.ImovelEndereco.numero))
-            .ForMember(dest => dest.Complemento,             opt => opt.MapFrom(src => src.ImovelEndereco.complemento))
+            .ForMember(dest => dest.Complemento,             opt => opt.MapFrom(src => string.IsNullOrWhiteSpace(src.ImovelEndereco.complemento) ? "N/A" : src.ImovelEndereco.complemento))
             .ForMember(dest => dest.Bairro,                  opt => opt.MapFrom(src => src.ImovelEndereco.bairro))
             .ForMember(dest => dest.BairroComercial,         opt => opt.MapFrom(src => src.ImovelEndereco.bairro))
             .ForMember(dest => dest.Cidade,                  opt => opt.MapFrom(src => src.ImovelEndereco.cidade))

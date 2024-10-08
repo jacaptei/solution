@@ -36,13 +36,13 @@ namespace IntegrarVistaSoftFunction
             var rawRequestBody = await new StreamReader(req.Body).ReadToEndAsync();
 
             var dto = JsonConvert.DeserializeObject<IntegracaoVistaSoftDTO>(rawRequestBody);
-            List<BairroDTO> bairros = dto.Bairros.ConvertAll(b => new BairroDTO()
+            List<BairroDTO> bairros = dto.Bairros.DistinctBy(b => b.Id).Select(b => new BairroDTO()
             {
                 Id = b.Id,
                 IdCidade = b.IdCidade,
                 IdEstado = b.IdEstado,
                 Nome = b.Value
-            });
+            }).ToList();
             var integracao = new IntegracaoVistaSoft()
             {
                 Id = 0,
