@@ -540,26 +540,30 @@ namespace JaCaptei.Application{
             return entityDB;
         }
 
-        public List<Parceiro> ObterContaPorId(int idConta)
+        public List<ContaId> ObterContaPorId(int idConta)
         {
             const string sql = @"
-                SELECT 
-                    p.*,
-                    c.*,
-                    pl.*
-                FROM 
-                    ""Parceiro"" p
-                INNER JOIN 
-                    ""Conta"" c ON p.""idConta"" = c.id
-                INNER JOIN
-                    ""Plano"" pl ON p.""idPlano"" = pl.id
-                WHERE 
-                    p.""idConta"" = @idConta";
+                    SELECT 
+                        p.*,
+                        c.*,
+                        c.nome,
+                        pl.*,
+                        ps.*
+                    FROM 
+                        ""Parceiro"" p
+                    INNER JOIN 
+                        ""Conta"" c ON p.""idConta"" = c.id
+                    INNER JOIN
+                        ""Plano"" pl ON p.""idPlano"" = pl.id
+                    INNER JOIN
+	                    ""ParceiroSettings"" ps ON p.id = ps.""idParceiro""
+                    WHERE 
+                        p.""idConta"" = @idConta";
             try
             {
                 using (var conn = new DBcontext().GetConn())
                 {
-                    var resultado = conn.ExecuteQuery<Parceiro>(sql, new { idConta }).ToList();
+                    var resultado = conn.ExecuteQuery<ContaId>(sql, new { idConta }).ToList();
                     return resultado;
                 }
             }
@@ -567,6 +571,8 @@ namespace JaCaptei.Application{
             {
                 throw new Exception("Erro ao obter parceiro por ID da conta", ex);
             }
+            // Se o fluxo de execução não atingir o 'try', adicione um retorno aqui.
+            return new List<ContaId>();
         }
 
         public List<Parceiro> ObterPendentesValidacao() {

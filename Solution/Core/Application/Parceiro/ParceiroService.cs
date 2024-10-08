@@ -39,11 +39,7 @@ namespace JaCaptei.Application
 
             else
             {
-                foreach (var entity in entities)
-                {
-                    entity.RemoverDadosSensiveis(); // Remover dados sensíveis de cada parceiro
-                }
-                appReturn.result = entities; // Atribui a coleção de parceiros
+                appReturn.result = entities;
             }
 
             return appReturn;
@@ -72,6 +68,60 @@ namespace JaCaptei.Application
 
         }
 
+        public AppReturn AtualizarConfiguracoesConta(ContaId entity)
+        {
+            try
+            {
+                if (entity == null || entity.id == 0)
+                {
+                    appReturn.result = "Entidade Parceiro inválida.";
+                    return appReturn;
+                }
+                var parceiroAtual = DAO.ObterPorId(entity.id);
+                if (parceiroAtual == null)
+                {
+                    appReturn.result = "Parceiro não encontrado.";
+                    return appReturn;
+                }
+
+                //if (entity.idPlano.HasValue)
+                //{
+                //    parceiroAtual.idPlano = entity.idPlano.Value;
+                //    DAO.AtualizarPlanoParceiro(parceiroAtual.idPlano);
+                //    DAO.AtualizarPlanoConta(parceiroAtual.idPlano);
+                //}
+
+
+                //var conta = DAO.ObterContaPorId(entity.idConta);
+                ////if (conta != null)
+                //{
+                //    conta.idPlano = entity.idPlano;
+                //    conta.TotalUsuariosPermitidos = entity.TotalUsuariosPermitidos;
+                //    DAO.Atualizar(conta);
+                //}
+
+                //// Atualizar configurações da tabela ParceiroSettings
+                //var parceiroSettings = DAO.ObterConfiguracoesPorParceiroId(entity.id);
+                //if (parceiroSettings != null)
+                //{
+                //    parceiroSettings.LimiteSolicitacoesDiarias = entity.LimiteSolicitacoesDiarias;
+                //    parceiroSettings.LimiteSolicitacoesAgendadas = entity.LimiteSolicitacoesAgendadas;
+                //    parceiroSettings.LimiteSolicitacoesNaoAgendadas = entity.LimiteSolicitacoesNaoAgendadas;
+                //    parceiroSettings.PermissaoSolicitacoes = entity.PermissaoSolicitacoes;
+                //    parceiroSettings.PermissaoSolicitacoesAgendadas = entity.PermissaoSolicitacoesAgendadas;
+                //    parceiroSettings.PermissaoSolicitacoesNaoAgendadas = entity.PermissaoSolicitacoesNaoAgendadas;
+                //    parceiroSettingsDAO.Atualizar(parceiroSettings);
+                //}
+
+                //// Atualizar parceiro no banco de dados
+                //DAO.AtualizarConfiguracoesConta(parceiroAtual);
+            }
+            catch
+            {
+
+            }
+            return appReturn;
+        }
         public AppReturn AceitarTermos(int id)
         {
             appReturn = DAO.AceitarTermos(id);
@@ -304,7 +354,6 @@ namespace JaCaptei.Application
                 appReturn.AddException("Já existe um Parceiro cadastrado com este documento (CPF ou CNPJ) ou E-mail.");
                 return appReturn;
             }
-
 
             try
             {
