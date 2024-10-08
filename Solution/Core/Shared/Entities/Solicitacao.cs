@@ -21,10 +21,14 @@ namespace JaCaptei.Model {
             public string           codImovel           {get;set;}  =   "";
             public Imovel           imovel              {get;set;}  =   new Imovel();
             public bool             imovelJC            {get;set;}  =   false;
+            public bool             imovelIndisponivel  {get;set;}  =   false;
+            public bool             imovelNaoEncontrado {get;set;}  =   false;
+            public bool             imovelVendido       {get;set;}  =   false;
 
-            public int              idProprietario      {get;set;}  =   0;
-            public Proprietario     proprietario        {get;set;}  =   new Proprietario();
-            public string           proprietarioCaptacao{get;set;}  =   "";
+            public int              idProprietario              {get;set;}  =   0;
+            public Proprietario     proprietario                {get;set;}  =   new Proprietario();
+            public string           proprietarioCaptacao        {get;set;}  =   "";
+            public bool             proprietarioNaoEncontrado   {get;set;}  =   false;
 
             public int              idStatus            {get;set;}  =   3;
             public string           status              {get;set;}  =   "Aguardando captador";

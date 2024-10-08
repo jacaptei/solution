@@ -1,4 +1,4 @@
-
+/*
 ALTER TABLE "Imovel" ADD COLUMN "motivoInativacao" VARCHAR(100) DEFAULT '';
 ALTER TABLE "Imovel" ADD COLUMN excluido BOOLEAN DEFAULT FALSE;
 
@@ -14,6 +14,11 @@ ALTER TABLE "Solicitacao" ADD COLUMN reagendado		  BOOLEAN		    DEFAULT FALSE;
 ALTER TABLE "Solicitacao" ADD COLUMN confirmado       BOOLEAN		    DEFAULT FALSE;
 ALTER TABLE "Solicitacao" ADD COLUMN visitado	      BOOLEAN		    DEFAULT FALSE;
 ALTER TABLE "Solicitacao" ADD COLUMN concluido	      BOOLEAN		    DEFAULT FALSE;
+
+ALTER TABLE "Solicitacao" ADD COLUMN "imovelIndisponivel"			BOOLEAN		DEFAULT FALSE;
+ALTER TABLE "Solicitacao" ADD COLUMN "imovelNaoEncontrado"			BOOLEAN		DEFAULT FALSE;
+ALTER TABLE "Solicitacao" ADD COLUMN "imovelVendido"				BOOLEAN		DEFAULT FALSE;
+ALTER TABLE "Solicitacao" ADD COLUMN "proprietarioNaoEncontrado"	BOOLEAN		DEFAULT FALSE;
 
 ALTER TABLE "Solicitacao" ADD COLUMN "obsAgendamento"	 VARCHAR(1200)        DEFAULT '';
 ALTER TABLE "Solicitacao" ADD COLUMN "obsReagendamento"  VARCHAR(1200)        DEFAULT '';
@@ -34,4 +39,7 @@ UPDATE "Solicitacao" SET "obsAgendamento" = descricao;
 UPDATE "Solicitacao" SET visita = true, "dataAgendamento" = "dataVisita" where EXTRACT(YEAR FROM "dataVisita") > 2000;
 UPDATE "Solicitacao" SET "dataAgendamento" = "dataVisita";
 UPDATE "Solicitacao" SET captacao = true where EXTRACT(YEAR FROM "dataVisita") < 2000;
+UPDATE "Solicitacao" SET "proprietarioNaoEncontrado" = true where "proprietarioCaptacao" = '';
+*/
 
+-- ----------- ATUALIZADO EM 03 OUT 2024 -----------

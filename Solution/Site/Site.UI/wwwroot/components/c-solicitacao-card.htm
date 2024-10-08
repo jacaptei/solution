@@ -7,22 +7,26 @@
                         <div class="text-h10" style="font-size:16px">
                             <span class="text-h10">
                                 <b style="margin-right:10px;">ID# {{item.id}}</b> 
-                                <span v-if="!item.concluido">
-                                        <span >
-                                            <i title="agendado" style="padding-left:10px;padding-right:10px;color:#fff;font-size:17px;" class="fa fa-calendar"></i>
-                                            {{$tools.FormatDateHour(item.dataVisita)}}
-                                        </span>
+                                <span>
+                                    <i title="agendado" style="padding-left:10px;padding-right:10px;color:#fff;font-size:17px;" class="fa fa-calendar"></i>
+                                    {{$tools.FormatDateHour(item.dataVisita)}}
+                                    <span v-if="$root.usuario.id != item.parceiro.id" style="margin-left:5px; ">
+                                        por <b>{{item.parceiro.apelido}}</b>
+                                    </span>
+                                </span>
+
+                                <span v-if="!item.concluido" style="font-size:14px">
                                         <span v-if="!item.confirmado && item.reagendado" style="margin-left:20px; background-color: #ff0000; padding: 6px; border-radius: 10px; color: #fff;">
                                             <i class="fa fa-warning"></i> REAGENDAMENTO SOLICITADO
                                         </span>
                                         <span v-else-if="item.confirmado" style="margin-left:20px; background-color: #3cff3c; padding: 6px; border-radius: 10px; color: #003900;">
-                                            <i class="fa fa-check-double"></i> CONFIRMADO
+                                            <i class="fa fa-check-double"></i> VISITA CONFIRMADA
                                         </span>
                                         <span v-else="!item.confirmado" style="margin-left:20px; background-color: #feff7b; padding: 6px; border-radius: 10px; color: #533800;">
-                                            <i class="fa fa-warning"></i> NÃO CONFIRMADO
+                                            <i class="fa fa-warning"></i> VISITA NÃO CONFIRMADA
                                         </span>
                                         <span v-else-if="item.reagendado && !item.visitado && !item.concluido" style="margin-left:20px; background-color: #ffc13c; padding: 6px; border-radius: 10px; color: #533800;">
-                                            REAGENDADO
+                                            VISITA REAGENDADA
                                         </span>
                                 </span>
                             </span>
@@ -137,7 +141,12 @@
 
                                                   <q-timeline-entry title=""    subtitle="Agendamento solicitado" color="primary" style="color:var(--s-color-primary)" v-if="!item.reagendado && !item.confirmado">
                                                     <div class="timetitle">
-                                                        <div><i class="fa fa-calendar"></i> <b>{{FormatarData(item.dataAgendamento)}}</b></div>
+                                                        <div>
+                                                            <i class="fa fa-calendar"></i> <b>{{FormatarData(item.dataAgendamento)}}</b>
+                                                            <span v-if="$root.usuario.donoConta && $root.usuario.id != item.parceiro.id" style="margin-left:5px;color:var(--s-text-color)">
+                                                                por <b>{{item.parceiro.apelido}}</b>, {{item.parceiro.email}}, {{item.parceiro.telefone}} 
+                                                            </span>
+                                                        </div>
                                                         <div><i class="fa fa-map-marker-alt"></i> <b>{{FormatarEndereco()}}</b></div>
                                                         <div v-if="$validator.is(item.titulo) && item.imovelJC">{{item.titulo}}</div>
                                                     </div>
@@ -218,8 +227,10 @@
                                                         <div v-if="$validator.is(item.titulo) && item.imovelJC">{{item.titulo}}</div>
                                                     </div>
                                                     <div>
-                                                        <span v-if="$validator.is(item.obsConcluido)" style="color:var(--s-text-color)">{{item.obsConcluido}}</span>
-                                                        <span v-else style="color:#c1c1c1">[ sem obs ]</span>
+                                                        <div v-if="item.imovelNaoEncontrado"><b>Imóvel não encontrado</b></div>
+                                                        <div v-else-if="item.imovelVendido"><b>Imóvel vendido</b></div>
+                                                        <div v-if="$validator.is(item.obsConcluido)" style="color:var(--s-text-color)">{{item.obsConcluido}}</div>
+                                                        <div v-else style="color:#c1c1c1">[ sem obs ]</div>
                                                     </div>
                                                   </q-timeline-entry>
 
@@ -235,6 +246,38 @@
                                                 <div>
 
 
+                                                    <div style="margin-top:10px;font-weight:500;color:#000" v-if="$root.usuario.donoConta && $root.usuario.id != item.parceiro.id">
+
+                                                        <el-input :value="item.parceiro.nome + ', '+item.parceiro.telefone + ', '+item.parceiro.email" readonly  input-style="color:#000" @click="item.acao='abrir-parceiro'">
+                                                            <template #prepend>
+                                                                <div style="text-transform:uppercase;font-weight:660;width:110px;text-align:right;cursor:pointer" @click="()=>{item.acao=='abrir-parceiro'?  item.acao='fechar-parceiro' :  item.acao='abrir-parceiro';}">
+                                                                    Solicitado por  <i style="padding-left:10px" class="fa fa-user-alt"></i>
+                                                                </div>
+                                                            </template>
+                                                            <template #append>
+                                                                <div @click="()=>{item.acao=='abrir-parceiro'?  item.acao='fechar-parceiro' :  item.acao='abrir-parceiro';}" style="cursor:pointer;text-align:center">
+                                                                    <q-btn icon="fa fa-caret-down" flat style="margin-left:5px;width:10px" v-if="item.acao != 'abrir-parceiro'"></q-btn>
+                                                                    <q-btn icon="fa fa-caret-up" flat style="margin-left:5px;width:10px" v-else></q-btn>
+                                                                </div>
+                                                            </template>
+                                                        </el-input>
+                                                        <div v-if="item.acao=='abrir-parceiro'">
+                                                            <q-card>
+                                                                <q-card-section>
+                                                                    <div style="line-height:30px;font-size:15px">
+                                                                        <!--<div style="font-weight:500;color:var(--s-color-primary)">ID# {{item.parceiro.id}}</div>-->
+                                                                        <div style="font-weight:500;color:#000"> <i class="fa fa-user-alt"></i> {{item.parceiro.nome}}</div>
+                                                                        <div><a :href="$tools.BuildWhatsappLink(item.parceiro.telefone,'Olá '+item.apelido)" target="_blank" style="color:var(--s-color-green);text-decoration:none"><i class="fab fa-whatsapp"></i> {{item.parceiro.telefone}}</a>                                    </div>
+                                                                        <div v-if="$validator.IsCPF(item.parceiro.cpf)"><a href="javascript:void(0)" @click="$tools.Copy(item.parceiro.cpf)" style="text-decoration:none;color:var(--s-color-tex-alt)"><i class="fa fa-copy" style="text-decoration:none"></i>CPF: {{item.parceiro.cpf}}  </a>       </div>
+                                                                        <div v-else-if="$validator.IsCNPJ(item.parceiro.cnpj)"><a href="javascript:void(0)" @click="$tools.Copy(item.parceiro.cnpj)" style="text-decoration:none;color:var(--s-color-tex-alt)"><i class="fa fa-copy" style="text-decoration:none"></i>CNPJ: {{item.parceiro.cnpj}}  </a>     </div>
+                                                                        <div><a :href="'mailto:'+item.parceiro.email" target="_blank" style="color:var(--el-color-primary);text-decoration:none"><i class="fa fa-envelope"></i>&nbsp; {{item.parceiro.email}}</a>                                                                                              </div>
+                                                                    </div>
+                                                                </q-card-section>
+                                                            </q-card>
+                                                        </div>
+                                                    </div>
+
+                                                    </div>
                                                     <div style="margin-top:10px;font-weight:500;color:#000">
 
                                                         <el-input v-if="item.idImovel > 0" v-model="item.titulo" readonly input-style="color:#000" @click="()=>{item.acao=='abrir-imovel'?  item.acao='fechar-imovel' :  item.acao='abrir-imovel';}">
@@ -305,7 +348,7 @@
 
 
                                                     <div style="margin-top:10px;font-weight:500;cursor:pointer;color:#000">
-                                                        <el-input v-model="item.url" readonly input-style="color:#000;text-transform:lowercase;">
+                                                        <el-input v-model="item.url" readonly input-style="color:#000;text-transform:lowercase;" @click="item.acao='abrir-url'">
                                                             <template #prepend>
                                                                 <div style="text-transform:uppercase;font-weight:660;width:110px;text-align:right;cursor:pointer" @click="$tools.OpenLink(item.url)">
                                                                     URL    <i v-if="!item.validadaURL" title="URL inválida" style="padding-left:4px;color:#ff0000;font-size:17px;" class="fa fa-warning"></i><i v-else style="padding-left:10px" class="fa fa-link"></i>
@@ -355,14 +398,14 @@
 
 
                                                     <div style="margin-top:10px;font-weight:500;color:#000">
-                                                        <el-input placeholder="" :value="ObterDataVisita(item)" readonly input-style="color:#000">
+                                                        <el-input placeholder="" :value="$tools.FormatDateHour(item.dataVisita)" readonly input-style="color:#000">
                                                             <template #prepend>
                                                                 <div style="text-transform:uppercase;font-weight:660;width:110px;text-align:right;cursor:pointer" @click="$tools.OpenCalendar(item.dataVisita)">
                                                                     Visita   <i style="padding-left:10px" class="fa fa-calendar" title="visita agendada"></i>
                                                                 </div>
                                                             </template>
                                                             <template #append>
-                                                                <q-btn icon="fa fa-copy" flat @click="()=>{ item.dataVisita.getFullYear() > 1900? $tools.Copy(item.dataVisita.format('dd/mm/yyyy, ddd, HH:MM\'h\'')) : $tools.MessageAlert('Data não especificada'); }" style="width:10px"></q-btn>
+                                                                <q-btn icon="fa fa-copy" flat @click="()=>{ item.dataVisita.getFullYear() > 2000? $tools.Copy($tools.FormatDateHour(item.dataVisita)) : $tools.MessageAlert('Data não especificada'); }" style="width:10px"></q-btn>
                                                                 <q-btn icon="fa fa-up-right-from-square" flat style="margin-left:5px;width:10px" @click="$tools.OpenCalendar(item.dataVisita)"></q-btn>
                                                             </template>
                                                         </el-input>
@@ -452,7 +495,8 @@
                 if (this.$validator.is(item.dataVisita)) {
                     var data = item.dataVisita;
                     //return data.format("dd/mm/yyyy, ddd, HH:MM'h'");
-                    return (data.getFullYear() > 2000) ? data.format("dd/mm/yyyy, ddd, HH:MM'h'") : "sem visita agendada";
+                    //return (data.getFullYear() > 2000) ? data.format("dd/mm/yyyy, ddd, HH:MM'h'") : "sem visita agendada";
+                    return this.$tools.FormatDateHour(item.dataVisita);
                 }
                 return "";
             },

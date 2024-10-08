@@ -49,7 +49,7 @@
                             <el-row :gutter="20" :style="bloqueadoEnvio? 'opacity:0.5;pointer-events:none;':'opacity:1'">
                                 <el-col :xs="24" :sm="24" :md="24" :lg="24" class="s-input" style="max-width:1700px;margin-top:20px">
                                     <div>CÓDIGO DE IMÓVEL <b style="color:var(--s-color-primary)">JÁ CPATEI</b> <span></span> </div>
-                                    <el-input @keyup.enter="ChecarCodImovelJaCaptei()" v-model="solicitacao.codImovel" placeholder="" maxlength="15" ref="codimovel" input-style="text-transform:lowercase;max-width:320px" @blur="ChecarCodImovelJaCaptei"></el-input>
+                                    <el-input @keyup.enter="ChecarCodImovelJaCaptei()" v-model="solicitacao.codImovel" placeholder="" maxlength="15" ref="codimovel" input-style="text-transform:uppercase;max-width:320px" @blur="ChecarCodImovelJaCaptei"></el-input>
                                 </el-col>
                             </el-row>
                             <el-row :gutter="20" :style="bloqueadoEnvio? 'opacity:0.5;pointer-events:none;':'opacity:1'">
@@ -228,6 +228,8 @@
         watch: {},
         created: function () {
 
+            this.solicitacao = this.$models.solicitacao();
+
             if(this.$validator.not(this.solicitacao))
                 this.solicitacao = {};
 
@@ -325,7 +327,7 @@
                     //    0, 0
                     //);
 
-                    this.dataVisitaLabel = this.solicitacao.dataVisita.format("dd/mm/yyyy, HH:MM'h'");
+                    this.dataVisitaLabel = this.$tools.FormatDateHour(this.solicitacao.dataVisita);
 
                     window.setTimeout(() => this.$refs.desc.focus(), 1000);
 
@@ -355,7 +357,7 @@
 
 
             ChecarCodImovelJaCaptei(){
-                if(this.codImovel != this.solicitacao.codImovel){
+                if(this.$validator.is(this.solicitacao.codImovel) && this.codImovel != this.solicitacao.codImovel){
                     this.codImovel = this.solicitacao.codImovel;
                     try{
                         this.BuscarImovel(0,this.solicitacao.codImovel);

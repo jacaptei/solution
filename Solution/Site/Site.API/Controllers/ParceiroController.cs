@@ -12,6 +12,30 @@ namespace JaCaptei.API.Controllers {
 
         ParceiroService service = new ParceiroService();
 
+        [HttpGet]
+        [Route("lista/parceiros-ativos")]
+        public async Task<IActionResult> ObterParceirosAtivos()
+        {
+            try
+            {
+                // Tornar a chamada ao serviço assíncrona, se possível
+                var parceirosAtivos = await service.ObterParceirosAtivos();
+
+                // Verifica se há parceiros ativos
+                if (parceirosAtivos == null || !parceirosAtivos.Any())
+                {
+                    return NotFound("Nenhum parceiro ativo foi encontrado.");
+                }
+
+                // Retorna os parceiros ativos
+                return Ok(parceirosAtivos);
+            }
+            catch (Exception ex)
+            {
+                // Retorna uma mensagem de erro genérica para evitar expor detalhes do servidor
+                return StatusCode(500, "Ocorreu um erro ao processar sua solicitação. Por favor, tente novamente mais tarde.");
+            }
+        }
 
         [HttpPost]
         [Route("inserir")]

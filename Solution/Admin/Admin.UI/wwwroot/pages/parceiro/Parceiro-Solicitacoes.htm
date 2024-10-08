@@ -652,8 +652,14 @@
 					this.results = request.result.result;
 
 					this.results.forEach(i => {
-						i.dataVisita = new Date(i.dataVisita);
-						i.agendado = (i.dataVisita.getFullYear() > 1900);
+                        i.data              = this.$tools.DateFix(i.data             );
+                        i.dataVisita        = this.$tools.DateFix(i.dataVisita       );
+                        i.dataAgendamento   = this.$tools.DateFix(i.dataAgendamento  );
+                        i.dataReagendamento = this.$tools.DateFix(i.dataReagendamento);
+                        i.dataConfirmado    = this.$tools.DateFix(i.dataConfirmado   );
+                        i.dataVisitado      = this.$tools.DateFix(i.dataVisitado     );
+                        i.dataConcluido     = this.$tools.DateFix(i.dataConcluido    );
+						i.agendado = (i.dataVisita.getFullYear() > 2000);
 						i.acaocard = 'fechar-card' + i.id;
 						// i.proprietarioCaptacao = "Teste, (11) 98498-4894, paulogneto@gmail.com";
 						if (this.$validator.is(i.proprietarioCaptacao)) {
