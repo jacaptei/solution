@@ -118,6 +118,19 @@ namespace JaCaptei.Model {
             public double            horasDataConsiderada    {get{ return Math.Round((Utils.Date.GetLocalDateTime() - dataConsiderada).TotalHours  ); }}
             public double            minutosDataConsiderada  {get{ return Math.Round((Utils.Date.GetLocalDateTime() - dataConsiderada).TotalMinutes); }}
 
+            public string ObterEndereco(){
+                    string endereco = "";
+                    endereco += Utils.Validator.Is(logradouro)  ? (logradouro +", ") : "";
+                    endereco += Utils.Validator.Is(numero)      ? (numero     +", ") : "";
+                    endereco += Utils.Validator.Is(complemento) ? (complemento+", ") : "";
+                    endereco += Utils.Validator.Is(bairro)      ? (bairro+ ", ") : "";
+                    endereco += Utils.Validator.Is(cidade)      ? (cidade     +", ") : "";
+                    endereco += Utils.Validator.Is(estado)      ? (estado) : "";
+                    endereco += Utils.Validator.Is(cep)         ? (", CEP: " + cep) : "";
+                    return endereco;
+            }
+
+
     }
 
 }
