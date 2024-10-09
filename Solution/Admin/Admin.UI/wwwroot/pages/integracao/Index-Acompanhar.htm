@@ -90,140 +90,7 @@
             const listaIntegracao = ref([]);
             const instance = getCurrentInstance();
             const options = ref({});
-            const acompanhar = ref([
-                {
-                    "plano": "IMOBILIÁRIA 03 USUÁRIOS",
-                    "status": "Concluido",
-                    "bairros": [
-                        {
-                            "bairro": {
-                                "nome": "Floramar",
-                                "imoveis": [
-                                    {
-                                        "id": 459,
-                                        "cod": "8672",
-                                        "data": "2024-08-01T20:59:22.367204",
-                                        "status": "Concluido",
-                                        "atualizadoEm": "-infinity",
-                                        "imoviewResponse": {
-                                            "erro": false,
-                                            "codigo": 11881,
-                                            "mensagem": "Imóvel 11881 cadastrado com sucesso!"
-                                        }
-                                    }
-                                ],
-                                "idCidade": "2754"
-                            }
-                        },
-                        {
-                            "bairro": {
-                                "nome": "Sion",
-                                "imoveis": [
-                                    {
-                                        "id": 436,
-                                        "cod": "10587",
-                                        "data": "2024-08-01T21:05:29.032171",
-                                        "status": "Concluido",
-                                        "atualizadoEm": "-infinity",
-                                        "imoviewResponse": {
-                                            "erro": false,
-                                            "codigo": 11882,
-                                            "mensagem": "Imóvel 11882 cadastrado com sucesso!"
-                                        }
-                                    },
-                                    {
-                                        "id": 561,
-                                        "cod": "8814",
-                                        "data": "2024-08-01T21:05:45.187063",
-                                        "status": "Concluido",
-                                        "atualizadoEm": "-infinity",
-                                        "imoviewResponse": {
-                                            "erro": false,
-                                            "codigo": 11883,
-                                            "mensagem": "Imóvel 11883 cadastrado com sucesso!"
-                                        }
-                                    }
-                                ],
-                                "idCidade": "2754"
-                            }
-                        },
-                        {
-                            "bairro": {
-                                "nome": "Centro",
-                                "imoveis": null,
-                                "idCidade": "1"
-                            }
-                        },
-                        {
-                            "bairro": {
-                                "nome": "Aarão Reis",
-                                "imoveis": null,
-                                "idCidade": "2754"
-                            }
-                        },
-                        {
-                            "bairro": {
-                                "nome": "Centro",
-                                "imoveis": null,
-                                "idCidade": "1122"
-                            }
-                        },
-                        {
-                            "bairro": {
-                                "nome": "Alagadiço",
-                                "imoveis": null,
-                                "idCidade": "1347"
-                            }
-                        }
-                    ],
-                    "cliente": "GHX IMÓVEIS",
-                    "criadoEm": "2024-08-01T20:58:44.64358",
-                    "integracao": 52,
-                    "atualizadoEm": "2024-10-02T17:16:41.890479"
-                },
-                {
-                    "plano": "IMOBILIÁRIA 05 USUÁRIOS",
-                    "status": "Concluido",
-                    "bairros": [
-                        {
-                            "bairro": {
-                                "nome": "Funcionários",
-                                "imoveis": [
-                                    {
-                                        "id": 650,
-                                        "cod": "8935",
-                                        "data": "2024-08-22T13:19:22.285691",
-                                        "status": "Concluido",
-                                        "atualizadoEm": "2024-08-22T14:55:06.094496",
-                                        "imoviewResponse": {
-                                            "erro": false,
-                                            "codigo": 2819,
-                                            "mensagem": "Imóvel 2819 cadastrado com sucesso!"
-                                        }
-                                    },
-                                    {
-                                        "id": 778,
-                                        "cod": "9099",
-                                        "data": "2024-08-22T13:19:25.333921",
-                                        "status": "Concluido",
-                                        "atualizadoEm": "2024-08-22T13:19:31.358386",
-                                        "imoviewResponse": {
-                                            "erro": false,
-                                            "codigo": 2561,
-                                            "mensagem": "Imóvel 2561 cadastrado com sucesso!"
-                                        }
-                                    }
-                                ],
-                                "idCidade": "2754"
-                            }
-                        }
-                    ],
-                    "cliente": "GRUPO IMOVEL NET",
-                    "criadoEm": "2024-08-22T13:13:11.322247",
-                    "integracao": 3,
-                    "atualizadoEm": "2024-09-05T21:00:02.483316"
-                }
-            ]);
+            const acompanhar = ref([]);
 
             onMounted(async () => {
                 setTimeout(() => {
@@ -245,10 +112,10 @@
                 try {
                     filtros.value.Integracao = listaIntegracao.value.value;
                     filtros.value.Cliente = listaIntegracao.value.label;
-
-                    console.log(filtros.value);
                     const url = instance.proxy.$api.BuildURL("api/imoview/integracao/status");
                     const response = await axios.post(url, filtros.value);
+                    acompanhar.value = [response.data];
+
                 } catch (error) {
                     console.error("Erro ao buscar integração:", error);
                 } finally {
