@@ -279,8 +279,6 @@ namespace JaCaptei.Application {
                     mail.about   = "Confirmação da Visita ID#"+entity.id.ToString();
                     mail.message = "<b>Prezado(a) " + entity.parceiro.apelido + ".</b><br><br>";
                     mail.message += "Conforme nossa conversa, confirmamos a visita ao seu imóvel na data e localização informados abaixo.<br><br>";
-                    mail.message += "Corretor:" + entity.parceiro.nome + ".<br>";
-                    mail.message += "Telefone:" + entity.parceiro.telefone ;
                     //mail.message = "<b>Confirmação da Visita ID#" + entity.id.ToString() + ".</b>";
                     entity.obs = entity.obsConfirmado;
                     notificar = true;
@@ -312,6 +310,9 @@ namespace JaCaptei.Application {
                         mail.message    += "<br><a href='"+entity.url+"'>"+entity.url+"</a>";
                     } else
                         mail.message    += "<br>não informada";
+
+                    mail.message += "<br><br>Corretor: " + entity.parceiro.nome + ".<br>";
+                    mail.message += "Telefone: " + entity.parceiro.telefone;
 
                     mail.message += "<br><br><b>Obs:</b>";
                     mail.message += "<br>" + (Utils.Validator.Is(entity.obs) ? entity.obs : "sem observações");
@@ -345,8 +346,6 @@ namespace JaCaptei.Application {
             mail.about   = "Confirmação da Visita ID#"+entity.id.ToString();
             mail.message = "<b>Prezado(a) " + entity.parceiro.apelido + ".</b><br><br>";
             mail.message += "Confirmamos a visita ao seu imóvel na data e localização informados abaixo.";
-            //mail.message += "Corretor:" + entity.parceiro.nome + ".<br>";
-            //mail.message += "Telefone:" + entity.parceiro.telefone + ".<br><br>";
 
             string endereco = entity.ObterEndereco();
 
@@ -363,6 +362,9 @@ namespace JaCaptei.Application {
                 mail.message    += "<br><a href='"+entity.url+"'>"+entity.url+"</a>";
             } else
                 mail.message    += "<br>não informada";
+
+            //mail.message += "<br><br>Corretor: " + entity.parceiro.nome + ".<br>";
+            //mail.message += "Telefone: " + entity.parceiro.telefone + ".<br><br>";
 
             mail.message += "<br><br><b>Obs:</b>";
             mail.message += "<br>" + (Utils.Validator.Is(entity.obs) ? entity.obs : "sem observações");
