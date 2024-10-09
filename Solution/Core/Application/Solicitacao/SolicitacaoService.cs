@@ -295,7 +295,15 @@ namespace JaCaptei.Application {
                     mail.message += "<br><br><b>Data:</b><br>";
                     mail.message += entity.dataVisita.ToString("dd/MM/yyyy', 'HH:mm'h'");
 
-                    string endereco = entity.ObterEndereco();
+                    //string endereco = entity.ObterEndereco();
+                    string endereco = "";
+                    endereco += Utils.Validator.Is(entity.logradouro) ? (entity.logradouro +", ") : "";
+                    endereco += Utils.Validator.Is(entity.numero) ? (entity.numero     +", ") : "";
+                    endereco += Utils.Validator.Is(entity.complemento) ? (entity.complemento+", ") : "";
+                    endereco += Utils.Validator.Is(entity.bairro) ? (entity.bairro+ ", ") : "";
+                    endereco += Utils.Validator.Is(entity.cidade) ? (entity.cidade     +", ") : "";
+                    endereco += Utils.Validator.Is(entity.estado) ? (entity.estado) : "";
+                    endereco += Utils.Validator.Is(entity.cep) ? ("<br>CEP: " + entity.cep) : "";
 
                     mail.message += "<br><br><b>Localização:</b>";
                     if(Utils.Validator.Is(endereco)) {
@@ -304,6 +312,7 @@ namespace JaCaptei.Application {
                         //    mail.message += "<br><b style='color:#ff3333'>Endereço inválido</b>";
                     } else
                         mail.message    += "<br>não encontrada";
+
 
                     mail.message    += "<br><br><b>URL:</b>";
                     if(Utils.Validator.Is(entity.url)) {
@@ -347,7 +356,15 @@ namespace JaCaptei.Application {
             mail.message = "<b>Prezado(a) " + entity.parceiro.apelido + ".</b><br><br>";
             mail.message += "Confirmamos a visita ao seu imóvel na data e localização informados abaixo.";
 
-            string endereco = entity.ObterEndereco();
+            //string endereco = entity.ObterEndereco();
+            string endereco = "";
+            endereco += Utils.Validator.Is(entity.logradouro) ? (entity.logradouro +", ") : "";
+            endereco += Utils.Validator.Is(entity.numero) ? (entity.numero     +", ") : "";
+            endereco += Utils.Validator.Is(entity.complemento) ? (entity.complemento+", ") : "";
+            endereco += Utils.Validator.Is(entity.bairro) ? (entity.bairro+ ", ") : "";
+            endereco += Utils.Validator.Is(entity.cidade) ? (entity.cidade     +", ") : "";
+            endereco += Utils.Validator.Is(entity.estado) ? (entity.estado) : "";
+            endereco += Utils.Validator.Is(entity.cep) ? ("<br>CEP: " + entity.cep) : "";
 
             mail.message += "<br><br><b>Localização:</b>";
             if(Utils.Validator.Is(endereco)) {
@@ -356,6 +373,7 @@ namespace JaCaptei.Application {
                 //    mail.message += "<br><b style='color:#ff3333'>Endereço inválido</b>";
             } else
                 mail.message    += "<br>não encontrada";
+
 
             mail.message    += "<br><br><b>URL:</b>";
             if(Utils.Validator.Is(entity.url)) {
@@ -455,15 +473,23 @@ namespace JaCaptei.Application {
                         mail.message    += "<br>não encontrado";
                 }
 
-                string endereco = entity.ObterEndereco();
+                //string endereco = entity.ObterEndereco();
+                string endereco = "";
+                endereco += Utils.Validator.Is(entity.logradouro) ? (entity.logradouro +", ") : "";
+                endereco += Utils.Validator.Is(entity.numero) ? (entity.numero     +", ") : "";
+                endereco += Utils.Validator.Is(entity.complemento) ? (entity.complemento+", ") : "";
+                endereco += Utils.Validator.Is(entity.bairro) ? (entity.bairro+ ", ") : "";
+                endereco += Utils.Validator.Is(entity.cidade) ? (entity.cidade     +", ") : "";
+                endereco += Utils.Validator.Is(entity.estado) ? (entity.estado) : "";
+                endereco += Utils.Validator.Is(entity.cep) ? ("<br>CEP: " + entity.cep) : "";
 
+                mail.message += "<br><br><b>Localização:</b>";
                 if(Utils.Validator.Is(endereco)) {
                     mail.message += "<br>" + endereco;
                     //if(!entity.validadoEndereco)
                     //    mail.message += "<br><b style='color:#ff3333'>Endereço inválido</b>";
                 } else
                     mail.message    += "<br>não encontrada";
-
 
 
                 mail.message    += "<br><br><b>URL:</b>";
