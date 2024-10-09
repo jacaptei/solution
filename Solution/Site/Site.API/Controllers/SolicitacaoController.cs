@@ -140,13 +140,16 @@ namespace JaCaptei.API.Controllers
         public IActionResult ObterTodos() {
             
             Solicitacao entity = new Solicitacao();
+            entity.parceiro = new Parceiro();
 
             Usuario logado = ObterUsuarioAutenticado();
             if(logado.idTipoUsuario == 3)
                 entity.idAdmin = logado.id;
-            else
-                entity.idParceiro = logado.id;
-
+            else {
+                entity.parceiro.id = entity.idParceiro = logado.id;
+                entity.parceiro.idConta = logado.idConta;
+                entity.parceiro.donoConta = logado.donoConta;
+            }
             appReturn = service.ObterTodasSolicitacoesPeloId(entity);
             return Result(appReturn);
         }
@@ -156,7 +159,10 @@ namespace JaCaptei.API.Controllers
         public IActionResult ObterTodosParceiro() {
             Solicitacao entity = new Solicitacao();
             Usuario logado = ObterUsuarioAutenticado();
-            entity.idParceiro = logado.id;
+            entity.parceiro = new Parceiro();
+            entity.parceiro.id = entity.idParceiro = logado.id;
+            entity.parceiro.idConta = logado.idConta;
+            entity.parceiro.donoConta = logado.donoConta;
 
             appReturn = service.ObterTodosParceiro(entity);
             return Result(appReturn);
@@ -167,7 +173,10 @@ namespace JaCaptei.API.Controllers
         public IActionResult ObterTodosSemVisitaParceiro() {
             Solicitacao entity = new Solicitacao();
             Usuario logado = ObterUsuarioAutenticado();
-            entity.idParceiro = logado.id;
+            entity.parceiro = new Parceiro();
+            entity.parceiro.id = entity.idParceiro = logado.id;
+            entity.parceiro.idConta = logado.idConta;
+            entity.parceiro.donoConta = logado.donoConta;
 
             appReturn = service.ObterTodosSemVisitaParceiro(entity);
             return Result(appReturn);
@@ -179,7 +188,10 @@ namespace JaCaptei.API.Controllers
         public IActionResult ObterTodosComVisitaParceiro() {
             Solicitacao entity = new Solicitacao();
             Usuario logado = ObterUsuarioAutenticado();
-            entity.idParceiro = logado.id;
+            entity.parceiro = new Parceiro();
+            entity.parceiro.id = entity.idParceiro = logado.id;
+            entity.parceiro.idConta = logado.idConta;
+            entity.parceiro.donoConta = logado.donoConta;
 
             appReturn = service.ObterTodosComVisitaParceiro(entity);
             return Result(appReturn);
@@ -190,7 +202,7 @@ namespace JaCaptei.API.Controllers
 
         [HttpGet]
         [Route("excluir/{id:int}")]
-        public IActionResult Buscar(int id) {
+        public IActionResult Excluir(int id) {
             appReturn = service.Excluir(id);
             return Result(appReturn);
         }

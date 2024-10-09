@@ -7,7 +7,7 @@ namespace JaCaptei.Model.Entities;
 
 
 [Map("IntegracaoBairroImoview")]
-public class IntegracaoBairroImoview
+public class IntegracaoBairroImoview : IIntegracaoBairro
 {
     [Map("id")]
     public int Id { get; set; }

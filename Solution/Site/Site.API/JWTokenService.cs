@@ -20,6 +20,7 @@ namespace JaCaptei.API{
                     new Claim("_id",                usuario.id.ToString()                  ),
                     new Claim("_email",             usuario.email.ToString()               ),
                     new Claim("_idConta",           usuario.idConta.ToString()             ),
+                    new Claim("_donoConta",         usuario.donoConta.ToString()           ),
                     new Claim("_idTipoUsuario",     usuario.idTipoUsuario.ToString()       ),
                 }),
                 Expires = DateTime.UtcNow.AddHours(7),

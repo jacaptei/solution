@@ -29,6 +29,13 @@ internal static class ServicesExtensions
         })
         .AddTransientHttpErrorPolicy(policyBuilder => policyBuilder.WaitAndRetryAsync(Backoff.DecorrelatedJitterBackoffV2(TimeSpan.FromSeconds(1), 5)));
 
+        services.AddHttpClient("vistasoft", client =>
+        {
+            client.BaseAddress = new Uri("http://sandbox-rest.vistahost.com.br/");
+        })
+        .AddTransientHttpErrorPolicy(policyBuilder => policyBuilder.WaitAndRetryAsync(Backoff.DecorrelatedJitterBackoffV2(TimeSpan.FromSeconds(1), 5)));
+
+
         var assembly = Assembly.GetExecutingAssembly();
         var types = assembly.GetTypes()
                             .Where(t => t.Namespace != null && t.Namespace.StartsWith("JaCaptei.Application.Mapper"))
