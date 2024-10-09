@@ -59,13 +59,15 @@
                title="Filtro"
                width="500"
                align-center>
-        <el-input v-model="filtros.plano" placeholder="ID Integração" clearable style="margin-bottom: 15px;" />
-        <!--<el-input v-model="filtros.cliente" placeholder="Filtrar por Cliente" clearable style="margin-bottom: 15px;" />-->
+        <el-input v-model.number="idIntegracao"
+                  placeholder="ID Integração"
+                  clearable
+                  style="margin-bottom: 15px;" />
         <template #footer>
             <div class="dialog-footer">
                 <span slot="footer" class="dialog-footer">
                     <el-button @click="filtrosVisiveis = false">Cancelar</el-button>
-                    <el-button type="primary" @click="aplicarFiltros">Aplicar Filtros</el-button>
+                    <el-button type="primary" @click="Buscar">Aplicar Filtros</el-button>
                 </span>
             </div>
         </template>
@@ -73,19 +75,13 @@
 </template>
 
 <script>
-    import { ref, onMounted } from 'vue';
+    import { ref, onMounted, getCurrentInstance } from 'vue';
     export default {
         setup() {
             const filtrosVisiveis = ref(false);
-            const filtros = ref({
-                plano: '',
-                cliente: '',
-                dataCriacao: []
-            });
-            const aplicarFiltros = () => {
-                console.log(filtros.value);
-                filtrosVisiveis.value = true;
-            };
+            const idIntegracao = ref(null);
+            const collapseItems = ref([]);
+            const instance = getCurrentInstance();
             const acompanhar = ref([
                 {
                     plano: 'IMOBILIÁRIA 05 USUÁRIOS',
@@ -223,8 +219,16 @@
                 }, 300);
             });
 
+            const filtros = ref({
+                idIntegracao: '',
+            });
+
+            // A função Buscar agora imprime os filtros corretamente
             const Buscar = () => {
-                console.log('Buscando...');
+                filtros.value.idIntegracao = idIntegracao.value; 
+                let request = instance.proxy.$api.Post("api/imoview/integracao/status", { Integracao: filtros.value.idIntegracao });
+                console.log(request);
+                filtrosVisiveis.value = false;
             };
 
             const Alterar = (scope) => {
@@ -241,10 +245,11 @@
             };
 
             return {
-               acompanhar,
+                acompanhar,
                 filtrosVisiveis,
                 filtros,
-                aplicarFiltros
+                Buscar,
+                idIntegracao
             };
         },
     };
