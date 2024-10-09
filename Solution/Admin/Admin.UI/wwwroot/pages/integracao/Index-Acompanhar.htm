@@ -1,0 +1,261 @@
+﻿<template>
+    <div>
+        <!-- O botão de "Filtrar" ainda está presente, mas o diálogo já abrirá automaticamente -->
+        <el-button type="primary" @click="aplicarFiltros">Filtrar</el-button>
+
+        <!-- Tabela principal de Integrações -->
+        <el-table :data="acompanhar" style="width: 100%">
+            <!-- Coluna expansível de Integrações -->
+            <el-table-column type="expand">
+                <template #default="props">
+                    <el-card :style="{ borderColor: '#f5eeeb', borderWidth: '1px', borderStyle: 'solid', padding: '20px' }" shadow="never">
+                        <!-- Tabela de Bairros dentro da Integração -->
+                        <el-table :data="props.row.bairros" style="width: 100%">
+                            <!-- Coluna expansível de Bairros -->
+                            <el-table-column type="expand">
+                                <template #default="bairroScope">
+                                    <!-- Tabela de Imóveis dentro de cada Bairro -->
+                                    <el-card :style="{ borderColor: '#f5eeeb', borderWidth: '1px', borderStyle: 'solid', maxHeight: '400px', overflow: 'hidden' }" shadow="never">
+                                        <transition name="fade" mode="out-in">
+                                            <el-table :data="bairroScope.row.bairro.imoveis" height="350" style="width: 100%">
+                                                <el-table-column label="ID Imóvel" prop="id" />
+                                                <el-table-column label="Código" prop="cod" />
+                                                <el-table-column label="Data" prop="data" />
+                                                <el-table-column label="Status" prop="status" />
+                                                <el-table-column label="Atualizado Em" prop="atualizadoEm" />
+                                                <el-table-column label="Resposta">
+                                                    <template #default="scope">
+                                                        <div v-if="!scope.row.imoviewResponse.erro">
+                                                            {{ scope.row.imoviewResponse.mensagem }}
+                                                        </div>
+                                                        <div v-else>
+                                                            <span class="error">Erro: {{ scope.row.imoviewResponse.mensagem }}</span>
+                                                        </div>
+                                                    </template>
+                                                </el-table-column>
+                                            </el-table>
+                                        </transition>
+                                    </el-card>
+                                </template>
+                            </el-table-column>
+
+                            <!-- Colunas de Bairros -->
+                            <el-table-column label="Bairro" prop="bairro.nome" />
+                        </el-table>
+                    </el-card>
+                </template>
+            </el-table-column>
+
+            <!-- Colunas principais da Integração -->
+            <el-table-column label="Plano" prop="plano" />
+            <el-table-column label="Cliente" prop="cliente" />
+            <el-table-column label="Data de Criação" prop="criadoEm" />
+            <el-table-column label="Última Atualização" prop="atualizadoEm" />
+
+        </el-table>
+    </div>
+
+    <el-dialog v-model="filtrosVisiveis"
+               title="Filtro"
+               width="500"
+               align-center>
+        <el-input v-model="filtros.plano" placeholder="ID Integração" clearable style="margin-bottom: 15px;" />
+        <!--<el-input v-model="filtros.cliente" placeholder="Filtrar por Cliente" clearable style="margin-bottom: 15px;" />-->
+        <template #footer>
+            <div class="dialog-footer">
+                <span slot="footer" class="dialog-footer">
+                    <el-button @click="filtrosVisiveis = false">Cancelar</el-button>
+                    <el-button type="primary" @click="aplicarFiltros">Aplicar Filtros</el-button>
+                </span>
+            </div>
+        </template>
+    </el-dialog>
+</template>
+
+<script>
+    import { ref, onMounted } from 'vue';
+    export default {
+        setup() {
+            const filtrosVisiveis = ref(false);
+            const filtros = ref({
+                plano: '',
+                cliente: '',
+                dataCriacao: []
+            });
+            const aplicarFiltros = () => {
+                console.log(filtros.value);
+                filtrosVisiveis.value = true;
+            };
+            const acompanhar = ref([
+                {
+                    plano: 'IMOBILIÁRIA 05 USUÁRIOS',
+                    cliente: 'GRUPO IMOVEL NET',
+                    criadoEm: '2024-08-22T13:13:11.322247',
+                    atualizadoEm: '2024-09-05T21:00:02.483316',
+                    bairros: [
+                        {
+                            bairro: {
+                                nome: 'Funcionários',
+                                imoveis: [
+                                    {
+                                        id: 650,
+                                        cod: '8935',
+                                        data: '2024-08-22T13:19:22.285691',
+                                        status: 'Concluido',
+                                        atualizadoEm: '2024-08-22T14:55:06.094496',
+                                        imoviewResponse: {
+                                            erro: false,
+                                            codigo: 2819,
+                                            mensagem: 'Imóvel 2819 cadastrado com sucesso!'
+                                        }
+                                    },
+                                    {
+                                        id: 778,
+                                        cod: '9099',
+                                        data: '2024-08-22T13:19:25.333921',
+                                        status: 'Concluido',
+                                        atualizadoEm: '2024-08-22T13:19:31.358386',
+                                        imoviewResponse: {
+                                            erro: false,
+                                            codigo: 2561,
+                                            mensagem: 'Imóvel 2561 cadastrado com sucesso!'
+                                        }
+                                    }
+                                ],
+                                idCidade: '2754'
+                            }
+                        }
+                    ]
+                },
+                {
+                    plano: 'IMOBILIÁRIA 05 USUÁRIOS',
+                    cliente: 'GRUPO IMOVEL NET',
+                    criadoEm: '2024-08-22T13:13:11.322247',
+                    atualizadoEm: '2024-09-05T21:00:02.483316',
+                    bairros: [
+                        {
+                            bairro: {
+                                nome: 'Funcionários',
+                                imoveis: [
+                                    {
+                                        id: 650,
+                                        cod: '8935',
+                                        data: '2024-08-22T13:19:22.285691',
+                                        status: 'Concluido',
+                                        atualizadoEm: '2024-08-22T14:55:06.094496',
+                                        imoviewResponse: {
+                                            erro: false,
+                                            codigo: 2819,
+                                            mensagem: 'Imóvel 2819 cadastrado com sucesso!'
+                                        }
+                                    },
+                                    {
+                                        id: 778,
+                                        cod: '9099',
+                                        data: '2024-08-22T13:19:25.333921',
+                                        status: 'Concluido',
+                                        atualizadoEm: '2024-08-22T13:19:31.358386',
+                                        imoviewResponse: {
+                                            erro: false,
+                                            codigo: 2561,
+                                            mensagem: 'Imóvel 2561 cadastrado com sucesso!'
+                                        }
+                                    },
+                                    {
+                                        id: 650,
+                                        cod: '8935',
+                                        data: '2024-08-22T13:19:22.285691',
+                                        status: 'Concluido',
+                                        atualizadoEm: '2024-08-22T14:55:06.094496',
+                                        imoviewResponse: {
+                                            erro: false,
+                                            codigo: 2819,
+                                            mensagem: 'Imóvel 2819 cadastrado com sucesso!'
+                                        }
+                                    },
+                                    {
+                                        id: 778,
+                                        cod: '9099',
+                                        data: '2024-08-22T13:19:25.333921',
+                                        status: 'Concluido',
+                                        atualizadoEm: '2024-08-22T13:19:31.358386',
+                                        imoviewResponse: {
+                                            erro: false,
+                                            codigo: 2561,
+                                            mensagem: 'Imóvel 2561 cadastrado com sucesso!'
+                                        }
+                                    },
+                                    {
+                                        id: 650,
+                                        cod: '8935',
+                                        data: '2024-08-22T13:19:22.285691',
+                                        status: 'Concluido',
+                                        atualizadoEm: '2024-08-22T14:55:06.094496',
+                                        imoviewResponse: {
+                                            erro: false,
+                                            codigo: 2819,
+                                            mensagem: 'Imóvel 2819 cadastrado com sucesso!'
+                                        }
+                                    },
+                                    {
+                                        id: 778,
+                                        cod: '9099',
+                                        data: '2024-08-22T13:19:25.333921',
+                                        status: 'Concluido',
+                                        atualizadoEm: '2024-08-22T13:19:31.358386',
+                                        imoviewResponse: {
+                                            erro: false,
+                                            codigo: 2561,
+                                            mensagem: 'Imóvel 2561 cadastrado com sucesso!'
+                                        }
+                                    }
+                                ],
+                                idCidade: '2754'
+                            }
+                        }
+                    ]
+                }
+            ]);
+
+            onMounted(() => {
+                setTimeout(() => {
+                    filtrosVisiveis.value = true;
+                }, 300);
+            });
+
+            const Buscar = () => {
+                console.log('Buscando...');
+            };
+
+            const Alterar = (scope) => {
+                console.log('Alterando', scope.row.id);
+            };
+
+            const Excluir = (scope) => {
+                console.log('Excluindo', scope.row.id);
+            };
+
+            const ToggleAtivar = (scope) => {
+                scope.row.ativo = !scope.row.ativo;
+                console.log('Ativando/Desativando', scope.row.id);
+            };
+
+            return {
+               acompanhar,
+                filtrosVisiveis,
+                filtros,
+                aplicarFiltros
+            };
+        },
+    };
+</script>
+
+<style>
+    .el-card__body {
+        padding: 10px;
+    }
+
+    .error {
+        color: red;
+    }
+</style>
