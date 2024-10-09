@@ -1,21 +1,21 @@
 ﻿<template>
     <div>
         <!-- O botão de "Filtrar" ainda está presente, mas o diálogo já abrirá automaticamente -->
-        <el-button type="primary" @click="aplicarFiltros">Filtrar</el-button>
+        <el-button type="primary" @click="abrirModalFiltro">Filtro</el-button>
 
         <!-- Tabela principal de Integrações -->
         <el-table :data="acompanhar" style="width: 100%">
             <!-- Coluna expansível de Integrações -->
             <el-table-column type="expand">
                 <template #default="props">
-                    <el-card :style="{ borderColor: '#f5eeeb', borderWidth: '1px', borderStyle: 'solid', padding: '20px' }" shadow="never">
+                    <el-card :style="{ borderColor: '#f5eeeb', borderWidth: '1px', borderStyle: 'solid'}" shadow="never">
                         <!-- Tabela de Bairros dentro da Integração -->
-                        <el-table :data="props.row.bairros" style="width: 100%">
+                        <el-table class="no-bottom-border" :data="props.row.bairros" style="width: 100%">
                             <!-- Coluna expansível de Bairros -->
                             <el-table-column type="expand">
                                 <template #default="bairroScope">
                                     <!-- Tabela de Imóveis dentro de cada Bairro -->
-                                    <el-card :style="{ borderColor: '#f5eeeb', borderWidth: '1px', borderStyle: 'solid', maxHeight: '400px', overflow: 'hidden' }" shadow="never">
+                                    <el-card :style="{ borderColor: '#b1b1b1', borderWidth: '1px', borderStyle: 'solid', maxHeight: '400px', overflow: 'hidden' }" shadow="never">
                                         <transition name="fade" mode="out-in">
                                             <el-table :data="bairroScope.row.bairro.imoveis" height="350" style="width: 100%">
                                                 <el-table-column label="ID Imóvel" prop="id" />
@@ -47,8 +47,8 @@
             </el-table-column>
 
             <!-- Colunas principais da Integração -->
-            <el-table-column label="Plano" prop="plano" />
             <el-table-column label="Cliente" prop="cliente" />
+            <el-table-column label="Plano" prop="plano" />
             <el-table-column label="Data de Criação" prop="criadoEm" />
             <el-table-column label="Última Atualização" prop="atualizadoEm" />
 
@@ -59,16 +59,22 @@
                title="Filtro"
                width="500"
                align-center>
-        <el-input v-model.number="idIntegracao"
-                  placeholder="ID Integração"
-                  clearable
-                  style="margin-bottom: 15px;" />
+        <div style="display: flex; flex-direction: column;">
+            <span>Integração</span>
+            <el-select v-model="listaIntegracao"
+                       placeholder="Escolha o Parceiro"
+                       style="width: 240px">
+                <el-option v-for="item in options"
+                           :key="item.value"
+                           :label="item.label"
+                           :value="item" />
+            </el-select>
+        </div>
+
         <template #footer>
             <div class="dialog-footer">
-                <span slot="footer" class="dialog-footer">
-                    <el-button @click="filtrosVisiveis = false">Cancelar</el-button>
-                    <el-button type="primary" @click="Buscar">Aplicar Filtros</el-button>
-                </span>
+                <el-button @click="filtrosVisiveis = false">Cancelar</el-button>
+                <el-button type="primary" @click="Buscar">Aplicar Filtros</el-button>
             </div>
         </template>
     </el-dialog>
@@ -81,154 +87,187 @@
             const filtrosVisiveis = ref(false);
             const idIntegracao = ref(null);
             const collapseItems = ref([]);
+            const listaIntegracao = ref([]);
             const instance = getCurrentInstance();
+            const options = ref({});
             const acompanhar = ref([
                 {
-                    plano: 'IMOBILIÁRIA 05 USUÁRIOS',
-                    cliente: 'GRUPO IMOVEL NET',
-                    criadoEm: '2024-08-22T13:13:11.322247',
-                    atualizadoEm: '2024-09-05T21:00:02.483316',
-                    bairros: [
+                    "plano": "IMOBILIÁRIA 03 USUÁRIOS",
+                    "status": "Concluido",
+                    "bairros": [
                         {
-                            bairro: {
-                                nome: 'Funcionários',
-                                imoveis: [
+                            "bairro": {
+                                "nome": "Floramar",
+                                "imoveis": [
                                     {
-                                        id: 650,
-                                        cod: '8935',
-                                        data: '2024-08-22T13:19:22.285691',
-                                        status: 'Concluido',
-                                        atualizadoEm: '2024-08-22T14:55:06.094496',
-                                        imoviewResponse: {
-                                            erro: false,
-                                            codigo: 2819,
-                                            mensagem: 'Imóvel 2819 cadastrado com sucesso!'
-                                        }
-                                    },
-                                    {
-                                        id: 778,
-                                        cod: '9099',
-                                        data: '2024-08-22T13:19:25.333921',
-                                        status: 'Concluido',
-                                        atualizadoEm: '2024-08-22T13:19:31.358386',
-                                        imoviewResponse: {
-                                            erro: false,
-                                            codigo: 2561,
-                                            mensagem: 'Imóvel 2561 cadastrado com sucesso!'
+                                        "id": 459,
+                                        "cod": "8672",
+                                        "data": "2024-08-01T20:59:22.367204",
+                                        "status": "Concluido",
+                                        "atualizadoEm": "-infinity",
+                                        "imoviewResponse": {
+                                            "erro": false,
+                                            "codigo": 11881,
+                                            "mensagem": "Imóvel 11881 cadastrado com sucesso!"
                                         }
                                     }
                                 ],
-                                idCidade: '2754'
+                                "idCidade": "2754"
+                            }
+                        },
+                        {
+                            "bairro": {
+                                "nome": "Sion",
+                                "imoveis": [
+                                    {
+                                        "id": 436,
+                                        "cod": "10587",
+                                        "data": "2024-08-01T21:05:29.032171",
+                                        "status": "Concluido",
+                                        "atualizadoEm": "-infinity",
+                                        "imoviewResponse": {
+                                            "erro": false,
+                                            "codigo": 11882,
+                                            "mensagem": "Imóvel 11882 cadastrado com sucesso!"
+                                        }
+                                    },
+                                    {
+                                        "id": 561,
+                                        "cod": "8814",
+                                        "data": "2024-08-01T21:05:45.187063",
+                                        "status": "Concluido",
+                                        "atualizadoEm": "-infinity",
+                                        "imoviewResponse": {
+                                            "erro": false,
+                                            "codigo": 11883,
+                                            "mensagem": "Imóvel 11883 cadastrado com sucesso!"
+                                        }
+                                    }
+                                ],
+                                "idCidade": "2754"
+                            }
+                        },
+                        {
+                            "bairro": {
+                                "nome": "Centro",
+                                "imoveis": null,
+                                "idCidade": "1"
+                            }
+                        },
+                        {
+                            "bairro": {
+                                "nome": "Aarão Reis",
+                                "imoveis": null,
+                                "idCidade": "2754"
+                            }
+                        },
+                        {
+                            "bairro": {
+                                "nome": "Centro",
+                                "imoveis": null,
+                                "idCidade": "1122"
+                            }
+                        },
+                        {
+                            "bairro": {
+                                "nome": "Alagadiço",
+                                "imoveis": null,
+                                "idCidade": "1347"
                             }
                         }
-                    ]
+                    ],
+                    "cliente": "GHX IMÓVEIS",
+                    "criadoEm": "2024-08-01T20:58:44.64358",
+                    "integracao": 52,
+                    "atualizadoEm": "2024-10-02T17:16:41.890479"
                 },
                 {
-                    plano: 'IMOBILIÁRIA 05 USUÁRIOS',
-                    cliente: 'GRUPO IMOVEL NET',
-                    criadoEm: '2024-08-22T13:13:11.322247',
-                    atualizadoEm: '2024-09-05T21:00:02.483316',
-                    bairros: [
+                    "plano": "IMOBILIÁRIA 05 USUÁRIOS",
+                    "status": "Concluido",
+                    "bairros": [
                         {
-                            bairro: {
-                                nome: 'Funcionários',
-                                imoveis: [
+                            "bairro": {
+                                "nome": "Funcionários",
+                                "imoveis": [
                                     {
-                                        id: 650,
-                                        cod: '8935',
-                                        data: '2024-08-22T13:19:22.285691',
-                                        status: 'Concluido',
-                                        atualizadoEm: '2024-08-22T14:55:06.094496',
-                                        imoviewResponse: {
-                                            erro: false,
-                                            codigo: 2819,
-                                            mensagem: 'Imóvel 2819 cadastrado com sucesso!'
+                                        "id": 650,
+                                        "cod": "8935",
+                                        "data": "2024-08-22T13:19:22.285691",
+                                        "status": "Concluido",
+                                        "atualizadoEm": "2024-08-22T14:55:06.094496",
+                                        "imoviewResponse": {
+                                            "erro": false,
+                                            "codigo": 2819,
+                                            "mensagem": "Imóvel 2819 cadastrado com sucesso!"
                                         }
                                     },
                                     {
-                                        id: 778,
-                                        cod: '9099',
-                                        data: '2024-08-22T13:19:25.333921',
-                                        status: 'Concluido',
-                                        atualizadoEm: '2024-08-22T13:19:31.358386',
-                                        imoviewResponse: {
-                                            erro: false,
-                                            codigo: 2561,
-                                            mensagem: 'Imóvel 2561 cadastrado com sucesso!'
-                                        }
-                                    },
-                                    {
-                                        id: 650,
-                                        cod: '8935',
-                                        data: '2024-08-22T13:19:22.285691',
-                                        status: 'Concluido',
-                                        atualizadoEm: '2024-08-22T14:55:06.094496',
-                                        imoviewResponse: {
-                                            erro: false,
-                                            codigo: 2819,
-                                            mensagem: 'Imóvel 2819 cadastrado com sucesso!'
-                                        }
-                                    },
-                                    {
-                                        id: 778,
-                                        cod: '9099',
-                                        data: '2024-08-22T13:19:25.333921',
-                                        status: 'Concluido',
-                                        atualizadoEm: '2024-08-22T13:19:31.358386',
-                                        imoviewResponse: {
-                                            erro: false,
-                                            codigo: 2561,
-                                            mensagem: 'Imóvel 2561 cadastrado com sucesso!'
-                                        }
-                                    },
-                                    {
-                                        id: 650,
-                                        cod: '8935',
-                                        data: '2024-08-22T13:19:22.285691',
-                                        status: 'Concluido',
-                                        atualizadoEm: '2024-08-22T14:55:06.094496',
-                                        imoviewResponse: {
-                                            erro: false,
-                                            codigo: 2819,
-                                            mensagem: 'Imóvel 2819 cadastrado com sucesso!'
-                                        }
-                                    },
-                                    {
-                                        id: 778,
-                                        cod: '9099',
-                                        data: '2024-08-22T13:19:25.333921',
-                                        status: 'Concluido',
-                                        atualizadoEm: '2024-08-22T13:19:31.358386',
-                                        imoviewResponse: {
-                                            erro: false,
-                                            codigo: 2561,
-                                            mensagem: 'Imóvel 2561 cadastrado com sucesso!'
+                                        "id": 778,
+                                        "cod": "9099",
+                                        "data": "2024-08-22T13:19:25.333921",
+                                        "status": "Concluido",
+                                        "atualizadoEm": "2024-08-22T13:19:31.358386",
+                                        "imoviewResponse": {
+                                            "erro": false,
+                                            "codigo": 2561,
+                                            "mensagem": "Imóvel 2561 cadastrado com sucesso!"
                                         }
                                     }
                                 ],
-                                idCidade: '2754'
+                                "idCidade": "2754"
                             }
                         }
-                    ]
+                    ],
+                    "cliente": "GRUPO IMOVEL NET",
+                    "criadoEm": "2024-08-22T13:13:11.322247",
+                    "integracao": 3,
+                    "atualizadoEm": "2024-09-05T21:00:02.483316"
                 }
             ]);
 
-            onMounted(() => {
+            onMounted(async () => {
                 setTimeout(() => {
                     filtrosVisiveis.value = true;
                 }, 300);
+                await getListaIntegracoes();
             });
+
+            const abrirModalFiltro = () => {
+                filtrosVisiveis.value = true;
+            }
 
             const filtros = ref({
-                idIntegracao: '',
+                Integracao: 0, // Inicialize como um array vazio
+                Cliente: '',    // Inicialize como string vazia
             });
 
-            // A função Buscar agora imprime os filtros corretamente
-            const Buscar = () => {
-                filtros.value.idIntegracao = idIntegracao.value; 
-                let request = instance.proxy.$api.Post("api/imoview/integracao/status", { Integracao: filtros.value.idIntegracao });
-                console.log(request);
-                filtrosVisiveis.value = false;
+            const Buscar = async () => {
+                try {
+                    filtros.value.Integracao = listaIntegracao.value.value;
+                    filtros.value.Cliente = listaIntegracao.value.label;
+
+                    console.log(filtros.value);
+                    const url = instance.proxy.$api.BuildURL("api/imoview/integracao/status");
+                    const response = await axios.post(url, filtros.value);
+                } catch (error) {
+                    console.error("Erro ao buscar integração:", error);
+                } finally {
+                    filtrosVisiveis.value = false;
+                }
+            };
+
+            const getListaIntegracoes = async () => {
+                try {
+                    const url = instance.proxy.$api.BuildURL("api/imoview/integracao/listar");
+                    const response = await axios.get(url);
+                    options.value = response.data.map(item => ({
+                        value: item.integracao,
+                        label: item.cliente
+                    }));
+                    console.log(options);
+                } catch (error) {
+                    console.error('Erro ao buscar integrações:', error);
+                }
             };
 
             const Alterar = (scope) => {
@@ -249,7 +288,10 @@
                 filtrosVisiveis,
                 filtros,
                 Buscar,
-                idIntegracao
+                idIntegracao,
+                listaIntegracao,
+                options,
+                abrirModalFiltro
             };
         },
     };
@@ -262,5 +304,9 @@
 
     .error {
         color: red;
+    }
+
+    .no-bottom-border .el-table__body-wrapper {
+        border-bottom: none !important;
     }
 </style>
