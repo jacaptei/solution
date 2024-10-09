@@ -10,6 +10,7 @@ using JaCaptei.Model.Model;
 using Npgsql;
 using Newtonsoft.Json;
 using RepoDb.Enumerations;
+using System.Transactions;
 
 namespace JaCaptei.Application{
 
@@ -529,6 +530,57 @@ namespace JaCaptei.Application{
             return appReturn;
         }
 
+        public AppReturn AtualizarPlanoParceiro(int idPlano, int idConta)
+        {
+            var appReturn = new AppReturn();
+            try
+            {
+                using (var conn = new DBcontext().GetConn())
+                {
+                    var result = conn.Update("Parceiro", new { idPlano = idPlano }, where: new { idConta = idConta });
+
+
+                    if (result > 0)
+                    {
+                        appReturn.result = "Plano do parceiro atualizado com sucesso!";
+                    }
+                    else
+                    {
+                        appReturn.result = "Nenhum parceiro encontrado com o ID fornecido.";
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("Erro ao atualizar o plano do parceiro.", ex);
+            }
+            return appReturn;
+        }
+
+        public AppReturn AtualizarPlanoConta(int idPlano, int limiteUsuarios, int idConta)
+        {
+            var appReturn = new AppReturn();
+            try
+            {
+                using (var conn = new DBcontext().GetConn())
+                {
+                    var result = conn.Update("Conta", new { idPlano = idPlano, limiteUsuarios = limiteUsuarios }, where: new { id = idConta });
+                    if (result > 0)
+                    {
+                        appReturn.result = "Plano do parceiro atualizado com sucesso!";
+                    }
+                    else
+                    {
+                        appReturn.result = "Nenhum parceiro encontrado com o ID fornecido.";
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("Erro ao atualizar o plano do parceiro.", ex);
+            }
+            return appReturn;
+        }
 
         public Parceiro ObterPorId(int id) {
 

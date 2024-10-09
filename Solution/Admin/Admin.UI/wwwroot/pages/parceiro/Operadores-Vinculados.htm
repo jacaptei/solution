@@ -151,7 +151,7 @@
                         </el-col>
                     </el-row>
 
-                    <div v-if="hasChanges" style="margin-top: 20px; display: flex; justify-content: end;">
+                    <div v-if="hasChanges[index]" style="margin-top: 20px; display: flex; justify-content: end;">
                         <el-button type="primary" @click="saveChanges">Salvar</el-button>
                         <el-button type="danger" @click="cancelChanges" style="margin-left: 10px">Cancelar</el-button>
                     </div>
@@ -171,7 +171,7 @@
             const idParceiro = ref(0);
             const originalData = ref([]);
             const collapseItems = ref([]);
-            const hasChanges = ref(false);
+            const hasChanges = ref([]);
             const activeNames = ref(['1']);
             const valoresAlterados = ref({});
             const currentEditData = reactive({});
@@ -208,6 +208,12 @@
                     console.error("parceiroRow não está definido.");
                     return null;
                 }
+            };
+
+            const planoUsuarioLimites = {
+                2: 1, // Corretor Autônomo
+                3: 4, // Imobiliária até 3 usuários
+                4: 6  // Imobiliária até 5 usuários
             };
 
             const ObterContaPorId = async () => {
@@ -253,26 +259,56 @@
                 }
             };
 
+            const hasAnyChanges = computed(() => {
+                return hasChanges.value.some(change => change === true);
+            });
+
             const handleChange = (index, field, newValue) => {
-                hasChanges.value = true;
+                if (!hasChanges.value[index]) {
+                    hasChanges.value[index] = false;
+                }
+                hasChanges.value[index] = true;
+
                 collapseItems.value[index].tableData[0][field] = newValue;
+
+                if (field === 'idPlano') {
+                    // Obtenha o limite de usuários correspondente ao novo plano
+                    const limiteUsuarios = planoUsuarioLimites[newValue] || 0;
+
+                    // Atualize o campo limiteUsuarios
+                    collapseItems.value[index].tableData[0].limiteUsuarios = limiteUsuarios;
+
+                    // Adicione o novo limite de usuários a valoresAlterados
+                    if (!valoresAlterados.value[index]) {
+                        valoresAlterados.value[index] = {
+                            id: collapseItems.value[index].tableData[0].id,
+                            idConta: collapseItems.value[index].tableData[0].idConta,
+                            donoConta: collapseItems.value[index].tableData[0].donoConta,
+                        };
+                    }
+                    // Inclua limiteUsuarios nas alterações
+                    valoresAlterados.value[index].limiteUsuarios = limiteUsuarios;
+                }
 
                 if (!valoresAlterados.value[index]) {
                     valoresAlterados.value[index] = {
-                        tableData: [{
-                            id: collapseItems.value[index].tableData[0].id,
-                            idConta: collapseItems.value[index].tableData[0].idConta,
-                            donoConta: collapseItems.value[index].tableData[0].donoConta
-                        }]
+                        id: collapseItems.value[index].tableData[0].id,
+                        idConta: collapseItems.value[index].tableData[0].idConta,
+                        donoConta: collapseItems.value[index].tableData[0].donoConta,
                     };
                 }
-                valoresAlterados.value[index].tableData[0][field] = newValue;
+
+                collapseItems.value[index].tableData[0][field] = newValue;
+                valoresAlterados.value[index][field] = newValue;
             };
 
             const saveChanges = async () => {
                 try {
-                    console.log(valoresAlterados.value[0]);
-                    let request = await instance.proxy.$api.Post("parceiro/atualizarconfiguracoesconta", valoresAlterados.value[0]);
+                    const payload = {
+                        tableData: Object.values(valoresAlterados.value) 
+                    };
+                    console.log(payload);
+                    await instance.proxy.$api.Post("parceiro/atualizarconfiguracoesconta", payload);
                     valoresAlterados.value = {};
                     hasChanges.value = false;
                 } catch (error) {
@@ -299,6 +335,7 @@
                 cancelChanges,
                 filteredCollapseItems,
                 idParceiro,
+                hasAnyChanges,
             };
         }
     };
