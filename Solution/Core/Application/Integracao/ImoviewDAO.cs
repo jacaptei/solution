@@ -234,7 +234,7 @@ public class ImoviewDAO: IDisposable {
         jsonb_build_object(
             'bairro', jsonb_build_object('nome', ib.bairro ->> 'Nome', 'idCidade', ib.bairro ->> 'IdCidade'
 	,'imoveis' , (SELECT jsonb_agg(jsonb_build_object(
-	'id', ii.""idImovel"",
+	'id', ii.id,
 	'cod', ii.""codImovel"",
 	'data', ii.""dataInclusao"",
 	'atualizadoEm', ii.""dataAtualizacao"",

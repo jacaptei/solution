@@ -51,7 +51,7 @@ public class ImovelReport
 public class ImoviewResponseModel
 {
     public bool erro { get; set; }
-    public int codigo { get; set; }
+    public int? codigo { get; set; }
     public string mensagem { get; set; }
 }
 

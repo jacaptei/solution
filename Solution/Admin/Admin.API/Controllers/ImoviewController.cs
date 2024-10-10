@@ -15,7 +15,7 @@ namespace JaCaptei.Administrativo.API.Controllers;
 
 [Route("api/[controller]")]
 [ApiController]
-//[Authorize(Roles = "ADMIN_GOD,ADMIN_GESTOR,ADMIN_PADRAO")]
+[Authorize(Roles = "ADMIN_GOD,ADMIN_GESTOR,ADMIN_PADRAO")]
 public class ImoviewController : ControllerBase
 {
     private readonly ImoviewService _service;
