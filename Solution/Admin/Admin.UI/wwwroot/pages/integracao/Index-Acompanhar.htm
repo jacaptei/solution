@@ -1,47 +1,57 @@
 ﻿<template>
     <div>
-        <!-- O botão de "Filtrar" ainda está presente, mas o diálogo já abrirá automaticamente -->
-        <el-button type="primary" @click="abrirModalFiltro">Filtro</el-button>
+        <div style="display: flex; width:100%; align-items: center; justify-content:end; margin-bottom: 10px">
+            <el-icon @click="abrirModalFiltro" style="cursor: pointer; color: #409EFF; font-size: 24px;">
+                <Filter />
+            </el-icon>
+        </div>
 
         <!-- Tabela principal de Integrações -->
-        <el-table :data="acompanhar" style="width: 100%" :xs="24" :sm="24" :md="24" :lg="24" class="register-input">
+        <el-table :data="acompanhar" table-layout="auto" class="register-input">
             <!-- Coluna expansível de Integrações -->
             <el-table-column type="expand">
                 <template #default="props">
                     <el-card :style="{ borderColor: '#f5eeeb', borderWidth: '1px', borderStyle: 'solid'}" shadow="never">
                         <!-- Tabela de Bairros dentro da Integração -->
-                        <el-table class="no-bottom-border" :data="props.row.bairros" style="width: 100%">
+                        <el-table :data="props.row.bairros" style="width: 100%" table-layout="auto">
                             <!-- Coluna expansível de Bairros -->
                             <el-table-column type="expand">
                                 <template #default="bairroScope">
                                     <!-- Tabela de Imóveis dentro de cada Bairro -->
                                     <el-card :style="{ borderColor: '#b1b1b1', borderWidth: '1px', borderStyle: 'solid', maxHeight: '400px', overflow: 'hidden' }" shadow="never">
                                         <transition name="fade" mode="out-in">
-                                            <el-table :data="bairroScope.row.bairro.imoveis" height="350" style="width: 100%">
+                                            <el-table :data="bairroScope.row.bairro.imoveis" height="350" style="width: 100%" table-layout="auto">
                                                 <el-table-column label="ID da Importação" prop="id" align="center" />
                                                 <el-table-column label="Código do Imóvel JaCaptei" prop="cod" align="center" />
                                                 <el-table-column label="Código do Imóvel Imoview" prop="imoviewResponse.codigo" align="center" />
-                                                <el-table-column label="Data" prop="data" width="150" align="center">
+                                                <el-table-column label="Data de Importação" prop="data" width="150" align="center">
                                                     <template #default="scope">
                                                         {{ formatarDataHora(scope.row.data) }}
                                                     </template>
                                                 </el-table-column>
                                                 <el-table-column label="Status" prop="status" align="center">
                                                     <template #default="scope">
-                                                        <div style="display: flex; align-items: center;">
-                                                            <div v-if="!scope.row.imoviewResponse.erro">
-                                                                <span style="margin-right:5px;">{{ scope.row.status }}</span>
+                                                        <div style="display: flex; align-items: center; justify-content:center">
+                                                            <div style="display: flex; align-items: center; justify-content:center">
+                                                                <div v-if="!scope.row.imoviewResponse.erro">
+                                                                    <span style="margin-right:5px;">{{ scope.row.status }}</span>
+                                                                </div>
+                                                                <div v-else>
+                                                                    <span style="margin-right:5px;" class="error">{{ scope.row.status }}</span>
+                                                                </div>
+                                                                <el-icon v-if="scope.row.status === 'Concluido'">
+                                                                    <SuccessFilled color="green" />
+                                                                </el-icon>
+                                                                <el-icon v-else-if="scope.row.status === 'Erro'">
+                                                                    <CircleCloseFilled color="red" />
+                                                                </el-icon>
                                                             </div>
-                                                            <div v-else>
-                                                                <span style="margin-right:5px;" class="error">{{ scope.row.status }}</span>
-                                                            </div>
-                                                            <el-icon v-if="scope.row.status === 'Concluido'">
-                                                                <SuccessFilled color="green" />
-                                                            </el-icon>
-                                                            <el-icon v-else-if="scope.row.status === 'Erro'">
-                                                                <CircleCloseFilled color="red" />
-                                                            </el-icon>
                                                         </div>
+                                                    </template>
+                                                </el-table-column>
+                                                <el-table-column label="Atualizado Em" prop="atualizadoEm" align="center">
+                                                    <template #default="scope">
+                                                        {{ formatarDataHora(scope.row.atualizadoEm) }}
                                                     </template>
                                                 </el-table-column>
                                                 <el-table-column label="Resposta" align="center">
@@ -52,11 +62,6 @@
                                                         <div v-else>
                                                             <span class="error">Erro: {{ scope.row.imoviewResponse.mensagem }}</span>
                                                         </div>
-                                                    </template>
-                                                </el-table-column>
-                                                <el-table-column label="Atualizado Em" prop="atualizadoEm" align="center">
-                                                    <template #default="scope">
-                                                        {{ formatarDataHora(scope.row.atualizadoEm) }}
                                                     </template>
                                                 </el-table-column>
                                             </el-table>
@@ -72,6 +77,22 @@
                                     {{ bairroScope.row.bairro.imoveis.length }}
                                 </template>
                             </el-table-column>
+                            <el-table-column label="Status" align="center">
+                                <template #default="bairroScope">
+                                    <div style="display: flex; align-items: center; justify-content: center">
+                                        <span style="margin-right:5px;">{{ bairroScope.row.status }}</span>
+                                        <el-icon v-if="bairroScope.row.status === 'Concluido'">
+                                            <SuccessFilled color="green" />
+                                        </el-icon>
+                                        <el-icon v-else-if="bairroScope.row.status === 'Parcial'">
+                                            <CircleCloseFilled color="orange" />
+                                        </el-icon>
+                                        <el-icon v-else-if="bairroScope.row.status === 'Erro'">
+                                            <CircleCloseFilled color="red" />
+                                        </el-icon>
+                                    </div>
+                                </template>
+                            </el-table-column>
                         </el-table>
                     </el-card>
                 </template>
@@ -80,17 +101,17 @@
             <!-- Colunas principais da Integração -->
             <el-table-column label="Cliente" prop="cliente" />
             <el-table-column label="Plano" prop="plano" />
-            <el-table-column label="Quantidade de Bairros Importados" prop="quantidadeBairros" width="155" align="center">
-                <el-table-column label="Data de Criação" prop="criadoEm">
-                    <template #default="scope">
-                        {{ formatarDataHora(scope.row.criadoEm) }}
-                    </template>
-                </el-table-column>
+            <el-table-column label="Data de Criação" prop="criadoEm">
+                <template #default="scope">
+                    {{ formatarDataHora(scope.row.criadoEm) }}
+                </template>
+            </el-table-column>
+            <el-table-column label="Quantidade de Bairros Importados" prop="quantidadeBairros" align="center">
                 <template #default="scope">
                     {{ quantidadeBairros }}
                 </template>
             </el-table-column>
-            <el-table-column label="Total de Imóveis Importados" prop="totalImoveis" width="125" align="center">
+            <el-table-column label="Total de Imóveis Importados" prop="totalImoveis" align="center">
                 <template #default="scope">
                     {{ totalImoveis }}
                 </template>
@@ -100,16 +121,18 @@
                     {{ formatarDataHora(scope.row.atualizadoEm) }}
                 </template>
             </el-table-column>
-            <el-table-column label="Status" prop="status">
+            <el-table-column label="Status" prop="status" align="center">
                 <template #default="scope">
-                    <div style="display: flex; align-items: center;">
-                        <span style="margin-right:5px;">{{ scope.row.status }}</span>
-                        <el-icon v-if="scope.row.status === 'Concluido'">
-                            <SuccessFilled color="green" />
-                        </el-icon>
-                        <el-icon v-else-if="scope.row.status === 'Erro'">
-                            <CircleCloseFilled color="red" />
-                        </el-icon>
+                    <div style="display: flex; align-items: center; justify-content: center">
+                        <div style="display: flex; align-items: center; justify-content: center">
+                            <span style="margin-right:5px;">{{ scope.row.status }}</span>
+                            <el-icon v-if="scope.row.status === 'Concluido'">
+                                <SuccessFilled color="green" />
+                            </el-icon>
+                            <el-icon v-else-if="scope.row.status === 'Erro'">
+                                <CircleCloseFilled color="red" />
+                            </el-icon>
+                        </div>
                     </div>
                 </template>
             </el-table-column>
@@ -125,7 +148,8 @@
                         <el-option v-for="item in crmOptions"
                                    :key="item.id"
                                    :label="item.nome"
-                                   :value="item.id" />
+                                   :value="item.id"
+                                   :disabled="item.disabled"/>
                     </el-select>
                 </el-col>
                 <el-col :xs="24" :sm="24" :md="24" :lg="24" class="register-input">
@@ -161,7 +185,7 @@
             const totalImoveis = ref(0);
             const crmOptions = ref([
                 { nome: 'IMOVIEW', id: 1 },
-                { nome: 'VISTASOFT', id: 2 },
+                { nome: 'VISTASOFT', id: 2, disabled: true },
             ]);
             const acompanhar = ref([]);
 
@@ -198,41 +222,6 @@
                 return listaCrmIntegracao.value === 1 || listaCrmIntegracao.value === 2;
             };
 
-            const validarUrlParaBuscarParceiroIntegracao = (crm) => {
-                switch (crm) {
-                    case 1:
-                        return instance.proxy.$api.BuildURL("api/imoview/integracao/listar");
-                    case 2:
-                        return instance.proxy.$api.BuildURL("api/vistasoft/integracao/listar");
-                    default:
-                        console.error("CRM inválido:", crm);
-                        return null;
-                }
-            };
-
-            const Buscar = async () => {
-                try {
-                    filtros.value.Integracao = listaIntegracao.value.value;
-                    filtros.value.Cliente = listaIntegracao.value.label;
-                    const url = instance.proxy.$api.BuildURL("api/imoview/integracao/status");
-                    const response = await axios.post(url, filtros.value);
-                    acompanhar.value = [response.data];
-                    totalImoveis.value = acompanhar.value.reduce((total, integracao) => {
-                        if (Array.isArray(integracao.bairros) && integracao.bairros.length > 0) {
-                            return total + integracao.bairros.reduce((bairroTotal, bairro) => {
-                                return bairroTotal + (Array.isArray(bairro.bairro.imoveis) ? bairro.bairro.imoveis.length : 0);
-                            }, 0);
-                        }
-                        return total;
-                    }, 0);
-                    quantidadeBairros.value = acompanhar.value[0].bairros.length;
-                } catch (error) {
-                    console.error("Erro ao buscar integração:", error);
-                } finally {
-                    filtrosVisiveis.value = false;
-                }
-            };
-
             const formatarData = (dataISO) => {
                 if (!dataISO) return '';
                 const data = new Date(dataISO);
@@ -247,18 +236,91 @@
 
             const formatarDataHora = (dataISO) => {
                 const data = new Date(dataISO);
-
                 const dataUTC3 = new Date(data.getTime() - (data.getTimezoneOffset() * 60000)); // Converter para UTC-3
-
                 const dataFormatada = dataUTC3.toLocaleDateString('pt-BR');
-
                 const horarioFormatado = dataUTC3.toLocaleTimeString('pt-BR', {
                     hour: '2-digit',
                     minute: '2-digit',
                     timeZone: 'America/Sao_Paulo'
                 });
-
                 return `${dataFormatada} às ${horarioFormatado}`;
+            };
+
+            const validarUrlParaBuscarParceiroIntegracao = (crm) => {
+                switch (crm) {
+                    case 1:
+                        return instance.proxy.$api.BuildURL("api/imoview/integracao/listar");
+                    case 2:
+                        return instance.proxy.$api.BuildURL("api/vistasoft/integracao/listar");
+                    default:
+                        console.error("CRM inválido:", crm);
+                        return null;
+                }
+            };
+
+            const verificarStatusBairro = (bairro) => {
+                const imoveis = bairro.bairro.imoveis;
+                const temErro = imoveis.some(imovel => imovel.imoviewResponse.erro);
+                const temSucesso = imoveis.some(imovel => !imovel.imoviewResponse.erro);
+                const temPendente = imoveis.some(imovel => imovel.status === 'Pendente');
+
+                if (temErro && temSucesso) return 'Parcial';
+                if (temErro) return 'Erro';
+                if (temPendente) return 'Pendente';
+                return 'Concluido';
+            };
+
+            const verificarStatusIntegracao = (integracao) => {
+                let statusIntegracao = "Concluido";
+                let temParcial = false;
+
+                integracao.bairros.forEach(bairro => {
+                    const statusBairro = verificarStatusBairro(bairro);
+                    if (statusBairro === "Erro") {
+                        statusIntegracao = "Erro";
+                    } else if (statusBairro === "Parcial") {
+                        temParcial = true;
+                    }
+                });
+
+                if (temParcial) return "Parcial";
+                return statusIntegracao;
+            };
+
+            const Buscar = async () => {
+                try {
+                    filtros.value.Integracao = listaIntegracao.value.value;
+                    filtros.value.Cliente = listaIntegracao.value.label;
+                    const url = instance.proxy.$api.BuildURL("api/imoview/integracao/status");
+                    const response = await axios.post(url, filtros.value);
+                    acompanhar.value = [response.data];
+                    acompanhar.value = acompanhar.value.map(integracao => {
+                        return {
+                            ...integracao,
+                            status: verificarStatusIntegracao(integracao),
+                            bairros: integracao.bairros.map(bairro => {
+                                return {
+                                    ...bairro,
+                                    status: verificarStatusBairro(bairro)
+                                };
+                            })
+                        };
+                    });
+                    console.log(acompanhar);
+                    totalImoveis.value = acompanhar.value.reduce((total, integracao) => {
+                        if (Array.isArray(integracao.bairros) && integracao.bairros.length > 0) {
+                            return total + integracao.bairros.reduce((bairroTotal, bairro) => {
+                                return bairroTotal + (Array.isArray(bairro.bairro.imoveis) ? bairro.bairro.imoveis.length : 0);
+                            }, 0);
+                        }
+                        return total;
+                    }, 0);
+                    quantidadeBairros.value = acompanhar.value[0].bairros.length;
+                } catch (error) {
+                    console.error("Erro ao buscar integração:", error);
+                } finally {
+                    filtrosVisiveis.value = false;
+                }
             };
 
             const getListaIntegracoes = async (url) => {
