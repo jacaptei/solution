@@ -13,6 +13,10 @@
                                     <span v-if="$root.usuario.id != item.parceiro.id" style="margin-left:5px; ">
                                         por <b>{{item.parceiro.apelido}}</b>
                                     </span>
+                                    <span style="margin-left:5px; ">
+                                        #PID <b>{{item.parceiro.id}}</b>
+                                    </span>
+
                                 </span>
 
                                 <span v-if="!item.concluido" style="font-size:14px">
@@ -452,7 +456,6 @@
                                                         </div>
                                                     </div>
 
-                                                </div>
 				                        </q-tab-panel>
 
 			                        </q-tab-panels>
@@ -474,16 +477,15 @@
             return {
                 view: "status",
                 onRequest:false,
-                item:this.$models.solicitacao(),
+                //item:this.$models.solicitacao(),
             }
         },
         computed: {},
         props: {
-            solicitacao:	{ type: Object, required: false, default: {}},
+            item:	{ type: Object, required: false, default: {}},
         },
         watch: {},
         created: function () {
-            this.item = this.solicitacao;
         },
         mounted() {
           //  c2("dataAgendamento"    , this.item.dataAgendamento);
