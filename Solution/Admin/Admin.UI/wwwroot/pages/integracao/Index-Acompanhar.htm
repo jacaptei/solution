@@ -18,8 +18,9 @@
                                     <el-card :style="{ borderColor: '#b1b1b1', borderWidth: '1px', borderStyle: 'solid', maxHeight: '400px', overflow: 'hidden' }" shadow="never">
                                         <transition name="fade" mode="out-in">
                                             <el-table :data="bairroScope.row.bairro.imoveis" height="350" style="width: 100%">
-                                                <el-table-column label="ID Imóvel" prop="id" />
-                                                <el-table-column label="Código" prop="cod" />
+                                                <el-table-column label="ID Importação" prop="id" />
+                                                <el-table-column label="Código Imóvel JaCaptei" prop="cod" />
+                                                <el-table-column label="Código Imoview" prop="imoviewResponse.codigo" />
                                                 <el-table-column label="Data" prop="data" />
                                                 <el-table-column label="Status" prop="status" />
                                                 <el-table-column label="Atualizado Em" prop="atualizadoEm" />
@@ -104,8 +105,8 @@
             }
 
             const filtros = ref({
-                Integracao: 0, // Inicialize como um array vazio
-                Cliente: '',    // Inicialize como string vazia
+                Integracao: 0,
+                Cliente: '',
             });
 
             const Buscar = async () => {
