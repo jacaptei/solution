@@ -6,7 +6,7 @@ using RepoDb.Attributes.Parameter.Npgsql;
 namespace JaCaptei.Model.Entities;
 
 [Map("ImportacaoBairroImoview")]
-public class ImportacaoBairroImoview
+public class ImportacaoBairroImoview : IImportacaoBairro
 {
     [Map("id")]
     public int Id { get; set; }
@@ -29,10 +29,4 @@ public class ImportacaoBairroImoview
     [Map("imoveis")]
     [NpgsqlDbType(NpgsqlDbType.Jsonb)]
     public string Imoveis { get; set; }
-
-    //[Map("idCidade")]
-    //public int IdCidade { get; set; }
-
-    //[Map("idBairro")]
-    //public int IdBairro { get; set; }
 }

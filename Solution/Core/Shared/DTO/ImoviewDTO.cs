@@ -255,11 +255,36 @@ public static class ImoviewCampos
 
     public static readonly Proprietario ProprietarioJaCaptei = new()
     {
-        nome       = "JaCaptei",
-        cpfoucnpj  = "51.075.001/0001-36",
-        telefone   = "31 4003-9992",
-        email      = "contato @jacaptei.com.br",
+        nome = "JaCaptei",
+        cpfoucnpj = "51.075.001/0001-36",
+        telefone = "31 4003-9992",
+        email = "contato @jacaptei.com.br",
         percentual = 100
     };
+}
 
+public class ClienteImoview
+{
+    public int Id { get; set; }
+    public string Nome { get; set; }
+    public string CpfCnpj { get; set; }
+    public string Email { get; set; }
+}
+
+public class EmailImoveisInativadosImoview
+{
+    public ClienteImoview Cliente { get; set; }
+    public int IdIntegracao { get; set; }
+    public DateTime DataEnvio { get; set; }
+    public List<ImovelInativadoImoview> Imoveis { get; set; }
+}
+
+public class ImovelInativadoImoview
+{
+    public int Id { get; set; }
+    public string CodJacaptei { get; set; }
+    public string CodImoview { get; set; }
+    public Endereco Endereco { get; set; }
+    public string Descricao { get; set; }
+    public DateTime DataInclusao { get; set; }
 }

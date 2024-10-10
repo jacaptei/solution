@@ -7,6 +7,7 @@ using JaCaptei.Model;
 using JaCaptei.Application.Services;
 using JaCaptei.Model.Model;
 using static System.Net.Mime.MediaTypeNames;
+using System.Runtime.Intrinsics.X86;
 
 namespace JaCaptei.Application{
 
@@ -47,7 +48,25 @@ namespace JaCaptei.Application{
                    entity.endereco.idBairro = (localidade.ObterIdBairroNorm(entity.endereco.idCidade,entity.endereco.bairroNorm)).result.id;
             } catch(Exception ex) { }
 
-            return DAO.Adicionar(entity);
+            appReturn = DAO.Adicionar(entity);
+
+            if(appReturn.status.success && Utils.Validator.IsEmail(entity.proprietario.email)){
+                Mail mail    = new Mail();
+                mail.about   = "Cadastro finalizado e disponível para centenas de corretores.";
+                mail.message = "<b>Olá " + entity.proprietario.apelido + ".</b><br><br>";
+                mail.message += "Seu imóvel, localizado no endereço "+ entity.ObterEndereco() +", já está ativo em nossa plataforma e acessível para diversos corretores e imobiliárias, agilizando o processo de venda.<br><br>";
+                mail.message += "Acesse o imóvel por meio do link: <br>";
+                mail.message += entity.ObterUrlPublica() + "<br><br>";
+                mail.message += "Agradecemos pela confiança e estamos à disposição para qualquer dúvida.<br><br>";
+                mail.message += "Lembrando que as imobiliárias e corretores só terão acesso aos seus dados de contato após a realização de uma visita com um cliente comprador.<br><br>";
+                mail.message += "Toda a comunicação relacionada às visitas e dúvidas será feita exclusivamente por meio da JáCaptei.<br><br>";
+                mail.message += "Atenciosamente,<br>";
+                mail.message += "Equipe JáCaptei";
+                mail.emailTo = entity.proprietario.email;
+                mail.Send();
+            }
+
+            return appReturn;
 
         }
 

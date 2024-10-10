@@ -6,6 +6,7 @@ using JaCaptei.Application.Integracao;
 using JaCaptei.Model;
 using JaCaptei.Model.DTO;
 using JaCaptei.Model.Entities;
+
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -18,7 +19,6 @@ namespace JaCaptei.Administrativo.API.Controllers;
 public class ImoviewController : ControllerBase
 {
     private readonly ImoviewService _service;
-    private readonly string _apiKey = "qnnYE4Fev/v2kRbZ5F9PgEGCkJI3Ixflcl0FADcTGyA=";
     private readonly IHttpClientFactory _httpClientFactory;
     private readonly DBcontext _context;
     private readonly IMapper _mapper;
@@ -48,11 +48,18 @@ public class ImoviewController : ControllerBase
         return Ok(res);
     }
 
-    [HttpPost("ObterImovel")]
-    public async Task<ActionResult<ImoviewAddImovelRequest>> GetFullImovel([FromBody] int id)
+    [HttpGet("integracao/listar")]
+    public async Task<ActionResult<List<IntegracaoComboDTO>>> GetIntegracoesCliente()
     {
-        var res = _mapper.Map<ImoviewAddImovelRequest>(await _service.ObterImovel(id));
-        return Ok(res);
+        var integracoes = await _service.GetIntegracoes();
+        return Ok(integracoes);
+    }
+
+    [HttpPost("integracao/status")]
+    public async Task<ActionResult<IntegracaoReponseDTO>> GetIntegracaoCliente([FromBody] IntegracaoComboDTO integracao)
+    {
+        var integracaoReport = await _service.GetReportIntegracao(integracao);
+        return Ok(integracaoReport);
     }
 
     [HttpPost("integracao/cliente")]
@@ -72,8 +79,7 @@ public class ImoviewController : ControllerBase
         {
             Cliente = new ComboDTO(cliente.id, cliente.nome),
             Plano = new ComboPlanoDTO(plano.id, plano.nome, plano.totalBairros),
-            Integracao = integracao, 
-            Unidades = [],
+            Integracao = (IntegracaoImoview?)integracao, 
             Crms = [new(1, "Imoview"), new (2,"VistaSoft")]
         };
         return Ok(res);
@@ -82,30 +88,10 @@ public class ImoviewController : ControllerBase
     [HttpPost("integracao/cliente/integrar")]
     public async Task<ActionResult<IntegrarClienteResponse>> IntegrarCliente([FromBody] IntegracaoImoviewDTO dto)
     {
-        //List<BairroDTO> bairros = dto.Bairros.ConvertAll(b => new BairroDTO()
-        //{
-        //    Id = b.Id,
-        //    IdCidade = b.IdCidade,
-        //    IdEstado = b.IdEstado,
-        //    Nome = b.Value
-        //});
-        //var integracao = new IntegracaoImoview()
-        //{
-        //    Id = 0,
-        //    ChaveApi = dto.ChaveApi,
-        //    CodUnidade = dto.CodUnidade,
-        //    CodUsuario = dto.CodUsuario,
-        //    IdCliente = dto.IdCliente,
-        //    IdOperador = dto.IdOperador,
-        //    IdPlano = dto.IdPlano,
-        //    Bairros = Newtonsoft.Json.JsonConvert.SerializeObject(bairros),
-        //};
-        //var res = await _service.IntegrarCliente(integracao);
         var jsonInString = Newtonsoft.Json.JsonConvert.SerializeObject(dto);
         var content = new StringContent(jsonInString, Encoding.UTF8, "application/json");
         var client = _httpClientFactory.CreateClient("");
         client.DefaultRequestHeaders.Add("Accept","application/json");
-        //var url = "https://integrarimoviewfunction20240801090029.azurewebsites.net/api/integracao/cliente/integrar";
         var url = Config.settings.IntegracaoAzureUrl;
         var result = await client.PostAsync(url, content);
         var res = await result.Content.ReadAsStringAsync();
@@ -127,6 +113,5 @@ public record IntegracaoReponseDTO
     public ComboDTO Cliente { get; set; }
     public ComboPlanoDTO Plano { get; set; }
     public Model.Entities.IntegracaoImoview? Integracao { get; set; }
-    public List<ComboDTO> Unidades { get; set; }
     public List<ComboDTO> Crms { get; set; }
 }

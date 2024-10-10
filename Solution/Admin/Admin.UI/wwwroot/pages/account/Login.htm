@@ -88,25 +88,9 @@
 
                     if(this.$validator.is(request))
                         this.$root.SignIn(request.result);
+                    else
+					    this.$root.loading = false;
 
-					//this.$root.loading = false;
-						
-
-					/*
-					axios.post(this.$api.BuildURL("usuario/autenticar"),this.$root.usuario).then((request) => {
-							//c2("request.data",request.data);
-							if(request.data.status.success)
-                                this.$root.SignIn(request.data.result);
-							else
-                                this.$tools.Alert("Não foi possível autenticar.");
-                        //alert("Não foi possível atender a requisição");
-						}).catch((error) => {
-                            this.$root.loading = false;
-                            this.$tools.HandleErrors(error);
-						}).finally(() => {
-                            window.setTimeout(() => { this.$root.loading = false;},400);
-						});
-						*/
 				}
 
 			}

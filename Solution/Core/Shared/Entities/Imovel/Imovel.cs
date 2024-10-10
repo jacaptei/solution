@@ -149,6 +149,20 @@ namespace JaCaptei.Model {
                 return res;
 
         }
+        public string ObterEndereco(){
+                string res = "";
+                if(endereco is not null){
+                    res += Utils.Validator.Is(endereco.logradouro)      ? (endereco.logradouro +", ") : "";
+                    res += Utils.Validator.Is(endereco.numero)          ? (endereco.numero     +", ") : "";
+                    res += Utils.Validator.Is(endereco.complementoTipo) ? (endereco.complementoTipo+", ") : "";
+                    res += Utils.Validator.Is(endereco.complemento)     ? (endereco.complemento+", ") : "";
+                    res += Utils.Validator.Is(endereco.bairro)          ? (endereco.bairro+ ", ") : "";
+                    res += Utils.Validator.Is(endereco.cidade)          ? (endereco.cidade     +", ") : "";
+                    res += Utils.Validator.Is(endereco.estado)          ? (endereco.estado) : "";
+                    res += Utils.Validator.Is(endereco.cep)             ? (", CEP: " + endereco.cep) : "";
+                }
+                return res;
+        }
 
 
 

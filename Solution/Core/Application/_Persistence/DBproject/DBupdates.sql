@@ -1,4 +1,4 @@
-
+/*
 ALTER TABLE "Imovel" ADD COLUMN "motivoInativacao" VARCHAR(100) DEFAULT '';
 ALTER TABLE "Imovel" ADD COLUMN excluido BOOLEAN DEFAULT FALSE;
 
@@ -39,5 +39,7 @@ UPDATE "Solicitacao" SET "obsAgendamento" = descricao;
 UPDATE "Solicitacao" SET visita = true, "dataAgendamento" = "dataVisita" where EXTRACT(YEAR FROM "dataVisita") > 2000;
 UPDATE "Solicitacao" SET "dataAgendamento" = "dataVisita";
 UPDATE "Solicitacao" SET captacao = true where EXTRACT(YEAR FROM "dataVisita") < 2000;
-UPDATE "Solicitacao" SET proprietarioNaoEncontrado = true where "proprietarioCaptacao" = '';
+UPDATE "Solicitacao" SET "proprietarioNaoEncontrado" = true where "proprietarioCaptacao" = '';
+*/
 
+-- ----------- ATUALIZADO EM 03 OUT 2024 -----------
