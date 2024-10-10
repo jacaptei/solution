@@ -225,7 +225,6 @@
                     console.error("URL não pode ser construída.");
                     return;
                 }
-
                 try {
                     const response = await instance.proxy.$api.Get(url);
                     collapseItems.value = response.result.map((item, index) => {
@@ -254,6 +253,11 @@
                             }]
                         };
                     });
+                    collapseItems.value.sort((a, b) => {
+                        const isADono = a.tableData[0].donoConta ? 1 : 0;
+                        const isBDono = b.tableData[0].donoConta ? 1 : 0;
+                        return isBDono - isADono;
+                    });
                 } catch (error) {
                     console.error('Erro ao buscar operadores relacionados:', error);
                 }
@@ -272,13 +276,10 @@
                 collapseItems.value[index].tableData[0][field] = newValue;
 
                 if (field === 'idPlano') {
-                    // Obtenha o limite de usuários correspondente ao novo plano
                     const limiteUsuarios = planoUsuarioLimites[newValue] || 0;
 
-                    // Atualize o campo limiteUsuarios
                     collapseItems.value[index].tableData[0].limiteUsuarios = limiteUsuarios;
 
-                    // Adicione o novo limite de usuários a valoresAlterados
                     if (!valoresAlterados.value[index]) {
                         valoresAlterados.value[index] = {
                             id: collapseItems.value[index].tableData[0].id,
@@ -286,7 +287,6 @@
                             donoConta: collapseItems.value[index].tableData[0].donoConta,
                         };
                     }
-                    // Inclua limiteUsuarios nas alterações
                     valoresAlterados.value[index].limiteUsuarios = limiteUsuarios;
                 }
 
@@ -307,10 +307,10 @@
                     const payload = {
                         tableData: Object.values(valoresAlterados.value) 
                     };
-                    console.log(payload);
                     await instance.proxy.$api.Post("parceiro/atualizarconfiguracoesconta", payload);
+                    await ObterContaPorId();
                     valoresAlterados.value = {};
-                    hasChanges.value = false;
+                    hasChanges.value = hasChanges.value.map(() => false);
                 } catch (error) {
                     console.error('Erro ao salvar mudanças:', error);
                 }
@@ -318,12 +318,16 @@
 
             const cancelChanges = () => {
                 console.log('Cancelando alterações...');
-                hasChanges.value = false;
+                hasChanges.value = hasChanges.value.map(() => false);
             };
 
             onMounted(() => {
                 idConta.value = null;
-                ObterContaPorId();
+                ObterContaPorId().then(() => {
+                    if (collapseItems.value.length > 0) {
+                        activeNames.value = [collapseItems.value[0].name];
+                    }
+                });
             });
 
             return {

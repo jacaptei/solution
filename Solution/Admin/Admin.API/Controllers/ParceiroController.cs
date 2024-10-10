@@ -161,9 +161,11 @@ namespace JaCaptei.Administrativo.API.Controllers
                 return Result(appReturn);
             }
 
+            Model.Admin operador = ObterAdminAutenticado();
+
             foreach (var item in request.tableData)
             {
-                appReturn = service.AtualizarConfiguracoesConta(item);
+                appReturn = service.AtualizarConfiguracoesConta(item, operador);
                 return Result(appReturn);
             }
 

@@ -41,7 +41,14 @@ CREATE	TABLE "Conta"(
     "valorMensal"           MONEY               DEFAULT 0.0,
 	obs						VARCHAR(1200)		DEFAULT '',
 	"dataAtualizacao"		TIMESTAMP WITHOUT TIME ZONE		DEFAULT CURRENT_TIMESTAMP, --AT TIME ZONE 'america/bahia')
-	data   					TIMESTAMP WITHOUT TIME ZONE		DEFAULT CURRENT_TIMESTAMP --AT TIME ZONE 'america/bahia')
+	data   					TIMESTAMP WITHOUT TIME ZONE		DEFAULT CURRENT_TIMESTAMP, --AT TIME ZONE 'america/bahia')
+	"inseridoPorId"  		INT				    DEFAULT 0,
+	"inseridoPorNome"   	VARCHAR(120) 		DEFAULT 'SITE',
+    "inseridoPorPerfil"  	VARCHAR(25) 		DEFAULT 'SITE',
+	"atualizadoPorId"    	INT				    DEFAULT 0,
+	"atualizadoPorNome"   	VARCHAR(120) 		DEFAULT '',
+    "atualizadoPorPerfil"  	VARCHAR(25) 		DEFAULT '',
+
 );
 ALTER TABLE "Conta" ADD CONSTRAINT pk_Conta             PRIMARY KEY (id);
 ALTER TABLE "Conta"	ADD CONSTRAINT fk_Conta_Plano	    FOREIGN KEY ("idPlano")         REFERENCES "Plano"(id);

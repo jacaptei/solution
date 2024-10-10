@@ -7,7 +7,7 @@
 
     public class ContaId
     {
-        public int id { get; set; }
+        public int? id { get; set; }
         public string? nome { get; set; }
         public int? idConta { get; set; }
         public int? idPlano { get; set; }

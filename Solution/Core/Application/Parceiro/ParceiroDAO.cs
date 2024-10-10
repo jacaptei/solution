@@ -530,15 +530,14 @@ namespace JaCaptei.Application{
             return appReturn;
         }
 
-        public AppReturn AtualizarPlanoParceiro(int idPlano, int idConta)
+        public AppReturn AtualizarPlanoParceiro(int idPlano, int idConta, int atualizadoPorId, string atualizadoPorNome)
         {
             var appReturn = new AppReturn();
             try
             {
                 using (var conn = new DBcontext().GetConn())
                 {
-                    var result = conn.Update("Parceiro", new { idPlano = idPlano }, where: new { idConta = idConta });
-
+                    var result = conn.Update("Parceiro", new { idPlano = idPlano, atualizadoPorId = atualizadoPorId, atualizadoPorNome = atualizadoPorNome, dataAtualizacao = DateTime.Now }, where: new { idConta = idConta });
 
                     if (result > 0)
                     {
@@ -557,14 +556,14 @@ namespace JaCaptei.Application{
             return appReturn;
         }
 
-        public AppReturn AtualizarPlanoConta(int idPlano, int limiteUsuarios, int idConta)
+        public AppReturn AtualizarPlanoConta(int idPlano, int limiteUsuarios, int idConta, int atualizadoPorId, string atualizadoPorNome)
         {
             var appReturn = new AppReturn();
             try
             {
                 using (var conn = new DBcontext().GetConn())
                 {
-                    var result = conn.Update("Conta", new { idPlano = idPlano, limiteUsuarios = limiteUsuarios }, where: new { id = idConta });
+                    var result = conn.Update("Conta", new { idPlano = idPlano, limiteUsuarios = limiteUsuarios, atualizadoPorId = atualizadoPorId, atualizadoPorNome = atualizadoPorNome, dataAtualizacao = DateTime.Now }, where: new { id = idConta });
                     if (result > 0)
                     {
                         appReturn.result = "Plano do parceiro atualizado com sucesso!";
@@ -578,6 +577,144 @@ namespace JaCaptei.Application{
             catch (Exception ex)
             {
                 throw new Exception("Erro ao atualizar o plano do parceiro.", ex);
+            }
+            return appReturn;
+        }
+        public AppReturn AtualizarQuantidadeUsuariosConta(int limiteUsuarios, int idConta, int atualizadoPorId, string atualizadoPorNome)
+        {
+            var appReturn = new AppReturn();
+            try
+            {
+                using (var conn = new DBcontext().GetConn())
+                {
+                    var result = conn.Update("Conta", new { limiteUsuarios = limiteUsuarios, atualizadoPorId = atualizadoPorId, atualizadoPorNome = atualizadoPorNome, dataAtualizacao = DateTime.Now }, where: new { id = idConta });
+                    if (result > 0)
+                    {
+                        appReturn.result = "Plano do parceiro atualizado com sucesso!";
+                    }
+                    else
+                    {
+                        appReturn.result = "Nenhum parceiro encontrado com o ID fornecido.";
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("Erro ao atualizar o plano do parceiro.", ex);
+            }
+            return appReturn;
+        }
+
+        public AppReturn InativarConta(bool ativo, int idConta, int atualizadoPorId, string atualizadoPorNome)
+        {
+            var appReturn = new AppReturn();
+            try
+            {
+                using (var conn = new DBcontext().GetConn())
+                {
+                    var result = conn.Update("Conta", new { ativo = ativo, atualizadoPorId = atualizadoPorId, atualizadoPorNome = atualizadoPorNome, status = "INATIVO", dataAtualizacao = DateTime.Now }, where: new { id = idConta });
+                    if (result > 0)
+                    {
+                        appReturn.result = "Plano do parceiro atualizado com sucesso!";
+                    }
+                    else
+                    {
+                        appReturn.result = "Nenhum parceiro encontrado com o ID fornecido.";
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("Erro ao atualizar o plano do parceiro.", ex);
+            }
+            return appReturn;
+        }
+
+        public AppReturn InativarParceirosAssociadosConta(bool ativo, int idConta, int atualizadoPorId, string atualizadoPorNome)
+        {
+            var appReturn = new AppReturn();
+            try
+            {
+                using (var conn = new DBcontext().GetConn())
+                {
+                    var result = conn.Update("Parceiro", new { ativo = ativo, status = "INATIVO", atualizadoPorId = atualizadoPorId, atualizadoPorNome = atualizadoPorNome, dataAtualizacao = DateTime.Now }, where: new { idConta = idConta });
+                    if (result > 0)
+                    {
+                        appReturn.result = "Plano do parceiro atualizado com sucesso!";
+                    }
+                    else
+                    {
+                        appReturn.result = "Nenhum parceiro encontrado com o ID fornecido.";
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("Erro ao atualizar o plano do parceiro.", ex);
+            }
+            return appReturn;
+        }
+        public AppReturn InativarParceiro(int id, bool ativo, int idConta, int atualizadoPorId, string atualizadoPorNome)
+        {
+            var appReturn = new AppReturn();
+            try
+            {
+                using (var conn = new DBcontext().GetConn())
+                {
+                    var result = conn.Update("Parceiro", new { ativo = ativo, status = "INATIVO", atualizadoPorId = atualizadoPorId, atualizadoPorNome = atualizadoPorNome, dataAtualizacao = DateTime.Now }, where: new { id = id, idConta = idConta });
+                    if (result > 0)
+                    {
+                       
+                        appReturn.result = "Plano do parceiro inativado com sucesso!";
+                    }
+                    else
+                    {
+                        appReturn.result = "Nenhum parceiro encontrado com o ID fornecido.";
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("Erro ao atualizar ao inativar o parceiro.", ex);
+            }
+            return appReturn;
+        }
+        public AppReturn CorrigirQuantidadeUsuariosAtivos(int idConta, int ajuste, int atualizadoPorId, string atualizadoPorNome)
+        {
+            var appReturn = new AppReturn();
+            try
+            {
+                using (var conn = new DBcontext().GetConn())
+                {
+                    Conta conta = conn.Query<Conta>(e => e.id == idConta).FirstOrDefault();
+                    if (conta != null)
+                    {
+                        int totalUsuariosAtuais = conta.totalUsuarios;
+
+                        int novoTotalUsuarios = totalUsuariosAtuais + ajuste;
+
+                        var result = conn.Update("Conta",
+                            new { totalUsuarios = novoTotalUsuarios, atualizadoPorId = atualizadoPorId, atualizadoPorNome = atualizadoPorNome, dataAtualizacao = DateTime.Now },
+                        where: new { id = idConta });
+
+                        if (result > 0)
+                        {
+                            appReturn.result = "Quantidade de usuários atualizada com sucesso!";
+                        }
+                        else
+                        {
+                            appReturn.result = "Nenhum parceiro encontrado para atualizar a quantidade de usuários.";
+                        }
+                    }
+                    else
+                    {
+                        appReturn.result = "Nenhum parceiro encontrado para o ID da conta fornecido.";
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("Erro ao corrigir a quantidade de usuários ativos.", ex);
             }
             return appReturn;
         }

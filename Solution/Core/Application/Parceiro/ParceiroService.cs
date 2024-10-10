@@ -68,31 +68,56 @@ namespace JaCaptei.Application
 
         }
 
-        public AppReturn AtualizarConfiguracoesConta(ContaId entity)
+        public AppReturn AtualizarConfiguracoesConta(ContaId entity, Model.Admin operador)
         {
             var appReturn = new AppReturn();
-
             try
             {
-                // Validação da entidade
                 if (entity == null || entity.id == 0)
                 {
                     appReturn.result = "Entidade Parceiro inválida.";
                     return appReturn;
                 }
 
-                // Obter informações do parceiro
-                var parceiroAtual = DAO.ObterPorId(entity.id);
+                var parceiroAtual = DAO.ObterPorId(entity.id.Value);
                 if (parceiroAtual == null)
                 {
                     appReturn.result = "Parceiro não encontrado.";
                     return appReturn;
                 }
 
-                if (entity.idPlano.HasValue && entity.idConta.HasValue && entity.limiteUsuarios.HasValue)
+                if (entity.idPlano.HasValue && entity.idConta.HasValue)
                 {
-                    DAO.AtualizarPlanoParceiro(entity.idPlano.Value, entity.idConta.Value);
-                    DAO.AtualizarPlanoConta(entity.idPlano.Value, entity.limiteUsuarios.Value, entity.idConta.Value);
+                    DAO.AtualizarPlanoParceiro(entity.idPlano.Value, entity.idConta.Value, operador.id, operador.nome);
+                    if (entity.limiteUsuarios.HasValue)
+                    {
+                        DAO.AtualizarPlanoConta(entity.idPlano.Value, entity.limiteUsuarios.Value, entity.idConta.Value, operador.id, operador.nome);
+                    }
+                }
+                else if (entity.limiteUsuarios.HasValue && entity.idConta.HasValue)
+                {
+                    DAO.AtualizarQuantidadeUsuariosConta(entity.limiteUsuarios.Value, entity.idConta.Value, operador.id, operador.nome);
+                }
+
+                if (entity.ativo.HasValue && entity.idConta.HasValue && entity.id.HasValue && entity.donoConta.HasValue)
+                {
+                    if (entity.donoConta.Value)
+                    {
+                        DAO.InativarConta(entity.ativo.Value, entity.idConta.Value, operador.id, operador.nome);
+                        DAO.InativarParceirosAssociadosConta(entity.ativo.Value, entity.idConta.Value, operador.id, operador.nome);
+                    }
+                    else
+                    {
+                        DAO.InativarParceiro(entity.id.Value, entity.ativo.Value, entity.idConta.Value, operador.id, operador.nome);
+                        if (entity.ativo.Value)
+                        {
+                            DAO.CorrigirQuantidadeUsuariosAtivos(entity.idConta.Value, 1, operador.id, operador.nome);
+                        }
+                        else
+                        {
+                            DAO.CorrigirQuantidadeUsuariosAtivos(entity.idConta.Value, -1, operador.id, operador.nome);
+                        }
+                    }
                 }
 
                 //// Atualizar as configurações do parceiro
