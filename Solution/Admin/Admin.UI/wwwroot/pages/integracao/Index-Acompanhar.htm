@@ -18,12 +18,20 @@
                                     <el-card :style="{ borderColor: '#b1b1b1', borderWidth: '1px', borderStyle: 'solid', maxHeight: '400px', overflow: 'hidden' }" shadow="never">
                                         <transition name="fade" mode="out-in">
                                             <el-table :data="bairroScope.row.bairro.imoveis" height="350" style="width: 100%">
-                                                <el-table-column label="ID Importação" prop="id" />
-                                                <el-table-column label="Código Imóvel JaCaptei" prop="cod" />
-                                                <el-table-column label="Código Imoview" prop="imoviewResponse.codigo" />
-                                                <el-table-column label="Data" prop="data" />
+                                                <el-table-column label="ID da Importação" prop="id" />
+                                                <el-table-column label="Código do Imóvel JaCaptei" prop="cod" />
+                                                <el-table-column label="Código do Imóvel Imoview" prop="imoviewResponse.codigo" />
+                                                <el-table-column label="Data" prop="data">
+                                                    <template #default="scope">
+                                                        {{ formatarDataHora(scope.row.data) }}
+                                                    </template>
+                                                </el-table-column>
                                                 <el-table-column label="Status" prop="status" />
-                                                <el-table-column label="Atualizado Em" prop="atualizadoEm" />
+                                                <el-table-column label="Atualizado Em" prop="atualizadoEm">
+                                                    <template #default="scope">
+                                                        {{ formatarDataHora(scope.row.atualizadoEm) }}
+                                                    </template>
+                                                </el-table-column>
                                                 <el-table-column label="Resposta">
                                                     <template #default="scope">
                                                         <div v-if="!scope.row.imoviewResponse.erro">
@@ -50,31 +58,44 @@
             <!-- Colunas principais da Integração -->
             <el-table-column label="Cliente" prop="cliente" />
             <el-table-column label="Plano" prop="plano" />
-            <el-table-column label="Data de Criação" prop="criadoEm" />
-            <el-table-column label="Última Atualização" prop="atualizadoEm" />
+            <el-table-column label="Data de Criação" prop="criadoEm">
+                <template #default="scope">
+                    {{ formatarDataHora(scope.row.criadoEm) }}
+                </template>
+            </el-table-column>
+            <el-table-column label="Última Atualização" prop="atualizadoEm">
+                <template #default="scope">
+                    {{ formatarDataHora(scope.row.atualizadoEm) }}
+                </template>
+            </el-table-column>
 
         </el-table>
     </div>
 
-    <el-dialog v-model="filtrosVisiveis"
-               title="Filtro"
-               width="500"
-               align-center>
-        <div style="display: flex; flex-direction: column;">
-            <span>Integração</span>
-            <el-select v-model="listaIntegracao"
-                       placeholder="Escolha o Parceiro"
-                       style="width: 240px">
-                <el-option v-for="item in options"
-                           :key="item.value"
-                           :label="item.label"
-                           :value="item" />
-            </el-select>
+    <el-dialog v-model="filtrosVisiveis" title="Filtro" width="500" align-center>
+        <div style="display: flex; width: 100%">
+            <el-row gutter=20>
+                <el-col :xs="24" :sm="24" :md="24" :lg="24" class="register-input">
+                    <span>Integração CRM</span>
+                    <el-select v-model="listaCrmIntegracao" @change="filtrarParceiroIntegracao" placeholder="Escolha o CRM" style="width: 100%">
+                        <el-option v-for="item in crmOptions"
+                                   :key="item.id"
+                                   :label="item.nome"
+                                   :value="item.id" />
+                    </el-select>
+                </el-col>
+                <el-col :xs="24" :sm="24" :md="24" :lg="24" class="register-input">
+                    <span>Integração Parceiro</span>
+                    <el-select :disabled="!isDisabled()" v-model="listaIntegracao" placeholder="Escolha o Parceiro" style="width: 100%">
+                        <el-option v-for="item in options" :key="item.value" :label="item.label" :value="item" />
+                    </el-select>
+                </el-col>
+            </el-row>
         </div>
 
         <template #footer>
             <div class="dialog-footer">
-                <el-button @click="filtrosVisiveis = false">Cancelar</el-button>
+                <el-button @click="fecharModal">Cancelar</el-button>
                 <el-button type="primary" @click="Buscar">Aplicar Filtros</el-button>
             </div>
         </template>
@@ -85,29 +106,63 @@
     import { ref, onMounted, getCurrentInstance } from 'vue';
     export default {
         setup() {
-            const filtrosVisiveis = ref(false);
-            const idIntegracao = ref(null);
             const collapseItems = ref([]);
+            const idIntegracao = ref(null);
             const listaIntegracao = ref([]);
+            const listaCrmIntegracao = ref([]);
+            const filtrosVisiveis = ref(false);
             const instance = getCurrentInstance();
             const options = ref({});
+            const crmOptions = ref([
+                { nome: 'IMOVIEW', id: 1 },
+                { nome: 'VISTASOFT', id: 2 },
+            ]);
             const acompanhar = ref([]);
 
-            onMounted(async () => {
+            onMounted(() => {
                 setTimeout(() => {
                     filtrosVisiveis.value = true;
                 }, 300);
-                await getListaIntegracoes();
             });
 
             const abrirModalFiltro = () => {
                 filtrosVisiveis.value = true;
-            }
+            };
+
+            const fecharModal = () => {
+                filtrosVisiveis.value = false;
+            };
 
             const filtros = ref({
                 Integracao: 0,
                 Cliente: '',
             });
+
+            const filtrarParceiroIntegracao = async (crm) => {
+                const url = validarUrlParaBuscarParceiroIntegracao(crm);
+                if (!url) {
+                    console.error("URL inválida para o parceiro de integração.");
+                    return;
+                }
+                await getListaIntegracoes(url);
+                isDisabled();
+            };
+
+            const isDisabled = () => {
+                return listaCrmIntegracao.value === 1 || listaCrmIntegracao.value === 2;
+            };
+
+            const validarUrlParaBuscarParceiroIntegracao = (crm) => {
+                switch (crm) {
+                    case 1:
+                        return instance.proxy.$api.BuildURL("api/imoview/integracao/listar"); // Retorna a URL
+                    case 2:
+                        return instance.proxy.$api.BuildURL("api/vistasoft/integracao/listar"); // Retorna a URL
+                    default:
+                        console.error("CRM inválido:", crm); // Log de erro
+                        return null; // Retorna null para indicar um erro
+                }
+            };
 
             const Buscar = async () => {
                 try {
@@ -116,7 +171,6 @@
                     const url = instance.proxy.$api.BuildURL("api/imoview/integracao/status");
                     const response = await axios.post(url, filtros.value);
                     acompanhar.value = [response.data];
-
                 } catch (error) {
                     console.error("Erro ao buscar integração:", error);
                 } finally {
@@ -124,31 +178,44 @@
                 }
             };
 
-            const getListaIntegracoes = async () => {
+            const formatarData = (dataISO) => {
+                if (!dataISO) return '';
+                const data = new Date(dataISO);
+                return data.toLocaleDateString('pt-BR', { timeZone: 'UTC' });  // Formato dd/mm/aaaa
+            };
+
+            const formatarHorario = (dataISO) => {
+                if (!dataISO) return '';
+                const data = new Date(dataISO);
+                return data.toLocaleTimeString('pt-BR', { timeZone: 'UTC', hour: '2-digit', minute: '2-digit' });  // Formato HH:mm
+            };
+
+            const formatarDataHora = (dataISO) => {
+                const data = new Date(dataISO);
+
+                const dataUTC3 = new Date(data.getTime() - (data.getTimezoneOffset() * 60000)); // Converter para UTC-3
+
+                const dataFormatada = dataUTC3.toLocaleDateString('pt-BR');
+
+                const horarioFormatado = dataUTC3.toLocaleTimeString('pt-BR', {
+                    hour: '2-digit',
+                    minute: '2-digit',
+                    timeZone: 'America/Sao_Paulo'
+                });
+
+                return `${dataFormatada} às ${horarioFormatado}`;
+            };
+
+            const getListaIntegracoes = async (url) => {
                 try {
-                    const url = instance.proxy.$api.BuildURL("api/imoview/integracao/listar");
-                    const response = await axios.get(url);
-                    options.value = response.data.map(item => ({
+                    const { data } = await axios.get(url); // Desestrutura o response
+                    options.value = data.map(item => ({
                         value: item.integracao,
                         label: item.cliente
                     }));
-                    console.log(options);
                 } catch (error) {
                     console.error('Erro ao buscar integrações:', error);
                 }
-            };
-
-            const Alterar = (scope) => {
-                console.log('Alterando', scope.row.id);
-            };
-
-            const Excluir = (scope) => {
-                console.log('Excluindo', scope.row.id);
-            };
-
-            const ToggleAtivar = (scope) => {
-                scope.row.ativo = !scope.row.ativo;
-                console.log('Ativando/Desativando', scope.row.id);
             };
 
             return {
@@ -159,7 +226,15 @@
                 idIntegracao,
                 listaIntegracao,
                 options,
-                abrirModalFiltro
+                abrirModalFiltro,
+                formatarData,
+                formatarHorario,
+                formatarDataHora,
+                fecharModal,
+                crmOptions,
+                listaCrmIntegracao,
+                filtrarParceiroIntegracao,
+                isDisabled
             };
         },
     };
@@ -174,7 +249,7 @@
         color: red;
     }
 
-    .no-bottom-border .el-table__body-wrapper {
-        border-bottom: none !important;
+    .el-dialog__title {
+        color: #0072ff;
     }
 </style>
