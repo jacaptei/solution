@@ -539,7 +539,7 @@ public class ImoviewService : IDisposable, IIntegracaoService
                         if (tipoMapeado == null)
                         {
                             _logger?.LogWarning("Tipo não mapeado para o imovel: {id}, tipo: {tipo}", import.CodImovel, request.codigotipo);
-                            request.codigotipo = 1;
+                            request.codigotipo = -1;
                         }
                     }
                     var requestBody = Newtonsoft.Json.JsonConvert.SerializeObject(request);
@@ -580,7 +580,7 @@ public class ImoviewService : IDisposable, IIntegracaoService
                         if (tipoMapeado == null)
                         {
                             _logger?.LogWarning("Tipo não mapeado para o imovel: {id}, tipo: {tipo}", import.CodImovel, request.codigotipo);
-                            request.codigotipo = 1;
+                            request.codigotipo = -1;
                         }
                     }
                     var requestBody = Newtonsoft.Json.JsonConvert.SerializeObject(request);

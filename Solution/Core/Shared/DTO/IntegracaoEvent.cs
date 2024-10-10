@@ -44,14 +44,14 @@ public class ImovelReport
     public string cod { get; set; }
     public DateTime data { get; set; }
     public string status { get; set; }
-    public DateTime atualizadoEm { get; set; }
+    public string atualizadoEm { get; set; }
     public ImoviewResponseModel imoviewResponse { get; set; }
 }
 
 public class ImoviewResponseModel
 {
     public bool erro { get; set; }
-    public int codigo { get; set; }
+    public int? codigo { get; set; }
     public string mensagem { get; set; }
 }
 
@@ -59,7 +59,7 @@ public class IntegracaoReport
 {
     public string plano { get; set; }
     public string status { get; set; }
-    public List<Bairro> bairros { get; set; }
+    public List<BairroReportModel> bairros { get; set; }
     public string cliente { get; set; }
     public DateTime criadoEm { get; set; }
     public int integracao { get; set; }

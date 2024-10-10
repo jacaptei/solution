@@ -215,7 +215,7 @@ public class ImoviewDAO: IDisposable {
 
     internal async Task<List<IntegracaoComboDTO>> GetIntegracoes()
     {
-        const string queryIntegracoesCombo = "SELECT id 'Integracao', p.nome 'Cliente' FROM \"IntegracaoImoview\" i INNER JOIN \"Parceiro\" p ON p.id = i.\"idCliente\" ";
+        const string queryIntegracoesCombo = "SELECT i.id as \"Integracao\", p.nome as \"Cliente\"  FROM \"IntegracaoImoview\" i INNER JOIN \"Parceiro\"   p ON p.id = i.\"idCliente\"  ";
         var res = await _conn.ExecuteQueryAsync<IntegracaoComboDTO>(queryIntegracoesCombo);
         return res.ToList();
     }
@@ -234,7 +234,7 @@ public class ImoviewDAO: IDisposable {
         jsonb_build_object(
             'bairro', jsonb_build_object('nome', ib.bairro ->> 'Nome', 'idCidade', ib.bairro ->> 'IdCidade'
 	,'imoveis' , (SELECT jsonb_agg(jsonb_build_object(
-	'id', ii.""idImovel"",
+	'id', ii.id,
 	'cod', ii.""codImovel"",
 	'data', ii.""dataInclusao"",
 	'atualizadoEm', ii.""dataAtualizacao"",
@@ -252,7 +252,8 @@ FROM
     INNER JOIN ""Parceiro"" p ON p.id = i.""idCliente"" 
     INNER JOIN ""Plano"" pl ON pl.id = i.""idPlano""
 WHERE i.id = @idIntegracao;";
-        var report = (await _conn.ExecuteQueryAsync<IntegracaoReport>(queryReport, new { idIntegracao })).FirstOrDefault();
+        var reportStr = (await _conn.ExecuteQueryAsync<string>(queryReport, new { idIntegracao })).FirstOrDefault();
+        var report= JsonConvert.DeserializeObject<IntegracaoReport>(reportStr);
         return report;
     }
 
