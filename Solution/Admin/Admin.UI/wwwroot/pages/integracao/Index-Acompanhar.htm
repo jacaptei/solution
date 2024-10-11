@@ -13,14 +13,14 @@
                 <template #default="props">
                     <el-card :style="{ borderColor: '#b1b1b1', borderWidth: '1px', height: auto, borderStyle: 'solid'}" shadow="never">
                         <!-- Tabela de Bairros dentro da Integração -->
-                        <el-table :data="props.row.bairros" style="width: 100%" height="auto" table-layout="auto" :header-cell-style="{ fontWeight: 'bold' }">
+                        <el-table :data="props.row.bairros" height="auto" table-layout="auto" :header-cell-style="{ fontWeight: 'bold' }">
                             <!-- Coluna expansível de Bairros -->
                             <el-table-column type="expand">
                                 <template #default="bairroScope">
                                     <!-- Tabela de Imóveis dentro de cada Bairro -->
                                     <el-card :style="{ borderColor: '#b1b1b1', borderWidth: '1px', borderStyle: 'solid'}" shadow="never">
                                         <transition name="fade" mode="out-in">
-                                            <el-table :data="bairroScope.row.bairro.imoveis" max-height="650" style="width: 100%" table-layout="auto" :header-cell-style="{ fontWeight: 'bold' }" fixed-header>
+                                            <el-table :data="bairroScope.row.bairro.imoveis" max-height="650" table-layout="auto" :header-cell-style="{ fontWeight: 'bold' }" fixed-header>
                                                 <el-table-column label="ID da Importação" prop="id" align="center" />
                                                 <el-table-column label="Código do Imóvel JaCaptei" prop="cod" align="center" />
                                                 <el-table-column label="Código do Imóvel Imoview" prop="imoviewResponse.codigo" align="center" />
@@ -44,6 +44,12 @@
                                                                 </el-icon>
                                                                 <el-icon v-else-if="scope.row.status === 'Erro'">
                                                                     <CircleCloseFilled color="red" />
+                                                                </el-icon>
+                                                                <el-icon v-else-if="scope.row.status === 'Processando'">
+                                                                    <LoadingFilled color="blue" />
+                                                                </el-icon>
+                                                                <el-icon v-else-if="scope.row.status === 'Aguardando'">
+                                                                    <ClockFilled color="yellow" />
                                                                 </el-icon>
                                                             </div>
                                                         </div>
@@ -90,6 +96,12 @@
                                         <el-icon v-else-if="bairroScope.row.status === 'Erro'">
                                             <CircleCloseFilled color="red" />
                                         </el-icon>
+                                        <el-icon v-else-if="bairroScope.row.status === 'Processando'">
+                                            <LoadingFilled color="blue" />
+                                        </el-icon>
+                                        <el-icon v-else-if="bairroScope.row.status === 'Aguardando'">
+                                            <ClockFilled color="yellow" />
+                                        </el-icon>
                                     </div>
                                 </template>
                             </el-table-column>
@@ -134,6 +146,12 @@
                             </el-icon>
                             <el-icon v-else-if="scope.row.status === 'Erro'">
                                 <CircleCloseFilled color="red" />
+                            </el-icon>
+                            <el-icon v-else-if="scope.row.status === 'Processando'">
+                                <LoadingFilled color="blue" />
+                            </el-icon>
+                            <el-icon v-else-if="scope.row.status === 'Aguardando'">
+                                <ClockFilled color="yellow" />
                             </el-icon>
                         </div>
                     </div>
@@ -276,7 +294,9 @@
                 const temErro = imoveis.some(imovel => imovel.imoviewResponse?.erro);
                 const temSucesso = imoveis.some(imovel => !imovel.imoviewResponse?.erro);
                 const temPendente = imoveis.some(imovel => imovel.status === 'Aguardando');
+                const emProcessamento = imoveis.some(imovel => imovel.status === 'Processando');
 
+                if (emProcessamento) return 'Processando';
                 if (temErro && temSucesso) return 'Concluído com Falhas';
                 if (temErro) return 'Erro';
                 if (temPendente) return 'Aguardando';
@@ -286,6 +306,7 @@
             const verificarStatusIntegracao = (integracao) => {
                 let statusIntegracao = "Concluido";
                 let temParcial = false;
+                let emProcessamento = false;
 
                 integracao.bairros.forEach(bairro => {
                     const statusBairro = verificarStatusBairro(bairro);
@@ -293,9 +314,12 @@
                         statusIntegracao = "Erro";
                     } else if (statusBairro === "Concluído com Falhas") {
                         temParcial = true;
+                    } else if (statusBairro === "Processando") {
+                        emProcessamento = true;
                     }
                 });
 
+                if (emProcessamento) return "Processando";
                 if (temParcial) return "Concluído com Falhas";
                 return statusIntegracao;
             };
