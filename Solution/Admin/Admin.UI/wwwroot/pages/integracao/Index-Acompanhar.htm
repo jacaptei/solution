@@ -275,11 +275,11 @@
                 const imoveis = bairro.bairro?.imoveis;
                 const temErro = imoveis.some(imovel => imovel.imoviewResponse?.erro);
                 const temSucesso = imoveis.some(imovel => !imovel.imoviewResponse?.erro);
-                const temPendente = imoveis.some(imovel => imovel.status === 'Pendente');
+                const temPendente = imoveis.some(imovel => imovel.status === 'Aguardando');
 
                 if (temErro && temSucesso) return 'Concluído com Falhas';
                 if (temErro) return 'Erro';
-                if (temPendente) return 'Pendente';
+                if (temPendente) return 'Aguardando';
                 return 'Concluido';
             };
 
