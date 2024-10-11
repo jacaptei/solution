@@ -718,6 +718,42 @@ namespace JaCaptei.Application{
             }
             return appReturn;
         }
+        public AppReturn AtualizarParceiroSettings(int idParceiro, Dictionary<string, object> mudancas, int atualizadoPorId, string atualizadoPorNome)
+        {
+            var appReturn = new AppReturn();
+            try
+            {
+                using (var conn = new DBcontext().GetConn())
+                {
+                    var dadosAtualizacao = new Dictionary<string, object>
+                    {
+                        { "atualizadoPorId", atualizadoPorId },
+                        { "atualizadoPorNome", atualizadoPorNome },
+                        { "dataAtualizacao", DateTime.Now }
+                    };
+
+                    foreach (var muda in mudancas)
+                    {
+                        dadosAtualizacao[muda.Key] = muda.Value;
+                    }
+
+                    var result = conn.Update("ParceiroSettings", dadosAtualizacao, where: new { idParceiro = idParceiro });
+                    if (result > 0)
+                    {
+                        appReturn.result = "Configurações do parceiro atualizadas com sucesso!";
+                    }
+                    else
+                    {
+                        appReturn.result = "Nenhum parceiro encontrado com o ID fornecido.";
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("Erro ao atualizar as configurações do parceiro.", ex);
+            }
+            return appReturn;
+        }
 
         public Parceiro ObterPorId(int id) {
 

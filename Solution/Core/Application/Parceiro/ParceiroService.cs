@@ -120,61 +120,42 @@ namespace JaCaptei.Application
                     }
                 }
 
-                //// Atualizar as configurações do parceiro
-                //if (entity.habilitadoFazerSolicitacoes.HasValue ||
-                //    entity.habilitadoFazerSolicitacoesAgendadas.HasValue ||
-                //    entity.habilitadoFazerSolicitacoesNaoAgendadas.HasValue || entity.limiteSolicitacoesDiarias.HasValue || entity.limiteSolicitacoesDiariasAgendadas.HasValue || entity.limiteSolicitacoesDiariasNaoAgendadas.HasValue)
-                //{
-                //    var mudancasParceiro = new ParceiroSettings // Supondo que você tenha um objeto para as mudanças
-                //    {
-                //        habilitadoFazerSolicitacoes = entity.habilitadoFazerSolicitacoes,
-                //        habilitadoFazerSolicitacoesAgendadas = entity.habilitadoFazerSolicitacoesAgendadas,
-                //        habilitadoFazerSolicitacoesNaoAgendadas = entity.habilitadoFazerSolicitacoesNaoAgendadas
-                //    };
-                //    DAO.AtualizarParceiroSettings(parceiroAtual.idParceiro, mudancasParceiro);
-                //}
+                var mudancasParceiro = new Dictionary<string, object>();
 
-                //// Atualizar limite de usuários
-                //if (entity.limiteUsuarios.HasValue)
-                //{
-                //    parceiroAtual.limiteUsuarios = entity.limiteUsuarios.Value;
-                //    DAO.AtualizarPlanoConta(parceiroAtual.idPlano);
-                //}
+                if (entity.habilitadoFazerSolicitacoes.HasValue)
+                {
+                    mudancasParceiro["habilitadoFazerSolicitacoes"] = entity.habilitadoFazerSolicitacoes.Value;
+                }
 
-                //// Atualizar status de ativo/inativo
-                //if (entity.ativo.HasValue)
-                //{
-                //    if (entity.donoConta == true)
-                //    {
-                //        DAO.InativarConta(parceiroAtual.idPlano);
-                //        DAO.InativarParceirosRelacionadoConta(parceiroAtual.idPlano);
-                //    }
-                //    DAO.InativarParceiro(entity.id, entity.ativo.Value);
-                //}
+                if (entity.habilitadoFazerSolicitacoesAgendadas.HasValue)
+                {
+                    mudancasParceiro["habilitadoFazerSolicitacoesAgendadas"] = entity.habilitadoFazerSolicitacoesAgendadas.Value;
+                }
 
-                //// Atualizar informações da conta
-                //var conta = DAO.ObterContaPorId(entity.idConta);
-                //if (conta != null)
-                //{
-                //    conta.idPlano = entity.idPlano;
-                //    conta.TotalUsuariosPermitidos = entity.TotalUsuariosPermitidos;
-                //    DAO.Atualizar(conta);
-                //}
+                if (entity.habilitadoFazerSolicitacoesNaoAgendadas.HasValue)
+                {
+                    mudancasParceiro["habilitadoFazerSolicitacoesNaoAgendadas"] = entity.habilitadoFazerSolicitacoesNaoAgendadas.Value;
+                }
 
-                //// Atualizar configurações da tabela ParceiroSettings
-                //var parceiroSettings = DAO.ObterConfiguracoesPorParceiroId(entity.id);
-                //if (parceiroSettings != null)
-                //{
-                //    parceiroSettings.LimiteSolicitacoesDiarias = entity.limiteSolicitacoesDiarias;
-                //    parceiroSettings.LimiteSolicitacoesAgendadas = entity.limiteSolicitacoesAgendadas;
-                //    parceiroSettings.LimiteSolicitacoesNaoAgendadas = entity.limiteSolicitacoesNaoAgendadas;
-                //    parceiroSettings.PermissaoSolicitacoes = entity.PermissaoSolicitacoes;
-                //    parceiroSettings.PermissaoSolicitacoesAgendadas = entity.PermissaoSolicitacoesAgendadas;
-                //    parceiroSettings.PermissaoSolicitacoesNaoAgendadas = entity.PermissaoSolicitacoesNaoAgendadas;
-                //    DAO.AtualizarParceiroSettings(parceiroSettings);
-                //}
+                if (entity.limiteSolicitacoesDiarias.HasValue)
+                {
+                    mudancasParceiro["limiteSolicitacoesDiarias"] = entity.limiteSolicitacoesDiarias.Value;
+                }
 
-                //DAO.AtualizarConfiguracoesConta(parceiroAtual);
+                if (entity.limiteSolicitacoesDiariasAgendadas.HasValue)
+                {
+                    mudancasParceiro["limiteSolicitacoesDiariasAgendadas"] = entity.limiteSolicitacoesDiariasAgendadas.Value;
+                }
+
+                if (entity.limiteSolicitacoesDiariasNaoAgendadas.HasValue)
+                {
+                    mudancasParceiro["limiteSolicitacoesDiariasNaoAgendadas"] = entity.limiteSolicitacoesDiariasNaoAgendadas.Value;
+                }
+
+                if (mudancasParceiro.Count > 0)
+                {
+                    DAO.AtualizarParceiroSettings(entity.id.Value, mudancasParceiro, operador.id, operador.nome);
+                }
 
                 appReturn.result = "Configurações atualizadas com sucesso.";
             }
@@ -291,7 +272,8 @@ namespace JaCaptei.Application
 
             appReturn = DAO.Adicionar(entity);
 
-            if (appReturn.status.success){
+            if (appReturn.status.success)
+            {
                 Mail mail = new Mail();
                 mail.emailTo = entity.email;
                 mail.about = "Confirme seu cadastro";
