@@ -219,9 +219,6 @@
 
             const ObterContaPorId = async () => {
                 const url = buildUrlForOperadoresRelacionados();
-                if (instance) {
-                    console.log(url);
-                }
                 if (!url) {
                     console.error("URL não pode ser construída.");
                     return;
@@ -360,7 +357,6 @@
             };
 
             const cancelChanges = () => {
-                console.log('Cancelando alterações...');
                 hasChanges.value = hasChanges.value.map(() => false);
             };
 
