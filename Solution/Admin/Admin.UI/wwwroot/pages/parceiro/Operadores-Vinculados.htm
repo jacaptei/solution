@@ -1,5 +1,5 @@
 ﻿<template>
-    <div>
+    <div v-loading.fullscreen.lock="fullscreenLoading" element-loading-background="rgba(0, 0, 0, 0.7)">
         <el-collapse v-model="activeNames">
             <el-collapse-item v-for="(item, index) in filteredCollapseItems"
                               :key="index"
@@ -61,7 +61,7 @@
 
                         <el-col class="register-input" :xs="24" :sm="12" :md="12" :lg="8" v-if="item.tableData[0].donoConta">
                             <div>
-                                <label>Usuários Cadastrados</label>
+                                <label>Total de Usuários Cadastrados</label>
                                 <el-input v-model="item.tableData[0].totalUsuarios"
                                           :min="0"
                                           :max="item.tableData[0].totalUsuarios"
@@ -174,6 +174,7 @@
             const hasChanges = ref([]);
             const activeNames = ref(['1']);
             const valoresAlterados = ref({});
+            const fullscreenLoading = ref(false);
             const currentEditData = reactive({});
             const instance = getCurrentInstance();
             const operadoresRelacionados = ref([]);
@@ -267,52 +268,94 @@
                 return hasChanges.value.some(change => change === true);
             });
 
-            const handleChange = (index, field, newValue) => {
-                if (!hasChanges.value[index]) {
-                    hasChanges.value[index] = false;
+            async function confirmarAcao(isAtivacao, donoConta) {
+                const entidade = donoConta ? 'esta conta e todos seus operadores' : 'este operador';
+                const acao = isAtivacao ? 'ativar' : 'desativar';
+                const mensagem = `Você está prestes a ${acao} ${entidade}. Deseja continuar?`;
+
+                try {
+                    await ElementPlus.ElMessageBox.confirm(
+                        mensagem,
+                        'Confirmação',
+                        {
+                            confirmButtonText: 'Sim',
+                            cancelButtonText: 'Não',
+                            type: 'warning'
+                        }
+                    );
+                    return true;
+                } catch {
+                    return false;
                 }
+            }
+
+            function atualizarValoresAlterados(index, currentItem, field, newValue) {
+                if (!valoresAlterados.value[index]) {
+                    valoresAlterados.value[index] = {
+                        id: currentItem.tableData[0].id,
+                        idConta: currentItem.tableData[0].idConta,
+                        donoConta: currentItem.tableData[0].donoConta,
+                    };
+                }
+                valoresAlterados.value[index][field] = newValue;
+            }
+
+            const handleChange = async (index, field, newValue) => {
+                const filteredItems = filteredCollapseItems.value;
+                const currentItem = filteredItems[index];
+                const isDonoConta = currentItem.tableData[0].donoConta;
+
+                if (field === 'ativo') {
+                    const isAtivacao = newValue === true;
+                    const confirmResult = await confirmarAcao(isAtivacao, isDonoConta);
+
+                    if (confirmResult) {
+                        currentItem.tableData[0].ativo = isAtivacao;
+                        atualizarValoresAlterados(index, currentItem, 'ativo', isAtivacao);
+                    } else {
+                        currentItem.tableData[0].ativo = !isAtivacao;
+                        return;
+                    }
+                }
+
                 hasChanges.value[index] = true;
 
-                collapseItems.value[index].tableData[0][field] = newValue;
+                currentItem.tableData[0][field] = newValue;
 
                 if (field === 'idPlano') {
                     const limiteUsuarios = planoUsuarioLimites[newValue] || 0;
-
-                    collapseItems.value[index].tableData[0].limiteUsuarios = limiteUsuarios;
-
-                    if (!valoresAlterados.value[index]) {
-                        valoresAlterados.value[index] = {
-                            id: collapseItems.value[index].tableData[0].id,
-                            idConta: collapseItems.value[index].tableData[0].idConta,
-                            donoConta: collapseItems.value[index].tableData[0].donoConta,
-                        };
-                    }
-                    valoresAlterados.value[index].limiteUsuarios = limiteUsuarios;
+                    currentItem.tableData[0].limiteUsuarios = limiteUsuarios;
+                    atualizarValoresAlterados(index, currentItem, 'limiteUsuarios', limiteUsuarios);
                 }
 
-                if (!valoresAlterados.value[index]) {
-                    valoresAlterados.value[index] = {
-                        id: collapseItems.value[index].tableData[0].id,
-                        idConta: collapseItems.value[index].tableData[0].idConta,
-                        donoConta: collapseItems.value[index].tableData[0].donoConta,
-                    };
-                }
-
-                collapseItems.value[index].tableData[0][field] = newValue;
-                valoresAlterados.value[index][field] = newValue;
+                atualizarValoresAlterados(index, currentItem, field, newValue);
             };
 
             const saveChanges = async () => {
                 try {
+                    fullscreenLoading.value = true;
                     const payload = {
-                        tableData: Object.values(valoresAlterados.value) 
+                        tableData: Object.values(valoresAlterados.value)
                     };
                     await instance.proxy.$api.Post("parceiro/atualizarconfiguracoesconta", payload);
                     await ObterContaPorId();
                     valoresAlterados.value = {};
                     hasChanges.value = hasChanges.value.map(() => false);
+                    ElementPlus.ElMessage({
+                        showClose: true,
+                        message: 'Configurações Salvas Com Sucesso!',
+                        type: 'success',
+                    });
+                    fullscreenLoading.value = false;
                 } catch (error) {
                     console.error('Erro ao salvar mudanças:', error);
+                    ElementPlus.ElMessage({
+                        showClose: true,
+                        message: 'Erro ao salvar configurações. Tente novamente.',
+                        type: 'error',
+                    });
+                } finally {
+                    fullscreenLoading.value = false;
                 }
             };
 
@@ -340,6 +383,7 @@
                 filteredCollapseItems,
                 idParceiro,
                 hasAnyChanges,
+                fullscreenLoading,
             };
         }
     };

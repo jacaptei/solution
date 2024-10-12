@@ -718,6 +718,57 @@ namespace JaCaptei.Application{
             }
             return appReturn;
         }
+        public AppReturn VerificaQuantidadeUsuariosAtivos(int idConta, int ajuste, int atualizadoPorId, string atualizadoPorNome, bool ativo)
+        {
+            var appReturn = new AppReturn();
+            try
+            {
+                using (var conn = new DBcontext().GetConn())
+                {
+                    Conta conta = conn.Query<Conta>(e => e.id == idConta).FirstOrDefault();
+
+                    if (conta == null)
+                    {
+                        appReturn.result = "Conta não encontrada para o ID fornecido.";
+                        return appReturn;
+                    }
+
+                    int quantidadeParceirosAtivos = conn.Query<Parceiro>(e => e.idConta == idConta && e.ativo == ativo).Count();
+
+                    int novoTotalUsuarios = Math.Max(conta.totalUsuarios, quantidadeParceirosAtivos);
+
+                    if (novoTotalUsuarios != conta.totalUsuarios)
+                    {
+                        var result = conn.Update("Conta",
+                            new
+                            {
+                                totalUsuarios = novoTotalUsuarios,
+                                atualizadoPorId = atualizadoPorId,
+                                atualizadoPorNome = atualizadoPorNome,
+                                dataAtualizacao = DateTime.Now
+                            },
+                            where: new { id = idConta });
+
+                        appReturn.result = result > 0
+                            ? "Quantidade de usuários atualizada com sucesso!"
+                            : "Erro ao atualizar a quantidade de usuários.";
+                    }
+                    else
+                    {
+                        appReturn.result = "Nenhuma atualização necessária, a quantidade de usuários já está correta.";
+                    }
+                }
+            }
+            catch (SqlException sqlEx)
+            {
+                throw new Exception("Erro no banco de dados ao corrigir a quantidade de usuários ativos.", sqlEx);
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("Erro ao corrigir a quantidade de usuários ativos.", ex);
+            }
+            return appReturn;
+        }
         public AppReturn AtualizarParceiroSettings(int idParceiro, Dictionary<string, object> mudancas, int atualizadoPorId, string atualizadoPorNome)
         {
             var appReturn = new AppReturn();

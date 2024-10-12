@@ -105,6 +105,8 @@ namespace JaCaptei.Application
                     {
                         DAO.InativarConta(entity.ativo.Value, entity.idConta.Value, operador.id, operador.nome);
                         DAO.InativarParceirosAssociadosConta(entity.ativo.Value, entity.idConta.Value, operador.id, operador.nome);
+                        if (entity.ativo.Value == true)
+                        DAO.VerificaQuantidadeUsuariosAtivos(entity.idConta.Value, 1, operador.id, operador.nome, entity.ativo.Value);
                     }
                     else
                     {
