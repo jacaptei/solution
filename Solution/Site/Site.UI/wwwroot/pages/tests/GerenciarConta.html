@@ -1,0 +1,103 @@
+﻿<template>
+    <el-row :gutter="20">
+        <!-- Coluna de membros -->
+        <el-col :span="12">
+            <el-card shadow="hover" class="card">
+                <h3>Membros do plano</h3>
+                <p>{{ membros.length }} / 6 contas usadas</p>
+
+                <el-divider></el-divider>
+
+                <el-list>
+                    <el-list-item v-for="(membro, index) in membros"
+                                  :key="index"
+                                  class="membro-item">
+                        <el-avatar :src="membro.avatar"
+                                   v-if="membro.avatar"
+                                   size="medium" />
+                        <el-avatar icon="el-icon-user" v-else size="medium" />
+                        <span class="membro-nome">{{ membro.nome }}</span>
+                        <el-tag v-if="membro.admin" type="info" size="small">
+                            Administrador do plano
+                        </el-tag>
+                    </el-list-item>
+                </el-list>
+            </el-card>
+        </el-col>
+
+        <!-- Coluna de convite -->
+        <el-col :span="12">
+            <el-card shadow="hover" class="card">
+                <h3>Convidar uma pessoa</h3>
+                <p>
+                    Para convidar alguém, envie o link abaixo ou crie um convite usando um
+                    serviço de mensagem ou e-mail.
+                </p>
+                <el-input v-model="linkConvite"
+                          class="input-link"
+                          suffix-icon="el-icon-link"
+                          readonly />
+
+                <el-space direction="vertical" class="convite-botoes">
+                    <el-button icon="el-icon-message" type="primary" size="medium">Messenger</el-button>
+                    <el-button icon="el-icon-chat-dot-round" size="medium">WhatsApp</el-button>
+                    <el-button icon="el-icon-message" size="medium">E-mail</el-button>
+                </el-space>
+
+                <el-button type="info"
+                           plain
+                           class="kids-button"
+                           :disabled="true">
+                    Criar uma conta Kids
+                </el-button>
+            </el-card>
+        </el-col>
+    </el-row>
+</template>
+
+<script>export default {
+  data() {
+    return {
+      linkConvite: "https://www.spotify.com/br-pt/invite",
+      membros: [
+        { nome: "Você", admin: true, avatar: "https://via.placeholder.com/150" },
+        { nome: "Rafael Mendes", avatar: "https://via.placeholder.com/150" },
+        { nome: "Stephanie Lopes", avatar: "https://via.placeholder.com/150" },
+        { nome: "Isaias Vaz" },
+        { nome: "Victor Souza" },
+        { nome: "Mateusbruno" },
+      ],
+    };
+  },
+};</script>
+
+<style scoped>
+    .card {
+        margin-bottom: 20px;
+        padding: 15px;
+    }
+
+    .membro-item {
+        display: flex;
+        align-items: center;
+        margin: 10px 0;
+    }
+
+    .membro-nome {
+        margin-left: 10px;
+        flex-grow: 1;
+    }
+
+    .input-link {
+        margin: 10px 0;
+    }
+
+    .convite-botoes > * {
+        width: 100%;
+    }
+
+    .kids-button {
+        width: 100%;
+        margin-top: 10px;
+    }
+</style>

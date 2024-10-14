@@ -21,6 +21,7 @@ const Ajuda = httpVueLoader(getVersionedUrl("/pages/Ajuda.htm"));
 const Confirma = httpVueLoader(getVersionedUrl("/pages/Confirma.htm"));
 const Senha = httpVueLoader(getVersionedUrl("/pages/Senha.htm"));
 const Perfil = httpVueLoader(getVersionedUrl("/pages/Perfil.htm"));
+const GerenciarConta = httpVueLoader(getVersionedUrl("/pages/GerenciarConta.htm"));
 const Admin = httpVueLoader(getVersionedUrl("/pages/Admin.htm"));
 const TermosPolitica = httpVueLoader(getVersionedUrl("/pages/TermosPolitica.htm"));
 const Tests = httpVueLoader(getVersionedUrl("/pages/tests/Tests.htm"));
@@ -44,6 +45,7 @@ const routes = [
     { name: "confirma", path: "/confirma", component: Confirma, meta: { area: "CONFIRMA", label: "CONFIRMA", menuIndex: "01-00-00-00", keypath: "01-00-00-00" } },
     { name: "senha", path: "/senha", component: Senha, meta: { area: "SENHA", label: "SENHA", menuIndex: "01-00-00-00", keypath: "01-00-00-00" } },
     { name: "perfil", path: "/perfil", component: Perfil, meta: { area: "PERFIL", label: "PERFIL", menuIndex: "01-00-00-00", keypath: "01-00-00-00" } },
+    { name: "gerenciar-conta", path: "/gerenciar-conta", component: GerenciarConta, meta: { area: "GERENCIAR CONTA", label: "GERENCIAR CONTA", menuIndex: "01-00-00-00", keypath: "01-00-00-00" } },
     { name: "tests", path: "/tests", component: Tests, meta: { area: "TESTS", menuIndex: "----", keypath: "----" } },
     { name: "manutencao", path: "/manutencao", component: Manutencao, meta: { area: "MANUTENCAO", label: "MANUTENÇÃO", menuIndex: "00-00-00-00", keypath: "00-00-00-00" } },
     { name: "", path: "/:notFound", component: Notfound, meta: { area: "404", label: "PÁGINA INEXISTENTE", menuIndex: "00-00-00-00", keypath: "00-00-00-00" } },
