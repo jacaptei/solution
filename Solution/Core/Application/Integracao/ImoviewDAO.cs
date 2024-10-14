@@ -115,6 +115,8 @@ public class ImoviewDAO: IDisposable {
              l  => l.idImovel   == idImovel   // lazer 
          );
 
+        var tipo = await _conn.QueryAsync<ImovelTipo>(t => t.id == imovel.First().idTipo);
+
         var res = new ImovelFullDTO()
         {
             Imovel = imovel.First(),
@@ -124,7 +126,8 @@ public class ImoviewDAO: IDisposable {
             ImovelDisposicao = disposicao.First(),
             ImovelCaracteristicasInternas = crsInternas.First(),
             ImovelCaracteristicasExternas = crsExternas.First(),
-            ImovelLazer = lazer.First()
+            ImovelLazer = lazer.First(),
+            ImovelTipo = tipo.First()
         };
         return res;
     }
