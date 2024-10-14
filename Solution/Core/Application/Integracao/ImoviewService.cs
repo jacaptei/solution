@@ -561,7 +561,19 @@ public class ImoviewService : IDisposable, IIntegracaoService
                 if (importacaoImovel.Status == StatusIntegracao.Concluido.GetDescription())
                     return false;
                 if (importacaoImovel.Status == StatusIntegracao.Processando.GetDescription())
-                    return false;
+                {
+                    try
+                    {
+                        var lastUpdate = importacaoImovel.DataAtualizacao > importacaoImovel.DataInclusao ? importacaoImovel.DataAtualizacao : importacaoImovel.DataInclusao;
+                        var timeDiff = DateTime.UtcNow - lastUpdate;
+                        if (timeDiff.TotalMinutes < 5)
+                            return false;
+                    }
+                    catch(Exception ex)
+                    {
+                        _logger?.LogError("Erro ao validar data de atualização. {ex}", ex);
+                    }
+                }
                 importacaoImovel.DataAtualizacao = DateTime.UtcNow;
                 importacaoImovel.Status = StatusIntegracao.Processando.GetDescription();
                 await _retryPolicy.ExecuteAsync(() => _imoviewDAO.SaveImportacaoImovel(importacaoImovel));
@@ -576,9 +588,9 @@ public class ImoviewService : IDisposable, IIntegracaoService
                     request.codigounidade = codunidade;
                     if (tipos != null)
                     {
-                    var tipoMapeado = tipos.Select(t => new { Tipo = t, Similarity = Utils.CalculateSimilarity(t.nome.ToLower(), imovelFull?.ImovelTipo.label.ToLower()) })
-                    .OrderByDescending(x => x.Similarity)
-                    .FirstOrDefault(x => x.Similarity >= 0.95)?.Tipo;
+                        var tipoMapeado = tipos.Select(t => new { Tipo = t, Similarity = Utils.CalculateSimilarity(t.nome.ToLower(), imovelFull?.ImovelTipo.label.ToLower()) })
+                        .OrderByDescending(x => x.Similarity)
+                        .FirstOrDefault(x => x.Similarity >= 0.95)?.Tipo;
                         if (tipoMapeado == null)
                         {
                             tipoMapeado = tipos.FirstOrDefault(t => t.codigo == request.codigotipo);
@@ -592,6 +604,10 @@ public class ImoviewService : IDisposable, IIntegracaoService
                             {
                                 request.codigotipo = tipoMapeado.codigo;
                             }
+                        }
+                        else
+                        {
+                            request.codigotipo = tipoMapeado.codigo;
                         }
                     }
                     var requestBody = Newtonsoft.Json.JsonConvert.SerializeObject(request);
