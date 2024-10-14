@@ -79,14 +79,8 @@ namespace JaCaptei.API.Controllers {
                 entity.tokenJWT     = JWTokenService.GenerateToken(entity);
                 appReturn.result    = entity;
             }
-
             return Result(appReturn);
-
         }
-
-
-
-
 
         // parte do Admin
         // JWT Token Validator
@@ -100,9 +94,6 @@ namespace JaCaptei.API.Controllers {
             appReturn = service.Ativar(entity);
             return Result(appReturn);
         }
-
-
-
 
         [HttpPost]
         [Route("senha/solicitar")]
@@ -122,7 +113,6 @@ namespace JaCaptei.API.Controllers {
             return Result(appReturn);
         }
 
-
         [HttpPost]
         [Route("senha/alterar")]
         public IActionResult AlterarSenha([FromBody] Parceiro entity) {
@@ -133,7 +123,6 @@ namespace JaCaptei.API.Controllers {
             appReturn = service.AlterarSenha(entity);
             return Result(appReturn);
         }
-        
 
         [HttpPost]
         [Route("perfil/alterar")]
@@ -146,28 +135,11 @@ namespace JaCaptei.API.Controllers {
             return Result(appReturn);
         }
 
-
-
         [HttpGet]
         [Route("obter/{id}")]
         public IActionResult Obter(string id) {
             appReturn = service.ObterPeloId(int.Parse(id));
             return Result(appReturn);
         }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
     }
 }
