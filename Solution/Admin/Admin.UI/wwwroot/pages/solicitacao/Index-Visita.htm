@@ -85,7 +85,7 @@
                                     </el-col>-->
 
                                     <el-col :md="24">
-                                        <div style="color:var(--s-color-primary);font-weight:700;height:40px;padding-left:12px;margin-top:-20px;float:left;">{{totalAguardando}} aguardando <span v-if="adminSelecionado.id > 0" style="color:#222222;font-weight:normal">{{adminSelecionado.nome}} </span></div>
+                                        <div style="color:var(--s-color-primary);font-weight:700;height:40px;padding-left:12px;margin-top:0px;float:left;">{{totalAguardando}} aguardando <span v-if="adminSelecionado.id > 0" style="color:#222222;font-weight:normal">{{adminSelecionado.nome}} </span></div>
                                     </el-col>
 
                                     <el-col v-if="totalAguardando > 0" :md="24" v-for="(item,index) in resultsAguardando">
@@ -1574,8 +1574,8 @@
                         this.totalVerificando = this.resultsVerificando.length;
                         this.totalFinalizadas = this.resultsFinalizadas.length;
 
-                        this.resultsAgendadas = this.resultsAguardando.filter(r => r.agendado == true);
-                        this.totalAgendadas = this.resultsAgendadas.length;
+                        //this.resultsAgendadas = this.resultsAguardando.filter(r => r.visita == true);
+                        //this.totalAgendadas = this.resultsAgendadas.length;
 
                         if (!this.update.inBG) {
                             this.somenteAgendadas = false;
