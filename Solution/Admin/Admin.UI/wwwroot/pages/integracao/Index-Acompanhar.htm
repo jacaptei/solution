@@ -1,9 +1,22 @@
 ﻿<template>
-    <div>
-        <div style="display: flex; width:100%; align-items: center; justify-content:end; margin-bottom: 10px">
-            <el-icon @click="abrirModalFiltro" style="cursor: pointer; color: #409EFF; font-size: 24px;">
+    <div v-loading.fullscreen.lock="fullscreenLoading" element-loading-background="rgba(0, 0, 0, 0.7)">
+        <div style="display: flex; width:100%; align-items: center; justify-content:end; margin-bottom: 30px">
+            <el-icon @click="abrirModalFiltro" style="cursor: pointer; margin-right: 8px; color: #409EFF; font-size: 24px;">
                 <Filter />
             </el-icon>
+            <el-icon @click="refreshData" style="cursor: pointer; color: #409EFF; font-size: 24px;">
+                <Refresh />
+            </el-icon>
+            <el-select v-model="refreshInterval"
+                       placeholder="Selecione o intervalo"
+                       size="small"
+                       style="width: 140px; margin-left: 8px"
+                       @change="startAutoRefresh">
+                <el-option v-for="item in optionsRefresh"
+                           :key="item.value"
+                           :label="item.label"
+                           :value="item.value" />
+            </el-select>
         </div>
 
         <!-- Tabela principal de Integrações -->
@@ -31,13 +44,18 @@
                                                 </el-table-column>
                                                 <el-table-column label="Status" prop="status" align="center">
                                                     <template #default="scope">
-                                                        <div style="display: flex; align-items: center; justify-content:center">
-                                                            <div style="display: flex; align-items: center; justify-content:center">
-                                                                <div v-if="!scope.row.imoviewResponse.erro">
-                                                                    <span style="margin-right:5px;">{{ scope.row.status }}</span>
+                                                        <div style="display: flex; align-items: center; justify-content: center">
+                                                            <div style="display: flex; align-items: center; justify-content: center">
+                                                                <div v-if="!scope.row.imoviewResponse?.erro">
+                                                                    <span style="margin-right: 5px;">
+                                                                        <!-- Verificação para 'Processando' e 'Aguardando' -->
+                                                                        <span v-if="scope.row.status === 'Processando'">O imóvel está sendo processado...</span>
+                                                                        <span v-else-if="scope.row.status === 'Aguardando'">O imóvel está aguardando...</span>
+                                                                        <span v-else>{{ scope.row.status }}</span>
+                                                                    </span>
                                                                 </div>
                                                                 <div v-else>
-                                                                    <span style="margin-right:5px;" class="error">{{ scope.row.status }}</span>
+                                                                    <span style="margin-right: 5px;" class="error">{{ scope.row.status }}</span>
                                                                 </div>
                                                                 <el-icon v-if="scope.row.status === 'Concluido'">
                                                                     <SuccessFilled color="green" />
@@ -62,8 +80,13 @@
                                                 </el-table-column>
                                                 <el-table-column label="Resposta" align="center">
                                                     <template #default="scope">
-                                                        <div v-if="!scope.row.imoviewResponse.erro">
-                                                            {{ scope.row.imoviewResponse.mensagem }}
+                                                        <div v-if="scope.row.status && !scope.row.imoviewResponse?.erro">
+                                                            <!-- Exibe a mensagem de status se imoviewResponse.erro for null -->
+                                                            <span>{{ scope.row.status }}</span>
+                                                        </div>
+                                                        <div v-else-if="!scope.row.imoviewResponse?.erro">
+                                                            <!-- Exibe a mensagem se não houver erro -->
+                                                            <span>{{ scope.row.imoviewResponse.mensagem }}</span>
                                                         </div>
                                                         <div v-else>
                                                             <span class="error">Erro: {{ scope.row.imoviewResponse.mensagem }}</span>
@@ -192,7 +215,7 @@
 </template>
 
 <script>
-    import { ref, onMounted, getCurrentInstance, watch } from 'vue';
+    import { ref, onMounted, getCurrentInstance, watch, onBeforeUnmount } from 'vue';
     export default {
         setup() {
             const options = ref({});
@@ -202,11 +225,24 @@
             const listaIntegracao = ref([]);
             const quantidadeBairros = ref(0);
             const listaCrmIntegracao = ref([]);
+            const refreshInterval = ref(0);
             const filtrosVisiveis = ref(false);
+            const fullscreenLoading = ref(false);
             const instance = getCurrentInstance();
+            let intervalId = null;
             const crmOptions = ref([
                 { nome: 'IMOVIEW', id: 1 },
                 { nome: 'VISTASOFT', id: 2, disabled: true },
+            ]);
+            const optionsRefresh = ref([
+                { label: 'Desativar', value: 0 },
+                { label: '5 segundos', value: 5 },
+                { label: '10 segundos', value: 10 },
+                { label: '30 segundos', value: 30 },
+                { label: '1 minuto', value: 60 },
+                { label: '2 minutos', value: 120 },
+                { label: '5 minutos', value: 300 },
+                { label: '10 minutos', value: 600 },
             ]);
             const acompanhar = ref([]);
 
@@ -220,10 +256,18 @@
                 quantidadeBairros.value = newVal[0]?.bairros.length || 0;
             }, { deep: true });
 
+            watch(refreshInterval, (newValue) => {
+                startAutoRefresh();
+            });
+
             onMounted(() => {
                 setTimeout(() => {
                     filtrosVisiveis.value = true;
                 }, 300);
+            });
+
+            onBeforeUnmount(() => {
+                stopAutoRefresh();
             });
 
             const abrirModalFiltro = () => {
@@ -238,6 +282,20 @@
                 Integracao: 0,
                 Cliente: '',
             });
+
+            const startAutoRefresh = () => {
+                if (intervalId) clearInterval(intervalId); // Limpa o intervalo existente
+                if (refreshInterval.value > 0) {
+                    intervalId = setInterval(refreshData, refreshInterval.value * 1000); // Define novo intervalo
+                }
+            };
+
+            const stopAutoRefresh = () => {
+                if (intervalId) {
+                    clearInterval(intervalId);
+                    intervalId = null;
+                }
+            };
 
             const filtrarParceiroIntegracao = async (crm) => {
                 const url = validarUrlParaBuscarParceiroIntegracao(crm);
@@ -324,8 +382,13 @@
                 return statusIntegracao;
             };
 
+            const refreshData = async () => {
+                await Buscar();
+            };
+
             const Buscar = async () => {
                 try {
+                    fullscreenLoading.value = true;
                     filtros.value.Integracao = listaIntegracao.value.value;
                     filtros.value.Cliente = listaIntegracao.value.label;
                     const url = instance.proxy.$api.BuildURL("api/imoview/integracao/status");
@@ -356,6 +419,7 @@
                     console.error("Erro ao buscar integração:", error);
                 } finally {
                     filtrosVisiveis.value = false;
+                    fullscreenLoading.value = false;;
                 }
             };
 
@@ -389,7 +453,12 @@
                 filtrarParceiroIntegracao,
                 isDisabled,
                 totalImoveis,
-                quantidadeBairros
+                quantidadeBairros,
+                refreshData,
+                fullscreenLoading,
+                optionsRefresh,
+                startAutoRefresh,
+                refreshInterval
             };
         },
     };
@@ -398,6 +467,10 @@
 <style>
     .el-card__body {
         padding: 10px;
+    }
+
+    .el-scrollbar__thumb {
+        margin-left: 10px;
     }
 
     .error {

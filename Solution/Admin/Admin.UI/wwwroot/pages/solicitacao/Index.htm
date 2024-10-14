@@ -329,7 +329,7 @@
                             if (this.$validator.is(tabbk))
                                 this.tab = tabbk;
                             else
-                                this.tab = (this.$root.usuario.god || this.$root.usuario.gestor) ? "distribuicao" : "aguardando";
+                                this.tab = (this.$root.usuario.god || this.$root.usuario.gestor) ? "distribuicao" : "visita";
 
                             window.setTimeout(() => { this.UpdateChart(); }, 2000);
                             this.view = "success";
