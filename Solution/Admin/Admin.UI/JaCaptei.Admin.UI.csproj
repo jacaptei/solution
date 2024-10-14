@@ -9,6 +9,7 @@
 
   <ItemGroup>
     <Content Remove="Properties\PublishProfiles\launchSettings_bk.json" />
+    <Content Remove="wwwroot\pages\integracao\htmlpage.html" />
   </ItemGroup>
 
   <ItemGroup>

@@ -561,12 +561,24 @@ public class ImoviewService : IDisposable, IIntegracaoService
                 if (importacaoImovel.Status == StatusIntegracao.Concluido.GetDescription())
                     return false;
                 if (importacaoImovel.Status == StatusIntegracao.Processando.GetDescription())
-                    return false;
+                {
+                    try
+                    {
+                        var lastUpdate = importacaoImovel.DataAtualizacao > importacaoImovel.DataInclusao ? importacaoImovel.DataAtualizacao : importacaoImovel.DataInclusao;
+                        var timeDiff = DateTime.UtcNow - lastUpdate;
+                        if (timeDiff.TotalMinutes < 5)
+                            return false;
+                    }
+                    catch(Exception ex)
+                    {
+                        _logger?.LogError("Erro ao validar data de atualização. {ex}", ex);
+                    }
+                }
                 importacaoImovel.DataAtualizacao = DateTime.UtcNow;
                 importacaoImovel.Status = StatusIntegracao.Processando.GetDescription();
                 await _retryPolicy.ExecuteAsync(() => _imoviewDAO.SaveImportacaoImovel(importacaoImovel));
-                if (importacaoImovel.RequestBody == null)
-                {
+                //if (importacaoImovel.RequestBody == null)
+                //{
                     var imovelFull = await _retryPolicy.ExecuteAsync(() => _imoviewDAO.GetFullImovel(import.IdImovel));
                     request = _mapper?.Map<ImoviewAddImovelRequest>(imovelFull);
                     int.TryParse(import.CodUsuario, out int codusuario);
@@ -576,16 +588,31 @@ public class ImoviewService : IDisposable, IIntegracaoService
                     request.codigounidade = codunidade;
                     if (tipos != null)
                     {
-                        var tipoMapeado = tipos.FirstOrDefault(t => t.codigo == request.codigotipo);
+                        var tipoMapeado = tipos.Select(t => new { Tipo = t, Similarity = Utils.CalculateSimilarity(t.nome.ToLower(), imovelFull?.ImovelTipo.label.ToLower()) })
+                        .OrderByDescending(x => x.Similarity)
+                        .FirstOrDefault(x => x.Similarity >= 0.95)?.Tipo;
                         if (tipoMapeado == null)
                         {
-                            _logger?.LogWarning("Tipo não mapeado para o imovel: {id}, tipo: {tipo}", import.CodImovel, request.codigotipo);
-                            request.codigotipo = -1;
+                            tipoMapeado = tipos.FirstOrDefault(t => t.codigo == request.codigotipo);
+
+                            if (tipoMapeado == null)
+                            {
+                                _logger?.LogWarning("Tipo não mapeado para o imovel: {id}, tipo: {tipo}", import.CodImovel, request.codigotipo);
+                                request.codigotipo = -1;
+                            }
+                            else 
+                            {
+                                request.codigotipo = tipoMapeado.codigo;
+                            }
+                        }
+                        else
+                        {
+                            request.codigotipo = tipoMapeado.codigo;
                         }
                     }
                     var requestBody = Newtonsoft.Json.JsonConvert.SerializeObject(request);
                     importacaoImovel.RequestBody = requestBody;
-                }
+                //}
                 request = Newtonsoft.Json.JsonConvert.DeserializeObject<ImoviewAddImovelRequest>(importacaoImovel.RequestBody);
                 images = await GetImageFiles(import.IdImovel);
                 if (importacaoImovel.Imagens == null)

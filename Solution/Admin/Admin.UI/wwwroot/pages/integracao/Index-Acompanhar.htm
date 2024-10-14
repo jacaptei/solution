@@ -1,0 +1,410 @@
+﻿<template>
+    <div>
+        <div style="display: flex; width:100%; align-items: center; justify-content:end; margin-bottom: 10px">
+            <el-icon @click="abrirModalFiltro" style="cursor: pointer; color: #409EFF; font-size: 24px;">
+                <Filter />
+            </el-icon>
+        </div>
+
+        <!-- Tabela principal de Integrações -->
+        <el-table :data="acompanhar" table-layout="auto" :header-cell-style="{ fontWeight: 'bold' }" :row-class-name="setRowClass">
+            <!-- Coluna expansível de Integrações -->
+            <el-table-column type="expand">
+                <template #default="props">
+                    <el-card :style="{ borderColor: '#b1b1b1', borderWidth: '1px', height: auto, borderStyle: 'solid'}" shadow="never">
+                        <!-- Tabela de Bairros dentro da Integração -->
+                        <el-table :data="props.row.bairros" height="auto" table-layout="auto" :header-cell-style="{ fontWeight: 'bold' }">
+                            <!-- Coluna expansível de Bairros -->
+                            <el-table-column type="expand">
+                                <template #default="bairroScope">
+                                    <!-- Tabela de Imóveis dentro de cada Bairro -->
+                                    <el-card :style="{ borderColor: '#b1b1b1', borderWidth: '1px', borderStyle: 'solid'}" shadow="never">
+                                        <transition name="fade" mode="out-in">
+                                            <el-table :data="bairroScope.row.bairro.imoveis" max-height="650" table-layout="auto" :header-cell-style="{ fontWeight: 'bold' }" fixed-header>
+                                                <el-table-column label="ID da Importação" prop="id" align="center" />
+                                                <el-table-column label="Código do Imóvel JaCaptei" prop="cod" align="center" />
+                                                <el-table-column label="Código do Imóvel Imoview" prop="imoviewResponse.codigo" align="center" />
+                                                <el-table-column label="Data de Importação" prop="data" width="150" align="center">
+                                                    <template #default="scope">
+                                                        {{ formatarDataHora(scope.row.data) }}
+                                                    </template>
+                                                </el-table-column>
+                                                <el-table-column label="Status" prop="status" align="center">
+                                                    <template #default="scope">
+                                                        <div style="display: flex; align-items: center; justify-content:center">
+                                                            <div style="display: flex; align-items: center; justify-content:center">
+                                                                <div v-if="!scope.row.imoviewResponse.erro">
+                                                                    <span style="margin-right:5px;">{{ scope.row.status }}</span>
+                                                                </div>
+                                                                <div v-else>
+                                                                    <span style="margin-right:5px;" class="error">{{ scope.row.status }}</span>
+                                                                </div>
+                                                                <el-icon v-if="scope.row.status === 'Concluido'">
+                                                                    <SuccessFilled color="green" />
+                                                                </el-icon>
+                                                                <el-icon v-else-if="scope.row.status === 'Erro'">
+                                                                    <CircleCloseFilled color="red" />
+                                                                </el-icon>
+                                                                <el-icon v-else-if="scope.row.status === 'Processando'">
+                                                                    <LoadingFilled color="blue" />
+                                                                </el-icon>
+                                                                <el-icon v-else-if="scope.row.status === 'Aguardando'">
+                                                                    <ClockFilled color="yellow" />
+                                                                </el-icon>
+                                                            </div>
+                                                        </div>
+                                                    </template>
+                                                </el-table-column>
+                                                <el-table-column label="Atualizado Em" prop="atualizadoEm" align="center">
+                                                    <template #default="scope">
+                                                        {{ formatarDataHora(scope.row.atualizadoEm) }}
+                                                    </template>
+                                                </el-table-column>
+                                                <el-table-column label="Resposta" align="center">
+                                                    <template #default="scope">
+                                                        <div v-if="!scope.row.imoviewResponse.erro">
+                                                            {{ scope.row.imoviewResponse.mensagem }}
+                                                        </div>
+                                                        <div v-else>
+                                                            <span class="error">Erro: {{ scope.row.imoviewResponse.mensagem }}</span>
+                                                        </div>
+                                                    </template>
+                                                </el-table-column>
+                                            </el-table>
+                                        </transition>
+                                    </el-card>
+                                </template>
+                            </el-table-column>
+
+                            <!-- Colunas de Bairros -->
+                            <el-table-column label="Bairro" prop="bairro.nome" />
+                            <el-table-column label="Quantidade de Imoveis" prop="totalImoveisBairro" align="center">
+                                <template #default="bairroScope">
+                                    {{ bairroScope.row.bairro.imoveis.length }}
+                                </template>
+                            </el-table-column>
+                            <el-table-column label="Status" align="center">
+                                <template #default="bairroScope">
+                                    <div style="display: flex; align-items: center; justify-content: center">
+                                        <span style="margin-right:5px;">{{ bairroScope.row.status }}</span>
+                                        <el-icon v-if="bairroScope.row.status === 'Concluido'">
+                                            <SuccessFilled color="green" />
+                                        </el-icon>
+                                        <el-icon v-else-if="bairroScope.row.status === 'Concluído com Falhas'">
+                                            <WarnTriangleFilled color="orange" />
+                                        </el-icon>
+                                        <el-icon v-else-if="bairroScope.row.status === 'Erro'">
+                                            <CircleCloseFilled color="red" />
+                                        </el-icon>
+                                        <el-icon v-else-if="bairroScope.row.status === 'Processando'">
+                                            <LoadingFilled color="blue" />
+                                        </el-icon>
+                                        <el-icon v-else-if="bairroScope.row.status === 'Aguardando'">
+                                            <ClockFilled color="yellow" />
+                                        </el-icon>
+                                    </div>
+                                </template>
+                            </el-table-column>
+                        </el-table>
+                    </el-card>
+                </template>
+            </el-table-column>
+
+            <!-- Colunas principais da Integração -->
+            <el-table-column label="Cliente" prop="cliente" />
+            <el-table-column label="Plano" prop="plano" />
+            <el-table-column label="Data de Criação" prop="criadoEm">
+                <template #default="scope">
+                    {{ formatarDataHora(scope.row.criadoEm) }}
+                </template>
+            </el-table-column>
+            <el-table-column label="Quantidade de Bairros Importados" prop="quantidadeBairros" align="center">
+                <template #default="scope">
+                    {{ quantidadeBairros }}
+                </template>
+            </el-table-column>
+            <el-table-column label="Total de Imóveis Importados" prop="totalImoveis" align="center">
+                <template #default="scope">
+                    {{ totalImoveis }}
+                </template>
+            </el-table-column>
+            <el-table-column label="Última Atualização" prop="atualizadoEm" align="center">
+                <template #default="scope">
+                    {{ formatarDataHora(scope.row.atualizadoEm) }}
+                </template>
+            </el-table-column>
+            <el-table-column label="Status" prop="status" align="center">
+                <template #default="scope">
+                    <div style="display: flex; align-items: center; justify-content: center">
+                        <div style="display: flex; align-items: center; justify-content: center">
+                            <span style="margin-right:5px;">{{ scope.row.status }}</span>
+                            <el-icon v-if="scope.row.status === 'Concluido'">
+                                <SuccessFilled color="green" />
+                            </el-icon>
+                            <el-icon v-else-if="scope.row.status === 'Concluído com Falhas'">
+                                <WarnTriangleFilled color="orange" />
+                            </el-icon>
+                            <el-icon v-else-if="scope.row.status === 'Erro'">
+                                <CircleCloseFilled color="red" />
+                            </el-icon>
+                            <el-icon v-else-if="scope.row.status === 'Processando'">
+                                <LoadingFilled color="blue" />
+                            </el-icon>
+                            <el-icon v-else-if="scope.row.status === 'Aguardando'">
+                                <ClockFilled color="yellow" />
+                            </el-icon>
+                        </div>
+                    </div>
+                </template>
+            </el-table-column>
+        </el-table>
+    </div>
+
+    <el-dialog v-model="filtrosVisiveis" title="Filtro" width="500" align-center>
+        <div style="display: flex; width: 100%">
+            <el-row gutter=20>
+                <el-col :xs="24" :sm="24" :md="24" :lg="24" class="register-input">
+                    <span>CRM</span>
+                    <el-select v-model="listaCrmIntegracao" @change="filtrarParceiroIntegracao" placeholder="Escolha o CRM" style="width: 100%">
+                        <el-option v-for="item in crmOptions"
+                                   :key="item.id"
+                                   :label="item.nome"
+                                   :value="item.id"
+                                   :disabled="item.disabled"/>
+                    </el-select>
+                </el-col>
+                <el-col :xs="24" :sm="24" :md="24" :lg="24" class="register-input">
+                    <span>Parceiro Integração</span>
+                    <el-select :disabled="!isDisabled()" v-model="listaIntegracao" placeholder="Escolha o Parceiro" style="width: 100%">
+                        <el-option v-for="item in options" :key="item.value" :label="item.label" :value="item" />
+                    </el-select>
+                </el-col>
+            </el-row>
+        </div>
+
+        <template #footer>
+            <div class="dialog-footer">
+                <el-button @click="fecharModal">Cancelar</el-button>
+                <el-button type="primary" @click="Buscar">Aplicar Filtros</el-button>
+            </div>
+        </template>
+    </el-dialog>
+</template>
+
+<script>
+    import { ref, onMounted, getCurrentInstance, watch } from 'vue';
+    export default {
+        setup() {
+            const options = ref({});
+            const totalImoveis = ref(0);
+            const collapseItems = ref([]);
+            const idIntegracao = ref(null);
+            const listaIntegracao = ref([]);
+            const quantidadeBairros = ref(0);
+            const listaCrmIntegracao = ref([]);
+            const filtrosVisiveis = ref(false);
+            const instance = getCurrentInstance();
+            const crmOptions = ref([
+                { nome: 'IMOVIEW', id: 1 },
+                { nome: 'VISTASOFT', id: 2, disabled: true },
+            ]);
+            const acompanhar = ref([]);
+
+            watch(acompanhar, (newVal) => {
+                totalImoveis.value = newVal.reduce((total, integracao) => {
+                    return total + integracao.bairros.reduce((bairroTotal, bairro) => {
+                        return bairroTotal + (bairro.bairro.imoveis ? bairro.bairro.imoveis.length : 0);
+                    }, 0);
+                }, 0);
+
+                quantidadeBairros.value = newVal[0]?.bairros.length || 0;
+            }, { deep: true });
+
+            onMounted(() => {
+                setTimeout(() => {
+                    filtrosVisiveis.value = true;
+                }, 300);
+            });
+
+            const abrirModalFiltro = () => {
+                filtrosVisiveis.value = true;
+            };
+
+            const fecharModal = () => {
+                filtrosVisiveis.value = false;
+            };
+
+            const filtros = ref({
+                Integracao: 0,
+                Cliente: '',
+            });
+
+            const filtrarParceiroIntegracao = async (crm) => {
+                const url = validarUrlParaBuscarParceiroIntegracao(crm);
+                if (!url) {
+                    console.error("URL inválida para o parceiro de integração.");
+                    return;
+                }
+                await getListaIntegracoes(url);
+                isDisabled();
+            };
+
+            const isDisabled = () => {
+                return listaCrmIntegracao.value === 1 || listaCrmIntegracao.value === 2;
+            };
+
+            const formatarData = (dataISO) => {
+                if (!dataISO) return '';
+                const data = new Date(dataISO);
+                return data.toLocaleDateString('pt-BR', { timeZone: 'UTC' });  // Formato dd/mm/aaaa
+            };
+
+            const formatarHorario = (dataISO) => {
+                if (!dataISO) return '';
+                const data = new Date(dataISO);
+                return data.toLocaleTimeString('pt-BR', { timeZone: 'UTC', hour: '2-digit', minute: '2-digit' });  // Formato HH:mm
+            };
+
+            const formatarDataHora = (dataISO) => {
+                const data = new Date(dataISO);
+                const dataUTC3 = new Date(data.getTime() - (data.getTimezoneOffset() * 60000)); // Converter para UTC-3
+                const dataFormatada = dataUTC3.toLocaleDateString('pt-BR');
+                const horarioFormatado = dataUTC3.toLocaleTimeString('pt-BR', {
+                    hour: '2-digit',
+                    minute: '2-digit',
+                    timeZone: 'America/Sao_Paulo'
+                });
+                return `${dataFormatada} às ${horarioFormatado}`;
+            };
+
+            const validarUrlParaBuscarParceiroIntegracao = (crm) => {
+                switch (crm) {
+                    case 1:
+                        return instance.proxy.$api.BuildURL("api/imoview/integracao/listar");
+                    case 2:
+                        return instance.proxy.$api.BuildURL("api/vistasoft/integracao/listar");
+                    default:
+                        console.error("CRM inválido:", crm);
+                        return null;
+                }
+            };
+
+            const verificarStatusBairro = (bairro) => {
+                const imoveis = bairro.bairro?.imoveis;
+                const temErro = imoveis.some(imovel => imovel.imoviewResponse?.erro);
+                const temSucesso = imoveis.some(imovel => !imovel.imoviewResponse?.erro);
+                const temPendente = imoveis.some(imovel => imovel.status === 'Aguardando');
+                const emProcessamento = imoveis.some(imovel => imovel.status === 'Processando');
+
+                if (emProcessamento) return 'Processando';
+                if (temErro && temSucesso) return 'Concluído com Falhas';
+                if (temErro) return 'Erro';
+                if (temPendente) return 'Aguardando';
+                return 'Concluido';
+            };
+
+            const verificarStatusIntegracao = (integracao) => {
+                let statusIntegracao = "Concluido";
+                let temParcial = false;
+                let emProcessamento = false;
+
+                integracao.bairros.forEach(bairro => {
+                    const statusBairro = verificarStatusBairro(bairro);
+                    if (statusBairro === "Erro") {
+                        statusIntegracao = "Erro";
+                    } else if (statusBairro === "Concluído com Falhas") {
+                        temParcial = true;
+                    } else if (statusBairro === "Processando") {
+                        emProcessamento = true;
+                    }
+                });
+
+                if (emProcessamento) return "Processando";
+                if (temParcial) return "Concluído com Falhas";
+                return statusIntegracao;
+            };
+
+            const Buscar = async () => {
+                try {
+                    filtros.value.Integracao = listaIntegracao.value.value;
+                    filtros.value.Cliente = listaIntegracao.value.label;
+                    const url = instance.proxy.$api.BuildURL("api/imoview/integracao/status");
+                    const response = await axios.post(url, filtros.value);
+                    acompanhar.value = [response.data];
+                    acompanhar.value = acompanhar.value.map(integracao => {
+                        return {
+                            ...integracao,
+                            status: verificarStatusIntegracao(integracao),
+                            bairros: integracao.bairros.map(bairro => {
+                                return {
+                                    ...bairro,
+                                    status: verificarStatusBairro(bairro)
+                                };
+                            })
+                        };
+                    });
+                    totalImoveis.value = acompanhar.value.reduce((total, integracao) => {
+                        if (Array.isArray(integracao.bairros) && integracao.bairros.length > 0) {
+                            return total + integracao.bairros.reduce((bairroTotal, bairro) => {
+                                return bairroTotal + (Array.isArray(bairro.bairro.imoveis) ? bairro.bairro.imoveis.length : 0);
+                            }, 0);
+                        }
+                        return total;
+                    }, 0);
+                    quantidadeBairros.value = acompanhar.value[0].bairros.length;
+                } catch (error) {
+                    console.error("Erro ao buscar integração:", error);
+                } finally {
+                    filtrosVisiveis.value = false;
+                }
+            };
+
+            const getListaIntegracoes = async (url) => {
+                try {
+                    const { data } = await axios.get(url);
+                    options.value = data.map(item => ({
+                        value: item.integracao,
+                        label: item.cliente
+                    }));
+                } catch (error) {
+                    console.error('Erro ao buscar integrações:', error);
+                }
+            };
+
+            return {
+                acompanhar,
+                filtrosVisiveis,
+                filtros,
+                Buscar,
+                idIntegracao,
+                listaIntegracao,
+                options,
+                abrirModalFiltro,
+                formatarData,
+                formatarHorario,
+                formatarDataHora,
+                fecharModal,
+                crmOptions,
+                listaCrmIntegracao,
+                filtrarParceiroIntegracao,
+                isDisabled,
+                totalImoveis,
+                quantidadeBairros
+            };
+        },
+    };
+</script>
+
+<style>
+    .el-card__body {
+        padding: 10px;
+    }
+
+    .error {
+        color: red;
+    }
+
+    .el-dialog__title {
+        color: #0072ff;
+    }
+</style>
