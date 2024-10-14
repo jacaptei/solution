@@ -302,12 +302,9 @@ namespace JaCaptei.Application{
             return appReturn;
         }
 
-
         public Parceiro ObterPorUsername(Parceiro entity) {
             return ObterPorDocumentoOuEmail(entity);
         }
-
-
 
         public Parceiro ObterPorDocumentoOuEmail(Parceiro entity) {
 
@@ -358,7 +355,6 @@ namespace JaCaptei.Application{
             return entityDB;
         }
 
-
         public Parceiro ObterPorCamposChaves(Parceiro entity) {
 
             Parceiro entityDB = null;
@@ -376,9 +372,6 @@ namespace JaCaptei.Application{
             }
             return entityDB;
         }
-
-
-
         public Parceiro ObterPorCamposChavesParaAlteracao(Parceiro entity) {
 
             Parceiro entityDB = null;
@@ -397,11 +390,6 @@ namespace JaCaptei.Application{
             }
             return entityDB;
         }
-
-
-
-
-
 
         public Parceiro ObterPeloToken(string token) {
 
@@ -441,9 +429,7 @@ namespace JaCaptei.Application{
             return entities;
         }
 
-
         public AppReturn AlterarSenha(Parceiro entity) {
-
             try {
                     var param = new { entity.token };
                     Parceiro entityDB = null;
@@ -462,15 +448,10 @@ namespace JaCaptei.Application{
                 appReturn.AddException("Não foi possível alterar senha (registro não encontrado ou inválido).");
                 appReturn.status.exception = ex.ToString();
             }
-
             return appReturn;
-
         }
-        
-
 
         public AppReturn AlterarPerfil(Parceiro entity) {
-
             try {
                     var param = new { entity.token };
                     Parceiro entityDB = null;
@@ -484,7 +465,6 @@ namespace JaCaptei.Application{
                             if(Utils.Validator.Is(entity.email))
                                 entityDB.email = Utils.String.HigienizeMail(entity.email);  
 
-                            //entityDB.token = entity.token = Utils.Key.CreateToken(entityDB.id.ToString());
                             entityDB.dataAtualizacao = Utils.Date.GetLocalDateTime();
 
                             conn.Update(entityDB);
@@ -580,6 +560,7 @@ namespace JaCaptei.Application{
             }
             return appReturn;
         }
+
         public AppReturn AtualizarQuantidadeUsuariosConta(int limiteUsuarios, int idConta, int atualizadoPorId, string atualizadoPorNome)
         {
             var appReturn = new AppReturn();
@@ -718,7 +699,7 @@ namespace JaCaptei.Application{
             }
             return appReturn;
         }
-        public AppReturn VerificaQuantidadeUsuariosAtivos(int idConta, int ajuste, int atualizadoPorId, string atualizadoPorNome, bool ativo)
+        public AppReturn VerificaQuantidadeUsuariosAtivos(int idConta, int atualizadoPorId, string atualizadoPorNome, bool ativo)
         {
             var appReturn = new AppReturn();
             try
@@ -1039,7 +1020,24 @@ namespace JaCaptei.Application{
         }
 
 
+        public AppReturn ObterContasAtivas()
+        {
+            var appReturn = new AppReturn();
+            try
+            {
+                using (var conn = new DBcontext().GetConn())
+                {
+                    var contaAtiva = conn.Query<Conta>(e => e.ativo == true).ToList();
+                    appReturn.result = contaAtiva;
+                }
+            }
+            catch (Exception ex)
+            {
+                throw new Exception();
+            }
 
+            return appReturn;
+        }
 
 
 

@@ -14,6 +14,7 @@ namespace JaCaptei.Model
         public string responsavel { get; set; } = "";
         public string tipoPessoa { get; set; } = "PF";
         public string cpf { get; set; } = "";
+        public bool ativo { get; set; } = true;
         public long cpfNum { get; set; } = 0;
         public string cnpj { get; set; } = "";
         public long cnpjNum { get; set; } = 0;

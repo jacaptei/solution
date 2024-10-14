@@ -4,10 +4,8 @@ using JaCaptei.Application.DAL;
 
 namespace JaCaptei.Application
 {
-
     public class ParceiroService : ServiceBase, IDisposable
     {
-
         readonly ParceiroBLO BLO;
         readonly ParceiroDAO DAO;
 
@@ -29,6 +27,7 @@ namespace JaCaptei.Application
                 appReturn.SetAsBadRequest("ID não informado.");
                 return appReturn;
             }
+            Model.Admin operador = new Model.Admin();
 
             var entities = DAO.ObterContaPorId(idConta);
 
@@ -41,7 +40,7 @@ namespace JaCaptei.Application
             {
                 appReturn.result = entities;
             }
-
+            DAO.VerificaQuantidadeUsuariosAtivos(idConta, operador.id, operador.nome, true);
             return appReturn;
         }
 
@@ -67,7 +66,6 @@ namespace JaCaptei.Application
             return appReturn;
 
         }
-
         public AppReturn AtualizarConfiguracoesConta(ContaId entity, Model.Admin operador)
         {
             var appReturn = new AppReturn();
@@ -106,7 +104,7 @@ namespace JaCaptei.Application
                         DAO.InativarConta(entity.ativo.Value, entity.idConta.Value, operador.id, operador.nome);
                         DAO.InativarParceirosAssociadosConta(entity.ativo.Value, entity.idConta.Value, operador.id, operador.nome);
                         if (entity.ativo.Value == true)
-                        DAO.VerificaQuantidadeUsuariosAtivos(entity.idConta.Value, 1, operador.id, operador.nome, entity.ativo.Value);
+                            DAO.VerificaQuantidadeUsuariosAtivos(entity.idConta.Value, operador.id, operador.nome, entity.ativo.Value);
                     }
                     else
                     {
@@ -167,7 +165,6 @@ namespace JaCaptei.Application
             }
             return appReturn;
         }
-
         public AppReturn AceitarTermos(int id)
         {
             appReturn = DAO.AceitarTermos(id);
@@ -196,10 +193,6 @@ namespace JaCaptei.Application
             return appReturn;
 
         }
-
-
-
-
         public AppReturn ObterPeloDocumentoOuEmail(Parceiro entity)
         {
 
@@ -222,14 +215,10 @@ namespace JaCaptei.Application
 
         }
 
-
-
         public AppReturn Obter(Parceiro entity)
         {
             return ObterPeloDocumentoOuEmail(entity);
         }
-
-
 
         public AppReturn Adicionar(Parceiro entity)
         {
@@ -255,9 +244,7 @@ namespace JaCaptei.Application
                     appReturn.AddException("Acesso indisponível. Entre em contato e verifique se sua conta ainda está ativa.");
                 else
                     appReturn.AddException("Já existe um Parceiro cadastrado com este CPF, CNPJ ou E-mail.");
-
                 return appReturn;
-
             }
 
             try
@@ -286,19 +273,11 @@ namespace JaCaptei.Application
             return appReturn;
         }
 
-
-
-
-
         public AppReturn Confirmar(string token)
         {
             appReturn = DAO.Confirmar(token);
             return appReturn;
         }
-
-
-
-
 
         public AppReturn Validar(Parceiro entity)
         {
@@ -329,8 +308,6 @@ namespace JaCaptei.Application
             return appReturn;
         }
 
-
-
         public AppReturn Ativar(Parceiro entity)
         {
 
@@ -359,24 +336,16 @@ namespace JaCaptei.Application
             return appReturn;
         }
 
-
-
         public AppReturn Desativar(Parceiro entity)
         {
-
             if (entity is null || entity?.id == 0)
             {
                 appReturn.AddException("Parceiro não identificado.");
                 return appReturn;
             }
-
             appReturn = DAO.Desativar(entity);
-
             return appReturn;
-
         }
-
-
 
         public AppReturn Alterar(Parceiro entity)
         {
@@ -420,18 +389,11 @@ namespace JaCaptei.Application
             return appReturn;
         }
 
-
-
         public AppReturn Excluir(Parceiro entity)
         {
             appReturn = DAO.Excluir(entity);
             return appReturn;
         }
-
-
-
-
-
 
         public AppReturn AlterarSenha(Parceiro entity)
         {
@@ -454,7 +416,6 @@ namespace JaCaptei.Application
             return appReturn;
 
         }
-
 
         public AppReturn AlterarPerfil(Parceiro entity)
         {
@@ -486,10 +447,6 @@ namespace JaCaptei.Application
             return appReturn;
 
         }
-
-
-
-
         public AppReturn ObterPorDocumentoOuEmail(Parceiro entity)
         {
 
@@ -503,10 +460,6 @@ namespace JaCaptei.Application
             return appReturn;
 
         }
-
-
-
-
 
         public AppReturn Autenticar(Parceiro entity)
         {
@@ -534,9 +487,6 @@ namespace JaCaptei.Application
             }
             return appReturn;
         }
-
-
-
 
         public AppReturn ObterPendentesValidacao()
         {
@@ -576,10 +526,11 @@ namespace JaCaptei.Application
 
         }
 
-
-
-
-
+        public AppReturn ObterContasAtivas()
+        {
+            appReturn = DAO.ObterContasAtivas();
+            return appReturn;
+        }
 
         public AppReturn Buscar(Busca busca)
         {
@@ -607,22 +558,6 @@ namespace JaCaptei.Application
         {
             DAO.Dispose();
         }
-        /*
-       public AppReturn ObterViaCPF(Shared.Model.Parceiro entity){
-
-           return DAO.ObterViaToken(entity);
-       }
-
-       public AppReturn ObterViaToken(Shared.Model.Parceiro entity){
-           return DAO.ObterViaToken(entity);
-       }
-
-       public AppReturn ObterViaTokenUID(Shared.Model.Parceiro entity){
-           return DAO.ObterViaTokenUID(entity);
-       }
-*/
-
-
 
     }
 }

@@ -2,17 +2,43 @@
     <div v-loading.fullscreen.lock="fullscreenLoading"
          element-loading-background="rgba(12, 8, 8, 0.56)">
         <el-row :gutter="20">
-            <el-col :xs="24" :sm="24" :md="24" :lg="24" class="register-input">
+            <el-col :xs="24" :sm="24" :md="24" :lg="8" class="register-input">
+                <div>NOVO CADASTRO?</div>
+                <el-select filterable v-model="cadastroConta" style="width: 100%" placeholder="SELECIONAR">
+                    <el-option v-for="item in [
+                                    {label: 'SIM',  value: true },
+                                    {label: 'NÃO',  value: false },
+                                    ]"
+                               :key="item.value"
+                               :label="item.label"
+                               :value="item.value"
+                               @click="ObterContasAtivas">
+                    </el-option>
+                </el-select>
+            </el-col>
+            
+            <el-col v-if="cadastroConta" :xs="24" :sm="24" :md="24" :lg="16" class="register-input">
                 <div>SELECIONE O PLANO</div>
                 <el-select filterable v-model="parceiro.idPlano" style="width: 100%" placeholder="SELECIONAR">
                     <el-option v-for="item in [
-                                    {label: 'CORRETOR AUTÔNOMO ESSENCIAL por R$387/mês',  value: 2 },
-                                    {label: 'IMOBILIÁRIA ATÉ 03 USUÁRIOS por R$499/mês',  value: 3 },
-                                    {label: 'IMOBILIÁRIA ATÉ 05 USUÁRIOS por R$699/mês',  value: 4 }
+                                    {label: 'BASIC',  value: 2 },
+                                    {label: 'PRO',  value: 3 },
+                                    {label: 'ADVANCED',  value: 4 }
                                     ]"
                                :key="item.value"
                                :label="item.label"
                                :value="item.value">
+                    </el-option>
+                </el-select>
+            </el-col>
+            
+            <el-col v-if="!cadastroConta" :xs="24" :sm="24" :md="24" :lg="16" class="register-input">
+                <div>SELECIONE A CONTA PARA VINCULAR O PARCEIRO</div>
+                <el-select @change ="SetContaAndToken" filterable v-model="contaSelecionada" style="width: 100%" placeholder="SELECIONAR">
+                    <el-option v-for="item in contasAtivas"
+                               :key="item.value"
+                               :label="item.label"
+                               :value="item">
                     </el-option>
                 </el-select>
             </el-col>
@@ -248,6 +274,9 @@
                 carregandoBairros: false,
                 carregandoEstadosCreci: false,
                 carregandoCidadesCreci: false,
+                contaSelecionada: [],
+                contasAtivas: [],
+                cadastroConta: true,
                 aceitouTermos: true,
                 aceitouPoliticaPrivacidade: true,
                 estadoSelecionado: {},
@@ -267,7 +296,9 @@
                     bairros: [],
                     sexos: [{ id: 1, label: "NÃO APLICÁVEL", value: "NA" }, { id: 2, label: "MASCULINO", value: "MASCULINO" }, { id: 3, label: "FEMININO", value: "FEMININO" }],
                 },
-                parceiro: {}
+                parceiro: {
+                    tipoPessoa: 'PF',
+                }
             }
         },
 
@@ -323,8 +354,6 @@
 
                 if (this.cep.numero !== this.parceiro.cep) {
 
-                    console.log(this.cep.numero, this.parceiro.cep);
-
                     this.carregandoCEP = true;
                     this.carregandoEstados = true;
                     this.carregandoCidades = true;
@@ -356,6 +385,35 @@
                 var endereco = this.parceiro.estado + "/" + this.parceiro.cidade.replaceAll(" ", "%20") + "/" + this.parceiro.logradouro.replaceAll(" ", "%20")
                 let res = await this.$sdata.BuscarCep(endereco);
                 return res.cep;
+            },
+
+            async ObterContasAtivas() {
+                this.fullscreenLoading = true;
+                try {
+                    const url = this.$api.BuildURL("parceiro/obtercontasativas");
+                    const { data } = await axios.post(url); 
+                    if (data.result) {
+                        const contas = data.result.map(item => ({
+                            id: item.id,
+                            value: item,
+                            label: item.nome
+                        }));
+                        this.contasAtivas = contas;
+                    } else {
+                        this.contasAtivas = [];
+                    }
+                } catch (error) {
+                    ce("Não foi possível obter os clientes.");
+                    if (error.response) ce(error.response);
+                    console.error(error);
+                } finally {
+                    this.fullscreenLoading = false;
+                }
+            },
+
+            SetContaAndToken() {
+                this.parceiro.tokenConta = this.contaSelecionada.value.token;
+                this.parceiro.idConta = this.contaSelecionada.value.id;
             },
 
             ObterCidades(estado) {
@@ -445,11 +503,8 @@
             },
 
             SalvarCadastro() {
-
                 this.parceiro.idTipo = 5;
-
                 var msg = "";
-
                 if (this.parceiro.tipoPessoa == "PF") {
                     if (this.$validator.not(this.parceiro.cpf))
                         msg += "<b>CPF</b> não informado<br>";
@@ -553,7 +608,7 @@
                             this.OpenLoadingService(false);
                             this.$tools.Alert("Não foi possível atender a requisição");
                     }).finally(() => {
-
+                        this.fullscreenLoading = false;
                     });
                 }
             },

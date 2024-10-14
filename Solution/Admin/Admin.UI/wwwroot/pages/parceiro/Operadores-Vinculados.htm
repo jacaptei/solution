@@ -14,7 +14,7 @@
                                 :md="24"
                                 :lg="24">
                             <el-col class="register-input" :xs="24" :sm="12" :md="12" :lg="12">
-                                <div v-if="item.tableData[0].donoConta" style="cursor: pointer" @click="$tools.Copy(item.tokenConta)">
+                                <div v-if="item.tableData[0].donoConta" style="cursor: pointer">
                                     <label>TITULAR DA CONTA {{ item.tableData[0].nome }}</label>
                                     <span style="margin-left: 10px; font-weight: bold; color: var(--s-color-green)">
                                         {{ item.tableData[0].donoConta ? 'SIM' : 'NÃO' }}
@@ -39,9 +39,9 @@
                                            placeholder="SELECIONAR"
                                            @change="(newValue) => handleChange(index, 'idPlano', newValue)">
                                     <el-option v-for="plan in [
-                                            { label: 'CORRETOR AUTÔNOMO ESSENCIAL por R$387/mês', value: 2 },
-                                            { label: 'IMOBILIÁRIA ATÉ 03 USUÁRIOS por R$499/mês', value: 3 },
-                                            { label: 'IMOBILIÁRIA ATÉ 05 USUÁRIOS por R$699/mês', value: 4 }
+                                            { label: 'BASIC', value: 2 },
+                                            { label: 'PRO', value: 3 },
+                                            { label: 'ADVANCED', value: 4 },
                                         ]"
                                                :key="plan.value"
                                                :label="plan.label"
@@ -238,6 +238,8 @@
                                 donoConta: item.donoConta,
                                 status: item.status,
                                 ativo: item.ativo,
+                                confirmado: item.confirmado,
+                                validado: item.validado,
                                 limiteUsuarios: item.limiteUsuarios,
                                 totalUsuarios: item.totalUsuarios,
                                 limiteSolicitacoesDiarias: item.limiteSolicitacoesDiarias,

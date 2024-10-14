@@ -198,5 +198,13 @@ namespace JaCaptei.Administrativo.API.Controllers
             appReturn = service.Buscar(busca);
             return Result(appReturn);
         }
+        
+        [HttpPost]
+        [Route("[action]")]
+        public IActionResult ObterContasAtivas()
+        {
+            appReturn = service.ObterContasAtivas();
+            return Result(appReturn);
+        }
     }
 }
