@@ -57,6 +57,7 @@
     --s-color-teal:#40e579;
     --s-color-red:#ff00a5;
     --s-color-red-dark:#d50101;
+    --s-color-purple:#c000ff;
     --s-color-yellow:#ffff00;
     --s-color-light-grey:#d9d9d9;
     --s-color-orange:#ff6b37;
@@ -253,8 +254,8 @@ article{
 
 
 .title{
-    font-size:28px;
-    color:var(--s-text-color);
+    font-size:15px;
+    color:var(--s-color-primary);
     font-weight:600;
 }
 

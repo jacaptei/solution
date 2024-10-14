@@ -14,6 +14,22 @@ namespace JaCaptei.Administrativo.API.Controllers {
         LocalidadeService   localidadeService   = new LocalidadeService();
         Mail mailService = new Mail();
 
+        [HttpGet]
+        [Route("email/teste/{email}")]
+        public IActionResult EmailTeste(string email) {
+            var res="[SUCESSO]";
+            try {
+                Mail mail    = new Mail();
+                mail.emailTo = email;
+                mail.about   = "Teste assunto";
+                mail.message = "Teste conteúdo";
+                mail.Send();
+            } catch(Exception e) {
+                var ex = e.ToString();
+                res = "[FALHOU] " + e.ToString();
+            }
+            return Ok(res);
+        }
 
         [HttpGet]
         [Route("modelos/obter")]

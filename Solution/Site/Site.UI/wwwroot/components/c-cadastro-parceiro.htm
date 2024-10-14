@@ -1,7 +1,6 @@
 <template>
 
 
-
     <div>
         <div style="margin-top:40px;text-align:center;width:100%">
             <div class="form-area" id="form-area" style="background:var(--s-accent-color);min-height:540px">
@@ -42,8 +41,7 @@
                                                                 ]"
                                                    :key="item.value"
                                                    :label="item.label"
-                                                   :value="item.value"
-                                                   ></el-option>
+                                                   :value="item.value"></el-option>
                                     </el-select>
                                 </el-col>
                                 <el-col :xs="24" :sm="24" :md="12" :lg="15" style="max-width:920px" class="s-input" v-else>
@@ -402,6 +400,7 @@
         },
         created: function () {
             //this.opcoes.estados = this.$sdata.forms.states;
+            this.$root.usuario.idPlano = 2;
         },
         mounted() {
             var count = 0;
@@ -481,7 +480,7 @@
                     this.cep.estado         = this.$root.usuario.estado     = "";
 
                     this.$root.usuario.cep  = this.cep.numero;
-                    let res                 = await this.$sdata.SearchAddress(this.cep.numero);
+                    let res                 = await this.$sdata.BuscarEndereco(this.cep.numero);
 
                     if (this.$validator.is(res?.city)) {
                         this.cep.cidade         = this.$root.usuario.cidade     = res.city;

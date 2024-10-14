@@ -26,19 +26,23 @@ namespace JaCaptei.Application
             Localidade localidade   = new Localidade();
             localidade.estados      = (List<Estado>) new LocalidadeService().ObterEstados().result;
 
-            dicModels.Add("pessoa"      ,   new Pessoa());
-            dicModels.Add("usuario"     ,   user);
-            dicModels.Add("proprietario",   new Proprietario());
-            dicModels.Add("parceiro"    ,   new Parceiro());
-            dicModels.Add("imovel"      ,   new Imovel());
-            dicModels.Add("tiposImoveis",   ObterTiposImoveis() );
-            dicModels.Add("localidade"  ,   localidade );
-            dicModels.Add("solicitacao" ,   new Solicitacao());
-            dicModels.Add("tiposStatus" ,   ObterTiposStatus());
-            dicModels.Add("imovelBusca" ,   new ImovelBusca { usuario = user });
-            dicModels.Add("favorito"    ,   new ImovelFavorito());
-            dicModels.Add("busca"       ,   new Search());
-            dicModels.Add("log"         ,   new Log());
+            List<ImovelTipo> tiposImoveis       = DAO.ObterTiposImoveis();
+
+            dicModels.Add("pessoa"              ,   new Pessoa());
+            dicModels.Add("usuario"             ,   user);
+            dicModels.Add("proprietario"        ,   new Proprietario());
+            dicModels.Add("parceiro"            ,   new Parceiro());
+            dicModels.Add("imovel"              ,   new Imovel());
+            dicModels.Add("imovelEndereco"      ,   new ImovelEndereco());
+            dicModels.Add("imovelBusca"         ,   new ImovelBusca { usuario = user });
+            dicModels.Add("tiposImoveis"        ,   tiposImoveis );
+            dicModels.Add("tiposComplementos"   ,   ObterTiposComplementos());
+            dicModels.Add("localidade"          ,   localidade   );
+            dicModels.Add("solicitacao"         ,   new Solicitacao());
+            dicModels.Add("tiposStatus"         ,   ObterTiposStatus());
+            dicModels.Add("favorito"            ,   new ImovelFavorito());
+            dicModels.Add("busca"               ,   new Busca());
+            dicModels.Add("log"                 ,   new Log());
             
             return dicModels;
 
@@ -70,63 +74,17 @@ namespace JaCaptei.Application
 
 
 
-        public List<string> ObterTiposImoveis() {
-
-            List<string> tipos = new List<string>();
-
-            tipos.Add("Apartamento");
-            tipos.Add("Casa");
-            tipos.Add("Andar");
-            tipos.Add("Andar corrido");
-            tipos.Add("Apart Hotel");
-            tipos.Add("Apartamento com área privativa");
-            tipos.Add("Apartamento Duplex");
-            tipos.Add("Área Comercial");
-            tipos.Add("Área privativa");
-            tipos.Add("Barracão");
-            tipos.Add("Casa");
-            tipos.Add("Casa comercial");
-            tipos.Add("Casa Duplex");
-            tipos.Add("Casa em condomínio");
-            tipos.Add("Casa geminada");
-            tipos.Add("Casa geminada coletiva");
-            tipos.Add("Casa Triplex");
-            tipos.Add("Chácara");
-            tipos.Add("Cobertura");
-            tipos.Add("Cobertura Duplex");
-            tipos.Add("Cobertura Triplex");
-            tipos.Add("Estacionamento");
-            tipos.Add("Fazenda");
-            tipos.Add("Fazendinha");
-            tipos.Add("Flat");
-            tipos.Add("Galpão");
-            tipos.Add("Garagem");
-            tipos.Add("Haras");
-            tipos.Add("Ilha");
-            tipos.Add("Kitnet");
-            tipos.Add("Loft");
-            tipos.Add("Loja");
-            tipos.Add("Lote");
-            tipos.Add("Lote Comercial");
-            tipos.Add("Lote em condomínio");
-            tipos.Add("Lotes em Condomínio");
-            tipos.Add("Ponto Comercial");
-            tipos.Add("Pousada");
-            tipos.Add("Prédio");
-            tipos.Add("Prédio Comercial");
-            tipos.Add("Sala");
-            tipos.Add("Salão");
-            tipos.Add("Sítio");
-            tipos.Add("Sobre Loja");
-            tipos.Add("Studio");
-            tipos.Add("Terreno / Área");
-
+        public List<ImovelTipo> ObterTiposImoveis() {
+            List<ImovelTipo> tipos = DAO.ObterTiposImoveis();   
             return tipos;
-
         }
 
 
 
+        public List<ImovelTipoComplemento> ObterTiposComplementos() {
+            List<ImovelTipoComplemento> tipos = DAO.ObterTiposComplementosImoveis();   
+            return tipos;
+        }
 
 
 

@@ -9,8 +9,12 @@ namespace JaCaptei.Model {
         private TimeZoneInfo ZONE = TimeZoneInfo.CreateCustomTimeZone("BRASILSP", new TimeSpan(-3, 0, 0), "BRASILSP", "BRASILSP");
         //TimeZoneInfo.ConvertTimeFromUtc(utcTime, ZONE);
 
-        public DateTime GetDateTime() {
+        public DateTime GetUTCDateTime() {
             return DateTime.UtcNow;
+        }
+
+        public DateTime GetDateTime() {
+            return DateTime.Now;
         }
 
         public DateTime GetUnsetDefaultDateTime() {
@@ -107,11 +111,9 @@ namespace JaCaptei.Model {
         //Model.dataEvento.ToString("ddd",new System.Globalization.CultureInfo("pt-BR"))
 
         public DateTime ConvertToLocalDateTime(DateTime dateTime) {
-            //if (dateTime == null) { return dateTime; }
-            //TimeZoneInfo UtcBrasilia = TimeZoneInfo.FindSystemTimeZoneById("E. South America Standard Time");
-            //dateTime = TimeZoneInfo.ConvertTimeFromUtc(dateTime,UtcBrasilia).ToLocalTime();
-            //return dateTime;
-            return GetLocalDate(dateTime);
+            TimeZoneInfo brasiliaTimeZone = TimeZoneInfo.FindSystemTimeZoneById("E. South America Standard Time");
+            dateTime = TimeZoneInfo.ConvertTimeFromUtc(dateTime, brasiliaTimeZone);
+            return dateTime;
         }
 
 

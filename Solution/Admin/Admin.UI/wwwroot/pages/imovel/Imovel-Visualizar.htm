@@ -1,0 +1,288 @@
+﻿<template>
+
+    <div>
+
+
+		    <el-row justify="center" v-if="onrequest">
+                <el-col :md="24" style="color:var(--s-color-primary)">
+                    <c-loading padding="20px"></c-loading>
+                </el-col>
+		    </el-row>
+
+
+		    <el-row v-else>
+                    <el-col :span="24" v-if="buscaImovel.total == 0">
+                        <el-divider style=""></el-divider>
+                          <span style="margin:10px;color:var(--s-color-orange)">imóvel não encontrado ou excluído</span>
+                        <el-divider></el-divider>
+                    </el-col>
+                    <el-col :span="24" style="color:var(--s-color-primary);font-weight:700" v-else-if="$validator.is(imoveisBuscaResult) && imoveisBuscaResult.length > 0">
+                            <c-imovel-view :imovel="imovel"></c-imovel-view>
+                    </el-col>
+                </el-row>
+
+                <el-row>
+
+
+
+		    </el-row>
+
+    </div>
+
+
+
+</template>
+
+
+<script>
+    module.exports = {
+
+        name: 'JaCapteiImovelVisualizar',
+
+        components: {
+
+        },
+
+        data: function () {
+            return {
+                onrequest               : true,
+                busca                   : this.$models.busca(),
+                buscaImovel             : this.$models.buscaImovel(),
+                imovel                  : this.$models.imovel(),
+                admins                  : this.$root.admins,
+            }
+        },
+
+		props: {
+            id:     { type: Number, required: true, default: 1 }
+		},
+        
+        computed: {
+
+        },
+
+
+
+        created: function () {
+
+
+        },
+
+
+
+        mounted() {
+
+  
+            this.Enviar(1);
+
+        },
+
+
+        methods: {
+
+
+
+			async Enviar(page){
+
+                this.buscaImovel.page = page;
+                this.buscaImovel.imovel.id = this.id;
+
+                this.onrequest  = true;
+                var request     = await this.$api.Post("imovel/buscar",this.buscaImovel);
+
+                if (request?.status?.success){
+                    //c2("request.result",request.result)
+                    if(this.$validator.is(request.result.total > 0)){
+                            this.buscaImovel        =  request.result;
+                            this.imoveisBuscaResult =  this.buscaImovel.result.imoveis;
+                            this.imovel             =  this.imoveisBuscaResult[0];
+                    }
+                }   
+
+                this.onrequest  = false;
+
+			},
+
+
+        }
+
+    }
+
+</script>
+
+
+<!--<script setup>
+const isCollapse = ref(true);
+const handleOpen = function(key, keyPath){
+  c(key, keyPath);
+}
+const handleClose = function(key, keyPath){
+  c(key, keyPath);
+}
+</script>-->
+
+<style scoped>
+
+    .el-checkbox.el-checkbox--large .el-checkbox__label {
+        font-size: 17px;
+        font-weight:600;
+    }
+
+    .space {
+        height: 2px;
+        background-color: #efefef;
+        margin-top: 10px;
+        margin-bottom: 20px;
+    }
+
+    img {
+        display: flex;
+        justify-content: center;
+        width: 100%;
+        height: 100%;
+    }
+
+
+    #build-info {
+        /*height:240px;*/
+        width: 100%;
+        border-radius: 14px;
+        margin:0px;
+        margin-top:40px;
+        text-align: center;
+        /*box-shadow: rgba(0, 0, 0, 0.16) 0px 1px 4px;*/
+    }
+
+    #build-info-xs {
+        height: auto;
+        width: calc(100% - 22px);
+        border-radius: 14px;
+        /*box-shadow: rgba(0, 0, 0, 0.16) 0px 1px 4px;*/
+    }
+
+
+    #carousel-thumbs {
+        /*height:240px;*/
+        display: inline-block;
+        padding: 0px;
+        max-width: 400px;
+        width: 33%;
+        float: left;
+    }
+
+
+
+    #carousel-thumbs-xs {
+        display: block;
+        padding: 0px;
+        width: 100%;
+    }
+
+    #body {
+        text-align: left;
+        padding: 20px;
+        max-width: 1360px;
+    }
+
+    #body-xs {
+        text-align: left;
+        padding: 40px;
+        width: 180px;
+    }
+
+    #title {
+        font-size: 22px;
+        line-height: 26px;
+        font-weight: 600;
+        color: var(--s-text-color);
+    }
+
+    #subtitle {
+        font-size: 18px;
+        line-height: 28px;
+        font-weight: 600;
+        color: var(--s-text-color);
+    }
+
+
+    .icons {
+        width: 28px;
+        display: inline-block;
+        text-align: center;
+        line-height: 32px;
+        color: var(--s-accent-color);
+    }
+
+
+    #location {
+        font-size: 15px;
+        line-height: 28px;
+        font-weight: 500;
+        color: #131A2E;
+        color: #6a728a;
+        padding: 10px 0px 5px 0px;
+    }
+
+
+    #resources {
+        font-size: 15px;
+        line-height: 20px;
+        font-weight: 500;
+        color: #131A2E;
+        color: #6a728a;
+        padding: 0px;
+        margin-bottom: 40px;
+    }
+
+
+    #value {
+        font-size: 25px;
+        font-weight: 700;
+        color: var(--s-accent-color);
+        padding: 14px 0px 14px 0px;
+    }
+
+
+    #bt-whats .q-icon {
+        font-size: 30px;
+    }
+
+    #bt-send .q-icon {
+        font-size: 20px;
+    }
+
+
+
+    .el-carousel__item {
+        background-color: #d3dce6;
+    }
+
+        .el-carousel__item div:nth-child(2) {
+            z-index: 100000;
+            color: #fff;
+            text-shadow: -1px -1px 0 #353535, 1px -1px 0 #353535, -1px 1px 0 #353535, 1px 1px 0 #353535;
+            margin-top: -26px;
+            text-align: left;
+            padding-left: 10px;
+        }
+
+        .el-carousel__item div:nth-child(3) {
+            z-index: 100000;
+            color: #fff;
+            text-shadow: -1px -1px 0 #353535, 1px -1px 0 #353535, -1px 1px 0 #353535, 1px 1px 0 #353535;
+            margin-top: -26px;
+            text-align: right;
+            padding-right: 10px;
+        }
+
+
+
+        .el-carousel__item span {
+            color: #475669;
+            opacity: 0.75;
+            margin: 0;
+            text-align: center;
+        }
+</style>
+
+

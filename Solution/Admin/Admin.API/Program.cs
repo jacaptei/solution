@@ -1,13 +1,12 @@
 using Microsoft.AspNetCore.Authentication.JwtBearer;
-using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.Extensions.Options;
 using JaCaptei.Model;
 using JaCaptei.Administrativo.API.Filters;
 using System.Text.Json;
 using System.Text;
-using Microsoft.Net.Http.Headers;
-using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
+using JaCaptei.Admin.API;
+using Microsoft.Extensions.DependencyInjection;
 
 //var builder = WebApplication.CreateBuilder(new WebApplicationOptions {
 //    ApplicationName = typeof(Program).Assembly.FullName,
@@ -142,10 +141,11 @@ builder.Services.AddAuthentication(x => {
 
 });
 
+builder.Services.AddServices(settings);
 
-// ------------------------------------------------------
 
 
+// -----------------------------------------------------
 
 var app = builder.Build();
 
@@ -173,7 +173,7 @@ app.MapControllerRoute(name: "default",pattern: "{controller=Home}/{action=Index
 
 //app.MapDefaultControllerRoute();
 //app.UseEndpoints(endpoints =>{    endpoints.MapControllerRoute(        name: "default",        pattern: "{controller=home}/{action=index}");});
-
-
 app.Run();
+//await busControl.StartAsync();
+
 

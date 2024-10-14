@@ -1,15 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using Microsoft.Data.SqlClient;
-using System.Threading.Tasks;
-using RepoDb;
+﻿using JaCaptei.Application.Services;
 using JaCaptei.Model;
-using JaCaptei.Application.Services;
-using JaCaptei.Model.Model;
-using JaCaptei.Application;
-using JaCaptei.Application.DAL;
 
-namespace JaCaptei.Application{
+namespace JaCaptei.Application
+{
 
 
     public class LocalidadeService : ServiceBase{
@@ -39,6 +32,9 @@ namespace JaCaptei.Application{
         public AppReturn ObterIdCidade(int idEstado, string nome) {
             return DAO.ObterIdCidade(idEstado,nome);
         }
+        public AppReturn ObterIdCidadeNorm(int idEstado, string nome) {
+            return DAO.ObterIdCidadeNorm(idEstado,nome);
+        }
 
         public AppReturn ObterBairrosPorCidadeId(int id) {
             return DAO.ObterBairrosPorCidadeId(id);
@@ -48,6 +44,9 @@ namespace JaCaptei.Application{
         }
         public AppReturn ObterIdBairro(int idCidade,string nome) {
             return DAO.ObterIdBairro(idCidade,nome);
+        }
+        public AppReturn ObterIdBairroNorm(int idCidade,string nome) {
+            return DAO.ObterIdBairroNorm(idCidade,nome);
         }
 
         public AppReturn ObterBairrosPorCidadeNome(string nome) {

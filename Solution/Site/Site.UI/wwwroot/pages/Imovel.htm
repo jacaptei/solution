@@ -2,13 +2,13 @@
 
     <div class="row">
 
-        <div class="col-12" style="width:100%;text-align:center;padding:40px;padding-left:0px" v-if="indisponivel">
-            <i class="fa fa-circle-exclamation" style="font-size:80px;color:var(--s-accent-color)"></i>  <br />
-            <div style="font-size:20px;font-weight:700;color:var(--s-accent-color);margin-top:20px">Imóvel não encontrado ou não mais disponível.</div>
+        <div class="col-12" style="width:100%;text-align:center;padding:40px;padding-left:0px" v-if="onRequest">
+            <c-loading size="60px"></c-loading>
         </div>
 
-        <div class="col-12" style="width:100%;text-align:center;padding:40px;padding-left:0px" v-else-if="onRequest">
-            <c-loading size="60px"></c-loading>
+        <div class="col-12" style="width:100%;text-align:center;padding:40px;padding-left:0px" v-else-if="indisponivel">
+            <i class="fa fa-circle-exclamation" style="font-size:80px;color:var(--s-accent-color)"></i>  <br />
+            <div style="font-size:20px;font-weight:700;color:var(--s-accent-color);margin-top:20px">Imóvel não encontrado ou não mais disponível.</div>
         </div>
 
         <div class="col-12" v-else>
@@ -46,7 +46,7 @@
 
                 <div class="col-6 xs-hide" style="height:500px" v-if="imovel.imagens.length > 0">
 
-                    <div>
+                    <div style="cursor:pointer">
                         <el-image style="height:480px;width:100%;" :src="image.url" fit="cover" @click="OpenModalImages(imageIndex)" />
                         <!--<img style="padding:10px;padding-top:0px;cursor:pointer;padding-bottom:0px;fit:cover" :src="image.url" @click="OpenModalImages(imageIndex)" />-->  <!--fits = ['fill', 'contain', 'cover', 'none', 'scale-down']-->
                     </div>
@@ -64,7 +64,8 @@
 
                 <div class="col-5 xs-hide" style="display:inline-block">
                     <div class="row" style="max-height:480px;overflow-y:auto">
-                        <div class="col-6" v-for="(item,index) in images" :key="index" @click="HilightImage(index)" style="text-align:center">
+                        <div class="col-6" v-for="(item,index) in imovel.imagens" :key="index" @click="HilightImage(index)" style="text-align:center">
+                            
                             <!--<img :src="item" style="width: 100%; padding:10px;padding-top:5px;padding-bottom:5px;border:5px solid #fff"  />-->  <!--fits = ['fill', 'contain', 'cover', 'none', 'scale-down']-->
                             <el-image style="cursor:pointer;width:100%;height:200px;padding-right:10px;padding-top:0px" :src="item.url" fit="cover"></el-image>  <!--fits = ['fill', 'contain', 'cover', 'none', 'scale-down']-->
                         </div>
@@ -84,7 +85,7 @@
 
                                 <div id="title" style="color:var(--s-accent-color)">
                                     <div style="width:calc(100% - 140px);">
-                                        {{$imovelHandler.BuildTitle(imovel)}}
+                                        {{imovel.titulo}}
                                     </div>
 
                                     <div style="float:right;padding-right:20px;line-height:17px;">
@@ -92,45 +93,38 @@
                                         <br />
                                         <span style="font-size: 13px;color: #999;font-weight: 100;">{{$tools.FormatDateToBR(imovel.data)}}</span>
 
-                                        <!--<div v-if="favoritando" style="width:19px;display:inline-block">
-                                        <c-loading size="14px"></c-loading>
-                                    </div>
-                                    <div v-else-if="$root.isAuth" @click="SetFavorite()" style="width:19px;display:inline-block">
-                                        <i :class="imovel.favorito? 'fa fa-heart':'far fa-heart'" style="color:var(--s-accent-color);font-size:14pt;cursor:pointer" :title="imovel.favorito? 'remover dos favoritos':'favoritar'"></i>
-                                    </div>
-                                    <div v-else @click="OpenLogin()" style="width:19px;display:inline-block">
-                                        <i class="far fa-heart" style="color:var(--s-color-grey);font-size:14pt;cursor:pointer" title="faça o login para poder favoritar"></i>
-                                    </div>-->
                                     </div>
 
                                 </div>
                                 <div id="subtitle">
-                                    <span v-if="$validator.is(imovel.bairro)">{{imovel.bairro}}, </span>
-                                    <span v-if="$validator.is(imovel.cidade)">{{imovel.cidade}}, </span>
-                                    <span v-if="$validator.is(imovel.estado)">{{imovel.estado}}  </span>
+                                    <span v-if="$validator.is(imovel.endereco.bairro)">{{imovel.endereco.bairro}}, </span>
+                                    <span v-if="$validator.is(imovel.endereco.cidade)">{{imovel.endereco.cidade}}, </span>
+                                    <span v-if="$validator.is(imovel.endereco.estado)">{{imovel.endereco.estado}}  </span>
                                     <br />
                                 </div>
 
                                 <div id="location">
                                     <i class="icons fa fa-map-marker-alt"></i>
                                     <span v-if="$root.isAuth">
-                                        <span v-if="$validator.is(imovel.endereco)">{{imovel.endereco}}, </span>
-                                        <span v-if="$validator.is(imovel.numero)">{{imovel.numero}}, </span>
-                                        <span v-if="$validator.is(imovel.complemento)">{{imovel.complemento}}, </span>
+                                        <span v-if="$validator.is(imovel.endereco.logradouro)">{{imovel.endereco.logradouro}}, </span>
+                                        <span v-if="$validator.is(imovel.endereco.numero)">{{imovel.endereco.numero}}, </span>
+                                        <span v-if="$validator.is(imovel.endereco.complemento)"> <span v-if="$validator.is(imovel.endereco.complementoTipo)">{{imovel.endereco.complementoTipo}} </span> {{imovel.endereco.complemento}}, </span>
                                         <!--<span v-if="$validator.is(imovel.andar && imovel.andar > 0)">{{imovel.andar}}º andar,  </span>-->
                                     </span>
-                                    <span v-if="$validator.is(imovel.bairro)">{{imovel.bairro}}, </span>
-                                    <span v-if="$validator.is(imovel.cidade)">{{imovel.cidade}}, </span>
-                                    <span v-if="$validator.is(imovel.estado)">{{imovel.estado}}  </span>
+                                    <span v-if="$validator.is(imovel.endereco.bairro)">{{imovel.endereco.bairro}}</span>
+                                    <span v-if="$validator.is(imovel.endereco.cidade)">, {{imovel.endereco.cidade}}</span>
+                                    <span v-if="$validator.is(imovel.endereco.estado)">, {{imovel.endereco.estado}}</span>
+                                    <span v-if="$validator.is(imovel.endereco.cep)">, CEP: {{imovel.endereco.cep}}  </span>
 
                                 </div>
 
 
                                 <el-col class="price">
                                     <el-row>
-                                        <el-col :md=8>Valor de Venda<br /><span>{{$tools.FormatMoneyBR(imovel.valor)}}</span></el-col>
-                                        <el-col v-if="$root.isAuth" :md=8>Condomínio<br /><span>{{$tools.FormatMoneyBR(imovel.valorCondominio)}}</span></el-col>
-                                        <el-col v-if="$root.isAuth" :md=8>IPTU<br /><span>{{$tools.FormatMoneyBR(imovel.valorIPTU)}}</span></el-col>
+                                        <el-col :md=6>Valor de Venda<br /><span>{{$tools.FormatMoneyBR(imovel.valor.venda)}}</span></el-col>
+                                        <el-col v-if="$root.isAuth" :md=6>Condomínio<br /><span>{{$tools.FormatMoneyBR(imovel.valor.condominio)}}</span></el-col>
+                                        <el-col v-if="$root.isAuth" :md=6>IPTU<br /><span>{{$tools.FormatMoneyBR(imovel.valor.iptuMensal)}}</span></el-col>
+                                        <el-col v-if="$root.isAuth" :md=6>Comissão<br /><span>{{imovel.valor.comissao}}%</span></el-col>
                                     </el-row>
                                 </el-col>
 
@@ -148,20 +142,16 @@
 
                                 <el-col id="resources">
                                     <el-row>
-                                        <el-col :md=6> <i class="icons mdi mdi-bed-king"></i>{{imovel.quartos}} quartos</el-col>
-                                        <el-col :md=6> <i class="icons fa fa-shower"></i>{{imovel.banheiros}} banheiros</el-col>
-                                        <el-col :md=6> <i class="icons fa fa-bath"></i>{{imovel.suites}} suítes</el-col>
-                                        <!--<el-col :md=6 v-if="$root.isAuth"> <i class="icons fa fa-building"></i><span v-if="$validator.is(imovel.andar && imovel.andar > 0)">{{imovel.andar}}º andar</span><span v-else>térreo</span></el-col>-->
-                                        <el-col :md=6 v-if="$root.isAuth"> 
-                                                <span v-if="$validator.is(imovel.complemento)"><i class="icons fa fa-building"></i><span>{{imovel.complemento}}</span></span>
-                                                <span v-else-if="$validator.is(imovel.numero)"><i class="icons fa fa-home"></i><span>nº {{imovel.numero}}</span> </span>
-                                        </el-col>
+                                        <el-col :md=6> <i class="icons mdi mdi-bed-king"></i>{{imovel.interno.totalQuartos}} quartos</el-col>
+                                        <el-col :md=6> <i class="icons fa fa-shower"    ></i>{{imovel.interno.totalBanheiros}} banheiros</el-col>
+                                        <el-col :md=6> <i class="icons fa fa-bath"      ></i>{{imovel.interno.totalSuites}} suítes</el-col>
                                         <el-col :md=6 v-if="$root.isAuth"> <i class="icons fa fa-building"></i><span v-if="$validator.is(imovel.andar && imovel.andar > 0)">{{imovel.andar}}º andar</span><span v-else>térreo</span></el-col>
-                                        <el-col :md=6> <i class="icons fa fa-car "></i>{{imovel.vagas}} vagas</el-col>
-                                        <el-col :md=6> <i class="icons mdi mdi-set-square "></i>{{imovel.areaTotal}} m&#178; <span style="color:#a5a5a5"> &nbsp;total</span></el-col>
-                                        <el-col :md=6> <i class="icons mdi mdi-set-square "></i>{{imovel.areaInterna}} m&#178; <span style="color:#a5a5a5"> &nbsp;interna</span></el-col>
-                                        <el-col :md=6> <i class="icons mdi mdi-set-square "></i>{{imovel.areaExterna}} m&#178;  <span style="color:#a5a5a5"> &nbsp;externa</span></el-col>
-                                        <el-col :md=6> <i class="icons fa fa-elevator     "></i>{{imovel.elevadores}} <span v-if="imovel.elevadores <=1">elevador</span><span v-else>elevadores</span></el-col>
+                                        <el-col :md=6> <i class="icons fa fa-car "         ></i>{{imovel.externo.totalVagas}} vagas</el-col>
+                                        <el-col :md=6> <i class="icons mdi mdi-set-square "></i>{{imovel.area.total}} m&#178; <span style="color:#a5a5a5"> &nbsp;total</span></el-col>
+                                        <el-col :md=6> <i class="icons mdi mdi-set-square "></i>{{imovel.area.interna}} m&#178; <span style="color:#a5a5a5"> &nbsp;interna</span></el-col>
+                                        <el-col :md=6> <i class="icons mdi mdi-set-square "></i>{{imovel.area.externa}} m&#178;  <span style="color:#a5a5a5"> &nbsp;externa</span></el-col>
+                                        <el-col :md=6> <i class="icons fa fa-elevator     "></i>{{imovel.externo.totalElevadores}} <span v-if="imovel.externo.totalElevadores <=1">elevador</span><span v-else>elevadores</span></el-col>
+                                        <el-col :md=6 style="display:flex" v-if="imovel.anoConstrucao > 0"> <i class="icons icons mdi mdi-cake-variant " v-if="imovel.anoConstrucao > 0"></i><span style="padding-top:8px">{{imovel.anoConstrucao}} <span style="color:#a5a5a5">{{imovel.idade}} anos</span></span></el-col>
                                     </el-row>
                                 </el-col>
 
@@ -233,29 +223,25 @@
                                                 <el-checkbox checked readonly label="Salão de festas   "></el-checkbox><br />
                                                 <el-checkbox checked readonly label="Quadra esportiva  "></el-checkbox>-->
                                                 </el-col>
-
-                                                <el-col :md="12" :sm="12" :xs="12" v-if="imovel.aguaIndividual    "><el-checkbox checked readonly label="Água individual   " v-model="checkboxes" @change="checkboxes=true" size="large"></el-checkbox></el-col>
-                                                <el-col :md="12" :sm="12" :xs="12" v-if="imovel.alarme            "><el-checkbox checked readonly label="Alarme            " v-model="checkboxes" @change="checkboxes=true" size="large"></el-checkbox></el-col>
-                                                <el-col :md="12" :sm="12" :xs="12" v-if="imovel.areaServico       "><el-checkbox checked readonly label="Área de Serviço   " v-model="checkboxes" @change="checkboxes=true" size="large"></el-checkbox></el-col>
-                                                <el-col :md="12" :sm="12" :xs="12" v-if="imovel.armarioCozinha    "><el-checkbox checked readonly label="Armário cozinha   " v-model="checkboxes" @change="checkboxes=true" size="large"></el-checkbox></el-col>
-                                                <el-col :md="12" :sm="12" :xs="12" v-if="imovel.armarioBanheiro   "><el-checkbox checked readonly label="Armário banheiro  " v-model="checkboxes" @change="checkboxes=true" size="large"></el-checkbox></el-col>
-                                                <el-col :md="12" :sm="12" :xs="12" v-if="imovel.armarioQuarto     "><el-checkbox checked readonly label="Armário quarto    " v-model="checkboxes" @change="checkboxes=true" size="large"></el-checkbox></el-col>
-                                                <el-col :md="12" :sm="12" :xs="12" v-if="imovel.boxDespejo        "><el-checkbox checked readonly label="Box despejo       " v-model="checkboxes" @change="checkboxes=true" size="large"></el-checkbox></el-col>
-                                                <el-col :md="12" :sm="12" :xs="12" v-if="imovel.cercaEletrica     "><el-checkbox checked readonly label="Cerca elétrica    " v-model="checkboxes" @change="checkboxes=true" size="large"></el-checkbox></el-col>
-                                                <el-col :md="12" :sm="12" :xs="12" v-if="imovel.churrasqueira     "><el-checkbox checked readonly label="Churrasqueira     " v-model="checkboxes" @change="checkboxes=true" size="large"></el-checkbox></el-col>
-                                                <el-col :md="12" :sm="12" :xs="12" v-if="imovel.closet            "><el-checkbox checked readonly label="Closet            " v-model="checkboxes" @change="checkboxes=true" size="large"></el-checkbox></el-col>
-                                                <el-col :md="12" :sm="12" :xs="12" v-if="imovel.dce               "><el-checkbox checked readonly label="DCE               " v-model="checkboxes" @change="checkboxes=true" size="large"></el-checkbox></el-col>
-                                                <el-col :md="12" :sm="12" :xs="12" v-if="imovel.gasCanalizado     "><el-checkbox checked readonly label="Gás canalizado    " v-model="checkboxes" @change="checkboxes=true" size="large"></el-checkbox></el-col>
-                                                <el-col :md="12" :sm="12" :xs="12" v-if="imovel.hidromassagem     "><el-checkbox checked readonly label="Hidromassagem     " v-model="checkboxes" @change="checkboxes=true" size="large"></el-checkbox></el-col>
-                                                <el-col :md="12" :sm="12" :xs="12" v-if="imovel.interfone         "><el-checkbox checked readonly label="Interfone         " v-model="checkboxes" @change="checkboxes=true" size="large"></el-checkbox></el-col>
-                                                <el-col :md="12" :sm="12" :xs="12" v-if="imovel.jardim            "><el-checkbox checked readonly label="Jardim            " v-model="checkboxes" @change="checkboxes=true" size="large"></el-checkbox></el-col>
-                                                <el-col :md="12" :sm="12" :xs="12" v-if="imovel.lavabo            "><el-checkbox checked readonly label="Lavabo            " v-model="checkboxes" @change="checkboxes=true" size="large"></el-checkbox></el-col>
-                                                <el-col :md="12" :sm="12" :xs="12" v-if="imovel.piscina           "><el-checkbox checked readonly label="Piscina           " v-model="checkboxes" @change="checkboxes=true" size="large"></el-checkbox></el-col>
-                                                <el-col :md="12" :sm="12" :xs="12" v-if="imovel.portaoEletronico  "><el-checkbox checked readonly label="Portao eletrônico " v-model="checkboxes" @change="checkboxes=true" size="large"></el-checkbox></el-col>
-                                                <el-col :md="12" :sm="12" :xs="12" v-if="imovel.elevador          "><el-checkbox checked readonly label="Elevador          " v-model="checkboxes" @change="checkboxes=true" size="large"></el-checkbox></el-col>
-                                                <el-col :md="12" :sm="12" :xs="12" v-if="imovel.salas             "><el-checkbox checked readonly label="Salas             " v-model="checkboxes" @change="checkboxes=true" size="large"></el-checkbox></el-col>
-                                                <el-col :md="12" :sm="12" :xs="12" v-if="imovel.salaoFestas       "><el-checkbox checked readonly label="Salão de festas   " v-model="checkboxes" @change="checkboxes=true" size="large"></el-checkbox></el-col>
-                                                <el-col :md="12" :sm="12" :xs="12" v-if="imovel.quadraEsportiva   "><el-checkbox checked readonly label="Quadra esportiva  " v-model="checkboxes" @change="checkboxes=true" size="large"></el-checkbox></el-col>
+                                                <el-col :span="12" v-if="imovel.interno.aguaIndividual    "  ><el-checkbox label="Água individual     " checked readonly size="large"></el-checkbox></el-col>
+                                                <el-col :span="12" v-if="imovel.interno.areaServico       "  ><el-checkbox label="Área servico        " checked readonly size="large"></el-checkbox></el-col>
+                                                <el-col :span="12" v-if="imovel.interno.armarioCozinha    "  ><el-checkbox label="Armário cozinha     " checked readonly size="large"></el-checkbox></el-col>
+                                                <el-col :span="12" v-if="imovel.interno.armarioQuarto     "  ><el-checkbox label="Armário quarto      " checked readonly size="large"></el-checkbox></el-col>
+                                                <el-col :span="12" v-if="imovel.interno.banheiro          "  ><el-checkbox label="Banheiro            " checked readonly size="large"></el-checkbox></el-col>
+                                                <el-col :span="12" v-if="imovel.interno.boxDespejo        "  ><el-checkbox label="Box despejo         " checked readonly size="large"></el-checkbox></el-col>
+                                                <el-col :span="12" v-if="imovel.interno.churrasqueira     "  ><el-checkbox label="Churrasqueira       " checked readonly size="large"></el-checkbox></el-col>
+                                                <el-col :span="12" v-if="imovel.interno.dce               "  ><el-checkbox label="Dce                 " checked readonly size="large"></el-checkbox></el-col>
+                                                <el-col :span="12" v-if="imovel.interno.gasCanalizado     "  ><el-checkbox label="Gás canalizado      " checked readonly size="large"></el-checkbox></el-col>
+                                                <el-col :span="12" v-if="imovel.interno.sala              "  ><el-checkbox label="Sala                " checked readonly size="large"></el-checkbox></el-col>
+                                                <el-col :span="12" v-if="imovel.interno.lavabo            "  ><el-checkbox label="Lavabo              " checked readonly size="large"></el-checkbox></el-col>
+                                                <el-col :span="12" v-if="imovel.externo.alarme            "  ><el-checkbox label="Alarme              " checked readonly size="large"></el-checkbox></el-col>
+                                                <el-col :span="12" v-if="imovel.externo.cercaEletrica     "  ><el-checkbox label="Cerca elétrica      " checked readonly size="large"></el-checkbox></el-col>
+                                                <el-col :span="12" v-if="imovel.externo.elevador          "  ><el-checkbox label="Elevador            " checked readonly size="large"></el-checkbox></el-col>
+                                                <el-col :span="12" v-if="imovel.externo.portaoEletronico  "  ><el-checkbox label="Portão eletrônico   " checked readonly size="large"></el-checkbox></el-col>
+                                                <el-col :span="12" v-if="imovel.lazer.hidromassagem       "  ><el-checkbox label="Hidromassagem       " checked readonly size="large"></el-checkbox></el-col>
+                                                <el-col :span="12" v-if="imovel.lazer.piscina             "  ><el-checkbox label="Piscina             " checked readonly size="large"></el-checkbox></el-col>
+                                                <el-col :span="12" v-if="imovel.lazer.quadraPoliesportiva "  ><el-checkbox label="Quadra esportes     " checked readonly size="large"></el-checkbox></el-col>
+                                                <el-col :span="12" v-if="imovel.lazer.salaoFestas         "  ><el-checkbox label="Salão de festas     " checked readonly size="large"></el-checkbox></el-col>
 
                                             </el-row>
                                         </el-col>
@@ -295,8 +281,8 @@
                                             </div>
                                             <div style="font-weight:400;font-size:14pt;color:var(--s-alt-accent-color);margin:9px">
                                                 <div><b>{{corretor.nome}}</b></div>
-                                                <div style="color:#a5ffa6;margin-top:7px;font-size:14pt;cursor:pointer" @click="OpenLink(corretor.linkWhats)"><i class="fab fa-whatsapp" style="font-size:18px"></i> {{corretor.telefone}}  <i class="fa fa-up-right-from-square" style="padding-left:6px;font-size:14px;"></i></div>
-                                                <div style="color:#feffa5;margin-top:7px;font-size:13pt;cursor:pointer" @click="OpenLink(corretor.linkMail)"><i class="fa fa-envelope" style="font-size:14px"></i> {{corretor.email}}     <i class="fa fa-up-right-from-square" style="padding-left:6px;font-size:14px;"></i></div>
+                                                <div style="color:#a5ffa6;margin-top:7px;font-size:14pt;cursor:pointer" @click="OpenLink(corretor.linkWhats)" v-if="corretor.telefone" ><i class="fab fa-whatsapp" style="font-size:18px"></i> {{corretor.telefone}}  <i class="fa fa-up-right-from-square" style="padding-left:6px;font-size:14px;"></i></div>
+                                                <div style="color:#feffa5;margin-top:7px;font-size:13pt;cursor:pointer" @click="OpenLink(corretor.linkMail)" v-if="corretor.email"><i class="fa fa-envelope" style="font-size:14px"></i> {{corretor.email}}     <i class="fa fa-up-right-from-square" style="padding-left:6px;font-size:14px;"></i></div>
                                             </div>
                                         </el-col>
                                     </el-row>
@@ -325,10 +311,9 @@
                                 </div>
                             </div>
 
-
-                            <!--<div style="margin-top:20px">
-                                <c-schedule :imovel="imovel" :link="url"></c-schedule>
-                            </div>-->
+                            <div style="margin:10px;margin-top:-20px;">
+                                <c-agendamento :usuario="$root.usuario" :imovel="imovel"></c-agendamento>
+                            </div>
 
                         </div>
 
@@ -460,7 +445,7 @@
 
 
 
-        <el-dialog v-model="showModalImages" :title="imovel.title">
+        <el-dialog v-model="showModalImages" :title="imovel?.titulo">
 
             <q-carousel v-model="imageIndex"
                         arrows
@@ -511,16 +496,18 @@
                 favoritando: false,
                 fromCache: false,
 
-                imageIndex: 0,
-                imovel: null,
+                imovel: {},
                 id: null,
                 cod: null,
 
+                imageIndex: 0,
                 imagesTotal: 0,
                 images: [],
-                imageIndex: 0,
                 image: "",
                 queryImage: null,
+
+                thumbs: [],
+
                 relatedBuildings: [],
 
                 checkboxes: true,
@@ -531,6 +518,8 @@
 
                 corretor:{id:0},
 
+                usuario:{},
+
             }
 
 
@@ -539,33 +528,30 @@
         },
         created: function () {
 
-           if (this.is(this.$sdata.Storage.Get("usuario"))) {
-               this.$root.usuario = this.$sdata.Storage.Get("usuario");
-               if (this.$root.usuario.id > 0)
-                this.$root.SignIn();
-           }
+            try{
+                var p = this.$tools.HandleParams();
+                this.id  = p.id;
+                this.cod = p.cod;
+            }catch(e){}
 
-            //params = this.$tools.HandleParams();
-            //c2("params", params)
-            //this.id = params.id;
-            //this.cod = params.cod;
+           //c2("this.$route.query.id", this.$route.query.id)
 
-            if (this.is(this.$route.query)) {
+            if (this.$validator.is(this.$route.query)) {
 
-                if(this.$validator.not(this.$route.query.id))
+                if(this.$validator.not(this.$route.query.id) && this.$validator.not(this.$route.query.cod)){
                     this.indisponivel = true;
-                else {
+                }else {
 
-                    this.id = this.$route.query.id;
+                    this.id  =  this.$tools.ParseInt(this.$route.query.id);
                     this.cod = this.$route.query.cod;
 
-                    this.corretor.id = this.$route.query.cid;
-                    this.corretor.nome = this.$route.query.cnome;
-                    this.corretor.razao = this.$route.query.crazao;
-                    this.corretor.fantasia = this.$route.query.cfantasia;
-                    this.corretor.telefone = this.$route.query.ctelefone;
-                    this.corretor.email = this.$route.query.cemail;
-                    this.corretor.tipo = this.$route.query.ctipo;
+                    this.corretor.id        = this.$route.query.cid;
+                    this.corretor.nome      = this.$route.query.cnome;
+                    this.corretor.razao     = this.$route.query.crazao;
+                    this.corretor.fantasia  = this.$route.query.cfantasia;
+                    this.corretor.telefone  = this.$route.query.ctelefone;
+                    this.corretor.email     = this.$route.query.cemail;
+                    this.corretor.tipo      = this.$route.query.ctipo;
 
                     this.queryImage = this.$route.query.img;
                     //c(this.queryImage)
@@ -573,13 +559,13 @@
 
             }else{
 
-                params = this.$tools.HandleParams();
+                var params = this.$tools.HandleParams();
 
-                if (this.$validator.not(this.$route.query.id))
+                if (this.$validator.not(params.id) && this.$validator.not(params.cod))
                     this.indisponivel = true;
                 else {
                     //c2("params", params)
-                    this.id     = params.id;
+                    this.id     = this.$tools.ParseInt(params.id);
                     this.cod    = params.cod;
 
                     this.corretor.id             = params.cid             ;
@@ -595,8 +581,14 @@
             }
 
             if(this.corretor.id > 0){
-                this.corretor.linkWhats = "https://api.whatsapp.com/send?phone=+55" + this.corretor.telefone.replaceAll("(", "").replaceAll(")", "").replaceAll("-", "").replaceAll(" ", "");
-                this.corretor.linkMail  = "mailto:" + this.corretor.email;
+                if(this.corretor.telefone)
+                    this.corretor.linkWhats = "https://api.whatsapp.com/send?phone=+55" + this.corretor.telefone.replaceAll("(", "").replaceAll(")", "").replaceAll("-", "").replaceAll(" ", "");
+                if(this.corretor.linkMail)
+                    this.corretor.linkMail  = "mailto:" + this.corretor.email;
+
+                //var usr = "jcuser"+this.corretor.id;
+                //var usuario = this.$sdata.Storage.Get(usr);
+                //c2("Usuario",usuario.nome);
             }
 
             //c2("corretor", this.corretor)
@@ -618,55 +610,30 @@
             //} else
             //    this.fromCache = true;
 
-            this.Search();
 
         },
 
         mounted() {
 
-            //c2("imovel", this.imovel)
-            if (this.fromCache) {
-                if (this.imovel.imagens.length > 0) {
-                    this.images = this.imovel.imagens;
-                    this.image = this.imovel.imagens[0];
-                    this.imagesTotal = this.imovel.imagens.length;
-                    this.onRequest = false;
-                } else {
-                    this.images = [];
-                    this.image = "/resources/images/noimages.jpg";
-                    this.imovel.imagens = [];
-                    this.imovel = "/resources/images/noimages.jpg";;
+         window.setTimeout(()=> {
+            
+            try{
+                if(!this.is(this.$root?.usuario) || !this.is(this.$root?.usuario?.id > 0)){
+                    var usr = "jcuser"+this.corretor.id;
+                    var usuario = this.$sdata.Storage.Get(usr);
+                    if (usuario?.id > 0 && usuario?.tokenJWT){
+                        this.$root.usuario = usuario;
+                        this.$root.SignIn();
+                    }
                 }
-
-                const maxSize = 20;
-
-                for (let i = 0; i < maxSize; i++) {
-                    this.relatedBuildings.push({
-                        label: 'Imóvel ' + (i + 1)
-                    })
-                }
-
-                this.CompletarLinksCorretor(this.imovel);
-                //this.UpdateMetatags();
-            }
-
-
-            //c2("imovel.armarioBanheiro",this.imovel.armarioBanheiro)
-
-
-
-            //c2("this.$root.usuario", this.$root.usuario);
-            //this.$sdata.Storage.Set("usuario",null);
-
-
-
-
-            /*
-        let og_site_name       = document.getElementById("og_site_name"     );
-        let og_title           = document.getElementById("og_title"         );
-        let og_image           = document.getElementById("og_image"         );
-        */
-
+           }catch(e){ 
+               console.log(e);
+           }finally{
+             if(!this.indisponivel)
+                this.Buscar();
+           }
+                    
+         }, 2000);
 
 
         },
@@ -710,7 +677,8 @@
 
             CopiarLink() {
                 
-                var link = this.$imovelHandler.BuildLink(this.imovel, this.image?.url, (this.$root.isAuth? this.$root.usuario : null));
+                //var link = this.$imovelHandler.BuildLink(this.imovel, this.image?.url, (this.$root.isAuth? this.$root.usuario : null));
+                var link = window.location.href;
                 
                 navigator.clipboard.writeText(link);
 
@@ -723,80 +691,18 @@
             },
 
 
-            UpdateURL() {
-                var link = this.$imovelHandler.BuildLink(this.imovel, this.image?.url, (this.$root.isAuth? this.$root.usuario : null));
-                //window.location.assign(link);
-                //window.location.replace(link);
-                window.history.pushState('data', "JáCaptei", link);
-            },
 
-
-            CompletarLinksCorretor(imovel){
-                if(this.corretor.id > 0){
-                    var imoveltitle = this.$imovelHandler.BuildTitle(imovel);
-                    var complemento = "Olá, me interessei pelo imóvel: " + imoveltitle;
-                    complemento += this.$validator.is(imovel.bairro) ? (", " + imovel.bairro):"" ;
-                    complemento += this.$validator.is(imovel.cidade) ? (", " + imovel.cidade):"" ;
-                    complemento += this.$validator.is(imovel.estado) ? (", " + imovel.estado):"" ;
-                    complemento += ", COD " + imovel.cod;
-
-                    this.corretor.linkWhats += "&text=" + complemento;
-                    this.corretor.linkMail += "?subject=" + (imoveltitle + ", COD " + imovel.cod) +"&body="+complemento;
-                }
-
-            },
-
-            async SetFavorite() {
-                this.favoritando = true;
-                var res = await this.$imovelHandler.Favoritar(this.$root.usuario.sessaoCRMsystem, this.$root.usuario.id, this.$root.usuario.idCRM, this.imovel.id, this.imovel.id, !this.imovel.favorito);
-                if (res.success) {
-                    this.imovel.favorito = !this.imovel.favorito;
-                    if (this.imovel.favorito)
-                        this.$root.usuario.favoritos.push(res.favorito);
-                    else {
-                        //const index = this.$root.usuario.favoritos.indexOf(this.imovel.id);
-                        const index = this.$root.usuario.findIndex(fav => fav.idImovelCRM === this.imovel.id);
-                        if (index > -1)
-                            this.$root.usuario.favoritos.splice(index, 1);
-                    }
-                    cclear();
-                    carray(this.$root.usuario.favoritos)
-                } else
-                    this.$tools.Alert("Não foi possível favoritar");
-
-                this.$sdata.Storage.Set("favoritos", []);
-                this.$sdata.Storage.Set("favoritos", this.$root.usuario.favoritos);
-                //window.setTimeout(()=>this.favoritando = false,800);
-                this.favoritando = false;
-            },
-
-            OpenLogin() {
-                this.$tools.MessageAlert("necessário login para favoritar", 100);
-                window.setTimeout(() => this.$root.OpenLoginModal(), 600);
-            },
-
-
-            OpenLink(link) {
-                window.open(link, "_blank");
-            },
-
-
-            ValidarCaracteristica(carac) {
-                if (carc == 1)
-                    this.temCaracteristicas = true;
-                return (carac == 1);
-            },
 
 
             BuildMapAddress() {
                 var res = "";
                 if (this.$root.isAuth){
-                    res += this.$validator.is(this.imovel.endereco) ? this.imovel.endereco + "," : "";
-                    res += this.$validator.is(this.imovel.numero    )? this.imovel.numero   +",":"";
+                    res += this.$validator.is(this.imovel.endereco.logradouro) ? this.imovel.endereco.logradouro + "," : "";
+                    res += this.$validator.is(this.imovel.endereco.numero    )? this.imovel.endereco.numero   +",":"";
                 }
-                res += this.$validator.is(this.imovel.bairro) ? this.imovel.bairro + "," : "";
-                res += this.$validator.is(this.imovel.cidade) ? this.imovel.cidade + "," : "";
-                res += this.$validator.is(this.imovel.estado) ? this.imovel.estado + "" : "";
+                res += this.$validator.is(this.imovel.endereco.bairro) ? this.imovel.endereco.bairro + "," : "";
+                res += this.$validator.is(this.imovel.endereco.cidade) ? this.imovel.endereco.cidade + "," : "";
+                res += this.$validator.is(this.imovel.endereco.estado) ? this.imovel.endereco.estado + "" : "";
                 res = res.replaceAll(" ", "%20");
                 //res = "https://maps.google.com/maps?q="+res+"+()&amp;t=&amp;z=12&amp;ie=UTF8&amp;iwloc=B&amp;output=embed";
                 //c(res)
@@ -813,7 +719,7 @@
                 else if (index < 0)
                     index = (this.imagesTotal - 1);
                 this.imageIndex = index;
-                this.image = this.images[index];
+                this.image = this.imovel.imagens[index];
                 this.UpdateURL();
             },
 
@@ -826,6 +732,66 @@
             },
 
 
+            async Buscar(){
+
+                        var buscaImovel = {imovel:{}};
+                        buscaImovel.imovel.id  = this.$validator.not(this.id)?  0 : this.id;
+                        buscaImovel.imovel.cod = this.$validator.not(this.cod)? "": this.cod;
+        
+                        if(this.$root.isAuth)
+                            buscaImovel.usuario = this.$root.usuario;
+
+                        this.onRequest    = true;
+                        this.indisponivel = false;
+
+                        var request = await this.$api.Post("imovel/buscar/unidade",buscaImovel);
+
+                        if (request?.status?.success){
+                            buscaImovel  =  request.result;
+                            this.imovel  =  buscaImovel.result.imoveis[0];
+                            if(this.$validator.not(this.imovel))
+                                this.indisponivel = true;
+                            else
+                                this.SetupImagens();
+                        }else
+                            this.indisponivel = true;
+
+                        this.onRequest = false;
+
+            },
+
+
+            SetupImagens(){
+
+                var limitTotalThumbs = 4;
+                var _url = "";
+
+                if(this.imovel?.imagens.length == 0)
+                    this.thumbs.push( { url: "../resources/images/noimages.jpg" });
+                else{
+
+                    this.imagesTotal = this.imovel.imagens.length;
+                    this.image       = this.imovel.imagens[0];
+
+                    this.imovel.imagens.forEach( img => {
+                                                    if(limitTotalThumbs > -1){
+                                                        _url = (limitTotalThumbs == 0)? "../resources/images/moreimages.jpg" :  img.urlMedium ;
+                                                        this.thumbs.push({ url: _url });
+                                                        limitTotalThumbs--;
+                                                     }
+                                                }
+                                        );
+                    
+                }
+            },
+
+
+            UpdateURL() {
+                //var link = this.$imovelHandler.BuildLink(this.imovel, this.image?.url, (this.$root.isAuth? this.$root.usuario : null));
+                ////window.location.assign(link);
+                ////window.location.replace(link);
+                //window.history.pushState('data', "JáCaptei", link);
+            },
 
             Search() {
 
@@ -842,7 +808,7 @@
                //c2("imovelBusca.imovel.id", imovelBusca.imovel.id);
                //c2("imovelBusca.imovel.cod", imovelBusca.imovel.cod);
 
-                axios.post(this.$api.BuildURL("imovel/buscar"), imovelBusca).then((request) => {
+                axios.post(this.$api.BuildURL("imovel/buscar/unidade"), imovelBusca).then((request) => {
                     
                     //c2("request.data", request.data);
                     //c2("request.data", request.data.result.crmResult.result);

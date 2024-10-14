@@ -258,9 +258,28 @@ namespace JaCaptei.Model{
              );
         }
 
-
         public bool IsUrlYoutubeVimeo(string url) {
             return (IsUrlYoutube(url) || IsUrlVimeo(url));
+        }
+
+
+        public bool IsUnsafeSQL(string _filter) {
+            if(_filter is null)
+                return true;
+            string filter  = _filter.ToUpper();
+            return (filter.Contains("INSERT") || filter.Contains("UPDATE") || filter.Contains("DELETE") || filter.Contains("SELECT") || filter.Contains("FROM") || filter.Contains("WHERE") || filter.Contains("JOIN"));
+        }
+
+        public string ParseSafeSQL(string filter) {
+            if(IsUnsafeSQL(filter))
+                return "";
+            else
+                return filter;
+        }
+
+        public void CheckSafeSQL(string filter) {
+            if(IsUnsafeSQL(filter))
+                throw new Exception("UNSAFE SQL DETECTED");
         }
 
 
@@ -275,11 +294,5 @@ namespace JaCaptei.Model{
 
 
 
-
     }
-
-
-
-
-
 }

@@ -1,0 +1,1798 @@
+﻿<template>
+
+
+
+    <div>
+
+
+        <el-row :gutter="20" v-if="onrequest">
+            <el-col :md="24">
+                    <c-loading padding="20px"></c-loading>
+            </el-col>
+        </el-row>
+
+
+        <el-row :gutter="20" v-else-if="imovel.id==0">
+            <el-col :md="24">
+                Nada encontrado
+            </el-col>
+        </el-row>
+
+
+        <el-row v-else>
+            <el-col :md="24">
+                
+
+
+        <el-row>
+            <el-col :md="24">
+
+                        <q-stepper v-model="step" ref="stepper" color="primary" done-color="green-13" animated >
+
+                          -<q-step :name="1" title="STATUS / PROP."    prefix="1" :caption="stepCaptions[1]" :done="step > 1"></q-step>
+
+                          <q-step :name="2" title="LOCALIZAÇÃO"     prefix="1" :caption="stepCaptions[2]"  :done="step > 2" ></q-step>
+                                                                                
+                          <q-step :name="3" title="PARTICULARIDADES" prefix="2" :done="step > 3"></q-step>
+                                                                                
+                          <q-step :name="4" title="CARACTERÍSTICAS" prefix="3"  :done="step > 4"></q-step>
+                                                                                
+                          <q-step :name="5" title="IMAGENS"         prefix="4" :caption="stepCaptions[5]"  :done="step > 5"></q-step>               
+
+                          <!--<q-step :name="5" title="CONFIRMAÇÃO" prefix="5" :caption="stepCaptions[5]" :done="step == 5" >--><!--describe --><!--</q-step>-->               
+
+            </el-col>
+        </el-row>
+
+
+        <el-row v-if="step == 0 ">
+            <el-col :md="24" style="max-width:360px">
+                <c-loading></c-loading>
+            </el-col>
+        </el-row>
+
+
+
+         <!--#region STATUS-PROPRIETARIO  -->
+
+        <div v-if="step == 1">
+
+
+                                        
+            <el-row :gutter="20" style="margin-top:0px">
+                <el-col :md="24" style="color:var(--s-color-primary);font-weight:700">
+                    STATUS
+                </el-col>
+            </el-row>
+
+            <el-row  style="margin-top:0px">
+                <el-col :span="24">
+                    <c-division></c-division>
+                </el-col>
+            </el-row>
+                    
+            <el-row :gutter="20" style="margin-top:10px" v-if="$root.usuario.god || $root.usuario.gestor">
+                    <el-col :xs="12" :sm="6" :md="4" :lg="3" class="s-input" style="max-width:120px">
+                        <div>ATIVO<span></span></div>
+                        <el-switch v-model="imovel.ativo" inline-prompt style="--el-switch-on-color: var(--s-color-green); --el-switch-off-color: var(--s-color-red)" active-text="&nbsp;&nbsp;SIM&nbsp;&nbsp;" inactive-text="&nbsp;&nbsp;NÃO&nbsp;&nbsp;"></el-switch>
+                    </el-col>
+                    <el-col :xs="12" :sm="6" :md="4" :lg="3" class="s-input" style="max-width:120px">
+                        <div>VALIDADO<span></span></div>
+                        <el-switch v-model="imovel.validado" inline-prompt style="--el-switch-on-color: var(--s-color-green); --el-switch-off-color: var(--s-color-red)" active-text="&nbsp;&nbsp;SIM&nbsp;&nbsp;" inactive-text="&nbsp;&nbsp;NÃO&nbsp;&nbsp;"></el-switch>
+                    </el-col>
+                    <el-col :xs="12" :sm="6" :md="4" :lg="3" class="s-input" style="max-width:120px">
+                        <div>VISÍVEL<span> no site</span></div>
+                        <el-switch v-model="imovel.visivel" inline-prompt style="--el-switch-on-color: var(--s-color-green); --el-switch-off-color: var(--s-color-red)" active-text="&nbsp;&nbsp;SIM&nbsp;&nbsp;" inactive-text="&nbsp;&nbsp;NÃO&nbsp;&nbsp;"></el-switch>
+                    </el-col>
+                    <el-col :xs="12" :sm="6" :md="4" :lg="3" class="s-input" style="max-width:160px">
+                        <div>EXCLUÍDO<span></span></div>
+                        <el-switch v-model="imovel.excluido" inline-prompt style="--el-switch-on-color: var(--s-color-red); --el-switch-off-color: var(--s-color-green)" active-text="&nbsp;&nbsp;SIM&nbsp;&nbsp;" inactive-text="&nbsp;&nbsp;NÃO&nbsp;&nbsp;"></el-switch>
+                    </el-col>
+                    <el-col :xs="12" :sm="6" :md="4" :lg="3" class="s-input" style="max-width:140px">
+                        <div><span></span></div>
+                        <q-btn label="SALVAR"               color="primary" @click="CheckoutStep5"              style="margin-right:20px;width:120px"   icon="fa fa-save"></q-btn>
+                    </el-col>
+                    <el-col :span="24" :xs="24">
+                             <div v-if="!imovel.ativo">
+                                <span style="color:var(--s-color-red);">Motivo da inativação</span><span style="color:#b1b1b1;float:right;padding-right:30px" v-if="exibirCampoAbertoMotivoInativacao">{{imovel.motivoInativacao.length}}/50</span><br />
+                                <span v-if="!exibirCampoAbertoMotivoInativacao">
+                                        <el-select v-model="imovel.motivoInativacao"  value-key="id" placeholder="selecionar" filterable class="m-4" size="large" style="width:100%" @change="()=>{ if(imovel.motivoInativacao == 'Outro'){imovel.motivoInativacao = '';exibirCampoAbertoMotivoInativacao = true;FocusCampoAbertoMotivoInativacao();} } ">
+                                        <el-option v-for="item in opcoes.motivosInativacao" :key="item.id" :label="item.label" :value="item.label"></el-option>
+                                    </el-select>
+                                </span>
+                                <span v-else>
+                                    <el-input @keyup.enter="CheckoutStep3()" v-model="imovel.motivoInativacao" placeholder="até 50 caracteres"  maxlength="50" ref="CampoAbertoMotivoInativacao" style="width:calc(100% - 20px)"></el-input>
+                                    <i class="fa fa-close" @click="()=>{imovel.motivoInativacao='';exibirCampoAbertoMotivoInativacao = false; }" style="margin-left:5px;color:var(--s-color-red);cursor:pointer"></i>
+                                </span>
+                            </div>
+                    </el-col>
+            </el-row>
+            <el-row :gutter="20" style="margin-top:0px" v-else>
+                    <el-col :span="8" :xs="24" style="max-width:120px">
+                            <div v-if="imovel.ativo"        class="checkiconstatus"><i class="fa fa-check"></i> Ativo </div>
+                            <div v-if="imovel.validado"     class="checkiconstatus"><i class="fa fa-check"></i> Validado </div>
+                            <div v-if="imovel.visivel"      class="checkiconstatus"><i class="fa fa-check"></i> Visível</div>
+                            <div v-if="!imovel.excluido"    class="checkiconstatus"><i class="fa fa-check"></i> Não excluído</div>
+                            <div v-if="!imovel.ativo"       class="inactive" @click="$tools.Alert(imovel.motivoInativacao,'Motivo da inativação')" style="cursor:pointer"><i class="fa fa-xmark"></i> Inativo <a href="javascript:void(0)" style="color:var(--s-color-red);text-decoration:none"><i class="fa fa-message"></i></a></div>
+                            <div v-if="!imovel.visivel"     class="inactive"><i class="fa fa-xmark"></i> Não validado </div>
+                            <div v-if="!imovel.validado"    class="inactive"><i class="fa fa-xmark"></i> Não visível </div>
+                            <div v-if="imovel.excluido"     class="inactive"><i class="fa fa-xmark"></i> Excluído</div>
+                    </el-col>
+            </el-row>
+
+
+            <el-row style="margin-top:0px">
+                <el-col :span="24">
+                    <c-division></c-division>
+                </el-col>
+            </el-row>
+          
+
+                                        
+        <el-row :gutter="20" style="margin-top:10px">
+            <el-col :md="24" style="color:var(--s-color-primary);font-weight:700">
+                PROPRIETÁRIO
+            </el-col>
+        </el-row>
+
+        <el-row style="margin-top:0px">
+            <el-col :span="24">
+                <c-division></c-division>
+            </el-col>
+        </el-row>
+                    
+        <el-row>
+            <el-col :md="24">
+               <c-proprietario-card textoComplemento="atual" :proprietario="imovel.proprietario"></c-proprietario-card>
+            </el-col>
+            <el-col :md="24">
+                <div style="padding:14px;padding-bottom:0px">
+                    <q-btn label='PROSSEGUIR SEM ALTERAR PROPRIETÁRIO' color="primary" @click="CheckoutStep1(imovel.proprietario)" style="width:340px"></q-btn>
+                </div>
+            </el-col>
+        </el-row>
+
+        <el-row>
+            <el-col :md="24">
+               <c-division></c-division>
+                <div style="font-weight:700;color:var(--s-color-primary)">BUSCAR OUTRO PROPRIETÁRIO</div>
+               <c-division></c-division>
+            </el-col>
+        </el-row>
+
+   		<el-row @keyup.enter="BuscarProprietario()">
+			<el-col :md="24">
+
+                <el-row :gutter="20">
+                        <el-col :xs="24" :sm="12" :md="8":lg="6" class="s-input">
+                            <div>NOME<span></span></div>
+                            <el-input v-model="buscaProprietario.item.nome" placeholder="qualquer" maxlength="120" ref="nome" input-style="text-transform:uppercase;"></el-input>
+                        </el-col>
+                        <el-col :xs="24" :sm="12" :md="8":lg="6" class="s-input">
+                            <div>E-MAIL <span></span></div>
+                            <el-input v-model="buscaProprietario.item.email" placeholder="qualquer" maxlength="80" input-style="text-transform:lowercase;"></el-input>
+                        </el-col>
+                        <el-col :xs="24" :sm="12" :md="8":lg="6" class="s-input">
+                            <div>TELEFONE <span></span></div>
+                            <el-input v-model="buscaProprietario.item.telefone" placeholder="qualquer" maxlength="40" input-style="text-transform:lowercase;" v-maska data-maska="(##) #####-#### ********************"></el-input>
+                        </el-col>
+                        <el-col :xs="24" :sm="12" :md="8":lg="6" class="s-input">
+                            <div>CPF<span></span></div>
+                            <el-input v-model="buscaProprietario.item.cpf" placeholder="qualquer" maxlength="22" v-maska data-maska="###.###.###-##" @blur="CheckDoc"></el-input>
+                        </el-col>
+                        <el-col :xs="24" :sm="12" :md="8":lg="6" class="s-input">
+                            <div>RG<span></span></div>
+                            <el-input v-model="buscaProprietario.item.rg" placeholder="qualquer" maxlength="22" ref="documento"></el-input>
+                        </el-col>
+                        <el-col :xs="24" :sm="12" :md="8":lg="6" class="s-input">
+                            <div>ID<span></span></div>
+                            <el-input-number v-model="buscaProprietario.item.id" placeholder="qualquer" maxlength="20" ref="id" :controls="false"></el-input-number>
+                        </el-col>
+                        <el-col :xs="24" :sm="12" :md="8" :lg="6" class="s-input">
+                            <div><span></span></div>
+                            <q-btn label="BUSCAR" color="primary" @click="BuscarProprietario()"></q-btn>
+                            <span style="cursor:pointer;padding-left:20px;color:var(--s-color-green)" @click="Reset"><i class="fa fa-refresh"></i> reset</span>
+                        </el-col>
+                </el-row>
+
+
+
+
+
+
+
+
+		    <el-row justify="center" v-if="onrequest">
+                <el-col :md="24" style="color:var(--s-color-primary)">
+                    <el-divider style="margin:10px;"><!--resultado--></el-divider>
+                    <c-loading padding="20px"></c-loading>
+                </el-col>
+		    </el-row>
+
+
+		    <el-row v-else>
+			    <el-col :md="24" >
+
+                <el-row>
+                    <el-col :md="24">
+                        <el-divider style="margin:10px"><!--resultado--></el-divider>
+
+                        <el-row style="padding-left:20px;padding-right:20px;">
+                            <el-col :md="24">
+                                <div style="float:left">
+                                    <span style="color:var(--s-color-primary)">encontrados</span><br />
+                                        <span v-if="buscaProprietario.total > 0">{{buscaProprietario.total}}</span>
+                                        <span v-else style="color:var(--s-color-orange)">nada encontrado</span>
+                                </div>
+                                <div style="float:right">
+                                    <q-input v-model.number="buscaProprietario.resultsPerPage" type="number" style="max-width:140px" label="RESULTADOS POR PÁGINA" stack-label :min="1" :dense="true" @keyup.enter="()=>{ if(!onrequest){ BuscarProprietario(1);}}" ></q-input>
+                                </div>
+                            </el-col>
+                        </el-row>
+
+                        <el-divider style="margin:10px"></el-divider>
+                    </el-col>
+                </el-row>
+
+                <el-row>
+                    <el-col :md="24">
+
+                        <!-- TABLE PROPRIETARIO -->
+
+                        <el-table :data="proprietariosBuscaResult" style="width: 100%" max-height="380" v-loading="ontablequest" :table-layout="auto" :row-class-name="tableRowClassName">
+
+                            <el-table-column fixed="left" label="Ações" width="200" style="color:orange">
+                                    <template #default="scope" style="border-right:1px solid #000">
+
+                                        <div v-if="scope.row.onrequest">
+                                            <c-loading></c-loading>
+                                        </div>
+                                        <div v-else>
+
+                                                <div v-if="scope.row.excluido">
+                                                    <div style="display:inline-block">
+                                                        <el-popconfirm width="220"
+                                                                       confirm-button-text="SIM"
+                                                                       cancel-button-text="Não"
+                                                                       :icon="InfoFilled"
+                                                                       icon-color="var(--s-color-primary)"
+                                                                       title="Confirma prosseguir inserção em proprietário excluído?"
+                                                                       @confirm="CheckoutStep1(scope.row)">
+                                                            <template #reference>
+                                                                    <q-btn label="PROSSEGUIR" color="orange" ></q-btn>
+                                                            </template>
+                                                        </el-popconfirm>
+                                                    </div>
+
+                                                </div>
+                                                <div v-else>
+                                                    <q-btn label="PROSSEGUIR" color="primary" @click="CheckoutStep1(scope.row)" ></q-btn>
+                                                </div>
+                                                <div v-if="scope.row.excluido" style="color:orange;font-weight:bold;display:inline-block;cursor:pointer"  @click="$tools.Alert('Este proprietário foi excluído')">
+                                                    <i class="fa fa-triangle-exclamation" color="orange"></i> Excluído
+                                                </div>
+
+                                        </div>
+
+                                    </template>
+                            </el-table-column>
+
+
+                                <el-table-column prop="id" label="ID" width="60">
+                                    <template #default="scope">
+                                        <b @click="Alterar(scope)" :style="(scope.row.ativo)? 'cursor:pointer;color:var(--s-color-primary)' : (scope.row.excluido)? 'cursor:pointer;color:#999' : 'cursor:pointer;color:var(--s-color-red)'">{{scope.row.id}}</b>
+                                    </template>
+                                </el-table-column>
+
+                                <el-table-column label="NOME" width="300">
+                                    <template #default="scope">
+                                        <div style="text-decoration:none">
+                                            <b @click="Alterar(scope)"  :style="(scope.row.ativo)? 'cursor:pointer;color:var(--s-color-primary)' : (scope.row.excluido)? 'cursor:pointer;color:#999' : 'cursor:pointer;color:var(--s-color-red)'">{{scope.row.nome}}</b>
+                                        </div>
+                                    </template>
+                                </el-table-column>
+
+                                <el-table-column label="CPF" width="150">
+                                    <template #default="scope">
+                                        <a v-if="$validator.is(scope.row.cpf)" href="javascript:void(0)" @click="$tools.Copy(scope.row.cpf)" style="text-decoration:none;color:var(--s-color-tex-alt)"><i class="fa fa-copy" style="padding-right:3px;color:#666;text-decoration:none"></i> {{scope.row.cpf}}  </a>
+                                        <span v-else>-</span>
+                                    </template>
+                                </el-table-column>
+                                <el-table-column label="RG" width="150">
+                                    <template #default="scope">
+                                        <a v-if="$validator.is(scope.row.rg)" href="javascript:void(0)" @click="$tools.Copy(scope.row.rg)" style="text-decoration:none;color:var(--s-color-tex-alt)"><i class="fa fa-copy" style="padding-right:3px;color:#666;text-decoration:none"></i> {{scope.row.rg}}  </a>
+                                        <span v-else>-</span>
+                                    </template>
+                                </el-table-column>
+
+                            <el-table-column label="E-Mail" width="220">
+                                <template #default="scope">
+                                    <a :href="'mailto:'+scope.row.email" target="_blank" style="color:var(--el-color-primary);text-decoration:none"><i class="fa fa-envelope"></i>&nbsp; {{scope.row.email}}</a>
+                                </template>
+                            </el-table-column>
+                            <el-table-column label="TELEFONE" width="150">
+                                <template #default="scope">
+                                        <a v-if="!scope.row.excluido" :href="$tools.BuildWhatsappLink(scope.row.telefone,'Olá '+scope.row.apelido)" target="_blank" :style="(scope.row.excluido)? 'color:#999;text-decoration:none' : 'color:var(--s-color-green);text-decoration:none' "><i class="fab fa-whatsapp" style="padding-right:3px;"></i> {{scope.row.telefone}}</a>
+                                </template>
+                            </el-table-column>
+                            <!--</el-table-column>-->
+                            <!--<el-table-column label="CONTATO">-->
+                                <el-table-column label="ENDEREÇO" width="400">
+                                    <template #default="scope">
+                                        <div v-if="!scope.row.excluido">
+                                            <a v-if="$validator.is(scope.row.logradouro)" href="javascript:void(0)" @click="$tools.Copy((scope.row.logradouro+','+scope.row.numero+','+($validator.is(scope.row.complemento)? scope.row.complemento+',':'')+scope.row.bairro+','+scope.row.cidade+','+scope.row.estado))" style="text-decoration:none;color:var(--s-color-tex-alt);margin-right:10px"><i class="fa fa-copy" style="padding-right:3px;color:#555;text-decoration:none"></i></a>
+                                            <a :href="$tools.BuildMapLink(scope.row)" target="_blank" style="color:var(--s-text-color);text-decoration:none;margin-right:6px">
+                                                <i style="color:#555;margin-right:6px" class="fa fa-location-dot"></i>
+                                                {{scope.row.logradouro}}, {{scope.row.numero}}
+                                                <span v-if="$validator.is(scope.row.complemento)"> , {{scope.row.complemento}}</span>,
+                                                {{scope.row.bairro}},
+                                                {{scope.row.cidade}}, {{scope.row.estado}}, CEP: {{scope.row.cep}}
+                                            </a>
+                                        </div>
+                                    </template>
+                                </el-table-column>
+                            <!--</el-table-column>-->
+                            <!--<el-table-column label="ENDEREÇO">-->
+                            <!--<el-table-column prop="cidade"      label="CIDADE"      width="280" />
+                                <el-table-column prop="estado"      label="ESTADO"      width="140" />
+                                <el-table-column prop="bairro"      label="BAIRRO"      width="240" />
+                                <el-table-column prop="logradouro"  label="LOGRADOURO"  width="240" />
+                                <el-table-column prop="numero"      label="NÚMERO"      width="140" />
+                                <el-table-column prop="complemento" label="COMPLEMENTO" width="140" />
+                            <!--</el-table-column>-->
+                            <el-table-column prop="data" label="DATA" width="140">
+                                <template #default="scope">
+                                    {{$tools.FormatDateToBR(new Date(scope.row.data))}}
+                                </template>
+                            </el-table-column>
+                            <el-table-column label="OBS" width="60">
+                                <template #default="scope">
+                                    <a v-if="$validator.is(scope.row.obs)" href="javascript:void(0)" @click="$tools.Alert(scope.row.obs,'OBSERVAÇÕES')" style="color:var(--s-color-primary);text-decoration:none"><i class="fa fa-message"></i></a>
+                                    <a v-else href="javascript:void(0)" @click="$tools.Message('sem observações')" style="color:var(--s-color-grey);text-decoration:none"><i class="fa fa-message"></i></a>
+                                </template>
+                            </el-table-column>
+                        </el-table>
+
+
+
+                    </el-col>
+                </el-row>
+
+
+                <el-row>
+                    <el-col :md="24">
+
+                        <div class="q-pa-lg flex flex-center">
+                                    <el-pagination layout="prev, pager, next" :total="buscaProprietario.total" :page-size="buscaProprietario.resultsPerPage" v-model:current-page="buscaProprietario.page" @current-change="BuscarProprietario"></el-pagination>
+                        </div>
+
+                    </el-col>
+                </el-row>
+
+                <el-row>
+                    <el-col :md="24">
+                        <div class="q-pa-lg flex-center">
+                        </div>
+                    </el-col>
+                </el-row>
+
+
+			    </el-col>
+		    </el-row>
+
+
+			</el-col>
+	</el-row>
+    
+        </div>
+
+         <!--#endregion -->
+
+
+
+         <!--#region LOCALIZACAO  -->
+
+        <div v-if="step == 2">
+
+                <div>
+                    <div>
+
+                        <el-row>
+                                <el-col :md="24">
+
+                                    <el-row style="margin-bottom:20px">
+                                        <el-col  :span="24" style="color:var(--s-color-primary);font-weight:700">
+                                            ÍNDICE CADASTRAL
+                                            <div style="max-width:320px">
+                                                <el-input v-model="imovel.documentacao.indiceCadastral"  ref="indiceCadastral" maxlength="38" >
+                                                    <template #append>
+                                                        <i class="fa fa-search" v-else style="color:var(--s-accent-color);cursor:pointer;padding:10px" @click="$tools.Alert('Pesquisa nos orgãos competentes ainda não disponível.')"></i>
+                                                    </template>
+                                                </el-input>
+                                            </div>
+                                        </el-col>
+                                    </el-row>
+
+                                    <el-row :gutter="20">
+
+                                        <el-col :xs="24" :sm="12" :md="8" :lg="6" class="s-input">
+                                            <div><p>CEP</p><span></span></div>
+                                            <el-input v-model="cep.numero" placeholder="" ref="postalCode" v-maska data-maska="#####-###" @keyup="()=>{  if(cep.numero.length>=9){BuscarEndereco();} }">
+                                                <template #append>
+                                                    <c-loading size="20px" v-if="carregandoCEP"></c-loading>
+                                                    <i class="fa fa-search" v-else-if="(cep.numero.length < 9)" style="color:var(--s-accent-color)" @click="$tools.Alert('Preencha todo o CEP para poder realizar a buscaProprietario.')"></i>
+                                                    <i class="fa fa-search" v-else style="color:var(--s-accent-color);cursor:pointer" @click="BuscarEndereco"></i>
+                                                </template>
+                                            </el-input>
+                                        </el-col>
+
+                                        <el-col :xs="24" :sm="12" :md="8" :lg="6" class="s-input">
+                                            <div><p>ESTADO</p><span></span></div>
+                                            <div style="height:40px" v-if="carregandoEstados">
+                                                <c-loading size="30px" style="padding-left:5px"></c-loading>
+                                            </div>
+                                            <el-select v-else filterable v-model="imovel.endereco.estado" class="m-4" placeholder="Selecionar" size="large" style="width:100%" @change="(item)=>{ObterCidades(item);enableFilterButton = true;}">
+                                                <el-option v-for="item in opcoes.estados"
+                                                           :key="item.id"
+                                                           :label="item.label"
+                                                           :value="item.value"></el-option>
+                                            </el-select>
+                                        </el-col>
+                                        <el-col :xs="24" :sm="12" :md="8" :lg="6" class="s-input">
+                                            <div><p>CIDADE</p><span></span></div>
+                                            <div style="height:40px" v-if="carregandoCidades">
+                                                <c-loading size="30px" style="padding-left:5px"></c-loading>
+                                            </div>
+                                            <el-select v-else v-model="imovel.endereco.cidade" filterable class="m-4" placeholder="Selecionar" size="large" style="width:100%" @click="()=>{ if($validator.not(imovel.endereco.estado)){ $tools.Alert('Selecione um <b>Estado</b> antes');} }" @change="(item)=>{ObterBairros(item);enableFilterButton = true;}">
+                                                <el-option v-for="item in opcoes.cidades"
+                                                           :key="item.id"
+                                                           :label="item.label"
+                                                           :value="item.value"></el-option>
+                                            </el-select>
+                                        </el-col>
+                                        <el-col :xs="24" :sm="12" :md="8" :lg="6" class="s-input">
+                                            <div><p>BAIRRO</p><span></span></div>
+                                            <div style="height:40px" v-if="carregandoBairros">
+                                                <c-loading size="30px" style="padding-left:5px"></c-loading>
+                                            </div>
+                                            <el-select v-else v-model="imovel.endereco.bairro" filterable :clearable="true" class="m-4" placeholder="Selecionar" size="large" style="width:100%;" @click="()=>{ if($validator.not(imovel.endereco.estado)){ $tools.Alert('Selecione <b>Estado</b> e <b>Cidade</b> antes');} }" @change="(item)=>{DefinirBairro(item);enableFilterButton = true;}">
+                                                <el-option v-for="item in opcoes.bairros"
+                                                           :key="item.id"
+                                                           :label="item.label"
+                                                           :value="item.value"></el-option>
+                                            </el-select>
+                                        </el-col>
+
+
+                                        <el-col :xs="24" :sm="12" :md="8" :lg="6" class="s-input">
+                                            <div>LOGRADOURO <span>&nbsp;rua, avenida, praça, etc</span></div>
+                                            <el-input @keyup.enter="CheckoutStep2()" v-model="imovel.endereco.logradouro" placeholder="" maxlength="80" input-style="text-transform:uppercase;"></el-input>
+                                        </el-col>
+                                        <el-col :xs="24" :sm="12" :md="8" :lg="6" class="s-input">
+                                            <div>NÚMERO <span>&nbsp;&nbsp;informe <b>SN</b> se não houver</span></div>
+                                            <el-input @keyup.enter="CheckoutStep2()" v-model="imovel.endereco.numero" placeholder="" maxlength="80" input-style="text-transform:uppercase;" ref="addressnumber"></el-input>
+                                        </el-col>
+
+                                        <el-col :xs="24" :sm="12" :md="8" :lg="6" class="s-input-optional">
+                                            <div>TIPO COMPLEMENTO</div>
+                                            <span v-if="!exibirCampoAbertoOutroComplemento">
+                                                 <el-select v-model="imovel.endereco.idTipoComplemento"  value-key="id" placeholder="selecionar" filterable class="m-4" size="large" style="width:100%" @change="()=>{ if(imovel.endereco.idTipoComplemento == 2){imovel.endereco.complementoTipo='';exibirCampoAbertoOutroComplemento = true;FocusOutroComplemento();} } ">
+                                                    <el-option v-for="item in opcoes.tiposComplementos" :key="item.id" :label="item.label" :value="item.id"></el-option>
+                                                </el-select>
+                                            </span>
+                                            <span v-else>
+                                                <el-input @keyup.enter="CheckoutStep2()" v-model="imovel.endereco.complementoTipo" ref="CampoAbertoOutroComplemento" maxlength="38" style="width:calc(100% - 40px)" input-style="text-transform:uppercase;"></el-input>
+                                                <i class="fa fa-close" @click="()=>{imovel.endereco.complementoTipo='';exibirCampoAbertoOutroComplemento = false; }" style="margin-left:5px;color:var(--s-color-red);cursor:pointer"></i>
+                                            </span>
+                                        </el-col>
+
+                                        <el-col :xs="24" :sm="12" :md="8" :lg="6" class="s-input-optional">
+                                            <div>COMPLEMENTO <span></span></div>
+                                            <el-input @keyup.enter="CheckoutStep2()" v-model="imovel.endereco.complemento" placeholder="" maxlength="80" input-style="text-transform:uppercase;"></el-input>
+                                        </el-col>
+
+                                        <el-col :xs="24" :sm="12" :md="8" :lg="6" class="s-input-optional">
+                                            <div>BLOCO / TORRE <span></span></div>
+                                            <el-input @keyup.enter="CheckoutStep2()" v-model="imovel.endereco.bloco" placeholder="" maxlength="80" input-style="text-transform:uppercase;"></el-input>
+                                        </el-col>
+                                    </el-row>
+                            
+
+                                     <!--<el-row :gutter="20">
+                                        <el-col :xs="24" :sm="12" :md="12" class="s-input-optional" style="width:100%;max-width:100%">
+                                            <div>REFERÊNCIAS <span></span></div>
+                                            <el-input @keyup.enter="CheckoutStep2()" v-model="imovel.endereco.referencia" placeholder="" maxlength="200" input-style="text-transform:lowercase;"></el-input>
+                                        </el-col>
+                                        <el-col :xs="24" :sm="12" :md="12" class="s-input-optional" style="width:100%;max-width:100%">
+                                            <div>MELHOR ACESSO <span></span></div>
+                                            <el-input @keyup.enter="CheckoutStep2()" v-model="imovel.endereco.acesso" placeholder="" maxlength="200" input-style="text-transform:lowercase;"></el-input>
+                                        </el-col>
+                                    </el-row>-->
+                            
+
+                                </el-col>
+
+                        </el-row>
+                    </div>
+
+
+                </div>
+
+
+
+            <el-row :gutter="20" style="margin-top:10px">
+
+                <!--<el-col :md="24" >
+                    <div><q-btn label="PESQUISAR IMÓVEIS NA REGIÃO" icon="fa fa-search" color="primary" @click="BuscarImoveisNaRegiao" ></q-btn></div>
+                    <div v-if="ontablequest" style="margin:10px;margin-top:20px"><c-loading></c-loading></div>
+                </el-col>
+                
+                <el-col :md="24" v-if="!ontablequest && verificadoImoveisNaRegiao && imoveisBuscaResult.length == 0">
+                    <div>nada encontrado</div>
+                </el-col>
+                <el-col :md="24" v-if="!verificadoImoveisNaRegiao" style="color: #bbbbbb; padding: 10px 0px 10px 15px;">
+                    <div>necessário informar o CEP (pode ser incompleto) ou endereço (estado, cidade, bairro e logradouro)</div>
+                </el-col>-->
+                <el-col :md="24" v-if="ontablequest" >
+                    <div>verificando imóveis...</div>
+                    <div style="margin:10px;margin-top:20px"><c-loading></c-loading></div>
+                </el-col>
+                <el-col  :md="24" style="color:var(--s-color-primary);font-weight:700" v-if="$validator.is(imoveisRegiaoBuscaResult) && imoveisRegiaoBuscaResult.length > 0">
+                        <div>
+                          <el-alert title="Já consta imóvel cadastrado neste local." description="Verifique se não há erro no índice cadastral e endereço ou se o mesmo já foi cadastrado." type="warning" show-icon />
+                        </div>
+                         <div class="col-12" v-for="(item,index) in imoveisRegiaoBuscaResult" style="margin:20px">
+                              <c-imovel-card :imovel="item"></c-imovel-card>
+                         </div>
+                </el-col>
+            </el-row>
+
+
+
+
+            </div>
+
+         <!--#endregion -->
+
+
+
+
+         <!--#region PARTICULARIDADES  -->
+
+        <div v-if="step == 3">
+
+
+
+            <el-row :gutter="20" style="margin-top:30px">
+                <el-col  :md="6" :sm="12" :xs="24" style="color:var(--s-color-primary);font-weight:700">
+                    RESPONSÁVEL PELA CAPTAÇÃO<br />
+                    <span style="color:var(--s-color-text);font-weight:700" v-if="$validator.is(imovel.adminCaptador)">
+                        <b>{{imovel.captador}}</b> <span v-if="imovel.idAdminCaptador > 0" style="font-weight:normal">ID #{{imovel.idAdminCaptador}}</span>
+                    </span>
+                    <span style="color:var(--s-color-text);font-weight:200" v-else>
+                        não identificado
+                    </span>
+                    <!--<el-select v-model="imovel.adminCaptador"  value-key="id" filterable placeholder="selecionar" size="large" style="width:100%">
+                        <el-option v-for="admin in admins"
+                                    :key="admin.id"
+                                    :label="admin.nome"
+                                    :value="admin">
+                        </el-option>
+                    </el-select>-->
+                </el-col>
+            </el-row>
+
+                                        
+            <el-row :gutter="20" style="margin-top:30px">
+                <el-col :md="24" style="color:var(--s-color-primary);font-weight:700">
+                    DISPOSIÇÃO
+                </el-col>
+            </el-row>
+                    
+            <el-row :gutter="20" style="margin-top:10px">
+                    <el-col :span="8" :xs="24" style="max-width:260px">
+                        Local das chaves<br />
+                        <span v-if="!exibirCampoAbertoOutroLocalChaves">
+                                <el-select v-model="imovel.localChaves"  value-key="id" placeholder="selecionar" filterable class="m-4" size="large" style="width:100%" @change="()=>{ if(imovel.localChaves == 'Outro'){imovel.localChaves = '';exibirCampoAbertoOutroLocalChaves = true;FocusOutroLocalChaves();} } ">
+                                <el-option v-for="item in opcoes.locaisChaves" :key="item.id" :label="item.label" :value="item.label"></el-option>
+                            </el-select>
+                        </span>
+                        <span v-else>
+                            <el-input @keyup.enter="CheckoutStep3()" v-model="imovel.localChaves" placeholder=""  maxlength="75" ref="CampoAbertoOutroLocalChaves" style="width:calc(100% - 20px)"></el-input>
+                            <i class="fa fa-close" @click="()=>{imovel.localChaves='';exibirCampoAbertoOutroLocalChaves = false; }" style="margin-left:5px;color:var(--s-color-red);cursor:pointer"></i>
+                        </span>
+                    </el-col>
+            </el-row>
+            <el-row :gutter="20" v-if="$root.usuario.god || $root.usuario.gestor">
+                    <el-col :md="4" :sm="8" :xs="12"><el-checkbox label="Venda               " v-model="imovel.venda                          " size="large"></el-checkbox></el-col>
+                    <el-col :md="4" :sm="8" :xs="12"><el-checkbox label="Locação             " v-model="imovel.locacao                        " size="large"></el-checkbox></el-col>
+                    <el-col :md="4" :sm="8" :xs="12"><el-checkbox label="Residencial         " v-model="imovel.residencial                    " size="large"></el-checkbox></el-col>
+                    <el-col :md="4" :sm="8" :xs="12"><el-checkbox label="Comercial           " v-model="imovel.comercial                      " size="large"></el-checkbox></el-col>
+                    <el-col :md="4" :sm="8" :xs="12"><el-checkbox label="Ocupado             " v-model="imovel.disposicao.ocupado             " size="large"></el-checkbox></el-col>
+                    <el-col :md="4" :sm="8" :xs="12"><el-checkbox label="Aceita financiamento" v-model="imovel.disposicao.aceitaFinanciamento " size="large"></el-checkbox></el-col>
+                    <el-col :md="4" :sm="8" :xs="12"><el-checkbox label="Aceita permuta      " v-model="imovel.disposicao.aceitaPermuta       " size="large"></el-checkbox></el-col>
+                    <el-col :md="4" :sm="8" :xs="12"><el-checkbox label="Placa               " v-model="imovel.disposicao.placa               " size="large"></el-checkbox></el-col>
+                    <!--<el-col :md="4" :sm="8" :xs="12"><el-checkbox label="Disponivel          " v-model="imovel.disposicao.disponivel          " size="large"></el-checkbox></el-col>
+                    <el-col :md="4" :sm="8" :xs="12"><el-checkbox label="Gestao JáCaptei     " v-model="imovel.disposicao.gestaoJacaptei      " size="large"></el-checkbox></el-col>
+                    <el-col :md="4" :sm="8" :xs="12"><el-checkbox label="Gestao Premium      " v-model="imovel.disposicao.gestaoPremium       " size="large"></el-checkbox></el-col>
+                    <el-col :md="4" :sm="8" :xs="12"><el-checkbox label="Alugado             " v-model="imovel.disposicao.alugado             " size="large"></el-checkbox></el-col>
+                    <el-col :md="4" :sm="8" :xs="12"><el-checkbox label="Vendido             " v-model="imovel.disposicao.vendido             " size="large"></el-checkbox></el-col>
+                    <el-col :md="4" :sm="8" :xs="12"><el-checkbox label="Comissao            " v-model="imovel.disposicao.comissao            " size="large"></el-checkbox></el-col>
+                    <el-col :md="4" :sm="8" :xs="12"><el-checkbox label="Desativado          " v-model="imovel.disposicao.desativado          " size="large"></el-checkbox></el-col>
+                    <el-col :md="4" :sm="8" :xs="12"><el-checkbox label="Na planta           " v-model="imovel.disposicao.naPlanta            " size="large"></el-checkbox></el-col>-->
+            </el-row>
+
+
+
+
+            <el-row :gutter="20">
+                <el-col :md="24">
+
+                        <el-row :gutter="20" style="margin-top:30px">
+                            <el-col :md="24" style="color:var(--s-color-primary);font-weight:700">
+                                QUALIFICAÇÃO
+                            </el-col>
+                        </el-row>
+                    
+                        <el-row :gutter="20">
+                            <el-col :md="6" :sm="12" :xs="24" style="margin-top:10px">
+                                Tipo<br />
+                                 <el-select v-model="imovel.tipo"  value-key="id" filterable class="m-4" size="large" style="width:100%" >
+                                    <el-option v-for="item in opcoes.tiposImoveis" :key="item.nome" :label="item.label" :value="item"></el-option>
+                                </el-select>
+                            </el-col>
+                            <!--<el-col :md="6" :sm="12" :xs="24" style="margin-top:10px">
+                                Destinação<br />
+                                <el-input @keyup.enter="CheckoutStep3()" v-model="imovel.destinacao" placeholder="" maxlength="55" ></el-input>
+                            </el-col>-->
+                            <el-col :md="6" :sm="12" :xs="24" style="margin-top:10px">
+                                Construtora<br />
+                                <el-input @keyup.enter="CheckoutStep3()" v-model="imovel.construtora" placeholder="" maxlength="55" ></el-input>
+                            </el-col>
+                            <el-col :md="6" :sm="12" :xs="24" style="margin-top:10px">
+                                Ano de construção<br />
+                                <el-select v-else v-model="imovel.anoConstrucao" filterable class="m-4" placeholder="qualquer" size="large" style="width:100%">
+                                    <el-option v-for="item in opcoes.anos" :key="item.id" :label="item.label" :value="item.value"></el-option>
+                                </el-select>
+                            </el-col>
+                            <el-col :md="6" :sm="12" :xs="24" style="margin-top:10px">
+                                Identificador das chaves<br />
+                                <el-input @keyup.enter="CheckoutStep3()" v-model="imovel.idChaves" placeholder="" maxlength="55" ></el-input>
+                            </el-col>
+
+
+                            <!--<el-col :md="6" :sm="12" :xs="24" style="margin-top:10px">
+                                Qtd de chaves<br />
+    						    <el-input-number v-model="imovel.totalChaves" :step="1" size="medium" :min="0"></el-input-number>
+                            </el-col>-->
+                            <el-col :md="24" style="margin-top:10px">
+                                Descrição<br />
+                                <el-input @keyup.enter="CheckoutStep3()" v-model="imovel.descricao" maxlength="4000" :rows="2" :autosize="{ minRows: 2, maxRows: 16 }" type="textarea"></el-input>
+                            </el-col>
+                        </el-row>
+
+
+                        <el-row :gutter="20" style="margin-top:30px">
+
+                            <el-col :md="24" >
+
+                                    <el-row :gutter="20">
+                                        <el-col :md="24" style="color:var(--s-color-primary);font-weight:700">
+                                            VALORES
+                                        </el-col>
+                                    </el-row>
+
+                                    <el-row :gutter="20">
+                                        <el-col  :md="4" :sm="8" :xs="12" style="margin-top:10px">
+                                            Venda<!--<el-checkbox label="sob consulta" v-model="imovel.valor.sobConsulta  " size="large" style="margin-left:20px;height:20px"></el-checkbox>--><br />
+                                            <el-input input-style="color:var(--s-accent-color);max-width:200px" v-model="imovel.valor.venda" maxlength="20"  @keyup.enter="CheckoutStep3()"  ref="valor"  :formatter="(value) => `${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, '.')"    :parser="(value) => value.replace(/\R\$\s?|(\.*)/g, '').replace(/[a-zA-Z]/g, '')"><template #prepend>R$</template></el-input>
+                                        </el-col>
+                                        <el-col :md="4" :sm="8" :xs="12" style="margin-top:10px">
+                                            Condomínio<br />
+                                            <el-input input-style="color:var(--s-accent-color);max-width:200px" v-model="imovel.valor.condominio" maxlength="20"  @keyup.enter="CheckoutStep3()"  :formatter="(value) => `${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, '.')"    :parser="(value) => value.replace(/\R\$\s?|(\.*)/g, '').replace(/[a-zA-Z]/g, '')"><template #prepend>R$</template></el-input>
+                                        </el-col>
+                                        <el-col  :md="4" :sm="8" :xs="12" style="margin-top:10px">
+                                            Comissão de venda <br />
+                                            <el-input input-style="color:var(--s-accent-color);max-width:200px" v-model="imovel.valor.comissao" maxlength="20" @keyup.enter="CheckoutStep3()"    :formatter="(value) => `${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, '.')"    :parser="(value) => value.replace(/\R\$\s?|(\.*)/g, '').replace(/[a-zA-Z]/g, '')"><template #prepend>%</template></el-input>
+                                        </el-col>
+                                        <!--<el-col  :md="4" :sm="8" :xs="12" style="margin-top:10px">
+                                            Consulta<br />
+                                            <el-input input-style="color:var(--s-accent-color);max-width:200px" v-model="imovel.valor.consulta" maxlength="20"  @keyup.enter="CheckoutStep3()"    :formatter="(value) => `${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, '.')"    :parser="(value) => value.replace(/\R\$\s?|(\.*)/g, '').replace(/[a-zA-Z]/g, '')"><template #prepend>R$</template></el-input>
+                                        </el-col>
+                                        <el-col  :md="4" :sm="8" :xs="12" style="margin-top:10px">
+                                            Rentabilidade<br />
+                                            <el-input input-style="color:var(--s-accent-color);max-width:200px" v-model="imovel.valor.rentabilidade" maxlength="20" @keyup.enter="CheckoutStep3()"    :formatter="(value) => `${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, '.')"    :parser="(value) => value.replace(/\R\$\s?|(\.*)/g, '').replace(/[a-zA-Z]/g, '')"><template #prepend>%</template></el-input>
+                                        </el-col>-->
+                                    </el-row>
+                                    <el-row :gutter="20">
+                                        <el-col  :md="4" :sm="8" :xs="12" style="margin-top:10px">
+                                            IPTU mensal<br />
+                                            <el-input input-style="color:var(--s-accent-color);max-width:200px" v-model="imovel.valor.iptuMensal" maxlength="20"  @keyup.enter="CheckoutStep3()"    :formatter="(value) => `${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, '.')"    :parser="(value) => value.replace(/\R\$\s?|(\.*)/g, '').replace(/[a-zA-Z]/g, '')"><template #prepend>R$</template></el-input>
+                                        </el-col>
+                                        <el-col  :md="4" :sm="8" :xs="12" style="margin-top:10px">
+                                            IPTU anual<br />
+                                            <el-input input-style="color:var(--s-accent-color);max-width:200px" v-model="imovel.valor.iptuAnual" maxlength="20"  @keyup.enter="CheckoutStep3()"    :formatter="(value) => `${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, '.')"    :parser="(value) => value.replace(/\R\$\s?|(\.*)/g, '').replace(/[a-zA-Z]/g, '')"><template #prepend>R$</template></el-input>
+                                        </el-col>
+                                        <!--<el-col  :md="4" :sm="8" :xs="12" style="margin-top:10px">
+                                            IPTU índice<br />
+                                            <el-input input-style="color:var(--s-accent-color);max-width:200px" v-model="imovel.valor.iptuIndice" maxlength="20"  @keyup.enter="CheckoutStep3()"  ></el-input>
+                                        </el-col>-->
+                                    </el-row>
+
+                            </el-col>
+                        </el-row>
+
+                        <el-row :gutter="20" style="margin-top:30px">
+                            <el-col :md="24" >
+
+                                    <el-row :gutter="20">
+                                        <el-col :md="24" style="color:var(--s-color-primary);font-weight:700">
+                                            ÁREAS
+                                        </el-col>
+                                    </el-row>
+
+                                    <el-row :gutter="20">
+                                        <el-col :md="4" :sm="8" :xs="12" style="margin-top:10px">
+                                            Interna<br />
+								            <el-input input-style="color:var(--s-accent-color);max-width:200px" v-model="imovel.area.interna" maxlength="20" @keyup.enter="CheckoutStep3()" ref="areainterna"  :formatter="(value) => `${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, '.')"    :parser="(value) => value.replace(/(\.*)/g, '').replace(/[a-zA-Z]/g, '')"><template #prepend>m²</template></el-input>
+                                        </el-col>
+                                        <el-col :md="4" :sm="8" :xs="12" style="margin-top:10px">
+                                            Externa<br />
+								            <el-input input-style="color:var(--s-accent-color);max-width:200px" v-model="imovel.area.externa" maxlength="20" @keyup.enter="CheckoutStep3()" ref="areaexterna"  :formatter="(value) => `${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, '.')"    :parser="(value) => value.replace(/(\.*)/g, '').replace(/[a-zA-Z]/g, '')"><template #prepend>m²</template></el-input>
+                                        </el-col>
+                                        <!--<el-col :md="4" :sm="8" :xs="12" style="margin-top:10px">
+                                            Frente<br />
+								            <el-input input-style="color:var(--s-accent-color);max-width:200px" v-model="imovel.area.frente" maxlength="20" @keyup.enter="CheckoutStep3()"   :formatter="(value) => `${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, '.')"    :parser="(value) => value.replace(/(\.*)/g, '').replace(/[a-zA-Z]/g, '')"><template #prepend>m²</template></el-input>
+                                        </el-col>
+                                        <el-col :md="4" :sm="8" :xs="12" style="margin-top:10px">
+                                            Fundo<br />
+								            <el-input input-style="color:var(--s-accent-color);max-width:200px" v-model="imovel.area.fundo" maxlength="20" @keyup.enter="CheckoutStep3()"   :formatter="(value) => `${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, '.')"    :parser="(value) => value.replace(/(\.*)/g, '').replace(/[a-zA-Z]/g, '')"><template #prepend>m²</template></el-input>
+                                        </el-col>
+                                        <el-col :md="4" :sm="8" :xs="12" style="margin-top:10px">
+                                            Direito<br />
+								            <el-input input-style="color:var(--s-accent-color);max-width:200px" v-model="imovel.area.direito" maxlength="20" @keyup.enter="CheckoutStep3()"   :formatter="(value) => `${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, '.')"    :parser="(value) => value.replace(/(\.*)/g, '').replace(/[a-zA-Z]/g, '')"><template #prepend>m²</template></el-input>
+                                        </el-col>
+                                        <el-col :md="4" :sm="8" :xs="12" style="margin-top:10px">
+                                            Esquerdo<br />
+								            <el-input input-style="color:var(--s-accent-color);max-width:200px" v-model="imovel.area.esquerdo" maxlength="20" @keyup.enter="CheckoutStep3()"   :formatter="(value) => `${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, '.')"    :parser="(value) => value.replace(/(\.*)/g, '').replace(/[a-zA-Z]/g, '')"><template #prepend>m²</template></el-input>
+                                        </el-col>
+                                        <el-col :md="4" :sm="8" :xs="12" style="margin-top:10px">
+                                            Confrontação frente<br />
+								            <el-input input-style="color:var(--s-accent-color);max-width:200px" v-model="imovel.area.confrontacaoFrente" maxlength="20" @keyup.enter="CheckoutStep3()"   :formatter="(value) => `${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, '.')"    :parser="(value) => value.replace(/(\.*)/g, '').replace(/[a-zA-Z]/g, '')"><template #prepend>m²</template></el-input>
+                                        </el-col>
+                                        <el-col :md="4" :sm="8" :xs="12" style="margin-top:10px">
+                                             Confrontação fundo<br />
+								            <el-input input-style="color:var(--s-accent-color);max-width:200px" v-model="imovel.area.confrontacaoFundo" maxlength="20" @keyup.enter="CheckoutStep3()"   :formatter="(value) => `${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, '.')"    :parser="(value) => value.replace(/(\.*)/g, '').replace(/[a-zA-Z]/g, '')"><template #prepend>m²</template></el-input>
+                                        </el-col>
+                                        <el-col :md="4" :sm="8" :xs="12" style="margin-top:10px">
+                                             Confrontação direito<br />
+								            <el-input input-style="color:var(--s-accent-color);max-width:200px" v-model="imovel.area.confrontacaoDireito" maxlength="20" @keyup.enter="CheckoutStep3()"   :formatter="(value) => `${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, '.')"    :parser="(value) => value.replace(/(\.*)/g, '').replace(/[a-zA-Z]/g, '')"><template #prepend>m²</template></el-input>
+                                        </el-col>
+                                        <el-col :md="4" :sm="8" :xs="12" style="margin-top:10px">
+                                             Confrontação esquerdo<br />
+								            <el-input input-style="color:var(--s-accent-color);max-width:200px" v-model="imovel.area.confrontacaoEsquerdo" maxlength="20" @keyup.enter="CheckoutStep3()"   :formatter="(value) => `${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, '.')"    :parser="(value) => value.replace(/(\.*)/g, '').replace(/[a-zA-Z]/g, '')"><template #prepend>m²</template></el-input>
+                                        </el-col>
+                                        <el-col :md="4" :sm="8" :xs="12" style="margin-top:10px">
+                                             Coeficiente de aproveitamento<br />
+								            <el-input input-style="color:var(--s-accent-color);max-width:200px" v-model="imovel.area.coeficienteAproveitamento" maxlength="20"    @keyup.enter="CheckoutStep3()"   :formatter="(value) => `${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, '.')"    :parser="(value) => value.replace(/(\.*)/g, '').replace(/[a-zA-Z]/g, '')"></el-input>
+                                        </el-col>
+                                        <el-col :md="4" :sm="8" :xs="12" style="margin-top:10px">
+                                             Zona de uso<br />
+								            <el-input input-style="color:var(--s-accent-color);max-width:200px" v-model="imovel.area.zonaUso" maxlength="20"    @keyup.enter="CheckoutStep3()"   :formatter="(value) => `${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, '.')"    :parser="(value) => value.replace(/(\.*)/g, '').replace(/[a-zA-Z]/g, '')"></el-input>
+                                        </el-col>-->
+                                    </el-row>
+
+                            </el-col>
+                        </el-row>
+                    
+
+                        <el-row :gutter="20" style="margin-top:30px">
+                            <el-col :md="24" style="color:var(--s-color-primary);font-weight:700">
+                                DOCUMENTAÇÃO
+                            </el-col>
+                        </el-row>
+                    
+                        <el-row :gutter="20">
+                            <el-col :md="6" :sm="12" :xs="24" style="margin-top:10px">
+                                Cartório<br />
+                                <el-input @keyup.enter="CheckoutStep3()" v-model="imovel.documentacao.cartorio" placeholder="" maxlength="55" ></el-input>
+                            </el-col>
+                            <el-col :md="6" :sm="12" :xs="24" style="margin-top:10px">
+                                Folha cartório<br />
+                                <el-input @keyup.enter="CheckoutStep3()" v-model="imovel.documentacao.cartorioFolha" placeholder="" maxlength="55" ></el-input>
+                            </el-col>
+                            <el-col :md="6" :sm="12" :xs="24" style="margin-top:10px">
+                                Livro cartório<br />
+                                <el-input @keyup.enter="CheckoutStep3()" v-model="imovel.documentacao.cartorioLivro" placeholder="" maxlength="55" ></el-input>
+                            </el-col>
+                            <el-col :md="6" :sm="12" :xs="24" style="margin-top:10px">
+                                Matrícula<br />
+                                <el-input @keyup.enter="CheckoutStep3()" v-model="imovel.documentacao.matricula" placeholder="" maxlength="55" ></el-input>
+                            </el-col>
+                            <el-col :md="6" :sm="12" :xs="24" style="margin-top:10px">
+                                Vencimento autorização de venda<br />
+                                <el-input @keyup.enter="CheckoutStep3()" v-model="imovel.documentacao.vencimentoVenda" placeholder="" maxlength="55" ></el-input>
+                            </el-col>
+                        </el-row>
+
+                </el-col>
+            </el-row>
+
+        </div>
+
+         <!--#endregion -->
+
+
+         <!--#region CARACTERISTICAS  -->
+
+        <div v-if="step == 4">
+
+            <el-row :gutter="20">
+                <el-col :md="24">
+
+                        <el-row :gutter="20" style="margin-top:10px">
+                            <el-col :md="24" style="color:var(--s-color-primary);font-weight:700">
+                                INTERNAS
+                            </el-col>
+                        </el-row>
+                    
+                        <el-row :gutter="20" style="margin-top:10px">
+                            <el-col  :md="4" :sm="8" :xs="12" >
+                                Qtd de Quartos<br />
+								<el-input-number v-model="imovel.interno.totalQuartos" :step="1" size="small" :min="0" @change="()=>{ imovel.interno.quarto = imovel.interno.totalQuartos > 0  }"></el-input-number>
+                            </el-col>
+                            <el-col  :md="4" :sm="8" :xs="12" >
+                                Qtd de Banheiros<br />
+								<el-input-number v-model="imovel.interno.totalBanheiros" :step="1" size="small" :min="0" @change="()=>{ imovel.interno.banheiro = imovel.interno.totalBanheiros > 0  }"></el-input-number>
+                            </el-col>
+                            <el-col  :md="4" :sm="8" :xs="12">
+                                Qtd de Suítes<br />
+								<el-input-number v-model="imovel.interno.totalSuites" :step="1" size="small" :min="0" @change="()=>{ imovel.interno.suite = imovel.interno.totalSuites > 0  }"></el-input-number>
+                            </el-col>
+                            <el-col  :md="4" :sm="8" :xs="12">
+                                Qtd de Salas<br />
+								<el-input-number v-model="imovel.interno.totalSalas" :step="1" size="small" :min="0" @change="()=>{ imovel.interno.sala = imovel.interno.totalSalas > 0  }"></el-input-number>
+                            </el-col>
+                            <el-col  :md="4" :sm="8" :xs="12">
+                                Qtd de Varandas<br />
+								<el-input-number v-model="imovel.interno.totalVarandas" :step="1" size="small" :min="0" @change="()=>{ imovel.interno.varanda = imovel.interno.totalVarandas > 0  }"></el-input-number>
+                            </el-col>
+                        </el-row>
+
+                        <el-row :gutter="20" style="margin-top:10px">
+                                <el-col :md="4" :sm="8" :xs="12"><el-checkbox label="Água individual     " v-model="imovel.interno.aguaIndividual    " size="large"></el-checkbox></el-col>
+                                <el-col :md="4" :sm="8" :xs="12"><el-checkbox label="Aquecedor gás       " v-model="imovel.interno.aquecedorGas      " size="large"></el-checkbox></el-col>
+                                <el-col :md="4" :sm="8" :xs="12"><el-checkbox label="Aquecedor elétrico  " v-model="imovel.interno.aquecedorEletrico " size="large"></el-checkbox></el-col>
+                                <el-col :md="4" :sm="8" :xs="12"><el-checkbox label="Aquecedor solar     " v-model="imovel.interno.aquecedorSolar    " size="large"></el-checkbox></el-col>
+                                <el-col :md="4" :sm="8" :xs="12"><el-checkbox label="Ar condicionado     " v-model="imovel.interno.arCondicionado    " size="large"></el-checkbox></el-col>
+                                <el-col :md="4" :sm="8" :xs="12"><el-checkbox label="Área servico        " v-model="imovel.interno.areaServico       " size="large"></el-checkbox></el-col>
+                                <el-col :md="4" :sm="8" :xs="12"><el-checkbox label="Área privativa      " v-model="imovel.interno.areaPrivativa     " size="large"></el-checkbox></el-col>
+                                <el-col :md="4" :sm="8" :xs="12"><el-checkbox label="Armário banheiro    " v-model="imovel.interno.armarioBanheiro   " size="large"></el-checkbox></el-col>
+                                <el-col :md="4" :sm="8" :xs="12"><el-checkbox label="Armário cozinha     " v-model="imovel.interno.armarioCozinha    " size="large"></el-checkbox></el-col>
+                                <el-col :md="4" :sm="8" :xs="12"><el-checkbox label="Armário quarto      " v-model="imovel.interno.armarioQuarto     " size="large"></el-checkbox></el-col>
+                                <el-col :md="4" :sm="8" :xs="12"><el-checkbox label="Banheiro            " v-model="imovel.interno.banheiro          " size="large" @change="()=>{ if(imovel.interno.banheiro && imovel.interno.totalBanheiros < 1){ imovel.interno.totalBanheiros = 1; } else if(!imovel.interno.banheiro){ imovel.interno.totalBanheiros = 0; }  }"></el-checkbox></el-col>
+                                <el-col :md="4" :sm="8" :xs="12"><el-checkbox label="Box despejo         " v-model="imovel.interno.boxDespejo        " size="large"></el-checkbox></el-col>
+                                <el-col :md="4" :sm="8" :xs="12"><el-checkbox label="Churrasqueira       " v-model="imovel.interno.churrasqueira     " size="large"></el-checkbox></el-col>
+                                <el-col :md="4" :sm="8" :xs="12"><el-checkbox label="Closet              " v-model="imovel.interno.closet            " size="large"></el-checkbox></el-col>
+                                <el-col :md="4" :sm="8" :xs="12"><el-checkbox label="Dce                 " v-model="imovel.interno.dce               " size="large"></el-checkbox></el-col>
+                                <el-col :md="4" :sm="8" :xs="12"><el-checkbox label="Despensa            " v-model="imovel.interno.despensa          " size="large"></el-checkbox></el-col>
+                                <el-col :md="4" :sm="8" :xs="12"><el-checkbox label="Escritório          " v-model="imovel.interno.escritorio        " size="large"></el-checkbox></el-col>
+                                <el-col :md="4" :sm="8" :xs="12"><el-checkbox label="Gás canalizado      " v-model="imovel.interno.gasCanalizado     " size="large"></el-checkbox></el-col>
+                                <el-col :md="4" :sm="8" :xs="12"><el-checkbox label="Hidromassagem       " v-model="imovel.interno.hidromassagem     " size="large"></el-checkbox></el-col>
+                                <el-col :md="4" :sm="8" :xs="12"><el-checkbox label="Lavabo              " v-model="imovel.interno.lavabo            " size="large"></el-checkbox></el-col>
+                                <el-col :md="4" :sm="8" :xs="12"><el-checkbox label="Mobilidado          " v-model="imovel.interno.mobilidado        " size="large"></el-checkbox></el-col>
+                                <el-col :md="4" :sm="8" :xs="12"><el-checkbox label="Quarto              " v-model="imovel.interno.quarto            " size="large" @change="()=>{ if(imovel.interno.quarto && imovel.interno.totalQuartos < 1){ imovel.interno.totalQuartos = 1; } else if(!imovel.interno.quarto){ imovel.interno.totalQuartos = 0; }  }"></el-checkbox></el-col>
+                                <el-col :md="4" :sm="8" :xs="12"><el-checkbox label="Rouparia            " v-model="imovel.interno.rouparia          " size="large"></el-checkbox></el-col>
+                                <el-col :md="4" :sm="8" :xs="12"><el-checkbox label="Sala                " v-model="imovel.interno.sala              " size="large" @change="()=>{ if(imovel.interno.sala && imovel.interno.totalSalas < 1){ imovel.interno.totalSalas = 1; } else if(!imovel.interno.sala){ imovel.interno.totalSalas = 0; }  }"></el-checkbox></el-col>
+                                <el-col :md="4" :sm="8" :xs="12"><el-checkbox label="Sol manhã           " v-model="imovel.interno.solManha          " size="large"></el-checkbox></el-col>
+                                <el-col :md="4" :sm="8" :xs="12"><el-checkbox label="Suite               " v-model="imovel.interno.suite             " size="large" @change="()=>{ if(imovel.interno.suite && imovel.interno.totalSuites < 1){ imovel.interno.totalSuites = 1; } else if(!imovel.interno.suite){ imovel.interno.totalSuites = 0; }  }"></el-checkbox></el-col>
+                                <el-col :md="4" :sm="8" :xs="12"><el-checkbox label="Varanda             " v-model="imovel.interno.varanda           " size="large" @change="()=>{ if(imovel.interno.varanda && imovel.interno.totalVarandas < 1){ imovel.interno.totalVarandas = 1; } else if(!imovel.interno.varanda){ imovel.interno.totalVarandas = 0; }  }"></el-checkbox></el-col>
+                                <el-col :md="4" :sm="8" :xs="12"><el-checkbox label="Varanda gourmet     " v-model="imovel.interno.varandaGourmet    " size="large"></el-checkbox></el-col>
+                                <el-col :md="4" :sm="8" :xs="12"><el-checkbox label="Vista mar           " v-model="imovel.interno.vistaMar          " size="large"></el-checkbox></el-col>
+                        </el-row>
+
+                        <el-row :gutter="20" style="margin-top:30px">
+                            <el-col :md="24" style="color:var(--s-color-primary);font-weight:700">
+                                EXTERNAS
+                            </el-col>
+                        </el-row>
+
+                        <el-row :gutter="20" style="margin-top:10px">
+                            <el-col  :md="4" :sm="8" :xs="12" >
+                                Qtd de Andares<br />
+								<el-input-number v-model="imovel.externo.totalAndares" :step="1" size="small" :min="0"></el-input-number>
+                            </el-col>
+                            <el-col  :md="4" :sm="8" :xs="12" >
+                                Qtd de Elevadores<br />
+								<el-input-number v-model="imovel.externo.totalElevadores" :step="1" size="small" :min="0" @change="()=>{ imovel.externo.elevador = imovel.externo.totalElevadores > 0  }"></el-input-number>
+                            </el-col>
+                            <el-col  :md="4" :sm="8" :xs="12">
+                                Qtd de Vagas<br />
+								<el-input-number v-model="imovel.externo.totalVagas" :step="1" size="small" :min="0" @change="()=>{ imovel.externo.vaga = imovel.externo.totalVagas > 0  }"></el-input-number>
+                            </el-col>
+                        </el-row>
+
+                        <el-row :gutter="20" style="margin-top:10px">
+                                <el-col :md="4" :sm="8" :xs="12"><el-checkbox label="Academia           " v-model="imovel.externo.academia          " size="large"></el-checkbox></el-col>
+                                <el-col :md="4" :sm="8" :xs="12"><el-checkbox label="Alarme             " v-model="imovel.externo.alarme            " size="large"></el-checkbox></el-col>
+                                <el-col :md="4" :sm="8" :xs="12"><el-checkbox label="Cerca elétrica     " v-model="imovel.externo.cercaEletrica     " size="large"></el-checkbox></el-col>
+                                <el-col :md="4" :sm="8" :xs="12"><el-checkbox label="Churrasqueira      " v-model="imovel.externo.churrasqueira     " size="large"></el-checkbox></el-col>
+                                <el-col :md="4" :sm="8" :xs="12"><el-checkbox label="Circuito TV        " v-model="imovel.externo.circuitoTV        " size="large"></el-checkbox></el-col>
+                                <el-col :md="4" :sm="8" :xs="12"><el-checkbox label="Elevador           " v-model="imovel.externo.elevador          " size="large" @change="()=>{ if(imovel.externo.elevador && imovel.externo.totalElevadores < 1){ imovel.externo.totalElevadores = 1; } else if(!imovel.externo.elevador){ imovel.externo.totalElevadores = 0; }  }"></el-checkbox></el-col>
+                                <el-col :md="4" :sm="8" :xs="12"><el-checkbox label="Interfone          " v-model="imovel.externo.interfone         " size="large"></el-checkbox></el-col>
+                                <el-col :md="4" :sm="8" :xs="12"><el-checkbox label="Jardim             " v-model="imovel.externo.jardim            " size="large"></el-checkbox></el-col>
+                                <el-col :md="4" :sm="8" :xs="12"><el-checkbox label="Lavanderia         " v-model="imovel.externo.lavanderia        " size="large"></el-checkbox></el-col>
+                                <el-col :md="4" :sm="8" :xs="12"><el-checkbox label="Portão eletrônico  " v-model="imovel.externo.portaoEletronico  " size="large"></el-checkbox></el-col>
+                                <el-col :md="4" :sm="8" :xs="12"><el-checkbox label="Portaria 24h       " v-model="imovel.externo.portaria24h       " size="large"></el-checkbox></el-col>
+                                <el-col :md="4" :sm="8" :xs="12"><el-checkbox label="Sauna              " v-model="imovel.externo.sauna             " size="large"></el-checkbox></el-col>
+                                <el-col :md="4" :sm="8" :xs="12"><el-checkbox label="Vaga               " v-model="imovel.externo.vaga              " size="large" @change="()=>{ if(imovel.externo.vaga && imovel.externo.totalVagas < 1){ imovel.externo.totalVagas = 1; } else if(!imovel.externo.vaga){ imovel.externo.totalVagas = 0; }  }"></el-checkbox></el-col>
+                        </el-row>
+
+
+
+                        <el-row :gutter="20" style="margin-top:30px">
+                            <el-col :md="24" style="color:var(--s-color-primary);font-weight:700">
+                               LAZER
+                            </el-col>
+                        </el-row>
+
+                        <el-row :gutter="20" style="margin-top:10px">
+                                <el-col :md="4" :sm="8" :xs="12"><el-checkbox label="Cinema               " v-model="imovel.lazer.cinema              " size="large"></el-checkbox></el-col>
+                                <el-col :md="4" :sm="8" :xs="12"><el-checkbox label="Hidromassagem        " v-model="imovel.lazer.hidromassagem       " size="large"></el-checkbox></el-col>
+                                <el-col :md="4" :sm="8" :xs="12"><el-checkbox label="Piscina              " v-model="imovel.lazer.piscina             " size="large"></el-checkbox></el-col>
+                                <el-col :md="4" :sm="8" :xs="12"><el-checkbox label="Playground           " v-model="imovel.lazer.playground          " size="large"></el-checkbox></el-col>
+                                <el-col :md="4" :sm="8" :xs="12"><el-checkbox label="Quadra poliesportiva " v-model="imovel.lazer.quadraPoliesportiva " size="large"></el-checkbox></el-col>
+                                <el-col :md="4" :sm="8" :xs="12"><el-checkbox label="Quadra tênis         " v-model="imovel.lazer.quadraTenis         " size="large"></el-checkbox></el-col>
+                                <el-col :md="4" :sm="8" :xs="12"><el-checkbox label="Salão de festas      " v-model="imovel.lazer.salaoFestas         " size="large"></el-checkbox></el-col>
+                                <el-col :md="4" :sm="8" :xs="12"><el-checkbox label="Salão de jogos       " v-model="imovel.lazer.salaoJogos          " size="large"></el-checkbox></el-col>
+                                <el-col :md="4" :sm="8" :xs="12"><el-checkbox label="Salão de massagem    " v-model="imovel.lazer.salaoMassagem       " size="large"></el-checkbox></el-col>
+                        </el-row>
+
+
+                </el-col>
+            </el-row>
+
+        </div>
+
+         <!--#endregion -->
+
+
+
+         <!--#region IMAGENS  -->
+
+        <div v-if="step == 5">
+            <div style="width:100%">
+                       
+                  <el-upload
+                    accept="image/jpeg"
+                    :auto-upload="false"
+                    ref="uploadImagesComponent"
+                    v-model:file-list="imagesInputs"
+                    list-type="picture-card"
+                    :on-preview="HandlePreviewImagem"
+                    :on-remove="HandleRemoverImagem"
+                    :on-change="HandleChangeImagem"
+                    class="upload-demo"
+                    drag
+                    multiple
+                    style="width:100%;display:block"
+                  >
+                    <el-icon class="el-icon--upload"><upload-filled /></el-icon>
+                    <div class="el-upload__text">
+                      Arraste as imagens aqui ou <em>clique para buscar</em>
+                    </div>
+                    <template #tip>
+                      <div class="el-upload__tip">
+                        <!--jpg/png files with a size less than 500kb-->
+                      </div>
+                    </template>
+                  </el-upload>
+
+                <div style="margin-top:0px">
+                    <q-btn label="EXCLUIR TODAS" outline color="orange" @click="ExcluirTodasImagens" icon="fa fa-trash"></q-btn>
+                    <q-btn label="VOLTAR COMO ESTAVA" outline color="primary" @click="VoltarImagensIniciais" icon="fa fa-refresh" style="margin-left:20px"></q-btn>
+                    <!--<q-btn label="SALVAR" color="primary" @click="Enviar()" :loading="onrequest" style="margin-left:20px" icon="fa fa-save"></q-btn>-->
+                </div>
+            </div>
+
+            <div>
+                  <el-dialog v-model="previewImagemModal" :title="previewImagem?.name" width="100%">
+                      <div>
+                            <img :src="previewImagem?.url" />
+                      </div>
+                  </el-dialog>
+            </div>
+
+        </div>
+
+         <!--#endregion -->
+
+
+
+         <!--#region CONFIRMACAO  -->
+
+        <div v-if="step == 6">
+            <div class="flex-center" style="padding-top:30px;height:240px;width:100%;text-align:center">
+                    <c-loading size="50px" color="var(--s-color-primary)"></c-loading>
+                    <div style="color:var(--s-color-primary);margin-top:20px">Alterando</div>
+            </div>
+        </div>
+
+        <div v-if="step == 7">
+            <div class="flex-center" style="padding-top:30px;height:240px;width:100%;text-align:center">
+                    <c-info type="success" title="Sucesso" subtitle="Alteração feita"></c-info>
+                    <div style="margin-top:-10px"><q-btn label="Alterar novamente" color="primary" @click="StepTo(1)"></q-btn></div>
+                    <div style="margin-top:10px" ><q-btn label="voltar" color="primary" outline @click="$root.RouteTo('/imoveis')"></q-btn></div>
+            </div>
+        </div>
+
+        <div v-if="step == 8">
+            <div class="flex-center" style="padding-top:30px;height:240px;width:100%;text-align:center">
+                    <c-info type="fail" title="Falhou" subtitle="Não foi possível atender a requisição"></c-info>
+                    <q-btn label="TENTAR NOVAMENTE" outline @click="TentarNovamente"></q-btn>
+            </div>
+        </div>
+
+        <div v-if="step == 9">
+            <div class="flex-center" style="padding-top:30px;height:240px;width:100%;text-align:center">
+                    <c-loading size="50px" color="var(--s-color-primary)"></c-loading>
+                    <div style="color:var(--s-color-primary);margin-top:20px">Excluindo</div>
+            </div>
+        </div>
+
+        <div v-if="step == 10">
+            <div class="flex-center" style="padding-top:30px;height:240px;width:100%;text-align:center">
+                    <c-info type="success" title="Sucesso" subtitle="Exclusão feita"></c-info>
+                    <div style="margin-top:10px" ><q-btn label="voltar" color="primary" outline @click="$root.RouteTo('/imoveis')"></q-btn></div>
+            </div>
+        </div>
+
+         <!--#endregion -->
+
+
+
+        <el-row :gutter="20" style="margin-top:10px">
+            <c-division></c-division>
+        </el-row>
+
+        <el-row :gutter="20" style="margin-top:10px">
+            <el-col :md="24">
+                <input type="hidden" id="imovelFormData" />
+                <div v-if="step <= 5">
+                        <div style="float:left">
+                            <q-btn label="VOLTAR"       outline color="primary" @click="$root.RouteTo('/imoveis')"  style="margin-right:20px;width:120px"  v-if="step <= 1"></q-btn>
+                            <q-btn label="VOLTAR"       outline color="primary" @click="StepTo(--step)"             style="margin-right:20px;width:120px"  v-if="step > 1 && step < 6"></q-btn>
+                            <q-btn label="PROSSEGUIR"   outline color="primary" @click="Checkout(step)"             style="margin-right:20px;width:120px"  v-if="step < 5"></q-btn>
+                            <q-btn label="SALVAR"               color="primary" @click="CheckoutStep5"              style="margin-right:20px;width:120px"   icon="fa fa-save"></q-btn>
+                        </div>
+                        <div style="float:right">
+                            <el-popconfirm width="220"
+                                            confirm-button-text="SIM"
+                                            cancel-button-text="Não"
+                                            :icon="InfoFilled"
+                                            icon-color="var(--s-color-primary)"
+                                            :title="'Excluir ID#'+imovel.id+'?'"
+                                            @confirm="Excluir()">
+                                <template #reference>
+                                        <q-btn label="EXCLUIR" color="red" :loading="onrequest" style="width:120px;margin-right:20px" icon="fa fa-trash"></q-btn>
+                                </template>
+                            </el-popconfirm>
+                       </div>
+                </div>
+            </el-col>
+            <!--<el-col :md="12" class="s-input">
+                <div><i class="fa fa-square"></i> campos necessários</div>
+            </el-col>-->
+        </el-row>
+
+
+            </el-col>
+        </el-row>
+
+
+
+
+    </div>
+
+
+
+
+</template>
+
+<script>
+    module.exports = {
+        components: {
+
+        },
+
+        data: function () {
+            return {
+                onrequest: true,
+                ontablequest    : false,
+                view: "imagens",
+                step:0,
+                imagesFiles: [],
+                imagesInputs: [],
+                immagesBK:[],
+                previewImagemModal:false,
+                previewImagem:null,
+                carregandoCEP: false,
+                carregandoEstados: false,
+                carregandoCidades: false,
+                carregandoBairros: false,
+                exibirCampoAbertoOutroComplemento: false,
+                exibirCampoAbertoOutroLocalChaves: false,
+                exibirCampoAbertoMotivoInativacao: false,
+                verificadoImoveisNaRegiao: false,
+                cep: { numero: "", estado: "", cidade: "", logradouro: ""},
+                opcoes: { estados: [], cidades: [], bairros: [],
+                    sexos: [],
+                    anos:[],
+                    tiposImoveis:this.$models.tiposImoveis(),
+                    tiposComplementos:this.$models.tiposComplementos(),
+                    locaisChaves: this.$sdata.opcoes.locaisChaves,
+                    motivosInativacao: this.$sdata.opcoes.motivosInativacao
+                },
+                proprietariosBuscaResult:[],
+                imoveisBuscaResult:[],
+                imoveisRegiaoBuscaResult:[],
+                proprietarioJacaptei: {id:1,nome:"JáCaptei"},
+                stepCaptions:['','','','','','','','',''],
+                buscaProprietario       : this.$models.busca(),
+                buscaImovel             : this.$models.buscaImovel(),
+                imovel                  : this.$models.imovel(),
+                admins                  : this.$root.admins,
+                captadorSelecionado     :{}
+            }
+        }, computed: {
+
+        },
+
+		props: {
+            id: { type: Number, required: true, default: 0 },
+		},
+        watch: {
+        },
+        created: function () {
+
+           this.$sdata.ObterEstados().then(res => { this.opcoes.estados = res; });
+           this.buscaProprietario.item = this.$models.proprietario();
+           this.buscaProprietario.page = 1;
+
+           //if(this.$validator.is(this.$router.params?.proprietario)){
+           //    this.buscaProprietario.item = this.$router.params.proprietario;
+           //    this.CheckoutStep1(this.buscaProprietario.item);
+           //}else
+           //     this.StepTo(1);
+            
+           this.opcoes.anos.push({ id:0, label:'indefinido', value:0 });
+           for(var i=new Date().getFullYear(); i >= 1000;i--)
+              this.opcoes.anos.push({ id:i, label:i, value:i });
+
+        },
+
+        mounted() {
+            this.Reset();
+			this.Obter(this.id);
+        },
+        methods: {
+
+
+			async Obter(id){
+
+                this.buscaImovel.imovel.id = id;
+
+                this.onrequest  = true;
+                var request     = await this.$api.Post("imovel/buscar",this.buscaImovel);
+
+                // c2("request",request);
+                if (request?.status?.success){
+                    this.buscaImovel    =  request.result;
+                    if(this.$validator.is(this.buscaImovel.result.imoveis)){
+                        this.imoveisBuscaResult =  this.buscaImovel.result.imoveis;
+                        this.imovel             =  this.buscaImovel.result.imoveis[0];
+                        this.cep.numero         = this.imovel.endereco.cep;
+
+                        if(this.$validator.not(this.imovel.imagens))
+                            this.imovel.imagens = [];
+                        else{
+                            this.imovel.imagens.forEach(i => this.imagesInputs.push({name:"noupdate",url:i.urlFull,}));
+                            this.immagesBK      = this.imovel.imagens;
+                        }
+                        this.imovel.tipo = this.opcoes.tiposImoveis.filter(it => it.id == this.imovel.idTipo)[0];
+                        
+                        this.imovel.adminCaptador = this.admins.filter(a => a.id == this.imovel.idAdminCaptador)[0];
+                        this.DefinirCaptador(this.imovel.adminCaptador);
+
+                        if(this.imovel.endereco.idTipoComplemento == 0)
+                            this.imovel.endereco.idTipoComplemento = null;
+
+                        this.StepTo(1);
+                        this.BuscarProprietario();
+                    }
+                } 
+
+                this.onrequest  = false;
+
+			},
+
+
+			async Excluir(){
+
+                this.StepTo(9);
+                var url = "imovel/excluir/" + this.imovel.id;
+                var request     = await this.$api.Get(url);
+
+                if (request?.status?.success)
+                    this.StepTo(10);
+                else
+                    this.StepTo(8);
+
+			},
+
+
+
+
+            ExcluirTodasImagens(){
+                this.imagesInputs = [];
+                this.imovel.imagens = [];
+            },
+
+            VoltarImagensIniciais(){
+                this.imagesInputs = [];
+                this.imovel.imagens = [];
+                if(this.immagesBK.length > 0){
+                    this.imovel.imagens = this.immagesBK;
+                    this.imovel.imagens.forEach(i => this.imagesInputs.push({name:"noupdate",url:i.urlFull,}));
+                }
+            },
+
+
+            Reset(){
+                   this.cep    = { numero: "", estado: "", cidade: "", logradouro: ""};
+
+                   this.busca                  = this.$models.busca();
+                   this.buscaProprietario      = this.$models.busca();
+                   this.buscaImovel            = this.$models.buscaImovel();
+                   this.imovel                 = this.$models.imovel();
+
+                   this.imovel.anoConstrucao    = 0;
+                 //  this.idTipoImovelSelecionado = this.imovel.tipo.id = this.imovel.idTipo;
+                   this.imovel.tipo             = this.opcoes.tiposImoveis.filter(it => it.id == this.imovel.idTipo)[0];
+                   this.imovel.adminCaptador    = this.admins.filter(a => a.id == 1)[0];
+
+                   this.buscaProprietario.item = this.$models.proprietario();
+                   this.imagesInputs = [];
+                   this.imagesFiles = [];
+                   this.stepCaptions = ['','','','','','','','','','','','','','',''];
+                   this.proprietariosBuscaResult    =[];
+                   this.imoveisBuscaResult          =[];
+                   this.imoveisRegiaoBuscaResult    =[];
+                   this.proprietarioJacaptei        = {id:1,nome:"JáCaptei"};
+                   /*
+                   this.imovel.valor.venda          = 
+                   this.imovel.valor.condominio     = 
+                   this.imovel.valor.iptuAnual      = 
+                   this.imovel.valor.iptuMensal     = 
+                   this.imovel.valor.iptuIndice     = 
+                   this.imovel.valor.consulta       = 
+                   this.imovel.valor.rentabilidade  = 
+                   this.imovel.valor.comissao       = null;
+
+                   this.imovel.area.interna                     =
+                   this.imovel.area.externa                     =
+                   this.imovel.area.terreno                     =
+                   this.imovel.area.frente                      =
+                   this.imovel.area.fundo                       =
+                   this.imovel.area.direito                     =
+                   this.imovel.area.esquerdo                    =
+                   this.imovel.area.confrontacaoFrente          =
+                   this.imovel.area.confrontacaoFundo           =
+                   this.imovel.area.confrontacaoDireito         =
+                   this.imovel.area.confrontacaoEsquerdo        =
+                   this.imovel.area.coeficienteAproveitamento   =
+                   this.imovel.area.zonaUso                     =
+                   this.imovel.area.minima                      =
+                   this.imovel.area.maxima                      =
+                   this.imovel.area.total                       = null;
+                   */
+                    },
+
+
+            StepTo(_step){
+                this.step = _step;
+                //if(_step == 1){
+                //   this.StepTo(2);
+                //   //this.BuscarProprietario();
+                //}
+                if(_step==2){
+                   window.setTimeout(() => this.$refs.indiceCadastral.focus(), 500);
+                }
+                //if(_step==3)
+                //   window.setTimeout(() => this.$refs.valor.focus(), 500);
+                this.$tools.ToTop();
+            },
+
+            Checkout(step,proprietario=null){
+                switch(step){
+                    case 1: this.CheckoutStep1(proprietario);break;
+                    case 2: this.CheckoutStep2();break;
+                    case 3: this.CheckoutStep3();break;
+                    case 4: this.CheckoutStep4();break;
+                    case 5: this.CheckoutStep5();break;
+                    default: this.StepTo(1);
+                }
+            },
+
+            CheckoutStep1(_proprietario){
+                if(this.$validator.is(_proprietario)){
+                    this.imovel.proprietario  = _proprietario;
+                    this.imovel.idPoprietario = _proprietario.id;
+                }
+                this.stepCaptions[1] = this.imovel.proprietario.apelido;
+                this.StepTo(2);
+            },
+
+            async CheckoutStep2(){
+
+                var msg = "";
+
+                if (this.$validator.not(this.imovel.documentacao.indiceCadastral))
+                    msg += "<b>ÍNDICE CADASTRAL</b> não informado<br>";
+
+                if (this.$validator.not(this.imovel.endereco.cep))
+                    msg += "<b>CEP</b> não informado<br>";
+
+                if (this.$validator.not(this.imovel.endereco.estado))
+                    msg += "<b>ESTADO</b> não selecionado<br>";
+
+                if (this.$validator.not(this.imovel.endereco.cidade))
+                    msg += "<b>CIDADE</b> não selecionada<br>";
+
+                if (this.$validator.not(this.imovel.endereco.bairro))
+                    msg += "<b>BAIRRO</b> não selecionado<br>";
+
+                if (this.$validator.not(this.imovel.endereco.logradouro))
+                    msg += "<b>LOGRADOURO</b> não informado<br>";
+
+                if (this.$validator.not(this.imovel.endereco.numero))
+                    msg += "<b>NÚMERO</b> não informado (informe <b>SN</b> se não houver)<br>";
+
+
+                if (msg.length > 0)
+                    this.$tools.Alert(msg);
+                else{
+
+                    await this.BuscarImoveisNaRegiao();
+
+                    if(this.imoveisRegiaoBuscaResult.length == 0){
+                        this.stepCaptions[2] = this.imovel.endereco.bairro + ', ' + this.imovel.endereco.cidade ;
+                        this.StepTo(3);
+                    }
+                }
+            },
+
+            CheckoutStep3(){
+
+                var msg = "";
+
+                //if(this.imovel.valor.venda <= 0){
+                //    msg += "<b>Valor</b> não informado<br>";
+                //    this.$refs.valor.focus()
+                //}
+                //if(this.imovel.area.interna <= 0 && this.imovel.area.externa <= 0){
+                //    msg += "<b>Área</b> não informada<br>";
+                //    this.$refs.areainterna.focus()
+                //}
+
+                if (!this.imovel.ativo && this.$validator.not(this.imovel.motivoInativacao))
+                    msg += "<b>MOTIVO DA INATIVAÇÃO</b> não informado<br>";
+
+                if(this.$validator.not(this.imovel.localChaves))
+                    msg += "<b>Local das chaves</b> não informado<br>";
+                if(this.$validator.not(this.imovel.descricao))
+                    msg += "<b>Descrição</b> não informada<br>";
+                
+                if (msg.length > 0)
+                    this.$tools.Alert(msg);
+                else{
+                    //this.stepCaptions[3] = 'R$ '+this.imovel.valor.venda ;
+                    this.StepTo(4);
+                }
+            },
+
+            CheckoutStep4(){
+                this.StepTo(5);
+            },
+
+
+            CheckoutStep5(){
+                if(this.imagesInputs.length == 0 && this.imovel?.imagens.length == 0){
+                     this.$tools.Alert("<b>Imagens</b> não inseridas.");
+                }else{
+                    this.stepCaptions[5] = this.imagesInputs.length + " imagens";
+                    this.Enviar();
+                }
+            },
+
+            CheckoutStep6(){
+               // this.stepCaptions[4] = this.imagesInputs.length + " imagens";
+                this.StepTo(7);
+            },
+
+            CheckoutStep7(){
+                this.StepTo(8);
+            },
+
+            TentarNovamente(){
+                this.imagesInputs = [];
+                this.StepTo(5);
+            },
+
+            HandleChangeImagem(uploadFile, uploadFiles){
+              //c("change")
+            },
+
+            HandleRemoverImagem(uploadFile, uploadFiles){
+              //c("remove")
+              //c2("uploadFiles",uploadFiles)
+              //c2("imovel.imagens",this.imovel.imagens);
+              //c2("uploadFile",uploadFile)
+              if(uploadFile.name == "noupdate")
+                this.imovel.imagens = this.imovel.imagens.filter(i=> i.url !== uploadFile.url);
+            
+              //c2("imovel.imagens",this.imovel.imagens);
+
+            },
+
+            HandlePreviewImagem(file){
+                //console.log(file)
+                this.previewImagem=file;
+                this.previewImagemModal=true;
+            },
+
+
+            async Enviar() {
+
+                if(this.Validar()){
+
+                        this.StepTo(6);
+
+                        this.ParseImovel();
+
+                        this.imagesFiles = [];
+
+                        const formData = new FormData();
+                        formData.append("jsonImovel", JSON.stringify(this.imovel));
+
+                        if(this.$validator.is(this.imagesInputs) && this.imagesInputs.length > 0){
+                            this.imagesInputs.forEach((img)=>{
+                                if(img.name !== "noupdate"){
+                                    var imageFile = Object.assign({}, img).raw;
+                                    formData.append('imagesFiles',imageFile, imageFile.name);
+                                }
+                            });
+                        }else
+                            formData.append('imagesFiles',[]);
+                    
+
+
+                        //this.onrequest = true;
+            
+                         var url = this.$api.BuildURL("imovel/alterar");
+                         var result = axios.post(url,formData,{headers:{"Accept": "application/json","Content-Type": "multipart/form-data"} }).then((request) => {
+                               //c(request);
+                              if (request.data.status.success){
+                                    this.CheckoutStep6();
+                                    return request.data;
+                               }else
+					                this.CheckoutStep7();
+
+				        }).catch((error) => {
+					        //ce(error);
+                            if (error.response) {
+                                ce(error);
+                            }
+					        this.CheckoutStep7();
+				        }).finally(() => {
+                           // this.onrequest = false;
+				        });
+                     }
+
+
+            },
+
+            Validar(){
+
+                var msg = "";
+
+                if (!this.imovel.ativo && this.$validator.not(this.imovel.motivoInativacao))
+                    msg += "<b>MOTIVO DA INATIVAÇÃO</b> não informado<br>";
+
+                if (this.$validator.not(this.imovel.documentacao.indiceCadastral))
+                    msg += "<b>ÍNDICE CADASTRAL</b> não informado<br>";
+
+                if (this.$validator.not(this.imovel.endereco.cep))
+                    msg += "<b>CEP</b> não informado<br>";
+
+                if (this.$validator.not(this.imovel.endereco.estado))
+                    msg += "<b>ESTADO</b> não selecionado<br>";
+
+                if (this.$validator.not(this.imovel.endereco.cidade))
+                    msg += "<b>CIDADE</b> não selecionada<br>";
+
+                if (this.$validator.not(this.imovel.endereco.bairro))
+                    msg += "<b>BAIRRO</b> não selecionado<br>";
+
+                if (this.$validator.not(this.imovel.endereco.logradouro))
+                    msg += "<b>LOGRADOURO</b> não informado<br>";
+
+                if (this.$validator.not(this.imovel.endereco.numero))
+                    msg += "<b>NÚMERO</b> não informado (informe <b>SN</b> se não houver)<br>";
+
+                if(this.$validator.not(this.imovel.localChaves))
+                    msg += "<b>Local das chaves</b> não informado<br>";
+
+                if(this.$validator.not(this.imovel.descricao))
+                    msg += "<b>Descrição</b> não informada<br>";
+             
+                if(this.imagesInputs.length == 0 && this.imovel?.imagens.length == 0)
+                    msg += "<b>Imagens</b> não inseridas<br>";
+                //if(this.imagesInputs.length < 15 && this.imovel?.imagens.length < 15)
+                //    msg += "<b>Imagens</b> precisam ser pelo menos 15<br>";
+             
+                if (msg.length > 0){
+                    this.$tools.Alert(msg);
+                    return false;
+                }else{
+                    return true;
+                }
+                
+            },
+
+
+            ParseImovel(){
+
+                    this.imovel.valor.venda                      = this.$tools.ParseFloat( this.imovel.valor.venda         );
+                    this.imovel.valor.condominio                 = this.$tools.ParseFloat( this.imovel.valor.condominio    );
+                    this.imovel.valor.iptuAnual                  = this.$tools.ParseFloat( this.imovel.valor.iptuAnual     );
+                    this.imovel.valor.iptuMensal                 = this.$tools.ParseFloat( this.imovel.valor.iptuMensal    );
+                    this.imovel.valor.iptuIndice                 = this.$tools.ParseFloat( this.imovel.valor.iptuIndice    );
+                    this.imovel.valor.consulta                   = this.$tools.ParseFloat( this.imovel.valor.consulta      );
+                    this.imovel.valor.rentabilidade              = this.$tools.ParseFloat( this.imovel.valor.rentabilidade );
+                    this.imovel.valor.comissao                   = this.$tools.ParseFloat( this.imovel.valor.comissao      );
+
+                    this.imovel.area.interna                     = this.$tools.ParseFloat( this.imovel.area.interna                    );
+                    this.imovel.area.externa                     = this.$tools.ParseFloat( this.imovel.area.externa                    );
+                    this.imovel.area.terreno                     = this.$tools.ParseFloat( this.imovel.area.terreno                    );
+                    this.imovel.area.frente                      = this.$tools.ParseFloat( this.imovel.area.frente                     );
+                    this.imovel.area.fundo                       = this.$tools.ParseFloat( this.imovel.area.fundo                      );
+                    this.imovel.area.direito                     = this.$tools.ParseFloat( this.imovel.area.direito                    );
+                    this.imovel.area.esquerdo                    = this.$tools.ParseFloat( this.imovel.area.esquerdo                   );
+                    this.imovel.area.confrontacaoFrente          = this.$tools.ParseFloat( this.imovel.area.confrontacaoFrente         );
+                    this.imovel.area.confrontacaoFundo           = this.$tools.ParseFloat( this.imovel.area.confrontacaoFundo          );
+                    this.imovel.area.confrontacaoDireito         = this.$tools.ParseFloat( this.imovel.area.confrontacaoDireito        );
+                    this.imovel.area.confrontacaoEsquerdo        = this.$tools.ParseFloat( this.imovel.area.confrontacaoEsquerdo       );
+                    this.imovel.area.coeficienteAproveitamento   = this.$tools.ParseFloat( this.imovel.area.coeficienteAproveitamento  );
+                    this.imovel.area.zonaUso                     = this.$tools.ParseFloat( this.imovel.area.zonaUso                    );
+                    this.imovel.area.minima                      = this.$tools.ParseFloat( this.imovel.area.minima                     );
+                    this.imovel.area.maxima                      = this.$tools.ParseFloat( this.imovel.area.maxima                     );
+                    this.imovel.area.total                       = this.$tools.ParseFloat( this.imovel.area.total                      ); 
+
+                    this.imovel.idTipo                           = this.imovel.tipo.id;
+                    this.imovel.idAdminCaptador                  = this.imovel.adminCaptador.id;
+                    this.imovel.captador                         = this.imovel.adminCaptador.nome;
+
+                    if(this.$validator.not(this.imovel.endereco.idTipoComplemento))
+                        this.imovel.endereco.idTipoComplemento = 1;
+
+
+            },
+
+
+
+            DefinirCaptador(admin){
+                this.imovel.idAdminCaptador = admin.id;
+                this.imovel.captador        = admin.nome;
+               //c2("this.imovel.idAdminCaptador",this.imovel.idAdminCaptador );
+               //c2("this.imovel.captador       ",this.imovel.captador        );
+
+            },
+
+
+
+            async BuscarEndereco() {
+
+                if (this.cep.numero !== this.imovel.cep) {
+
+                    this.carregandoCEP      = true;
+                    this.carregandoEstados  = true;
+                    this.carregandoCidades  = true;
+                    this.carregandoBairros  = true;
+
+                    this.cep.logradouro     = this.imovel.endereco.logradouro = "";
+                    this.cep.cidade         = this.imovel.endereco.cidade     = "";
+                    this.cep.bairro         = this.imovel.endereco.bairro     = "";
+                    this.cep.estado         = this.imovel.endereco.estado     = "";
+
+                    this.imovel.endereco.cep  = this.cep.numero;
+                    let res                = await this.$sdata.BuscarEndereco(this.cep.numero);
+
+                    if (this.$validator.is(res?.city)) {
+                        this.cep.logradouro     = this.imovel.endereco.logradouro = res.address;
+                        this.cep.cidade         = this.imovel.endereco.cidade     = res.city;
+                        this.cep.bairro         = this.imovel.endereco.bairro     = res.neighborhood;
+                        this.cep.estado         = this.imovel.endereco.estado     = res.state;
+
+                       // this.BuscarImoveisNaRegiao();
+
+                        this.$refs.addressnumber.focus();
+
+                    }
+
+                    this.carregandoCEP      = false;
+                    this.carregandoEstados  = false;
+                    this.carregandoCidades  = false;
+                    this.carregandoBairros  = false;
+                }
+            },
+
+            async BuscarCep() {
+                var endereco = this.imovel.estado + "/" + this.imovel.cidade.replaceAll(" ", "%20") + "/" + this.imovel.logradouro.replaceAll(" ", "%20")
+                let res = await this.$sdata.BuscarCep(endereco);
+                return res.cep;
+            },
+
+            
+
+            ObterCidades(estado) {
+
+                this.imovel.cidade   =   this.imovel.bairro   = "";
+                this.imovel.idCidade =   this.imovel.idBairro = 0;
+
+                this.carregandoCidades = true;
+                this.opcoes.bairros = [];
+                this.opcoes.cidades = [];
+                var cidades = [];
+
+                if (this.$validator.is(estado)) {
+                    this.imovel.idEstado = this.opcoes.estados.filter((e) => e.value == estado)[0].id;
+                    this.$sdata.ObterCidades(this.imovel.idEstado).then(res => { this.opcoes.cidades = res; this.carregandoCidades = false; });
+                }
+
+            },
+
+
+            ObterBairros(cidade) {
+
+                this.imovel.bairro   = "";
+                this.imovel.idBairro = 0;
+                
+                this.carregandoBairros = true;
+                this.opcoes.bairros = [];
+                var bairros = [];
+
+                if (this.$validator.is(cidade)) {
+                    this.imovel.idCidade = this.opcoes.cidades.filter((c) => c.value == cidade)[0].id;
+                    this.$sdata.ObterBairros(this.imovel.idCidade).then(res => { this.opcoes.bairros = res; this.carregandoBairros = false; });
+                } 
+
+            },
+
+            DefinirBairro(bairro) {
+                this.imovel.idBairro = this.opcoes.bairros.filter((c) => c.value == bairro)[0].id;
+                //this.imovel.bairro = bairro.label;
+                //c2("this.imovel", this.imovel)
+            },
+
+
+
+
+            async BuscarProprietario(){
+
+                this.proprietariosBuscaResult = [];
+                this.buscaProprietario.result = [];
+
+                this.onrequest  = true;
+                var request     = await this.$api.Post("proprietario/buscar",this.buscaProprietario);
+                this.onrequest  = false;
+
+                if (request?.status?.success){
+                    this.buscaProprietario = request.result;
+                    this.proprietariosBuscaResult = this.buscaProprietario.result;
+                    this.proprietariosBuscaResult.forEach(d => {d.onrequest=false;});
+                } 
+
+
+			},
+
+
+            
+
+            async BuscarImoveisNaRegiao(){
+
+                var busca = this.$models.buscaImovel();
+                busca.result.imoveis = this.imoveisRegiaoBuscaResult = [];
+                
+                if(
+                    this.$validator.is(this.cep.numero ) ||
+                    (
+                        this.$validator.is(this.imovel.endereco.logradouro) &&
+                        this.$validator.is(this.imovel.endereco.cidade    ) &&
+                        this.$validator.is(this.imovel.endereco.bairro    ) &&
+                        this.$validator.is(this.imovel.endereco.estado    ) 
+                    )
+                ){
+
+                        busca.imovel.endereco.cep        = this.imovel.endereco.cep        = this.cep.numero;
+                        busca.imovel.endereco.logradouro = this.imovel.endereco.logradouro ;
+                        busca.imovel.endereco.numero     = this.imovel.endereco.numero     ;
+                        busca.imovel.endereco.complemento= this.imovel.endereco.complemento;
+                        busca.imovel.endereco.cidade     = this.imovel.endereco.cidade     ;
+                        busca.imovel.endereco.bairro     = this.imovel.endereco.bairro     ;
+                        busca.imovel.endereco.estado     = this.imovel.endereco.estado     ;
+                        
+                        if(this.$validator.is( this.imovel.endereco.complementoTtipo))
+                            busca.imovel.endereco.complementoTtipo     = this.imovel.endereco.complementoTtipo     ;
+                        if(this.$validator.is( this.imovel.endereco.complemento))
+                            busca.imovel.endereco.complemento = this.imovel.endereco.complemento;
+
+                        if(this.cep.numero)
+                            busca.cepBase = this.$validator.is(busca.imovel.endereco.cep )? this.imovel.endereco.cep.split("-")[0]   : ""       ;
+
+                        busca.imovel.id = this.imovel.id;
+                        busca.somenteOutroID = true;
+                        busca.result.imoveis = [];
+                        busca.page = 1;
+                        this.ontablequest  = true;
+                        var request     = await this.$api.Post("imovel/buscar",busca);
+                        this.ontablequest  = false;
+
+                        if (request?.status?.success){
+                            busca =  request.result;
+                            this.imoveisRegiaoBuscaResult =  busca.result.imoveis;
+                        } 
+                    }else
+                        this.$tools.Alert("Necessário informar o CEP ou endereço (estado, cidade, bairro e logradouro)");
+
+
+			},
+
+
+
+            FocusOutroComplemento(){
+                window.setTimeout(()=>this.$refs.CampoAbertoOutroComplemento.focus(),200);
+            },
+
+            FocusOutroLocalChaves(){
+                window.setTimeout(()=>this.$refs.CampoAbertoOutroLocalChaves.focus(),200);
+            },
+
+            FocusCampoAbertoMotivoInativacao(){
+                window.setTimeout(()=>this.$refs.CampoAbertoMotivoInativacao.focus(),200);
+            },
+
+
+
+
+        }
+
+    }
+
+</script>
+
+
+<style scoped>
+
+    .checkicon{
+        color:var(--s-color-primary);
+    }
+
+    .nocheckicon{
+        color:var(--s-color-red);
+        opacity:0.5;
+    }
+
+</style>
+
+

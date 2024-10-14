@@ -1,5 +1,4 @@
 <template>
-
     <div class="row">
         <div class="col-10 xs-hide sm-hide">
         <!--<div class="col-12">-->
@@ -8,8 +7,7 @@
                      class="el-menu-horizontal"
                      background-color="none"
                      :default-active="$root.routing.menuIndex"
-                     mode="horizontal"
-             >
+                     mode="horizontal">
                 <div style="flex-grow: 0.8;"></div>
                 <el-menu-item index="01-00-00-00"   @click="$root.RouteTo('/home')"             class="el-menu-horizontal-space"><span>  Home             </span></el-menu-item>
                 <el-menu-item index="02-00-00-00"   @click="$root.RouteTo('/busca')"            class="el-menu-horizontal-space"><span>  Buscar Imóveis   </span></el-menu-item>
@@ -35,7 +33,6 @@
             <c-entrar></c-entrar>
         </div>
 
-
         <div class="col-7  xs-hide md-hide lg-hide xl-hide" style="line-height:4px;padding:15px 0px 0px 40px">
                 <q-btn   @click="$root.RouteTo('/home')"           :flat="($root.routing.menuIndex != '01-00-00-00')"  :color="$root.routing.menuIndex == '01-00-00-00'? 'primary':'secondary'" ><span>  Home          </span></q-btn>
                 <q-btn   @click="$root.RouteTo('/busca')"          :flat="($root.routing.menuIndex != '02-00-00-00')"  :color="$root.routing.menuIndex == '02-00-00-00'? 'primary':'secondary'" ><span>  Buscar        </span></q-btn>
@@ -45,10 +42,10 @@
                 <q-btn   @click="$root.RouteTo('/sobre')"          :flat="($root.routing.menuIndex != '06-00-00-00')"  :color="$root.routing.menuIndex == '06-00-00-00'? 'primary':'secondary'" ><span>  Sobre         </span></q-btn>
                 <q-btn   @click="$root.RouteTo('/ajuda')"          :flat="($root.routing.menuIndex != '07-00-00-00')"  :color="$root.routing.menuIndex == '07-00-00-00'? 'primary':'secondary'" ><span>  Ajuda         </span></q-btn>
         </div>
-        <div class="xs-hide md-hide lg-hide xl-hide" style="float: right;    max-width: 240px;    text-align: center; margin-top:17px; padding-left:40px">
+
+        <div class="xs-hide md-hide lg-hide xl-hide" style="float: right; max-width: 240px; text-align: center; margin-top:17px; padding-left:40px">
             <c-entrar></c-entrar>
         </div>
-
 
         <div class="col-12  sm-hide md-hide lg-hide xl-hide" style="line-height:4px;padding-left:20px;padding-top:33px;min-width:220px">
                 <el-dropdown>
@@ -80,12 +77,7 @@
         <div class="sm-hide md-hide lg-hide xl-hide" style="position: absolute;    float: right;    text-align: right; margin-top:-10px; margin-left:120px">
             <c-entrar></c-entrar>
         </div>
-        
-
     </div>
-
-
-
 </template>
 
 <script>

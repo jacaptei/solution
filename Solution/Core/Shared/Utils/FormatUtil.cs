@@ -25,6 +25,10 @@ namespace JaCaptei.Model {
                 return Number(value.ToString(),@"{0:000\.000\.000\-00}");
             }
 
+            public string CEP(dynamic value) {
+                return Number(value.ToString(),@"{0:00000\-000}");
+            }
+
             public string Number(string value, string mask){
                 string ret = value;
                 if(!String.IsNullOrWhiteSpace(value)){ 

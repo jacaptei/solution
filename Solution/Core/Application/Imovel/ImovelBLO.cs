@@ -12,8 +12,6 @@ namespace JaCaptei.Application {
 
     public class ImovelBLO:BLOBase {
 
-        ImovelDAO DAO = new ImovelDAO();
-
         /*
         public AppReturn Validar(Imovel entity) {
 
@@ -69,29 +67,104 @@ namespace JaCaptei.Application {
                 return entity;
 
                 
-                entity.nome            =   "imovel_id_"+entity.id+"_cod_"+ (Utils.Validator.Not(entity.cod)? entity.cod : entity.codCRM);
-                entity.nome            =   Utils.String.HigienizeToLower(entity.nome);
+                //entity.nome                     =   "imovel_id_"+entity.id+"_cod_"+ (Utils.Validator.Not(entity.cod)? entity.cod : entity.codCRM);
+                //entity.nome                     =   Utils.String.HigienizeToLower(entity.nome);
 
-                //entity.tipo            =   Utils.String.HigienizeToUpper(entity.tipo);
+                entity.edificio                 =   Utils.String.Higienize(entity.edificio);
+                entity.edificioNorm             =   Utils.String.NormalizeToUpper(entity.edificio);
+                entity.construtora              =   Utils.String.Higienize(entity.construtora);
+                entity.construtoraNorm          =   Utils.String.NormalizeToUpper(entity.construtora);
 
-                entity.cepNorm         =   Utils.String.HigienizeToUpper(entity.cep.Replace("-",""));
-                entity.estado          =   Utils.String.HigienizeToUpper(entity.estado);
-                entity.cidade          =   Utils.String.HigienizeToUpper(entity.cidade);
-                entity.bairro          =   Utils.String.HigienizeToUpper(entity.bairro);
-                entity.estadoNorm      =   Utils.String.NormalizeToUpper(entity.estado);
-                entity.cidadeNorm      =   Utils.String.NormalizeToUpper(entity.cidade);
-                entity.bairroNorm      =   Utils.String.NormalizeToUpper(entity.bairro);
+                entity.endereco.estado          =   Utils.String.Higienize(entity.endereco.estado);
+                entity.endereco.estadoNorm      =   Utils.String.NormalizeToUpper(entity.endereco.estado);
+                entity.endereco.cidade          =   Utils.String.Higienize(entity.endereco.cidade);
+                entity.endereco.cidadeNorm      =   Utils.String.NormalizeToUpper(entity.endereco.cidade);
+                entity.endereco.bairro          =   Utils.String.Higienize(entity.endereco.bairro);
+                entity.endereco.bairroNorm      =   Utils.String.NormalizeToUpper(entity.endereco.bairro);
+                entity.endereco.logradouro      =   Utils.String.Higienize(entity.endereco.logradouro);
+                entity.endereco.logradouroNorm  =   Utils.String.NormalizeToUpper(entity.endereco.logradouro);
 
-                entity.logradouro      =   Utils.String.HigienizeToUpper(entity.logradouro);
-                entity.numero          =   Utils.String.HigienizeToUpper(entity.numero);
-                entity.complemento     =   Utils.String.HigienizeToUpper(entity.complemento);
-                entity.logradouroNorm  =   Utils.String.NormalizeToUpper(entity.logradouro);
+                entity.endereco.numero          =   Utils.String.Higienize(entity.endereco.numero);
+                entity.endereco.complemento     =   Utils.String.Higienize(entity.endereco.complemento);
+                entity.endereco.cep             =   entity.endereco.cep.Replace("-","");
+                entity.endereco.cepNorm         =   Utils.String.HigienizeToUpper(entity.endereco.cep);
+                entity.endereco.cep             =   Utils.Format.CEP(entity.endereco.cep);
+       
+                entity.area.total               = (entity.area.interna + entity.area.externa);
+                entity.interno.banheiro         = (entity.interno.totalBanheiros    > 0);
+                entity.interno.quarto           = (entity.interno.totalQuartos      > 0);
+                entity.interno.sala             = (entity.interno.totalSalas        > 0);
+                entity.interno.suite            = (entity.interno.totalSuites       > 0);
+                entity.interno.varanda          = (entity.interno.totalVarandas     > 0);
+                entity.externo.elevador         = (entity.externo.totalElevadores   > 0);
+                entity.externo.vaga             = (entity.externo.totalVagas        > 0);
+                entity.idAdmin                  = entity.admin.id;
+                entity.idProprietario           = (entity.proprietario.id > 0)? entity.proprietario.id : entity.idProprietario;
+
+                entity.proprietario.cpf         =  Utils.Format.CPF(entity.proprietario.cpf);
+                entity.proprietario.cpfNum      =  Utils.Number.ToLong(entity.proprietario.cpf);
+                entity.proprietario.cnpj        =  Utils.Format.CNPJ(entity.proprietario.cnpj);
+                entity.proprietario.cnpjNum     =  Utils.Number.ToLong(entity.proprietario.cnpj);
+                entity.proprietario.email       =  Utils.String.HigienizeMail(entity.proprietario.email);
+
+
+                //entity.token                    =   Utils.Key.CreateToken();
+                //entity.tokenNum                 =   Utils.Key.CreateTokenNum();
+                //entity.ativo                    =   entity.ativoCRM = true;
+
+                //entity.data            =   entity.dataAtualizacao = Utils.Date.GetLocalDateTime();
+
+            return entity;
+
+        }
+
+
+
+        public Imovel NormalizarBusca(Imovel entity) {
+
+            if(entity is null)
+                return entity;
+
                 
-                entity.token           =   Utils.Key.CreateToken();
-                entity.tokenNum        =   Utils.Key.CreateTokenNum();
-                entity.tokenUID        =   Utils.Key.CreateTokenUID();
-                entity.ativo           =   entity.ativoCRM = true;
-                entity.data            =   entity.dataAtualizacao = Utils.Date.GetLocalDateTime();
+                //entity.nome                     =   "imovel_id_"+entity.id+"_cod_"+ (Utils.Validator.Not(entity.cod)? entity.cod : entity.codCRM);
+                //entity.nome                     =   Utils.String.HigienizeToLower(entity.nome);
+
+                entity.edificio                 =   Utils.String.Higienize(entity.edificio);
+                entity.edificioNorm             =   Utils.String.NormalizeToUpper(entity.edificio);
+                entity.construtora              =   Utils.String.Higienize(entity.construtora);
+                entity.construtoraNorm          =   Utils.String.NormalizeToUpper(entity.construtora);
+
+                entity.endereco.estado          =   Utils.String.Higienize(entity.endereco.estado);
+                entity.endereco.estadoNorm      =   Utils.String.NormalizeToUpper(entity.endereco.estado);
+                entity.endereco.cidade          =   Utils.String.Higienize(entity.endereco.cidade);
+                entity.endereco.cidadeNorm      =   Utils.String.NormalizeToUpper(entity.endereco.cidade);
+                entity.endereco.bairro          =   Utils.String.Higienize(entity.endereco.bairro);
+                entity.endereco.bairroNorm      =   Utils.String.NormalizeToUpper(entity.endereco.bairro);
+                entity.endereco.logradouro      =   Utils.String.Higienize(entity.endereco.logradouro);
+                entity.endereco.logradouroNorm  =   Utils.String.NormalizeToUpper(entity.endereco.logradouro);
+
+                entity.endereco.numero          =   Utils.String.Higienize(entity.endereco.numero);
+                entity.endereco.complemento     =   Utils.String.Higienize(entity.endereco.complemento);
+                entity.endereco.cep             =   entity.endereco.cep.Replace("-","");
+                entity.endereco.cepNorm         =   Utils.String.HigienizeToUpper(entity.endereco.cep);
+                entity.endereco.cep             =   Utils.Format.CEP(entity.endereco.cep);
+       
+                entity.area.total               = (entity.area.interna + entity.area.externa);
+                //entity.interno.banheiro         = (entity.interno.totalBanheiros    > 0)? true : entity.interno.banheiro    ;
+                //entity.interno.quarto           = (entity.interno.totalQuartos      > 0)? true : entity.interno.quarto      ;
+                //entity.interno.sala             = (entity.interno.totalSalas        > 0)? true : entity.interno.sala        ;
+                //entity.interno.suite            = (entity.interno.totalSuites       > 0)? true : entity.interno.suite       ;
+                //entity.interno.varanda          = (entity.interno.totalVarandas     > 0)? true : entity.interno.varanda     ;
+                //entity.externo.elevador         = (entity.externo.totalElevadores   > 0)? true : entity.externo.elevador    ;
+                entity.externo.vaga             = (entity.externo.totalVagas        > 0)? true : entity.externo.vaga        ;
+                entity.idAdmin                  = entity.admin.id;
+                entity.idProprietario           = (entity.proprietario.id > 0)? entity.proprietario.id : entity.idProprietario;
+
+                //entity.token                    =   Utils.Key.CreateToken();
+                //entity.tokenNum                 =   Utils.Key.CreateTokenNum();
+                //entity.ativo                    =   entity.ativoCRM = true;
+
+                //entity.data            =   entity.dataAtualizacao = Utils.Date.GetLocalDateTime();
 
             return entity;
 

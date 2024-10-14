@@ -5,7 +5,7 @@
 
 					<div :class="(type=='info')? 's-info-info' : (type=='warning')? 's-info-warning' : (type=='success')? 's-info-success' : 's-info-fail'  " >
 						<div>
-							<i :class="(type=='info')? 'fa fa-info-circle' : (type=='warning')? 'fa fa-triangle-exclamation' : (type=='success')? 'fa fa-circle-check' : 'fa fa-xmark'  " ></i>
+							<i :class="(type=='info')? 'fa fa-info-circle' : (type=='warning')? 'fa fa-triangle-exclamation' : (type=='success')? 'fa fa-circle-check' : 'fa fa-xmark-circle'  " ></i>
 						</div>
 						<div v-if="$validator.is(_title)"><span v-html="_title"></span></div>
 						<div v-if="$validator.is(_subtitle)" class="s-subtitle"><span v-html="_subtitle"></span></div>
@@ -134,7 +134,7 @@ i {
     color:#10e965;
 }
 .s-info-fail {
-    color:#ff5091;
+    color:#ff00a5;
 }
 
 

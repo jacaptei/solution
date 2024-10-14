@@ -1,0 +1,401 @@
+﻿<template>
+    <div v-loading.fullscreen.lock="fullscreenLoading" element-loading-background="rgba(0, 0, 0, 0.7)">
+        <el-collapse v-model="activeNames">
+            <el-collapse-item v-for="(item, index) in filteredCollapseItems"
+                              :key="index"
+                              :name="item.name"
+                              :title="item.title"
+                              style="padding: 0; width: 100%">
+                <el-card style="width: 100%">
+                    <el-row :gutter="20" class="item-fields">
+                        <el-col style="display: flex; padding: 0; width: 100%; justify-content: space-between"
+                                :xs="24"
+                                :sm="24"
+                                :md="24"
+                                :lg="24">
+                            <el-col class="register-input" :xs="24" :sm="12" :md="12" :lg="12">
+                                <div v-if="item.tableData[0].donoConta" style="cursor: pointer">
+                                    <label>TITULAR DA CONTA {{ item.tableData[0].nome }}</label>
+                                    <span style="margin-left: 10px; font-weight: bold; color: var(--s-color-green)">
+                                        {{ item.tableData[0].donoConta ? 'SIM' : 'NÃO' }}
+                                    </span>
+                                </div>
+                            </el-col>
+
+                            <el-col class="register-input" style="display: flex; width: 100%; justify-content: end" :xs="24" :sm="12" :md="12" :lg="12">
+                                <div>
+                                    <label style="margin-right: 10px">ATIVO</label>
+                                    <el-switch @change="(newValue) => handleChange(index, 'ativo', newValue)" v-model="item.tableData[0].ativo"></el-switch>
+                                </div>
+                            </el-col>
+                        </el-col>
+
+                        <el-col class="register-input" :xs="24" :sm="12" :md="12" :lg="8" v-if="item.tableData[0].donoConta">
+                            <div>
+                                <label>PLANO</label>
+                                <el-select filterable
+                                           v-model="item.tableData[0].idPlano"
+                                           style="width: 100%"
+                                           placeholder="SELECIONAR"
+                                           @change="(newValue) => handleChange(index, 'idPlano', newValue)">
+                                    <el-option v-for="plan in [
+                                            { label: 'BASIC', value: 2 },
+                                            { label: 'PRO', value: 3 },
+                                            { label: 'ADVANCED', value: 4 },
+                                        ]"
+                                               :key="plan.value"
+                                               :label="plan.label"
+                                               :value="plan.value"></el-option>
+                                </el-select>
+                            </div>
+                        </el-col>
+
+                        <el-col class="register-input" :xs="24" :sm="12" :md="12" :lg="8" v-if="item.tableData[0].donoConta">
+                            <div>
+                                <label>Total de Usuários Permitidos</label>
+                                <el-input-number style="width: 100%"
+                                                 v-model="item.tableData[0].limiteUsuarios"
+                                                 @change="(newValue) => handleChange(index, 'limiteUsuarios', newValue)" />
+                            </div>
+                        </el-col>
+
+                        <el-col class="register-input" :xs="24" :sm="12" :md="12" :lg="8" v-if="item.tableData[0].donoConta">
+                            <div>
+                                <label>Total de Usuários Cadastrados</label>
+                                <el-input v-model="item.tableData[0].totalUsuarios"
+                                          :min="0"
+                                          :max="item.tableData[0].totalUsuarios"
+                                          placeholder="Telefone 1"
+                                          @change="(newValue) => handleChange(index, 'totalUsuarios', newValue)" />
+                            </div>
+                        </el-col>
+
+                        <el-col class="register-input" :xs="24" :sm="12" :md="12" :lg="8">
+                            <div>
+                                <label>Limite Diário de Solicitações</label>
+                                <el-input v-model="item.tableData[0].limiteSolicitacoesDiarias"
+                                          placeholder="Telefone 2"
+                                          @change="(newValue) => handleChange(index, 'limiteSolicitacoesDiarias', newValue)" />
+                            </div>
+                        </el-col>
+
+                        <el-col class="register-input" :xs="24" :sm="12" :md="12" :lg="8">
+                            <div>
+                                <label>Limite Diário de Solicitações Agendadas</label>
+                                <el-input v-model="item.tableData[0].limiteSolicitacoesDiariasAgendadas"
+                                          placeholder="CNPJ"
+                                          @change="(newValue) => handleChange(index, 'limiteSolicitacoesDiariasAgendadas', newValue)" />
+                            </div>
+                        </el-col>
+
+                        <el-col class="register-input" :xs="24" :sm="12" :md="12" :lg="8">
+                            <div>
+                                <label>Limite Diário de Solicitações Não Agendadas</label>
+                                <el-input v-model="item.tableData[0].limiteSolicitacoesDiariasNaoAgendadas"
+                                          placeholder="Razão Social"
+                                          @change="(newValue) => handleChange(index, 'limiteSolicitacoesDiariasNaoAgendadas', newValue)" />
+                            </div>
+                        </el-col>
+
+                        <el-col class="register-input" :xs="24" :sm="12" :md="12" :lg="8">
+                            <div>
+                                <label>Permissão para Solicitações?</label>
+                                <el-select style="width: 100%"
+                                           v-model="item.tableData[0].habilitadoFazerSolicitacoes"
+                                           @change="(newValue) => handleChange(index, 'habilitadoFazerSolicitacoes', newValue)"
+                                           placeholder="Selecione">
+                                    <el-option label="Sim" :value="true"></el-option>
+                                    <el-option label="Não" :value="false"></el-option>
+                                </el-select>
+                            </div>
+                        </el-col>
+
+                        <el-col :xs="24" :sm="12" :md="12" :lg="8">
+                            <div class="register-input">
+                                <label>Permissão para Solicitações Agendadas?</label>
+                                <el-select style="width: 100%"
+                                           v-model="item.tableData[0].habilitadoFazerSolicitacoesAgendadas"
+                                           placeholder="Selecione"
+                                           @change="(newValue) => handleChange(index, 'habilitadoFazerSolicitacoesAgendadas', newValue)">
+                                    <el-option label="Sim" :value="true"></el-option>
+                                    <el-option label="Não" :value="false"></el-option>
+                                </el-select>
+                            </div>
+                        </el-col>
+
+                        <el-col :xs="24" :sm="12" :md="12" :lg="8">
+                            <div>
+                                <label>Permissão para Solicitações Não Agendadas?</label>
+                                <el-select style="width: 100%"
+                                           v-model="item.tableData[0].habilitadoFazerSolicitacoesNaoAgendadas"
+                                           placeholder="Selecione"
+                                           @change="(newValue) => handleChange(index, 'habilitadoFazerSolicitacoesNaoAgendadas', newValue)">
+                                    <el-option label="Sim" :value="true"></el-option>
+                                    <el-option label="Não" :value="false"></el-option>
+                                </el-select>
+                            </div>
+                        </el-col>
+
+                        <el-col class="register-input" :xs="24" :sm="12" :md="12" :lg="12">
+                            <div>
+                                <label>Solicitações Agendadas Ativas</label>
+                                <el-input disabled v-model="item.tableData[0].totalSolicitacoesAbertasAgendadas" placeholder="Razão Social" />
+                            </div>
+                        </el-col>
+
+                        <el-col class="register-input" :xs="24" :sm="12" :md="12" :lg="12">
+                            <div>
+                                <label>Solicitações Não Agendadas Ativas</label>
+                                <el-input disabled v-model="item.tableData[0].totalSolicitacoesAbertasNaoAgendadas" placeholder="Razão Social" />
+                            </div>
+                        </el-col>
+                    </el-row>
+
+                    <div v-if="hasChanges[index]" style="margin-top: 20px; display: flex; justify-content: end;">
+                        <el-button type="primary" @click="saveChanges">Salvar</el-button>
+                        <el-button type="danger" @click="cancelChanges" style="margin-left: 10px">Cancelar</el-button>
+                    </div>
+                </el-card>
+            </el-collapse-item>
+        </el-collapse>
+    </div>
+</template>
+
+<script>
+    import { ref, onMounted, reactive, computed, getCurrentInstance } from 'vue';
+
+    export default {
+        name: 'JCAdminParceirosRelacionados',
+        setup() {
+            const idConta = ref(0);
+            const idParceiro = ref(0);
+            const originalData = ref([]);
+            const collapseItems = ref([]);
+            const hasChanges = ref([]);
+            const activeNames = ref(['1']);
+            const valoresAlterados = ref({});
+            const fullscreenLoading = ref(false);
+            const currentEditData = reactive({});
+            const instance = getCurrentInstance();
+            const operadoresRelacionados = ref([]);
+
+            const filteredCollapseItems = computed(() => {
+                const result = [];
+                const isDonoConta = collapseItems.value.some(item =>
+                    item.tableData.some(data => data.donoConta && data.id === idParceiro.value)
+                );
+                if (isDonoConta) {
+                    return collapseItems.value;
+                }
+                collapseItems.value.forEach(item => {
+                    const relatedItems = item.tableData.filter(data => data.id === idParceiro.value);
+                    if (relatedItems.length > 0) {
+                        result.push({
+                            ...item,
+                            tableData: relatedItems
+                        });
+                    }
+                });
+                return result;
+            });
+
+            const buildUrlForOperadoresRelacionados = () => {
+                if (instance && instance.proxy.$root.parceiroRow) {
+                    idConta.value = instance.proxy.$root.parceiroRow.idConta;
+                    idParceiro.value = instance.proxy.$root.parceiroRow.id;
+                    const url = "parceiro/obtercontaporid/" + idConta.value;
+                    return url;
+                } else {
+                    console.error("parceiroRow não está definido.");
+                    return null;
+                }
+            };
+
+            const planoUsuarioLimites = {
+                2: 1, // Corretor Autônomo
+                3: 4, // Imobiliária até 3 usuários
+                4: 6  // Imobiliária até 5 usuários
+            };
+
+            const ObterContaPorId = async () => {
+                const url = buildUrlForOperadoresRelacionados();
+                if (!url) {
+                    console.error("URL não pode ser construída.");
+                    return;
+                }
+                try {
+                    const response = await instance.proxy.$api.Get(url);
+                    collapseItems.value = response.result.map((item, index) => {
+                        return {
+                            name: (index + 1).toString(),
+                            title: item.nome,
+                            tableData: [{
+                                id: item.id,
+                                idPlano: item.idPlano,
+                                idConta: item.idConta,
+                                contaNome: item.nomeConta,
+                                someSetting: item.someSetting,
+                                donoConta: item.donoConta,
+                                status: item.status,
+                                ativo: item.ativo,
+                                confirmado: item.confirmado,
+                                validado: item.validado,
+                                limiteUsuarios: item.limiteUsuarios,
+                                totalUsuarios: item.totalUsuarios,
+                                limiteSolicitacoesDiarias: item.limiteSolicitacoesDiarias,
+                                totalSolicitacoesAbertasAgendadas: item.totalSolicitacoesAbertasAgendadas,
+                                limiteSolicitacoesDiariasAgendadas: item.limiteSolicitacoesDiariasAgendadas,
+                                limiteSolicitacoesDiariasNaoAgendadas: item.limiteSolicitacoesDiariasNaoAgendadas,
+                                totalSolicitacoesAbertasNaoAgendadas: item.totalSolicitacoesAbertasNaoAgendadas,
+                                habilitadoFazerSolicitacoes: item.habilitadoFazerSolicitacoes,
+                                habilitadoFazerSolicitacoesAgendadas: item.habilitadoFazerSolicitacoesAgendadas,
+                                habilitadoFazerSolicitacoesNaoAgendadas: item.habilitadoFazerSolicitacoesNaoAgendadas,
+                            }]
+                        };
+                    });
+                    collapseItems.value.sort((a, b) => {
+                        const isADono = a.tableData[0].donoConta ? 1 : 0;
+                        const isBDono = b.tableData[0].donoConta ? 1 : 0;
+                        return isBDono - isADono;
+                    });
+                } catch (error) {
+                    console.error('Erro ao buscar operadores relacionados:', error);
+                }
+            };
+
+            const hasAnyChanges = computed(() => {
+                return hasChanges.value.some(change => change === true);
+            });
+
+            async function confirmarAcao(isAtivacao, donoConta) {
+                const entidade = donoConta ? 'esta conta e todos seus operadores' : 'este operador';
+                const acao = isAtivacao ? 'ativar' : 'desativar';
+                const mensagem = `Você está prestes a ${acao} ${entidade}. Deseja continuar?`;
+
+                try {
+                    await ElementPlus.ElMessageBox.confirm(
+                        mensagem,
+                        'Confirmação',
+                        {
+                            confirmButtonText: 'Sim',
+                            cancelButtonText: 'Não',
+                            type: 'warning'
+                        }
+                    );
+                    return true;
+                } catch {
+                    return false;
+                }
+            }
+
+            function atualizarValoresAlterados(index, currentItem, field, newValue) {
+                if (!valoresAlterados.value[index]) {
+                    valoresAlterados.value[index] = {
+                        id: currentItem.tableData[0].id,
+                        idConta: currentItem.tableData[0].idConta,
+                        donoConta: currentItem.tableData[0].donoConta,
+                    };
+                }
+                valoresAlterados.value[index][field] = newValue;
+            }
+
+            const handleChange = async (index, field, newValue) => {
+                const filteredItems = filteredCollapseItems.value;
+                const currentItem = filteredItems[index];
+                const isDonoConta = currentItem.tableData[0].donoConta;
+
+                if (field === 'ativo') {
+                    const isAtivacao = newValue === true;
+                    const confirmResult = await confirmarAcao(isAtivacao, isDonoConta);
+
+                    if (confirmResult) {
+                        currentItem.tableData[0].ativo = isAtivacao;
+                        atualizarValoresAlterados(index, currentItem, 'ativo', isAtivacao);
+                    } else {
+                        currentItem.tableData[0].ativo = !isAtivacao;
+                        return;
+                    }
+                }
+
+                hasChanges.value[index] = true;
+
+                currentItem.tableData[0][field] = newValue;
+
+                if (field === 'idPlano') {
+                    const limiteUsuarios = planoUsuarioLimites[newValue] || 0;
+                    currentItem.tableData[0].limiteUsuarios = limiteUsuarios;
+                    atualizarValoresAlterados(index, currentItem, 'limiteUsuarios', limiteUsuarios);
+                }
+
+                atualizarValoresAlterados(index, currentItem, field, newValue);
+            };
+
+            const saveChanges = async () => {
+                try {
+                    fullscreenLoading.value = true;
+                    const payload = {
+                        tableData: Object.values(valoresAlterados.value)
+                    };
+                    await instance.proxy.$api.Post("parceiro/atualizarconfiguracoesconta", payload);
+                    await ObterContaPorId();
+                    valoresAlterados.value = {};
+                    hasChanges.value = hasChanges.value.map(() => false);
+                    ElementPlus.ElMessage({
+                        showClose: true,
+                        message: 'Configurações Salvas Com Sucesso!',
+                        type: 'success',
+                    });
+                    fullscreenLoading.value = false;
+                } catch (error) {
+                    console.error('Erro ao salvar mudanças:', error);
+                    ElementPlus.ElMessage({
+                        showClose: true,
+                        message: 'Erro ao salvar configurações. Tente novamente.',
+                        type: 'error',
+                    });
+                } finally {
+                    fullscreenLoading.value = false;
+                }
+            };
+
+            const cancelChanges = () => {
+                hasChanges.value = hasChanges.value.map(() => false);
+            };
+
+            onMounted(() => {
+                idConta.value = null;
+                ObterContaPorId().then(() => {
+                    if (collapseItems.value.length > 0) {
+                        activeNames.value = [collapseItems.value[0].name];
+                    }
+                });
+            });
+
+            return {
+                activeNames,
+                collapseItems,
+                hasChanges,
+                handleChange,
+                saveChanges,
+                cancelChanges,
+                filteredCollapseItems,
+                idParceiro,
+                hasAnyChanges,
+                fullscreenLoading,
+            };
+        }
+    };
+</script>
+
+<style>
+    .q-tab-panel {
+        padding-top: 0px;
+    }
+
+    .register-input {
+        margin-bottom: 10px;
+        letter-spacing: 0.02em;
+        margin-top: 2px;
+        color: var(--s-color-primary);
+    }
+</style>

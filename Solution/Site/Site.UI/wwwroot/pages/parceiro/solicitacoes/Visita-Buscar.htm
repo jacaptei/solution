@@ -1,0 +1,247 @@
+<template>
+    <div id="parceiro_solicitacao_busca" tabindex="0">
+
+
+        <el-row :gutter="20" v-if="view == 'request' ">
+
+            <el-col :md="24" style="width:100%;text-align:center;padding:40px;padding-left:0px">
+                <c-loading size="60px"></c-loading>
+            </el-col>
+
+        </el-row>
+
+        <el-row :gutter="20" v-else-if="view == 'fail' ">
+            <el-col :md="24" style="width:100%;text-align:center;padding:40px;padding-left:0px">
+                <div class="title" style="color:var(--s-color-red)"><b><i class="fa fa-circle-xmark"></i> Falhou</b></div>
+                <br />Não foi possível buscar solicitação,<br />favor tentar novamente.
+                <br /><br />
+                <q-btn color="white" text-color="orange-10" label="VOLTAR" @click="ShowView('form')" style="width:200px;"></q-btn>
+            </el-col>
+        </el-row>
+
+        <el-row :gutter="20" v-else>
+
+            <el-col :md="24" style="width:100%;text-align:center;padding:10px;padding-left:0px;cursor:pointer" @click="Enviar">
+                <i class="fa fa-refresh" style="font-size: 20px; color: var(--s-color-primary);"></i>
+            </el-col>
+
+            <el-col v-if="$root.usuario.donoConta" :md="24" style="width:100%;text-align:center;padding:10px;">
+
+                 <el-select v-model="parceiroSelecionado" placeholder="Exibir Todos" style="width:240px" @change="Filtrar">
+                        <el-option v-for="p in parceiros"
+                                    :key="p.id"
+                                    :label="p.label"
+                                    :value="p"
+                        ></el-option>
+                  </el-select>
+
+            </el-col>
+            <el-col :md="24" style="color:var(--s-color-primary)">
+                {{results.length}}
+            </el-col>
+
+            <el-col :md="24" style="width:100%;text-align:center;padding:40px;padding-left:0px" v-if="results?.length == 0">
+                <i class="fa fa-circle-exclamation" style="font-size:80px;color:var(--s-accent-color)"></i>  <br />
+                <div style="font-size:20px;font-weight:700;color:var(--s-accent-color);margin-top:20px">Sem solicitações</div>
+            </el-col>
+            <el-col :md="24" v-for="(item,index) in results" v-else style="padding:10px">
+
+                <c-solicitacao-visita-card :item="item"></c-solicitacao-visita-card>
+
+             </el-col>
+
+            <!--
+        <c-card status="DEFAULT"      title="CANCELADO"           >TESTE</c-card>
+        <c-card status="AGUARDANDO"   title="AGUARDANDO CAPTADOR" >TESTE</c-card>
+        <c-card status="VERIFICANDO"  title="EM VERIFICAÇÃO"      >TESTE</c-card>
+        <c-card status="FINALIZADO"   title="FINALIZADO"          >TESTE</c-card>
+        -->
+
+        </el-row>
+
+    </div>
+</template>
+
+<script>
+    module.exports = {
+
+        name: 'JaCapteiParceiroSolicitacaoBuscar8929325',
+
+        components: {
+
+        },
+
+        data: function () {
+            return {
+                view: "form",
+                messageSuccess: "",
+                messageAlert: "",
+                content: "",
+                carregandoCEP: false,
+                carregandoEstados: false,
+                carregandoCidades: false,
+                carregandoBairros: false,
+                cep: {
+                    numero: "",
+                    estado: "",
+                    cidade: "",
+                    logradouro: ""
+                },
+                opcoes: {
+                    estados: this.$root.localidade.estados,
+                    cidades: [],
+                    bairros: [],
+                    sexos: [],
+                },
+                solicitacao: this.$models.solicitacao(),
+                results: [],
+                resultsAll: [],
+                parceiroSelecionado: {id:0,value:"EXIBIR TODOS",label:"EXIBIR TODOS"},
+                parceiros: [],
+                city:""
+            }
+        }, computed: {
+
+        },
+
+        props: {},
+        watch: {
+        },
+        created: function () {
+        },
+        mounted() {
+
+
+            this.Enviar();
+
+
+            $(document).keydown((e) => {
+
+                if (this.$router.currentRoute._rawValue.path == "/parceiros") {
+                    try {
+                       return this.UpdateParceiroSolicitacoes(e);
+                    } catch (e) {
+
+                    }
+
+                }
+                  //  return this.Update(e);
+            });  
+
+
+        },
+        methods: {
+
+
+            UpdateParceiroSolicitacoes(e) {
+                try {
+
+                    if (e.keyCode == 116)
+                        this.Enviar();
+                } catch (e) { ce("" + e); }
+                return (e.which || e.keyCode) != 116;
+            },
+
+
+
+            ShowView(v) {
+                this.view = v;
+            },
+
+            ObterDataVisita(item) {
+                if (this.$validator.is(item.dataVisita)) {
+                    var data = item.dataVisita;
+                    //return data.format("dd/mm/yyyy, ddd, HH:MM'h'");
+                    return (data.getFullYear() > 1900) ? data.format("dd/mm/yyyy, ddd, HH:MM'h'") : "sem visita agendada";
+                }
+                return "";
+            },
+
+
+           async Enviar() {
+                    
+                    this.results    = [];
+                    this.resultsAll = [];
+                    this.parceiros  = [];
+
+                    this.view = "request";
+
+                    var request = await this.$api.Get("solicitacao/obter/visitas/parceiro");
+
+                    if (request?.status?.success){
+                        this.resultsAll = request.result;
+
+                        //this.results.forEach(i => i.dataVisita = new Date(i.dataVisita));
+
+
+                        this.resultsAll.forEach(i => {
+
+                            i.data              = this.$tools.DateFix(i.data             );
+                            i.dataVisita        = this.$tools.DateFix(i.dataVisita       );
+                            i.dataAgendamento   = this.$tools.DateFix(i.dataAgendamento  );
+                            i.dataReagendamento = this.$tools.DateFix(i.dataReagendamento);
+                            i.dataConfirmado    = this.$tools.DateFix(i.dataConfirmado   );
+                            i.dataVisitado      = this.$tools.DateFix(i.dataVisitado     );
+                            i.dataConcluido     = this.$tools.DateFix(i.dataConcluido    );
+                            //i.dataVisita        = new Date(new Date(i.dataVisita        ).toISOString());
+                            //i.dataAgendamento   = new Date(new Date(i.dataAgendamento   ).toISOString());
+                            //i.dataReagendamento = new Date(new Date(i.dataVisita        ).toISOString());
+                            //i.dataConfirmado    = new Date(new Date(i.dataConfirmado    ).toISOString());
+                            //i.dataVisitado      = new Date(new Date(i.dataVisitado      ).toISOString());
+                            //i.dataConcluido     = new Date(new Date(i.dataConcluido     ).toISOString());
+
+                            i.acaocard = 'fechar-card' + i.id;
+                            i.agendado = (i.dataVisita.getFullYear() > 1900);
+                            // i.proprietarioCaptacao = "Teste, (11) 98498-4894, paulogneto@gmail.com";
+                            if (this.$validator.is(i.proprietarioCaptacao)) {
+                                var fields = i.proprietarioCaptacao.split(",");
+                                i.proprietario.nome         = this.$validator.is(fields[0]) ? fields[0] : null;
+                                i.proprietario.email        = this.$validator.is(fields[1]) ? fields[1] : null;
+                                i.proprietario.telefone     = this.$validator.is(fields[2]) ? fields[2] : null;
+                                i.proprietario.telefone2    = this.$validator.is(fields[3]) ? fields[3] : null;
+                                i.proprietario.telefone3    = this.$validator.is(fields[4]) ? fields[4] : null;
+                            }
+
+                            //c2("i",i);
+                            this.results.push(i);
+
+                            if(this.parceiros.length == 0 || this.parceiros.filter((item)=>item.id == i.parceiro.id).length == 0){
+                              if(i.parceiro.id == this.$root.usuario.id)
+                                this.parceiros.unshift({id:i.parceiro.id,label:"MINHAS",value:"MINHAS"});
+                              else
+                                this.parceiros.push({id:i.parceiro.id,label:i.parceiro.nome,value:i.parceiro.apelido});
+                            }
+
+
+                        });
+
+                        this.parceiros.unshift(this.parceiroSelecionado);
+
+                        this.view = "success";
+                    } else
+                        this.view = "fail";
+
+            },
+
+            Filtrar(){
+                  this.results = [];
+                  this.results = this.resultsAll.filter((i) =>(i.parceiro.id == this.parceiroSelecionado.id || this.parceiroSelecionado.id == 0));
+            },
+
+
+
+
+        }
+
+    }
+
+</script>
+
+
+<style scoped>
+    .s-input{
+        margin-bottom:20px;
+    }
+</style>
+
+

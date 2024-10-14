@@ -34,6 +34,20 @@ export default class Tools {
         res += this.validator.is(item.estado) ? item.estado + "" : "";
         return res;
     }
+    
+    BuildAddressImovel(item) {
+        var res = "";
+        res += this.validator.is(item.endereco.endereco )               ? item.endereco.endereco     + ", " : "";
+        res += this.validator.is(item.endereco.logradouro )             ? item.endereco.logradouro   + ", " : "";
+        res += this.validator.is(item.endereco.numero     )             ? item.endereco.numero       +", ":"";
+        res += this.validator.is(item.endereco.complementoTipo)         ? item.endereco.complementoTipo  +" ":"";
+        res += this.validator.is(item.endereco.complemento)             ? item.endereco.complemento  +", ":"";
+        res += this.validator.is(item.endereco.andar && item.andar > 0) ? item.endereco.andar   +"º andar, ":"";
+        res += this.validator.is(item.endereco.bairro)                  ? item.endereco.bairro + ", " : "";
+        res += this.validator.is(item.endereco.cidade)                  ? item.endereco.cidade + ", " : "";
+        res += this.validator.is(item.endereco.estado)                  ? item.endereco.estado + "" : "";
+        return res;
+    }
 
     BuildMapUrl(item) {
         var res = "";
@@ -58,7 +72,21 @@ export default class Tools {
         res += this.validator.is(item.cidade) ? item.cidade + "," : "";
         res += this.validator.is(item.estado) ? item.estado + "" : "";
         res = res.replaceAll(" ", "%20");
-        res = "https://maps.google.com/maps?q="+res+"+()&amp;t=&amp;z=12&amp;ie=UTF8&amp;iwloc=B&amp;output=embed";
+        res = "https://maps.google.com/maps?q="+res+"+&amp;t=&amp;z=12&amp;ie=UTF8&amp;iwloc=B&amp;output=embed";
+        //c(res)
+        this.OpenLink(res);
+    }
+
+    
+    OpenMapImovel(item) {
+        var res = "";
+        res += this.validator.is(item.endereco.logradouro ) ? item.endereco.logradouro + "," : "";
+        res += this.validator.is(item.endereco.numero    )  ? item.endereco.numero   +",":"";
+        res += this.validator.is(item.endereco.bairro)      ? item.endereco.bairro + "," : "";
+        res += this.validator.is(item.endereco.cidade)      ? item.endereco.cidade + "," : "";
+        res += this.validator.is(item.endereco.estado)      ? item.endereco.estado + "" : "";
+        res = res.replaceAll(" ", "%20");
+        res = "https://maps.google.com/maps?q="+res+"+&amp;t=&amp;z=12&amp;ie=UTF8&amp;iwloc=B&amp;output=embed";
         //c(res)
         this.OpenLink(res);
     }
@@ -269,18 +297,47 @@ export default class Tools {
 
     ParseFloat(n){
         var res = 0.00;
-        try{
-	        res = parseFloat(n);
-          if(isNaN(res))
-  	        res = 0.00;
-        }catch(e){
-	        res = 0.00;
+        var nstr = n + "";
+        if(n){
+            //nstr = nstr.replace(/R\$/g,"").replace(/ /g,"").replace(".","").replace(",",".");
+            nstr = nstr.replaceAll("R","").replaceAll("r","").replaceAll("$","").replaceAll(".","").replaceAll(",",".").replaceAll(" ","");
+            try{
+                res = parseFloat(nstr);
+                if(isNaN(res))
+  	                res = 0.00;
+            }catch(e){
+	            res = 0.00;
+            }
         }
         return res;
     }
 
-
+    
     ParseInt(n){
+        var res = 0.00;
+        if(this.IsStringNumber(n)){
+            try{
+	            res = parseInt(n);
+              if(isNaN(res))
+  	            res = 0.00;
+            }catch(e){
+	            res = 0.00;
+            }
+        }
+        return res;
+    }
+
+    IsStringNumber(ns){  
+        var res = false;
+        try{
+            res = /^[0-9]+$/.test(ns)        ;
+        }catch(e){}
+        return res;
+    }
+
+
+
+    ParseInt_BK(n){
         var res = 0.00;
         try{
 	        res = parseInt(n);
@@ -522,22 +579,35 @@ export default class Tools {
 
     
     
-    BuildMapLink(entity){
-        var link = "";
+    BuildMapLink(item){
+        var res = "";
 
-        if (this.is(entity)){
-
-            var address      = entity.logradouro + ",";
-            address         += entity.numero + ",";
-            address         += entity.bairro + ",";
-            address         += entity.cidade + ",";
-            address         += entity.estado + ",";
-            address         += this.is(entity.cep)?  entity.cep :"";
+        if (this.is(item)){
+            /*
+            var address      = item.logradouro + ",";
+            address         += item.numero + ",";
+            address         += item.bairro + ",";
+            address         += item.cidade + ",";
+            address         += item.estado + ",";
+            address         += this.is(item.cep)?  item.cep :"";
             address = address.replaceAll(" ", "+");
             
             link = "https://www.google.com/maps/place/" + address;
+            */
+
+            res += this.validator.is(item.endereco )    ? item.endereco     + "," : "";
+            res += this.validator.is(item.logradouro )  ? item.logradouro   + "," : "";
+            res += this.validator.is(item.numero    )   ? item.numero       + "," : "";
+            res += this.validator.is(item.bairro)       ? item.bairro       + "," : "";
+            res += this.validator.is(item.cidade)       ? item.cidade       + "," : "";
+            res += this.validator.is(item.estado)       ? item.estado       + ""  : "";
+            res = res.replaceAll(" ", "%20");
+            res = "https://maps.google.com/maps?q="+res+"+()&amp;t=&amp;z=12&amp;ie=UTF8&amp;iwloc=B&amp;output=embed";
+            //c(res)
         }
-        return link;
+
+        return res;
+
     }
 
 
@@ -606,7 +676,7 @@ export default class Tools {
 
     GetHours(d) {
         if(this.IsNotSet(d)) return "";
-        d = new Date(d + "");
+        d = this.DateFix(d);
         return (d.getHours() < 10 ? "0" + d.getHours() : d.getHours()) + ":" +
             (d.getMinutes() < 10 ? "0" + d.getMinutes() : d.getMinutes());
     }
@@ -614,7 +684,7 @@ export default class Tools {
     GetDateHour(d) {
         if(this.IsNotSet(d)) return "";
         var days = ["Dom", "Seg", "Ter", "Qua", "Qui", "Sex", "Sáb"];
-        d = new Date(d);
+        d = this.DateFix(d);
         var dia = d.getDate() < 10 ? "0" + d.getDate() : d.getDate();
         var mes = (d.getMonth() + 1) < 10 ? "0" + (d.getMonth() + 1) : (d.getMonth() + 1);
         var ano = d.getFullYear();
@@ -628,7 +698,7 @@ export default class Tools {
     FormatDate(d) {
         if(this.IsNotSet(d)) return "";
         var days = ["Dom", "Seg", "Ter", "Qua", "Qui", "Sex", "Sáb"];
-        d = new Date(d);
+        d = this.DateFix(d);
         var dia = d.getDate() < 10 ? "0" + d.getDate() : d.getDate();
         var mes = (d.getMonth() + 1) < 10 ? "0" + (d.getMonth() + 1) : (d.getMonth() + 1);
         var ano = d.getFullYear();
@@ -656,20 +726,53 @@ export default class Tools {
     }
 
 
+    DateUTC(dt){
+        return DateFix(dt);
+    }
+    DateFix(dt){
+        if(this.IsNotSet(dt)) 
+            return dt;
+        var fix = dt.toString().includes("Z");
+        var d = new Date(dt.toString().replaceAll("Z","").replaceAll("z",""));
+        var fixHours = d.getHours() - 3;
+        dt = new Date(Date.UTC( d.getFullYear(), d.getMonth(), d.getDate(),d.getHours(),d.getMinutes(),d.getSeconds(),0,0 ) );
+        if(fix)
+            dt.setHours(fixHours);
+        return dt;
+    }
+
+    
     FormatDateHour(d) {
-        if(this.IsNotSet(d)) return "";
+        if(!d) 
+            return "";
         var days = ["Dom", "Seg", "Ter", "Qua", "Qui", "Sex", "Sáb"];
+        var hours = 0;
+        if(!d.toString().includes("Z"))
+          hours += 3; 
         d = new Date(d);
+        hours = d.getHours() + hours;
         var dia = d.getDate() < 10 ? "0" + d.getDate() : d.getDate();
         var mes = (d.getMonth() + 1) < 10 ? "0" + (d.getMonth() + 1) : (d.getMonth() + 1);
         var ano = d.getFullYear();
-        var hora = (d.getHours() < 10 ? "0" + d.getHours() : d.getHours()) + ":" + (d.getMinutes() < 10 ? "0" + d.getMinutes() : d.getMinutes()) + "h";
+        var hora = (hours < 10 ? "0" + hours : hours) + ":" + (d.getMinutes() < 10 ? "0" + d.getMinutes() : d.getMinutes()) + "h";
         var diaSemana = days[d.getDay()];
 
         return dia + "/" + mes + "/" + ano + " "+ diaSemana + " " + hora;
 
     }
+        
+    FormatHour(d) {
+        if(!d) 
+            return "";
+        d = this.DateFix(d);
+        var hours = d.getHours();
+        if(!d.toString().includes("Z"))
+          hours = hours + 3; 
+        var hora = (hours < 10 ? "0" + hours : hours) + ":" + (d.getMinutes() < 10 ? "0" + d.getMinutes() : d.getMinutes()) + "h";
 
+        return hora;
+
+    }
 
 
     GetDayWeek(d) {

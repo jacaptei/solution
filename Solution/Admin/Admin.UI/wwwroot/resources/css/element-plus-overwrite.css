@@ -167,6 +167,16 @@
 
     --el-messagebox-content-color:#444444;
 
+    --el-card-border-color:#99c6ff;
+    --el-border-color-light:#b1d3ff;
+}
+
+.el-card__header {
+    padding:10px;
+    color: var(--s-color-primary);
+    border-bottom: 1px solid var(--el-card-border-color);
+    box-sizing: border-box;
+    font-weight:600;
 }
 
 .el-collapse {
@@ -247,7 +257,7 @@
 
 .el-carousel__container {
     position: relative;
-    height: 244px;
+    height: 200px;
     font-size:12px;
     color:var(--s-accent-color);
 }
@@ -389,9 +399,8 @@
     color: #ffffff;
 }
 .el-alert--warning.is-light .el-alert__description {
-    color: #f7a000;
+    color: #ffdd9d;
 }
-
 .el-popper.is-customized {
   /* Set padding to ensure the height is 32px */
   padding: 6px 12px;
@@ -719,9 +728,34 @@
 /* ************************************ */
 
 
-
-
-
+.el-switch__core .el-switch__inner {
+    width: 100%;
+    transition: all var(--el-transition-duration);
+    height: 16px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    overflow: hidden;
+    padding: 5px;
+    padding-left: 12px;
+}
+.el-switch.is-checked .el-switch__core .el-switch__inner {
+    padding: 5px;
+    padding-right: 15px;
+}
+.el-switch__core .el-switch__inner .is-text {
+    font-size: 12px;
+    color: var(--el-color-white);
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    padding: 12px;
+    text-align:center;
+}
 
 
 
@@ -1127,22 +1161,6 @@
 }
 
 
-
-.el-dropdown-menu__item {
-    display: flex;
-    align-items: center;
-    white-space: nowrap;
-    list-style: none;
-    line-height: 22px;
-    padding: 5px 16px;
-    margin: 0;
-    font-size: var(--el-font-size-base);
-    color: var(--s-text-color);
-    cursor: pointer;
-    outline: 0;
-}
-
-
 .el-pagination {
     --el-pagination-font-size: 19px;
     --el-pagination-bg-color: var(--el-fill-color-blank);
@@ -1277,6 +1295,7 @@
 
 .el-upload-dragger {
     /* padding: var(--el-upload-dragger-padding-horizontal) var(--el-upload-dragger-padding-vertical); */
+    padding:30px;
     background-color: var(--el-fill-color-blank);
     border: 1px dashed var(--el-border-color);
     border-radius: 6px;
@@ -1287,6 +1306,12 @@
     overflow: hidden;
     width:100%;
 }
+.el-upload-dragger .el-icon--upload {
+    font-size: 40px;
+    color: var(--el-text-color-placeholder);
+    margin-bottom: -5px;
+    line-height: 50px;
+}
 
 .el-upload-list--picture-card {
     --el-upload-list-picture-card-size: 200px;
@@ -1294,4 +1319,8 @@
     flex-wrap: wrap;
     margin: 0px;
     width: calc(100% - 80px);
+}
+
+.el-textarea__inner {
+    /*height:100px !important;*/
 }

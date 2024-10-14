@@ -1,35 +1,64 @@
-﻿using System;
-using System.Collections.Generic;
-using Microsoft.Data.SqlClient;
-using System.Threading.Tasks;
-using RepoDb;
-using JaCaptei.Model;
+﻿using JaCaptei.Model;
 using JaCaptei.Application.Services;
-using JaCaptei.Model.Model;
-using System.ComponentModel.DataAnnotations;
-using System.Runtime.InteropServices;
+using JaCaptei.Application.DAL;
 
-namespace JaCaptei.Application{
+namespace JaCaptei.Application
+{
+    public class ParceiroService : ServiceBase, IDisposable
+    {
+        readonly ParceiroBLO BLO;
+        readonly ParceiroDAO DAO;
 
-    public class ParceiroService : ServiceBase{
+        public ParceiroService()
+        {
+            BLO = new ParceiroBLO();
+            DAO = new ParceiroDAO();
+        }
 
+        public ParceiroService(DBcontext context)
+        {
+            DAO = new ParceiroDAO(context);
+        }
 
-        ParceiroBLO BLO = new ParceiroBLO();
-        ParceiroDAO DAO = new ParceiroDAO();
+        public AppReturn ObterContaPorId(int idConta)
+        {
+            if (idConta == 0)
+            {
+                appReturn.SetAsBadRequest("ID não informado.");
+                return appReturn;
+            }
+            Model.Admin operador = new Model.Admin();
 
+            var entities = DAO.ObterContaPorId(idConta);
 
-        public AppReturn ObterPeloId(int id){
+            if (entities == null || !entities.Any())
+            {
+                appReturn.SetAsNotFound();
+            }
 
-            if(id == 0) {
+            else
+            {
+                appReturn.result = entities;
+            }
+            DAO.VerificaQuantidadeUsuariosAtivos(idConta, operador.id, operador.nome, true);
+            return appReturn;
+        }
+
+        public AppReturn ObterPeloId(int id)
+        {
+
+            if (id == 0)
+            {
                 appReturn.SetAsBadRequest("ID não informado.");
                 return appReturn;
             }
 
             Parceiro entity = DAO.ObterPorId(id);
 
-            if(entity is null || entity?.id == 0)
+            if (entity is null || entity?.id == 0)
                 appReturn.SetAsNotFound();
-            else {
+            else
+            {
                 entity.RemoverDadosSensiveis();
                 appReturn.result = entity;
             }
@@ -37,20 +66,126 @@ namespace JaCaptei.Application{
             return appReturn;
 
         }
-        
+        public AppReturn AtualizarConfiguracoesConta(ContaId entity, Model.Admin operador)
+        {
+            var appReturn = new AppReturn();
+            try
+            {
+                if (entity == null || entity.id == 0)
+                {
+                    appReturn.result = "Entidade Parceiro inválida.";
+                    return appReturn;
+                }
 
-        public AppReturn ObterPeloToken(string token){
+                var parceiroAtual = DAO.ObterPorId(entity.id.Value);
+                if (parceiroAtual == null)
+                {
+                    appReturn.result = "Parceiro não encontrado.";
+                    return appReturn;
+                }
 
-            if(Utils.Validator.Not(token)) {
+                if (entity.idPlano.HasValue && entity.idConta.HasValue)
+                {
+                    DAO.AtualizarPlanoParceiro(entity.idPlano.Value, entity.idConta.Value, operador.id, operador.nome);
+                    if (entity.limiteUsuarios.HasValue)
+                    {
+                        DAO.AtualizarPlanoConta(entity.idPlano.Value, entity.limiteUsuarios.Value, entity.idConta.Value, operador.id, operador.nome);
+                    }
+                }
+                else if (entity.limiteUsuarios.HasValue && entity.idConta.HasValue)
+                {
+                    DAO.AtualizarQuantidadeUsuariosConta(entity.limiteUsuarios.Value, entity.idConta.Value, operador.id, operador.nome);
+                }
+
+                if (entity.ativo.HasValue && entity.idConta.HasValue && entity.id.HasValue && entity.donoConta.HasValue)
+                {
+                    if (entity.donoConta.Value)
+                    {
+                        DAO.InativarConta(entity.ativo.Value, entity.idConta.Value, operador.id, operador.nome);
+                        DAO.InativarParceirosAssociadosConta(entity.ativo.Value, entity.idConta.Value, operador.id, operador.nome);
+                        if (entity.ativo.Value == true)
+                            DAO.VerificaQuantidadeUsuariosAtivos(entity.idConta.Value, operador.id, operador.nome, entity.ativo.Value);
+                    }
+                    else
+                    {
+                        DAO.InativarParceiro(entity.id.Value, entity.ativo.Value, entity.idConta.Value, operador.id, operador.nome);
+                        if (entity.ativo.Value)
+                        {
+                            DAO.CorrigirQuantidadeUsuariosAtivos(entity.idConta.Value, 1, operador.id, operador.nome);
+                        }
+                        else
+                        {
+                            DAO.CorrigirQuantidadeUsuariosAtivos(entity.idConta.Value, -1, operador.id, operador.nome);
+                        }
+                    }
+                }
+
+                var mudancasParceiro = new Dictionary<string, object>();
+
+                if (entity.habilitadoFazerSolicitacoes.HasValue)
+                {
+                    mudancasParceiro["habilitadoFazerSolicitacoes"] = entity.habilitadoFazerSolicitacoes.Value;
+                }
+
+                if (entity.habilitadoFazerSolicitacoesAgendadas.HasValue)
+                {
+                    mudancasParceiro["habilitadoFazerSolicitacoesAgendadas"] = entity.habilitadoFazerSolicitacoesAgendadas.Value;
+                }
+
+                if (entity.habilitadoFazerSolicitacoesNaoAgendadas.HasValue)
+                {
+                    mudancasParceiro["habilitadoFazerSolicitacoesNaoAgendadas"] = entity.habilitadoFazerSolicitacoesNaoAgendadas.Value;
+                }
+
+                if (entity.limiteSolicitacoesDiarias.HasValue)
+                {
+                    mudancasParceiro["limiteSolicitacoesDiarias"] = entity.limiteSolicitacoesDiarias.Value;
+                }
+
+                if (entity.limiteSolicitacoesDiariasAgendadas.HasValue)
+                {
+                    mudancasParceiro["limiteSolicitacoesDiariasAgendadas"] = entity.limiteSolicitacoesDiariasAgendadas.Value;
+                }
+
+                if (entity.limiteSolicitacoesDiariasNaoAgendadas.HasValue)
+                {
+                    mudancasParceiro["limiteSolicitacoesDiariasNaoAgendadas"] = entity.limiteSolicitacoesDiariasNaoAgendadas.Value;
+                }
+
+                if (mudancasParceiro.Count > 0)
+                {
+                    DAO.AtualizarParceiroSettings(entity.id.Value, mudancasParceiro, operador.id, operador.nome);
+                }
+
+                appReturn.result = "Configurações atualizadas com sucesso.";
+            }
+            catch (Exception ex)
+            {
+                appReturn.result = $"Erro ao atualizar configurações: {ex.Message}";
+            }
+            return appReturn;
+        }
+        public AppReturn AceitarTermos(int id)
+        {
+            appReturn = DAO.AceitarTermos(id);
+            return appReturn;
+        }
+
+        public AppReturn ObterPeloToken(string token)
+        {
+
+            if (Utils.Validator.Not(token))
+            {
                 appReturn.SetAsBadRequest("Token não informado.");
                 return appReturn;
             }
 
             Parceiro entity = DAO.ObterPeloToken(token);
 
-            if(entity is null || entity?.id == 0)
+            if (entity is null || entity?.id == 0)
                 appReturn.SetAsNotFound("Parceiro não encontrado");
-            else {
+            else
+            {
                 entity.RemoverDadosSensiveis();
                 appReturn.result = entity;
             }
@@ -58,22 +193,20 @@ namespace JaCaptei.Application{
             return appReturn;
 
         }
-        
-
-
-
-        public AppReturn ObterPeloDocumentoOuEmail(Parceiro entity){
+        public AppReturn ObterPeloDocumentoOuEmail(Parceiro entity)
+        {
 
             appReturn = BLO.ValidarDadosChaves(entity);
 
-            if(!appReturn.status.success)
+            if (!appReturn.status.success)
                 return appReturn;
 
             entity = DAO.ObterPorDocumentoOuEmail(entity);
 
-            if(entity is null || entity?.id == 0)
+            if (entity is null || entity?.id == 0)
                 appReturn.SetAsNotFound("Parceiro não encontrado");
-            else {
+            else
+            {
                 entity.RemoverDadosSensiveis();
                 appReturn.result = entity;
             }
@@ -81,16 +214,14 @@ namespace JaCaptei.Application{
             return appReturn;
 
         }
-        
 
-
-        public AppReturn Obter(Parceiro entity){
+        public AppReturn Obter(Parceiro entity)
+        {
             return ObterPeloDocumentoOuEmail(entity);
         }
 
-
-
-        public AppReturn Adicionar(Parceiro entity) {
+        public AppReturn Adicionar(Parceiro entity)
+        {
 
             appReturn = BLO.Validar(entity);
 
@@ -101,38 +232,40 @@ namespace JaCaptei.Application{
 
             Parceiro entityDB = DAO.ObterPorCamposChaves(entity);
 
-            if(entityDB is not null && entityDB?.id > 0) {
-                if(!entityDB.confirmado)
+            if (entityDB is not null && entityDB?.id > 0)
+            {
+                if (!entityDB.confirmado)
                     appReturn.AddException("Já existe um Parceiro cadastrado com este CPF, CNPJ ou E-mail. Se já fez o cadastro, não esqueça de o confirmar através do link enviado pelo e-mail para ter o acesso liberado.");
-                else if(!entityDB.validado)
+                else if (!entityDB.validado)
                     appReturn.AddException("Aguarde a liberação de seu acesso (será notificado via e-mail.");
-                else if(entityDB.excluido)
+                else if (entityDB.excluido)
                     appReturn.AddException("Login indisponível. Entre em contato e verifique se sua conta ainda é válida.");
-                else if(!entityDB.ativo || !entityDB.ativoCRM)
+                else if (!entityDB.ativo || !entityDB.ativoCRM)
                     appReturn.AddException("Acesso indisponível. Entre em contato e verifique se sua conta ainda está ativa.");
                 else
                     appReturn.AddException("Já existe um Parceiro cadastrado com este CPF, CNPJ ou E-mail.");
-
                 return appReturn;
-
             }
 
-            try {
+            try
+            {
                 LocalidadeService localidade = new LocalidadeService();
-                if(entity.idEstado == 0)
+                if (entity.idEstado == 0)
                     entity.idEstado = (localidade.ObterIdEstado(entity.estado)).result.id;
-                if(entity.idCidade == 0)
-                    entity.idCidade = (localidade.ObterIdCidade(entity.idEstado,entity.cidade)).result.id;
-                if(entity.idBairro == 0)
-                    entity.idBairro = (localidade.ObterIdBairro(entity.idCidade,entity.bairro)).result.id;
-            } catch(Exception ex) { }
+                if (entity.idCidade == 0)
+                    entity.idCidade = (localidade.ObterIdCidade(entity.idEstado, entity.cidade)).result.id;
+                if (entity.idBairro == 0)
+                    entity.idBairro = (localidade.ObterIdBairro(entity.idCidade, entity.bairro)).result.id;
+            }
+            catch (Exception ex) { }
 
             appReturn = DAO.Adicionar(entity);
 
-            if(appReturn.status.success) {
-                Mail mail    = new Mail();
+            if (appReturn.status.success)
+            {
+                Mail mail = new Mail();
                 mail.emailTo = entity.email;
-                mail.about   = "Confirme seu cadastro";
+                mail.about = "Confirme seu cadastro";
                 mail.message = "Olá " + entity.apelido + ".<br><br>Clique (ou copie e cole no navegador) o link abaixo para confirmar seu cadastro:<br><a href='" + Config.settings.baseURL + "/confirma?t=" + entity.token + "' target='_blank' style='color:#ef5924'>" + Config.settings.baseURL + "/confirma?t=" + entity.token + "</a>";
                 mail.Send();
             }
@@ -140,52 +273,49 @@ namespace JaCaptei.Application{
             return appReturn;
         }
 
-
-
-
-
-        public AppReturn Confirmar(string token) {
+        public AppReturn Confirmar(string token)
+        {
             appReturn = DAO.Confirmar(token);
             return appReturn;
         }
 
+        public AppReturn Validar(Parceiro entity)
+        {
 
-
-
-
-        public AppReturn Validar(Parceiro entity) {
-
-            if(entity is null || entity?.id == 0) {
+            if (entity is null || entity?.id == 0)
+            {
                 appReturn.AddException("Parceiro não identificado.");
                 return appReturn;
-             }
+            }
 
             appReturn = DAO.Validar(entity);
-            
-            if(appReturn.status.success) {
+
+            if (appReturn.status.success)
+            {
                 Mail mail = new Mail();
-                mail.emailTo    = entity.email;
-                mail.about      = "Seja Bem " + (entity.sexo == "FEMININO" ? "Vinda" : "Vindo") + "!";
+                mail.emailTo = entity.email;
+                mail.about = "Seja Bem " + (entity.sexo == "FEMININO" ? "Vinda" : "Vindo") + "!";
                 //mail.message    = "Seja bem " + (entity.sexo == "FEMININO" ? "vinda" : "vindo") + " "+ Utils.String.Capitalize(entity.nome.Split(' ')[0]) + " à <b style='color:#ef5924'>JáCaptei</b>.<br><br>Seu acesso estará liberado logo após o pagamento da assinatura. <br>Para isso, basta acessar o link abaixo e aproveitar todos os benefícios JáCaptei.<br><a href='https://www.asaas.com/c/a6w4nl67dwjhqhq7' target='_blank' style='color:#ef5924'>https://www.asaas.com/c/a6w4nl67dwjhqhq7</a>";
-                mail.message    = "Seja bem " + (entity.sexo == "FEMININO" ? "vinda" : "vindo") + " "+ entity.apelido + " à <b style='color:#ef5924'>JáCaptei</b>.<br><br>Seu acesso está liberado!";
-                if(entity.donoConta) { 
-                    mail.message    += "<br><br>Entraremos em contato para cuidar da concretização de seu plano.";
-                    mail.message    += "<br><br>Passe o seguinte <b>TOKEN DA CONTA</b> abaixo para que seus colaboradores possam se cadastrar na sua conta (devem selecionar, na tela de cadastro do site, a opção \"INSERIR TOKEN DE UMA CONTA EXISTENTE\").";
-                    mail.message    += "<br><br><b>" + entity.tokenConta+"</b>";
+                mail.message = "Seja bem " + (entity.sexo == "FEMININO" ? "vinda" : "vindo") + " " + entity.apelido + " à <b style='color:#ef5924'>JáCaptei</b>.<br><br>Seu acesso está liberado!";
+                if (entity.donoConta)
+                {
+                    mail.message += "<br><br>Entraremos em contato para cuidar da concretização de seu plano.";
+                    mail.message += "<br><br>Passe o seguinte <b>TOKEN DA CONTA</b> abaixo para que seus colaboradores possam se cadastrar na sua conta (devem selecionar, na tela de cadastro do site, a opção \"INSERIR TOKEN DE UMA CONTA EXISTENTE\").";
+                    mail.message += "<br><br><b>" + entity.tokenConta + "</b>";
                 }
                 mail.Send();
             }
             return appReturn;
         }
-      
 
+        public AppReturn Ativar(Parceiro entity)
+        {
 
-        public AppReturn Ativar(Parceiro entity) {
-
-            if(entity is null || entity?.id == 0) {
+            if (entity is null || entity?.id == 0)
+            {
                 appReturn.AddException("Parceiro não identificado.");
                 return appReturn;
-             }
+            }
 
             appReturn = DAO.Ativar(entity);
             /*
@@ -206,54 +336,52 @@ namespace JaCaptei.Application{
             return appReturn;
         }
 
-
-
-        public AppReturn Desativar(Parceiro entity) {
-
-            if(entity is null || entity?.id == 0) {
+        public AppReturn Desativar(Parceiro entity)
+        {
+            if (entity is null || entity?.id == 0)
+            {
                 appReturn.AddException("Parceiro não identificado.");
                 return appReturn;
             }
-
             appReturn = DAO.Desativar(entity);
-
             return appReturn;
-
         }
 
+        public AppReturn Alterar(Parceiro entity)
+        {
 
-
-        public AppReturn Alterar(Parceiro entity) {
-
-            if(entity is null || entity?.id == 0) {
+            if (entity is null || entity?.id == 0)
+            {
                 appReturn.AddException("Parceiro não identificado.");
                 return appReturn;
             }
 
             appReturn = BLO.ValidarAlteracao(entity);
 
-            if(!appReturn.status.success)
+            if (!appReturn.status.success)
                 return appReturn;
 
             entity = BLO.NormalizarAlteracao(entity);
 
             Parceiro parceiroExiste = DAO.ObterPorCamposChavesParaAlteracao(entity);
 
-            if(parceiroExiste is not null && parceiroExiste?.id > 0) {
+            if (parceiroExiste is not null && parceiroExiste?.id > 0)
+            {
                 appReturn.AddException("Já existe um Parceiro cadastrado com este documento (CPF ou CNPJ) ou E-mail.");
                 return appReturn;
             }
 
-
-            try {
+            try
+            {
                 LocalidadeService localidade = new LocalidadeService();
-                if(entity.idEstado == 0)
+                if (entity.idEstado == 0)
                     entity.idEstado = (localidade.ObterIdEstado(entity.estado)).result.id;
-                if(entity.idCidade == 0)
-                    entity.idCidade = (localidade.ObterIdCidade(entity.idEstado,entity.cidade)).result.id;
-                if(entity.idBairro == 0)
-                    entity.idBairro = (localidade.ObterIdBairro(entity.idCidade,entity.bairro)).result.id;
-            } catch(Exception ex) { }
+                if (entity.idCidade == 0)
+                    entity.idCidade = (localidade.ObterIdCidade(entity.idEstado, entity.cidade)).result.id;
+                if (entity.idBairro == 0)
+                    entity.idBairro = (localidade.ObterIdBairro(entity.idCidade, entity.bairro)).result.id;
+            }
+            catch (Exception ex) { }
 
 
             appReturn = DAO.Alterar(entity);
@@ -261,49 +389,52 @@ namespace JaCaptei.Application{
             return appReturn;
         }
 
-
-
-        public AppReturn Excluir(Parceiro entity) {
+        public AppReturn Excluir(Parceiro entity)
+        {
             appReturn = DAO.Excluir(entity);
             return appReturn;
         }
 
+        public AppReturn AlterarSenha(Parceiro entity)
+        {
 
-
-
-
-
-        public AppReturn AlterarSenha(Parceiro entity) {
-
-            if(entity is null || Utils.Validator.Not(entity?.token)) {
+            if (entity is null || Utils.Validator.Not(entity?.token))
+            {
                 appReturn.AddException("Parceiro não identificado.");
                 return appReturn;
-             }
-            else if(Utils.Validator.Not(entity.senha)){
+            }
+            else if (Utils.Validator.Not(entity.senha))
+            {
                 appReturn.AddException("Senha não informada.");
                 return appReturn;
-             }
+            }
 
             entity.senha = Utils.Key.EncodeToBase64(entity.senha.ToLower());
 
             appReturn = DAO.AlterarSenha(entity);
-            
+
             return appReturn;
 
         }
 
-        
-        public AppReturn AlterarPerfil(Parceiro entity) {
+        public AppReturn AlterarPerfil(Parceiro entity)
+        {
 
-            if(entity is null || entity?.id == 0 || Utils.Validator.Not(entity?.token)) {
+            if (entity is null || entity?.id == 0 || Utils.Validator.Not(entity?.token))
+            {
                 appReturn.AddException("Parceiro não identificado.");
                 return appReturn;
-            } else {
-                if(Utils.Validator.Is(entity.email)) {
+            }
+            else
+            {
+                if (Utils.Validator.Is(entity.email))
+                {
                     entity.email = Utils.String.HigienizeMail(entity.email);
                     Parceiro entityDB = DAO.ObterPorDocumentoOuEmail(entity);
-                    if(entityDB is not null) {
-                        if(entityDB.token != entity.token) {
+                    if (entityDB is not null)
+                    {
+                        if (entityDB.token != entity.token)
+                        {
                             appReturn.AddException("Já existe um usuário cadastrado com este E-Mail");
                             return appReturn;
                         }
@@ -312,19 +443,16 @@ namespace JaCaptei.Application{
             }
 
             appReturn = DAO.AlterarPerfil(entity);
-            
+
             return appReturn;
 
         }
-
-        
-
-        
-        public AppReturn ObterPorDocumentoOuEmail(Parceiro entity) {
+        public AppReturn ObterPorDocumentoOuEmail(Parceiro entity)
+        {
 
             entity = DAO.ObterPorDocumentoOuEmail(entity);
 
-            if(entity is null || entity?.id == 0)
+            if (entity is null || entity?.id == 0)
                 appReturn.AddException("Nada encontrado.");
             else
                 appReturn.result = entity;
@@ -333,38 +461,35 @@ namespace JaCaptei.Application{
 
         }
 
-
-
-
-        
-        public AppReturn Autenticar(Parceiro entity) {
+        public AppReturn Autenticar(Parceiro entity)
+        {
 
             appReturn = BLO.ValidarDadosLogin(entity);
 
-            if(!appReturn.status.success)
+            if (!appReturn.status.success)
                 return appReturn;
 
             appReturn = DAO.Autenticar(entity);
 
             entity = appReturn.result;
 
-            if(entity is null)
+            if (entity is null)
                 appReturn.SetAsNotFound("Parceiro não encontrado.");
-            else {
+            else
+            {
                 entity.RemoverDadosSensiveis();
-                if(!entity.ativo)
+                if (!entity.ativo)
                     appReturn.SetAsGone("Parceiro não ativo.");
-                else {
+                else
+                {
                     appReturn.result = entity;
                 }
             }
             return appReturn;
         }
 
-
-
-
-        public AppReturn ObterPendentesValidacao() {
+        public AppReturn ObterPendentesValidacao()
+        {
 
             List<Parceiro> entities = DAO.ObterPendentesValidacao();
 
@@ -373,11 +498,25 @@ namespace JaCaptei.Application{
             return appReturn;
 
         }
+        public async Task<List<ParceiroList>> ObterParceirosAtivos()
+        {
+            try
+            {
+                var parceirosAtivos = await DAO.ObterParceirosAtivos();
+                if (parceirosAtivos == null || !parceirosAtivos.Any())
+                {
+                    return new List<ParceiroList>();
+                }
+                return parceirosAtivos;
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("Ocorreu um erro ao obter parceiros ativos.", ex);
+            }
+        }
 
-
-
-
-        public AppReturn ObterInativos() {
+        public AppReturn ObterInativos()
+        {
 
             List<Parceiro> entities = DAO.ObterInativos();
 
@@ -387,39 +526,38 @@ namespace JaCaptei.Application{
 
         }
 
-
-
-
-
-
-        public AppReturn Buscar(Search busca) {
-            busca.item  = BLO.NormalizarParaBusca(busca.item);
-            appReturn   = DAO.Buscar(busca);
+        public AppReturn ObterContasAtivas()
+        {
+            appReturn = DAO.ObterContasAtivas();
             return appReturn;
         }
 
+        public AppReturn Buscar(Busca busca)
+        {
+            busca.item = BLO.NormalizarParaBusca(busca.item);
+            appReturn = DAO.Buscar(busca);
+            return appReturn;
+        }
 
+        public Task<Parceiro?> ObterPorCPF(string cpf)
+        {
+            return DAO.ObterPorCPF(cpf);
+        }
 
+        public Task<Parceiro?> ObterPorCNPJ(string cnpj)
+        {
+            return DAO.ObterPorCNPJ(cnpj);
+        }
 
+        public Task<Plano?> ObterPlanoParceiro(Parceiro parceiro)
+        {
+            return DAO.ObterPlanoParceiro(parceiro);
+        }
 
-
-
-        /*
-                public AppReturn ObterViaCPF(Shared.Model.Parceiro entity){
-
-                    return DAO.ObterViaToken(entity);
-                }
-
-                public AppReturn ObterViaToken(Shared.Model.Parceiro entity){
-                    return DAO.ObterViaToken(entity);
-                }
-
-                public AppReturn ObterViaTokenUID(Shared.Model.Parceiro entity){
-                    return DAO.ObterViaTokenUID(entity);
-                }
-        */
-
-
+        public void Dispose()
+        {
+            DAO.Dispose();
+        }
 
     }
 }

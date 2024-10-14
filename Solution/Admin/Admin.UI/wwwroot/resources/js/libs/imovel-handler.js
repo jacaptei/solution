@@ -56,9 +56,22 @@ export default class ImovelHandler{
         console.log(res.join());
     }
 
+    
+    ExtractImageName(url) {
+        var img="";
+        if (this.validator.is(url)) {
+            if (url.split("/")[2] == "imagizer.imageshack.com") {
+                var imageSplit = url.replace("https://imagizer.imageshack.com/", "").split("/");
+                img = imageSplit[2];
+            }else
+                img = url.split("/")[url.split("/").length-1];
+        }
+        return img.trim();
+    }
+
 
     //GetThumbnail(image, resol = "320x240") {
-    GetThumbnail(image, resol = "640x480") {
+    GetImageShackResize(image, resol = "640x480") {
         var img = "/resources/images/noimages.jpg";
         if (this.validator.is(image)) {
             var url = (this.validator.is(image.url)) ? image.url : image;
@@ -74,6 +87,7 @@ export default class ImovelHandler{
     BuildLink(imovel,imagem,usuario=null){
 
                 var url = window.location.origin + "/imovel?";
+                    url = "https://jacaptei.com.br"+ "/imovel?";
 
                 url += "cod=" + imovel.cod;
                 url += "&id=" + imovel.id;
@@ -102,15 +116,15 @@ export default class ImovelHandler{
 
                 url += " em ";
 
-                if (this.validator.is(imovel.bairro))
-                        url += imovel.bairro +", ";
-                if (this.validator.is(imovel.cidade))
-                        url += imovel.cidade + ", ";
-                if (this.validator.is(imovel.estado))
-                        url+= imovel.estado
+                if (this.validator.is(imovel.endereco.bairro))
+                        url += imovel.endereco.bairro +", ";
+                if (this.validator.is(imovel.endereco.cidade))
+                        url += imovel.endereco.cidade + ", ";
+                if (this.validator.is(imovel.endereco.estado))
+                        url+= imovel.endereco.estado
 
 
-                var img = this.GetThumbnail(imagem);
+                var img = this.GetImageShackResize(imagem);
 
                 //if (this.validator.is(imagem)) {
                 //    if (imagem.split("/")[2] == "imagizer.imageshack.com") {
@@ -119,7 +133,7 @@ export default class ImovelHandler{
                 //    }
                 //}
 
-                url += "&img="   + img;
+                url += "&img=https://jacaptei.com.br/resources/images/logo_icon.jpg";//   + img;
                 url += "&tag=imovel&r=000000";
 
                 //url = encodeURIComponent(url.replace("#/", ""));
@@ -160,12 +174,12 @@ export default class ImovelHandler{
 
                 res.desc += " em ";
 
-                if (this.validator.is(imovel.bairro))
-                        res.desc += imovel.bairro +", ";
-                if (this.validator.is(imovel.cidade))
-                        res.desc += imovel.cidade + ", ";
-                if (this.validator.is(imovel.estado))
-                        res.desc+= imovel.estado
+                if (this.validator.is(imovel.endereco.bairro))
+                        res.desc += imovel.endereco.bairro +", ";
+                if (this.validator.is(imovel.endereco.cidade))
+                        res.desc += imovel.endereco.cidade + ", ";
+                if (this.validator.is(imovel.endereco.estado))
+                        res.desc+= imovel.endereco.estado
 
 
                 var img = this.GetThumbnail(imagem);
@@ -187,10 +201,10 @@ export default class ImovelHandler{
 
     BuildTitle(imovel){
         var res = "";
-            res += this.validator.is(imovel.tipo   )?          imovel.tipo     : "";
-            res += this.validator.is(imovel.quartos)? ", " +   imovel.quartos + ( (imovel.quartos > 1 || imovel.quartos == 0)? " quartos":" quartos") : "";
-            res += this.validator.is(imovel.estado )? ", " +   imovel.suites  + ( (imovel.suites  > 1 || imovel.suites  == 0)? " suites" :" suites" ) : "";
-            res += this.validator.is(imovel.vagas  )? ", " +   imovel.vagas   + ( (imovel.vagas   > 1 || imovel.vagas   == 0)? " vagas"  :" vagas"  ) : "";
+            res += this.validator.is(imovel.tipo.label)?          imovel.tipo.label     : "";
+            res += this.validator.is(imovel.interno.totalQuartos)? ", " +   imovel.interno.totalQuartos + ( (imovel.interno.totalQuartos  > 1 || imovel.interno.totalQuartos  == 0)? " quartos":" quartos") : "";
+            res += this.validator.is(imovel.interno.totalSuites )? ", " +   imovel.interno.totalSuites  + ( (imovel.interno.totalSuites   > 1 || imovel.interno.totalSuites   == 0)? " suites" :" suites" ) : "";
+            res += this.validator.is(imovel.externo.totalVagas  )? ", " +   imovel.externo.totalVagas   + ( (imovel.externo.totalVagas    > 1 || imovel.externo.totalVagas    == 0)? " vagas"  :" vagas"  ) : "";
         return res;
     }
 
@@ -199,91 +213,174 @@ export default class ImovelHandler{
         var res = "";
         res += this.validator.is(imovel.endereco  )? imovel.endereco +",":"";
         //res += this.validator.is(imovel.numero    )? imovel.numero   +",":"";
-        res += this.validator.is(imovel.bairro    )? imovel.bairro   +",":"";
-        res += this.validator.is(imovel.cidade    )? imovel.cidade   +",":"";
-        res += this.validator.is(imovel.estado    )? imovel.estado   +"":"";
+        res += this.validator.is(imovel.endereco.bairro    )? imovel.endereco.bairro   +",":"";
+        res += this.validator.is(imovel.endereco.cidade    )? imovel.endereco.cidade   +",":"";
+        res += this.validator.is(imovel.endereco.estado    )? imovel.endereco.estado   +"":"";
         res = res.replaceAll(" ","%20");
         return res;
     }
 
 
-    ParseCRM(imovel,item,index){
+    
+    ParseImport(imovel,item,index){
 
-        imovel.id           =   item.id;
-        imovel.idCRM = item.id;
+        imovel.codCarga     = 20240625; //20240317;
+        imovel.idCRM   = item.id;
+        imovel.codCRM  = item.productcode;
+        imovel.cod     = item.productcode;
+
 
         try {
             imovel.idSKU        =   item.id.split("x")[1];
             imovel.idModule     =   item.id.split("x")[0];
         } catch (e) { }
 
-        imovel.cod          =   item.productcode;
-        imovel.key          =   "imovel_cod_"+imovel.cod+"_id_"+imovel.id;
+        //imovel.key          =   "imovel_cod_"+imovel.cod+"_id_"+imovel.id;
 
         if (this.validator.is(item.productcategory))
-            imovel.tipo = item.productcategory;
+            imovel.tipo.label = item.productcategory;
         else
-            imovel.tipo = item.cf_1280;
+            imovel.tipo.label = item.cf_1280;
 
+        imovel.construtora    =   item.cf_967 + "";
+        imovel.edificio       =   item.cf_973 + "";
         //imovel.tipo         =   item.productname;
         //imovel.tipo         =   item.productcategory;
         //imovel.images       =   this.imagesData.sort((a, b) => 0.5 - Math.random()).slice(0, 4);
         imovel.data         =   new Date(item.createdtime);
         imovel.index        =   index;
         imovel.nome         =   "build"+index;
-        imovel.cep          =   item.cf_999;
-        imovel.estado       =   item.cf_1021;
-        imovel.cidade       =   item.cf_1019;
-        imovel.bairro       =   item.cf_1011;
-        imovel.endereco     =   item.cf_1001;
-        imovel.numero       =   item.cf_1003;
-        imovel.andar        =   item.cf_1033;
 
-        imovel.quartos      =   item.cf_1041;
-        imovel.vagas        =   item.cf_1097;
-        imovel.banheiros    =   item.cf_1035;
-        imovel.suites       =   item.cf_1045;
-        imovel.elevadores   =   item.cf_1101;
-        imovel.areaInterna  =   item.cf_1203;
-        imovel.areaExterna  =   item.cf_1205;
-        imovel.areaTotal    =   this.tools.ParseFloat(imovel.areaInterna) + this.tools.ParseFloat(imovel.areaExterna);
+        imovel.venda    = true;
+        imovel.locacao = false;
 
+        imovel.titulo               =   this.BuildTitle(imovel);
+        imovel.descricao            =   item.description + "";
+        //imovel.descricao          =   imovel.descricao.replace(/\n/g,"<br />");
+
+        // areas
+        imovel.area = {};
+        imovel.area.interna  =   this.tools.ParseFloat(item.cf_1203);
+        imovel.area.externa  =   this.tools.ParseFloat(item.cf_1205);
+        imovel.area.total    =   this.tools.ParseFloat(imovel.areaInterna) + this.tools.ParseFloat(imovel.areaExterna);
+
+
+        // valores
+        imovel.valor = {};
         if (this.validator.is(item.unit_price) && item.unit_price > 0)
-            imovel.valor = this.tools.ParseFloat(item.unit_price);
+            imovel.valor.atual = this.tools.ParseFloat(item.unit_price);
         else
-            imovel.valor = this.tools.ParseFloat(item.cf_1282);
+            imovel.valor.atual = this.tools.ParseFloat(item.cf_1282);
 
-        imovel.valorCondominio  =   this.tools.ParseFloat(item.cf_1191);
-        imovel.valorIPTU        =   this.tools.ParseFloat(item.cf_1193);
-
-        // booleans
-        imovel.areaServico      = this.validator.not(item.cf_1053)? false : (item.cf_1053 == 1);
-        imovel.closet           = this.validator.not(item.cf_1063)? false : (item.cf_1063 == 1);
-        imovel.churrasqueira    = this.validator.not(item.cf_1147)? false : (item.cf_1147 == 1);
-        imovel.salas            = this.validator.not(item.cf_1043)? false : (item.cf_1043 == 1);
-        imovel.armarioBanheiro  = this.validator.not(item.cf_1055)? false : (item.cf_1055 == 1);
-        imovel.armarioQuarto    = this.validator.not(item.cf_1059)? false : (item.cf_1059 == 1);
-        imovel.boxDespejo       = this.validator.not(item.cf_1121)? false : (item.cf_1121 == 1);
-        imovel.lavabo           = this.validator.not(item.cf_1071)? false : (item.cf_1071 == 1);
-        imovel.hidromassagem    = this.validator.not(item.cf_1149)? false : (item.cf_1149 == 1);
-        imovel.piscina          = this.validator.not(item.cf_1153)? false : (item.cf_1153 == 1);
-        imovel.quadraEsportiva  = this.validator.not(item.cf_1157)? false : (item.cf_1157 == 1);
-        imovel.salaoFestas      = this.validator.not(item.cf_1163)? false : (item.cf_1163 == 1);
-        imovel.dce              = this.validator.not(item.cf_1065)? false : (item.cf_1065 == 1);
-        imovel.cercaEletrica    = this.validator.not(item.cf_1123)? false : (item.cf_1123 == 1);
-        imovel.jardim           = this.validator.not(item.cf_1131)? false : (item.cf_1131 == 1);
-        imovel.interfone        = this.validator.not(item.cf_1129)? false : (item.cf_1129 == 1);
-        imovel.armarioCozinha   = this.validator.not(item.cf_1057)? false : (item.cf_1057 == 1);
-        imovel.portaoEletronico = this.validator.not(item.cf_1135)? false : (item.cf_1135 == 1);
-        imovel.alarme           = this.validator.not(item.cf_1113)? false : (item.cf_1113 == 1);
-        imovel.aguaIndividual   = this.validator.not(item.cf_1111)? false : (item.cf_1111 == 1);
-        imovel.gasCanalizado    = this.validator.not(item.cf_1127)? false : (item.cf_1127 == 1);
-        imovel.elevador         = this.validator.not(item.cf_1101)? false : (item.cf_1101  > 0);
+        imovel.valor.condominio  =   this.tools.ParseFloat(item.cf_1191);
+        imovel.valor.iPTU        =   this.tools.ParseFloat(item.cf_1193);
+        
 
 
-        imovel.titulo       =   this.BuildTitle(imovel);
-        imovel.descricao    =   item.description + "";
-        //imovel.descricao    =   imovel.descricao.replace(/\n/g,"<br />");
+
+        // endereco
+        imovel.endereco = {};
+        imovel.endereco.cep          =   item.cf_999;
+        imovel.endereco.estado       =   item.cf_1021;
+        imovel.endereco.cidade       =   item.cf_1019;
+        imovel.endereco.bairro       =   item.cf_1011;
+        imovel.endereco.logradouro   =   item.cf_1001;
+        imovel.endereco.numero       =   item.cf_1003;
+        imovel.endereco.andar        =   item.cf_1033;
+        imovel.endereco.bloco        =   item.cf_1288;
+        imovel.endereco.referencia   =   item.cf_1023;
+        imovel.endereco.acesso       =   item.cf_1025;
+
+        //c2("imovel.endereco",imovel.endereco);
+
+        if (this.validator.is(item.cf_1007)){
+            imovel.endereco.complemento=(  (this.validator.not(item.cf_1005) && imovel.tipo=="Apartamento")? "Apto": item.cf_1005) + " "+item.cf_1007;
+          //  imovel.complemento = imovel.complemento.replace("Apto","Ap.");
+        }
+
+
+        // internas
+        imovel.interno = {};
+        imovel.interno.totalBanheiros   =   item.cf_1035;
+        imovel.interno.totalQuartos     =   item.cf_1041;
+        imovel.interno.totalSalas       =   item.cf_1043;
+        imovel.interno.totalSuites      =   item.cf_1045;
+        imovel.interno.totalVarandas    =   item.cf_1047;
+        imovel.interno.aguaIndividual   = this.validator.not(item.cf_1111)? false : (item.cf_1111 == 1);
+        imovel.interno.aquecedorGas     = this.validator.not(item.cf_1117)? false : (item.cf_1117 == 1);
+        imovel.interno.aquecedorEletrico= this.validator.not(item.cf_1115)? false : (item.cf_1115 == 1);
+        imovel.interno.aquecedorSolar   = this.validator.not(item.cf_1119)? false : (item.cf_1119 == 1);
+        imovel.interno.arCondicionado   = this.validator.not(item.cf_1049)? false : (item.cf_1049 == 1);
+        imovel.interno.areaServico      = this.validator.not(item.cf_1053)? false : (item.cf_1053 == 1);
+        imovel.interno.areaPrivativa    = this.validator.not(item.cf_1051)? false : (item.cf_1051 == 1);
+        imovel.interno.armarioBanheiro  = this.validator.not(item.cf_1055)? false : (item.cf_1055 == 1);
+        imovel.interno.armarioCozinha   = this.validator.not(item.cf_1057)? false : (item.cf_1057 == 1);
+        imovel.interno.armarioQuarto    = this.validator.not(item.cf_1059)? false : (item.cf_1059 == 1);
+        imovel.interno.boxDespejo       = this.validator.not(item.cf_1121)? false : (item.cf_1121 == 1);
+        imovel.interno.dce              = this.validator.not(item.cf_1065)? false : (item.cf_1065 == 1);
+        imovel.interno.despensa         = this.validator.not(item.cf_1121)? false : (item.cf_1121 == 1);
+        imovel.interno.closet           = this.validator.not(item.cf_1063)? false : (item.cf_1063 == 1);
+        imovel.interno.escritorio       = this.validator.not(item.cf_1069)? false : (item.cf_1069 == 1);
+        imovel.interno.gasCanalizado    = this.validator.not(item.cf_1127)? false : (item.cf_1127 == 1);
+        imovel.interno.lavabo           = this.validator.not(item.cf_1071)? false : (item.cf_1071 == 1);
+        imovel.interno.mobilidado       = this.validator.not(item.cf_1161)? false : (item.cf_1161 == 1);
+        imovel.interno.rouparia         = this.validator.not(item.cf_1075)? false : (item.cf_1075 == 1);
+        imovel.interno.salas            = (imovel.totalSalas > 0);
+        imovel.interno.solManha         = this.validator.not(item.cf_1077)? false : (item.cf_1077 == 1);
+        imovel.interno.varanda          = (imovel.totalVarandas > 0);
+        imovel.interno.varandaGourmet   = this.validator.not(item.cf_1081)? false : (item.cf_1081 == 1);
+        imovel.interno.vistaMar         = this.validator.not(item.cf_1079)? false : (item.cf_1079 == 1);
+
+        // externas
+        imovel.externo = {};
+        imovel.externo.totalAndares     =   item.cf_1105;
+        imovel.externo.totalElevadores  =   item.cf_1101;
+        imovel.externo.totalVagas       =   item.cf_1097;
+        imovel.externo.academia         = this.validator.not(item.cf_1053)? false : (item.cf_1053 == 1);
+        imovel.externo.alarme           = this.validator.not(item.cf_1113)? false : (item.cf_1113 == 1);
+        imovel.externo.cercaEletrica    = this.validator.not(item.cf_1123)? false : (item.cf_1123 == 1);
+        imovel.externo.churrasqueira    = this.validator.not(item.cf_1147)? false : (item.cf_1147 == 1);
+        imovel.externo.circuitoTV       = this.validator.not(item.cf_1125)? false : (item.cf_1125 == 1);
+        imovel.externo.elevador         = (imovel.totalElevadores > 0);
+        imovel.externo.interfone        = this.validator.not(item.cf_1129)? false : (item.cf_1129 == 1);
+        imovel.externo.jardim           = this.validator.not(item.cf_1131)? false : (item.cf_1131 == 1);
+        imovel.externo.lavanderia       = this.validator.not(item.cf_1133)? false : (item.cf_1133 == 1);
+        imovel.externo.portaoEletronico = this.validator.not(item.cf_1135)? false : (item.cf_1135 == 1);
+        imovel.externo.portaria24h      = this.validator.not(item.cf_1137)? false : (item.cf_1137 == 1);
+        imovel.externo.sauna            = this.validator.not(item.cf_1167)? false : (item.cf_1167 == 1);
+        imovel.externo.vaga             = (imovel.totalVagas > 0);
+  
+
+        //lazer
+        imovel.lazer = {};
+        imovel.lazer.cinema               = this.validator.not(item.cf_1151)? false : (item.cf_1151 == 1);
+        imovel.lazer.hidromassagem        = this.validator.not(item.cf_1149)? false : (item.cf_1149 == 1);
+        imovel.lazer.playground           = this.validator.not(item.cf_1155)? false : (item.cf_1155 == 1);
+        imovel.lazer.piscina              = this.validator.not(item.cf_1153)? false : (item.cf_1153 == 1);
+        imovel.lazer.quadraPoliesportiva  = this.validator.not(item.cf_1157)? false : (item.cf_1157 == 1);
+        imovel.lazer.quadraTenis          = this.validator.not(item.cf_1159)? false : (item.cf_1159 == 1);
+        imovel.lazer.salaoFestas          = this.validator.not(item.cf_1163)? false : (item.cf_1163 == 1);
+        imovel.lazer.salaoJogos           = this.validator.not(item.cf_1165)? false : (item.cf_1165 == 1);
+        imovel.lazer.salaoMassagem        = this.validator.not(item.cf_1161)? false : (item.cf_1161 == 1);
+
+        
+        //disposicao
+        imovel.disposicao = {};
+        imovel.disposicao.aceitaFinanciamento  = this.validator.not(item.cf_985) ? false : (item.cf_985  == 1);
+        imovel.disposicao.aceitaPermuta        = this.validator.not(item.cf_987) ? false : (item.cf_987  == 1);
+        imovel.disposicao.comissao             = this.validator.not(item.cf_1199) ? 0 : (this.tools.ParseFloat(item.cf_1199));
+        if(this.validator.is(item.cf_1278)){
+            //imovel.situacao     = item.cf_1278;
+            imovel.disposicao.alugado      = (item.cf_1278 == "Alugado");
+            imovel.disposicao.desativado   = (item.cf_1278 == "Desativado");
+            imovel.disposicao.disponivel   = (item.cf_1278 == "Disponíveis");
+            imovel.disposicao.vendido      = (item.cf_1278 == "Vendido");
+        }   
+        imovel.disposicao.gestaoJacaptei   = true;
+        imovel.disposicao.gestaoPremium    = false;
+        imovel.disposicao.naPlanta         = this.validator.not(item.cf_989) ? false : (item.cf_989  == 1);
+        imovel.disposicao.placa            = this.validator.not(item.cf_977) ? false : (item.cf_977  == 1);
+        imovel.disposicao.ocupado          = this.validator.not(item.cf_981) ? false : (item.cf_981  == 1);
 
         return imovel;
 

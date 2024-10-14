@@ -1,14 +1,16 @@
+using JaCaptei.API.Filters;
+using JaCaptei.API.Middleware;
+using JaCaptei.Model;
+
 using Microsoft.AspNetCore.Authentication.JwtBearer;
-using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
-using JaCaptei.Model;
-using System.Text.Json;
-using System.Text;
-using Microsoft.Net.Http.Headers;
-using Microsoft.Extensions.Configuration;
-using JaCaptei.API.Filters;
 
+using Polly;
+using Polly.Contrib.WaitAndRetry;
+
+using System.Text;
+using System.Text.Json;
 //var builder = WebApplication.CreateBuilder(new WebApplicationOptions {
 //    ApplicationName = typeof(Program).Assembly.FullName,
 //    ContentRootPath = Path.GetFullPath(Directory.GetCurrentDirectory()),
@@ -18,8 +20,6 @@ using JaCaptei.API.Filters;
 
 
 var builder = WebApplication.CreateBuilder(args);
-
-builder.WebHost.UseUrls("http://localhost:52200","https://localhost:52220");
 
 //builder.Services.AddEndpointsApiExplorer();  // to mvc application 
 builder.Services.AddRouting(options => options.LowercaseUrls = true);
@@ -78,9 +78,9 @@ builder.Services.AddCors(options => {
 
 builder.Services.AddCors(options => {
     options.AddPolicy("AllowSites",builder =>
-         builder.WithOrigins("https://jacaptei.com.br"          ,
-                             "https://homolog.jacaptei.com.br"  ,
-                             "https://localhost:52240"          ,
+         builder.WithOrigins("https://jacaptei.com.br",
+                             "https://homolog.jacaptei.com.br",
+                             "https://localhost:52240",
                              "https://*.jacaptei.com.br"
                              )
                             .SetIsOriginAllowedToAllowWildcardSubdomains()
@@ -96,7 +96,6 @@ builder.Services.AddCors(options => {
 // ------------------------ JWT .NET ------------------------------
 
 
-//var key = Encoding.ASCII.GetBytes(Settings.key);
 builder.Services.AddAuthentication(x => {
     x.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
     x.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
@@ -111,10 +110,9 @@ builder.Services.AddAuthentication(x => {
     };
     x.Events = new JwtBearerEvents {
         OnChallenge = context => {
-            // Call this to skip the default logic and avoid using the default response
             context.HandleResponse();
             context.Response.StatusCode = 403;
-            context.Response.ContentType = "application/json";// and here also.
+            context.Response.ContentType = "application/json";
             var result = new AppReturn();
             result.SetAsForbidden();
             //var result = JsonSerializer.Serialize(context);
@@ -123,21 +121,34 @@ builder.Services.AddAuthentication(x => {
             return context.Response.WriteAsync(JsonSerializer.Serialize(result));
         },
         OnForbidden = context => {
-            context.Response.ContentType = "application/json";// and here also.
+            context.Response.ContentType = "application/json";
             var result = new AppReturn();
             context.Response.StatusCode = 403;
             result.SetAsForbidden();
             return context.Response.WriteAsync(JsonSerializer.Serialize(result));
         }
-
     };
-
-
 });
 
 
 // ------------------------------------------------------
+builder.Services.AddHttpClient("crm", client =>
+{
+    client.BaseAddress = new Uri(settings.crmEndpoint);
+})
+.AddTransientHttpErrorPolicy(policyBuilder => policyBuilder.WaitAndRetryAsync(Backoff.DecorrelatedJitterBackoffV2(TimeSpan.FromSeconds(1), 3)));
 
+builder.Services.AddHttpClient("location", client =>
+{
+    client.BaseAddress = new Uri("https://brasilaberto.com/api/v1/");
+})
+.AddTransientHttpErrorPolicy(policyBuilder => policyBuilder.WaitAndRetryAsync(Backoff.DecorrelatedJitterBackoffV2(TimeSpan.FromSeconds(1), 5)));
+
+builder.Services.AddHttpClient("imoview", client =>
+{
+    client.BaseAddress = new Uri("https://api.imoview.com.br/");
+})
+.AddTransientHttpErrorPolicy(policyBuilder => policyBuilder.WaitAndRetryAsync(Backoff.DecorrelatedJitterBackoffV2(TimeSpan.FromSeconds(1), 5)));
 
 var app = builder.Build();
 
@@ -154,6 +165,8 @@ app.UseRouting();
 
 app.UseCors("AllowAll");
 //app.UseCors("AllowSites");
+
+app.UseMiddleware<JwtValidationMiddleware>();
 
 app.UseAuthentication();
 app.UseAuthorization();

@@ -28,19 +28,50 @@ export default class DataHelper {
             cep     :   ""
         }
         
-        
+   
+        this.locadalidade = {
+            estados :   [],
+            cidades :   [],
+            bairros :   [],
+            estado  :   {},
+            cidade  :   {},
+            bairro  :   {},
+            cep     :   ""
+        }
+             
     }
 
-
+    /*
     async ObterEstados() {
         var result = [];
         const request = await axios.get(this.api.BuildURL("suporte/estados/obter"));
         return request.data? request.data.result : result;
     }
+    */
+    
+
+    async ObterEstados(){
+        this.locadalidade.estados = [];
+        const request = await axios.get(this.api.BuildURL("suporte/estados/obter"));
+        if (request.data) {
+            request.data.result.forEach((item, index) => {
+                this.locadalidade.estados.push({ id: item.id, value: item.uf, label: item.label });
+            });
+        }
+        return this.locadalidade.estados;
+    }
 
 
+    async ObterIdEstado(nome){
+        var id = 0;
+        const request = await axios.get(this.api.BuildURL("suporte/estado/obter/id/"+nome));
+        if (request.data)
+            id = request.data.result.id;
+        return id;
+    }
 
 
+    /*
     async ObterCidades(idEstado) {
 
 
@@ -49,34 +80,65 @@ export default class DataHelper {
 
         const request = await axios.get(url);
         return request.data ? request.data.result : result;
-        
-        /*
-	    var res = await axios.get(url).then((request) => {
-                //c(request.data)
-                if (request.data) {
-                    if (request.data.status.success)
-                        return request.data.result;
-                    else{
-                        this.tools.HandleFails(request.data)
-                        return null;
-                    }
-                }else
-                    return null;
-		}).catch((error) => {
-            this.tools.HandleErrors(error);
-		}).finally(() => {});
-        */
+
        
     }
 
-
+*/
     
+
+    async ObterCidades(idEstado){
+        this.locadalidade.cidades = [];
+        var url = this.api.BuildURL("suporte/cidades/obter") + "/" + idEstado;
+        const request = await axios.get(url);
+        if (request.data) {
+            request.data.result.forEach((item, index) => {
+                this.locadalidade.cidades.push({ id: item.id, value: item.nome, label: item.label });
+            });
+        }
+        return this.locadalidade.cidades;
+    }
+
+    async ObterIdCidade(idEstado,nome) {
+        var id = 0;
+        const request = await axios.get(this.api.BuildURL("suporte/cidade/obter/id/" + idEstado +"/"+ nome));
+        if (request.data)
+            id = request.data.result.id;
+        return id;
+    }
+  
+
+    /*
     async ObterBairros(idCidade){
         var result = [];
         var url = this.api.BuildURL("suporte/bairros/obter") + "/" + idCidade;
         const request = await axios.get(url);
         return request.data ? request.data.result : result;
     }
+    */
+
+   
+
+    async ObterBairros(idCidade) {
+        this.locadalidade.bairros = [];
+        var url = this.api.BuildURL("suporte/bairros/obter") + "/" + idCidade;
+        const request = await axios.get(url);
+        if (request.data) {
+            request.data.result.forEach((item, index) => {
+                this.locadalidade.bairros.push({ id: item.id, value: item.nome, label: item.label });
+            });
+        }
+        return this.locadalidade.bairros;
+    }
+    async ObterIdBairro(idCidade, nome) {
+        var id = 0;
+        const request = await axios.get(this.api.BuildURL("suporte/bairro/obter/id/" + idCidade + "/" + nome));
+        if (request.data)
+            id = request.data.result.id;
+        return id;
+    }
+
+
 
 
 
@@ -85,7 +147,7 @@ export default class DataHelper {
     async BuscarEndereco(postalCode) {
         postalCode = postalCode.replaceAll("-", "");
         var url = "https://viacep.com.br/ws/" + postalCode + "/json/";
-        c(url)
+        //c(url)
         var res = {
             city: "",
             address: "",

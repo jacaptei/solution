@@ -4,7 +4,7 @@
         <el-button type="primary">Offset top 120px</el-button>
     </el-affix>-->          
 
-   <el-aside id="side-search" :style="showForm? 'width:320px':'width:0px'" >
+   <el-aside id="side-search" :style="showForm? 'width:320px':'width:0px'">
     
 
          <div  style="font-weight:800;z-index:100">
@@ -35,7 +35,7 @@
 								<el-row :gutter="20">
                                         <el-col :md="24">
 								                        <div><p>Estado</p><span></span></div>
-                                                        <el-select filterable v-model="$root.search.estado" class="m-4" placeholder="Selecionar" size="large" style="width:100%" @change="(item)=>{$root.search.DefinirEstado(item);enableFilterButton = true;}">
+                                                        <el-select filterable v-model="$root.search.estado" class="m-4" placeholder="selecionar" size="large" style="width:100%">
                                                                 <el-option
                                                                     v-for="item in $root.search.opcoes.estados"
                                                                     :key="item.id"
@@ -52,33 +52,26 @@
                                                         <div style="height:40px" v-if="$root.search.carregandoCidades">
                                                             <c-loading size="30px" style="padding-left:5px"></c-loading>
                                                         </div>
-                                                        <div v-else-if=" $root.search.opcoes.cidades.length==0">
-                                                            <span style="color:#7d7d7d;padding-left:10px">selecione um estado</span>
-                                                        </div>
-                                                        <el-select v-else v-model="$root.search.cidade" filterable class="m-4" placeholder="qualquer" size="large" style="width:100%" @change="(item)=>{$root.search.DefinirCidade(item);enableFilterButton = true;}">
-                                                            <el-option v-for="item in $root.search.opcoes.cidades"
-                                                                       :key="item.id"
-                                                                       :label="item.label"
-                                                                       :value="item"></el-option>
-                                                        </el-select>
+                                                        <el-input @keyup.enter="RequestSearch()" v-model="$root.search.cidade" placeholder="qualquer" maxlength="200"  ></el-input>
                                         </el-col>
                                 </el-row>
 
 								<el-row :gutter="20">
                                         <el-col :md="24">
-								                        <div><p v-if="$root.search.bairros.length <= 1">Bairro</p><p v-else>Bairros</p><span></span></div>
+								                        <div>
+                                                                <p>
+                                                                    Bairro
+                                                                    <i class="fa fa-info-circle" style="padding-left:10px;cursor:pointer" @click="$tools.Alert('Utilize vírgula para buscar por vários bairros <br>(ex: cidade nova,cachoeirinha).')">
+                                                                        <q-tooltip anchor="top middle" self="bottom middle" :offset="[10, 10]" style="font-size:10pt">
+                                                                            Utilize vírgula para buscar vários (ex: cidade nova,cachoeirinha).
+                                                                        </q-tooltip>
+                                                                    </i>
+                                                                </p>
+                                                        </div>
                                                         <div style="height:40px" v-if="$root.search.carregandoBairros">
                                                             <c-loading size="30px" style="padding-left:5px"></c-loading>
                                                         </div>
-                                                        <div v-else-if=" $root.search.opcoes.bairros.length==0">
-                                                            <span style="color:#7d7d7d;padding-left:10px">selecione um estado</span>
-                                                        </div>
-                                                        <el-select v-else v-model="$root.search.bairros" multiple filterable :clearable="true" class="m-4" placeholder="qualquer" size="large" style="width:100%">
-                                                            <el-option v-for="item in $root.search.opcoes.bairros"
-                                                                       :key="item.id"
-                                                                       :label="item.label"
-                                                                       :value="item"></el-option>
-                                                        </el-select>
+                                                        <el-input @keyup.enter="RequestSearch()" v-model="$root.search.bairro" placeholder="qualquer" maxlength="200"  ></el-input>
                                         </el-col>
                                 </el-row>
 
@@ -191,7 +184,6 @@
                                                 <el-checkbox v-model="$root.search.imovelBusca.imovel.lavabo            " label="Lavabo            "></el-checkbox>
                                                 <el-checkbox v-model="$root.search.imovelBusca.imovel.piscina           " label="Piscina           "></el-checkbox>
                                                 <el-checkbox v-model="$root.search.imovelBusca.imovel.portaoEletronico  " label="Portao eletrônico "></el-checkbox>
-                                                <el-checkbox v-model="$root.search.imovelBusca.imovel.elevador          " label="Elevador          "></el-checkbox>
                                                 <el-checkbox v-model="$root.search.imovelBusca.imovel.salas             " label="Salas             "></el-checkbox>
                                                 <el-checkbox v-model="$root.search.imovelBusca.imovel.salaoFestas       " label="Salão de festas   "></el-checkbox>
                                                 <el-checkbox v-model="$root.search.imovelBusca.imovel.quadraEsportiva   " label="Quadra esportiva  "></el-checkbox>
@@ -204,19 +196,14 @@
                     </div>
 					<el-row :gutter="20" class="search-form">
                             <el-col :md="24" style="margin-top:-20px">
-                                <!--<q-btn flat color="grey" icon="fa fa-cancel" label="limpar filtro"  @click="ClearFilter" style="width:160px"></q-btn>--><br />
-		                        <q-btn label="Aplicar filtro" color="primary" style="width:100%;height:40px" @click="RequestSearch"></q-btn>
-		                        <q-btn label="Limpar filtro" color="secondary" style="width:100%;height:40px;margin-top:10px" @click="ClearFilter"></q-btn>
+                                <q-btn flat color="grey" icon="fa fa-cancel" label="limpar filtro"  @click="ClearFilter" style="width:160px"></q-btn><br />
+		                        <q-btn label="Aplicar filtro" color="secondary" :disable="!enableFilterButton" style="width:100%;height:40px" @click="RequestSearch"></q-btn>
                             </el-col>
                     </el-row>
-                </div>
          
-                    <el-affix position="bottom" :offset="60"  :style="showForm? 'width:280px':'width:0px'">
-                        <q-btn label="Aplicar filtro" color="primary" style="width:100%;height:40px" @click="RequestSearch"></q-btn>
-                    </el-affix>                    
 
+                </div>
         </div>
-
    </el-aside>
 
 </template>
@@ -284,7 +271,8 @@ module.exports = {
            //     this.$root.search.SetUpOptions();
            //}
             this.showForm = this.show;
-            //this.$root.search.opcoes.estados = [{label:"MG - Minas Gerais",value:"MG"}];
+            this.$root.search.opcoes.estados = [{label:"MG - Minas Gerais",value:"MG"}];
+            this.$root.search.estado = this.$root.search.opcoes.estados[0];
 	    },
 	    mounted(){
            // cclear();
@@ -311,8 +299,8 @@ module.exports = {
                 this.$root.search.imovelBusca.imovel.areaMinima     =  this.$validator.is(this.areaMinima    )?  parseInt(this.areaMinima.replace("m² ","").replaceAll(".","")) : 0;
                 this.$root.search.imovelBusca.imovel.areaMaxima     =  this.$validator.is(this.areaMaxima    )?  parseInt(this.areaMaxima.replace("m² ","").replaceAll(".","")) : 0;
 
-                //c2("this.$root.search.imovelBusca.imovel.valorMinim0",this.$root.search.imovelBusca.imovel.valorMinimo);
-                //c2("this.$root.search.imovelBusca.imovel.valorMaxim0",this.$root.search.imovelBusca.imovel.valorMaximo);
+                c2("this.$root.search.imovelBusca.imovel.valorMinim0",this.$root.search.imovelBusca.imovel.valorMinimo);
+                c2("this.$root.search.imovelBusca.imovel.valorMaxim0",this.$root.search.imovelBusca.imovel.valorMaximo);
 
                 if(this.$root.search.imovelBusca.imovel.valorMaximo > 0 && (this.$root.search.imovelBusca.imovel.valorMaximo < this.$root.search.imovelBusca.imovel.valorMinimo)){
                     this.$tools.Alert("<b>Valor Máximo</b> deve ser maior ou igual ao <b>Valor Mínimo</b>")
@@ -349,7 +337,7 @@ module.exports = {
                                   this.$root.search.imovelBusca.imovel.tipo = this.$root.search.tipoImovel.label;  
                     
                             if(this.$validator.is(this.$root.search.estado))
-                                  this.$root.search.imovelBusca.imovel.estado = this.$root.search.estado.uf;  
+                                  this.$root.search.imovelBusca.imovel.estado = this.$root.search.estado.value;  
                     
                             if(this.$validator.is(this.$root.search.cidade))
                                   this.$root.search.imovelBusca.imovel.cidade = this.$root.search.cidade.label;  
@@ -357,7 +345,10 @@ module.exports = {
                             this.$root.search.imovelBusca.imovel.bairros = [];
                             if(this.$root.search.bairros?.length > 0)
                                   this.$root.search.bairros.forEach(item => this.$root.search.imovelBusca.imovel.bairros.push(item.label));  
-                    
+                            else if (this.$validator.is(this.$root.search.bairro))
+                                this.$root.search.imovelBusca.imovel.bairros = this.$root.search.bairro.split(",");
+                                //this.$root.search.imovelBusca.imovel.bairros.push(this.$root.search.bairro);
+
                             this.$root.search.imovelBusca.imovel.finalidade = "Venda";
                              //console.table(this.$root.search.imovelBusca.imovel.bairros);
                         //c(this.$root.search.imovelBusca.imovel);

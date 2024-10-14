@@ -10,13 +10,19 @@
                         class="text-grey"
                         active-color="primary"
                         indicator-color="primary">
-                    <q-tab name="alterar"    icon="fa fa-edit"    label="EDITAR"   ></q-tab>
+                    <q-tab name="visualizar" icon="fa fa-eye"   label="VISUALIZAR"   ></q-tab>
+                    <q-tab name="alterar"    icon="fa fa-edit"  label="ALTERAR" v-if="$root.usuario.gestor || $root.usuario.god " ></q-tab>
+                    <q-btn label="VOLTAR" outline color="primary" @click="$root.RouteTo('/imoveis')" style="margin-left:20px"></q-btn>
                     <!--<q-tab name="imoveis"	icon="fa fa-user-plus"			label="IMÓVEIS"		style="width:115px"></q-tab>-->
                 </q-tabs>
                 <q-tab-panels v-model="view" animated>
 
+                    <q-tab-panel name="visualizar">
+                        <page_visualizar :id="id" />
+                    </q-tab-panel>
+
                     <q-tab-panel name="alterar">
-                        <page_alterar :id="$route.params.id" />
+                        <page_alterar :id="id" />
                     </q-tab-panel>
 
                 </q-tab-panels>
@@ -33,12 +39,13 @@
 		name: 'Imovel',
 
         components: {
-            page_alterar:   LoadComponent("./pages/imovel/Imovel-Alterar.htm")
+            page_visualizar:    LoadComponent("./pages/imovel/Imovel-Visualizar.htm"),
+            page_alterar:       LoadComponent("./pages/imovel/Imovel-Alterar.htm")
         },
 
 		data: function () {
             return {
-                view: "alterar",
+                view: "visualizar",
                 id:0
 			}
 		}, computed: {
@@ -52,10 +59,10 @@
 
 		},
 		created: function () {
-            this.$root.SetTitle("Proprietário", "fa fa-user", null);
+            this.id = this.$route.params.id;
+            this.$root.SetTitle("Imóvel #"+this.id, "fa fa-building", null);
 		},
 		mounted() {
-            this.id = this.$route.params.id;
         },
 		methods: {
 		}
@@ -67,25 +74,6 @@
 
 
 <style scoped>
-    .titler {
-        font-size: 17px;
-        font-family: "hind-regular", "Segoe UI", sans-serif;
-        font-weight: 700;
-        letter-spacing: 1px;
-        margin: 0;
-        color: #FFF;
-        background-color: #0080ff;
-        line-height: 36px;
-        height: 38px;
-        vertical-align: middle;
-        background: rgb(0,90,255);
-        -webkit-box-shadow: 0px 5px 15px 5px rgba(0,44,87,0.29);
-        box-shadow: 0px 5px 10px 2px rgba(0,44,87,0.29);
-        z-index: 1000;
-        /*background: linear-gradient(90deg, rgba(0,90,255,1) 0%, rgba(2,4,118,1) 85%, rgba(0,1,68,1) 100%);*/
-        /*background: linear-gradient(200deg,rgba(0,1,68,1) 0%, rgba(115,85,255,0.8) 0%, rgba(0,1,68,1) 100%);*/
-        background: linear-gradient(292deg,rgba(0,1,68,1) 0%, rgb(69 0 203 / 90%) 0%, rgba(0,1,68,1) 100%);
-    }
 </style>
 
 

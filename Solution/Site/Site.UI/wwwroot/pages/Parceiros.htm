@@ -1,7 +1,5 @@
 ﻿<template>
-
     <div>
-
         <div v-if="manutencao">
             <c-info type="warning" title="Em manutenção" subtitle="voltará em breve"></c-info>
         </div>
@@ -9,28 +7,12 @@
             <page_logado />
         </div>
         <div v-else>
-
-
-            <!--<div>
-    <div class="banner" :style="'background:url('+$root.GetBanner(4)+');background-size:cover;'">
-        <div class="text">
-            Seja um parceiro e
-            <br />aumente suas vendas
-            <br />com benefícios
-            <br />exclusivos.-->
-            <!--<br /><span style="font-size:14px">[Texto resumido sobre os benefícios para parceiros]</span>-->
-            <!--</div>
-        </div>
-    </div>-->
             <div style="cursor:pointer" @click="ScrollTo('planos')">
-                <div class="banner" style="background:url('resources/images/pages/banners/banner_mensalidade.jpg';background-size:cover;"></div>
+                <div class="banner" style="background:url('resources/images/pages/banners/banner_mensalidade.png');background-size:cover;"></div>
             </div>
-
 
             <article class="content-boxes">
                 <br />
-
-
                 <c-box color="grey"
                        image="resources/images/pages/parceiros/qualidade.png"
                        align="right"
@@ -39,7 +21,6 @@
                        btlabel="Seja um parceiro JáCaptei"
                        event="contact"
                        @contact="ScrollTo('planos')"></c-box>
-
 
                 <c-box color="orange"
                        image="resources/images/pages/parceiros/tecnologia.png"
@@ -50,7 +31,6 @@
                        event="contact"
                        @contact="ScrollTo('planos')"></c-box>
 
-
                 <c-box color="navy"
                        image="resources/images/pages/parceiros/estrutura.png"
                        align="right"
@@ -60,18 +40,14 @@
                        event="contact"
                        @contact="ScrollTo('planos')"></c-box>
 
-
-
                 <c-box color="grey"
                        image="resources/images/pages/parceiros/comissao.png"
                        align="left"
                        title="100% da Comissão<br />para Você"
-                       content="Na JáCaptei você fica com <b>100% da comissão</b> assinando nossa plataforma a partir de <b>R$ 387,00 por mês</b>.<br /><span style='color:#888;font-size:16px'>consulte as condições com nossos consultores</span>"
+                       content="Na JáCaptei você fica com <b>100% da comissão</b> assinando nossa plataforma a partir de <b>R$ 449,00 por mês</b>.<br /><span style='color:#888;font-size:16px'>consulte as condições com nossos consultores</span>"
                        btlabel="Seja um parceiro JáCaptei"
                        event="contact"
                        @contact="ScrollTo('planos')"></c-box>
-
-
 
                 <c-box color="orange"
                        image="resources/images/pages/parceiros/beneficios.png"
@@ -81,59 +57,51 @@
                        btlabel="Seja um parceiro JáCaptei"
                        event="contact"
                        @contact="ScrollTo('planos')"></c-box>
-
-
-
             </article>
 
+            <el-row style="padding: 20px" id="planos">
+                <el-col :xs="24" :sm="8" :md="8" :lg="8">
+                    <q-btn label="PLANO PARA CORRETORES"
+                           color="primary"
+                           rounded
+                           @click="SelecionarPlano(2)"
+                           style="width: 100%; max-width: 97%; margin-left: 10px; font-size: 16px; margin-bottom: 20px; padding: 5px ">
+                    </q-btn>
+                    <el-image src="../resources/images/plano_basic.png"
+                              @click="SelecionarPlano(2)"
+                              fit="contain"
+                              style="width: 100%;cursor:pointer;">
+                    </el-image>
+                </el-col>
 
-
-            <div v-if="$root.usuario.idConta < 2" class="q-pa-md row items-start q-gutter-md" id="planos" style="margin-top:40px;text-align:center;width:100%;cursor:pointer;margin: auto; ">
-
-                <div class="row" style="margin:auto; width: 88%">
-                    <div class="col-12">
-                        <div class="row" style="display: flex; flex-wrap: wrap; justify-content: space-between; margin-left: 15px; margin-bottom: 20px ">
-                            <div class="col-4 sm-hide xs-hide" style="width: 32%; margin-left: 20px; max-width: 365px"><q-btn label="PLANO PARA CORRETORES" color="primary" rounded @click="SelecionarPlano(2)" style="width:100%;font-size: 16px;"></q-btn></div>
-                            <div class="col-9 sm-hide xs-hide" style="width: 67%; margin-right: 30px; max-width: 790px "><q-btn label="PLANO PARA IMOBILIÁRIAS" color="secondary" rounded @click="SelecionarPlano(3)" style="width:100%;font-size: 16px;"></q-btn></div>
-                        </div>
-
-                        <div class="row" style="display: flex; flex-wrap: wrap; justify-content: space-around;">
-                            <el-col :span="8" style="display: flex; justify-content: center; margin-bottom: 20px;">
-                                <el-image src="../resources/images/plano_basic.png" @click="SelecionarPlano(2)" fit="contain"
-                                          style="width: 100%; height: 580px;" />
-                            </el-col>
-                            <el-col :span="8" style="display: flex; justify-content: center; margin-bottom: 20px;">
-                                <el-image src="../resources/images/plano_pro.png" @click="SelecionarPlano(3)" fit="contain"
-                                          style="width: 100%; height: 580px;" />
-                            </el-col>
-                            <el-col :span="8" style="display: flex; justify-content: center; margin-bottom: 20px;">
-                                <el-image src="../resources/images/plano_advanced.png" @click="SelecionarPlano(4)" fit="contain"
-                                          style="width: 100%; height: 580px;" />
-                            </el-col>
-                        </div>
-
-                    </div>
-                </div>
-            </div>
-
-
-
-
+                <el-col :xs="24" :sm="16" :md="16" :lg="16">
+                    <q-btn label="PLANO PARA IMOBILIÁRIAS"
+                           color="secondary"
+                           rounded
+                           @click="SelecionarPlano(3)"
+                           style="width: 100%; max-width: 100%; font-size: 16px; margin-right: 20px; margin-left: 5px; margin-bottom: 20px; padding: 5px ">
+                    </q-btn>
+                    <el-col class="plan-images" style="width: 100%; display: flex;">
+                        <el-image src="../resources/images/plano_pro.png"
+                                  @click="SelecionarPlano(3)"
+                                  fit="contain"
+                                  style="width: 100%; margin-right:5px;cursor:pointer">
+                        </el-image>
+                        <el-image src="../resources/images/plano_advanced.png"
+                                  @click="SelecionarPlano(4)"
+                                  fit="contain"
+                                  style="width: 100%;cursor:pointer;">
+                        </el-image>
+                    </el-col>
+                </el-col>
+            </el-row>
 
             <div class="q-pa-md row items-start q-gutter-md" style="margin-top:0px;text-align:center;width:100%;display:block">
                 <c-cadastro-parceiro></c-cadastro-parceiro>
             </div>
-
-
-
         </div>
-
-
     </div>
-
-
 </template>
-
 
 <script>
     module.exports = {
@@ -236,6 +204,12 @@
     .img-responsive {
         max-width: 100%;
         height: auto;
+    }
+
+    @media (max-width: 768px) {
+        .plan-images {
+            flex-direction: column;
+        }
     }
 </style>
 

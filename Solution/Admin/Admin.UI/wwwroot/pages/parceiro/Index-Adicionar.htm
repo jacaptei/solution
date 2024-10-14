@@ -1,186 +1,268 @@
 ﻿<template>
+    <div v-loading.fullscreen.lock="fullscreenLoading"
+         element-loading-background="rgba(12, 8, 8, 0.56)">
+        <el-row :gutter="20">
+            <el-col :xs="24" :sm="24" :md="24" :lg="8" class="register-input">
+                <div>NOVO CADASTRO?</div>
+                <el-select filterable v-model="cadastroConta" style="width: 100%" placeholder="SELECIONAR">
+                    <el-option v-for="item in [
+                                    {label: 'SIM',  value: true },
+                                    {label: 'NÃO',  value: false },
+                                    ]"
+                               :key="item.value"
+                               :label="item.label"
+                               :value="item.value"
+                               @click="ObterContasAtivas">
+                    </el-option>
+                </el-select>
+            </el-col>
+            
+            <el-col v-if="cadastroConta" :xs="24" :sm="24" :md="24" :lg="16" class="register-input">
+                <div>SELECIONE O PLANO</div>
+                <el-select filterable v-model="parceiro.idPlano" style="width: 100%" placeholder="SELECIONAR">
+                    <el-option v-for="item in [
+                                    {label: 'BASIC',  value: 2 },
+                                    {label: 'PRO',  value: 3 },
+                                    {label: 'ADVANCED',  value: 4 }
+                                    ]"
+                               :key="item.value"
+                               :label="item.label"
+                               :value="item.value">
+                    </el-option>
+                </el-select>
+            </el-col>
+            
+            <el-col v-if="!cadastroConta" :xs="24" :sm="24" :md="24" :lg="16" class="register-input">
+                <div>SELECIONE A CONTA PARA VINCULAR O PARCEIRO</div>
+                <el-select @change ="SetContaAndToken" filterable v-model="contaSelecionada" style="width: 100%" placeholder="SELECIONAR">
+                    <el-option v-for="item in contasAtivas"
+                               :key="item.value"
+                               :label="item.label"
+                               :value="item">
+                    </el-option>
+                </el-select>
+            </el-col>
 
+            <el-col :xs="24" :sm="12" :md="8" :lg="8" class="register-input">
+                <div>TIPO DE PESSOA<span></span></div>
+                <q-btn-toggle v-model="parceiro.tipoPessoa"
+                              maxlength="80"
+                              toggle-color="primary"
+                              :options="[
+                                      {label: 'Pessoa Física (PF)',   value: 'PF'},
+                                      {label: 'Pessoa Juridica (PJ)', value: 'PJ'}
+                                  ]"
+                              @click="MudarTipoPessoa">
+                </q-btn-toggle>
+            </el-col>
 
+            <el-col :xs="24" :sm="12" :md="8" :lg="8" class="register-input" v-if="parceiro.tipoPessoa == 'PF'">
+                <div>CPF<span></span></div>
+                <el-input @keyup.enter="Send()" v-model="parceiro.cpf" maxlength="22" v-maska data-maska="###.###.###-##" @blur="CheckDoc" ref="documento"></el-input>
+            </el-col>
 
-    <div>
+            <el-col :xs="24" :sm="12" :md="8" :lg="8" class="register-input" v-else>
+                <div>CNPJ<span></span></div>
+                <el-input @keyup.enter="Send()" v-model="parceiro.cnpj" maxlength="22" v-maska data-maska="##.###.###/####-##" @blur="CheckDoc" ref="documento"></el-input>
+            </el-col>
 
-        <el-row v-if="view == 'sending' ">
-            <el-col :md="24" style="max-width:360px">
-                <c-loading></c-loading>
+            <el-col :xs="24" :sm="12" :md="8" :lg="8" class="register-input" v-if="parceiro.tipoPessoa == 'PJ'">
+                <div>RAZÃO SOCIAL <span></span></div>
+                <el-input @keyup.enter="Send()" v-model="parceiro.razao" placeholder="" maxlength="80" input-style="text-transform:uppercase;"></el-input>
+            </el-col>
+
+            <el-col :xs="24" :sm="12" :md="8" :lg="8" class="register-input">
+                <div>
+                    <span></span><span></span>
+                    <div v-if="parceiro.tipoPessoa == 'PF'">NOME COMPLETO</div><div v-else>NOME FANTASIA &nbsp;&nbsp;<span style="padding-left:10px;color:var(--s-accent-color);cursor:pointer" @click="()=>{parceiro.nome = parceiro.razao}"><i class="fa fa-copy" style="color:var(--s-accent-color)"></i> copiar razão</span></div>
+                </div>
+                <el-input @keyup.enter="Send()" v-model="parceiro.nome" placeholder="" maxlength="80" input-style="text-transform:uppercase;"></el-input>
+            </el-col>
+
+            <el-col :xs="24" :sm="12" :md="8" :lg="8" class="register-input" v-if="parceiro.tipoPessoa == 'PJ'">
+                <div>NOME DO RESPONSÁVEL <span></span></div>
+                <el-input @keyup.enter="Send()" v-model="parceiro.responsavel" placeholder="" maxlength="80" input-style="text-transform:uppercase;"></el-input>
+            </el-col>
+
+            <el-col :xs="24" :sm="12" :md="8" :lg="8" class="register-input">
+                <div>E-MAIL <span></span></div>
+                <el-input @keyup.enter="Send()" v-model="parceiro.email" placeholder="" maxlength="80" input-style="text-transform:lowercase;"></el-input>
+            </el-col>
+
+            <el-col :xs="24" :sm="12" :md="8" :lg="8" class="register-input">
+                <div>TELEFONE <span></span></div>
+                <el-input @keyup.enter="Send()" v-model="parceiro.telefone" placeholder="(11) 11111-1111" maxlength="40" input-style="text-transform:lowercase;" v-maska data-maska="(##) #####-#### ********************"></el-input>
+            </el-col>
+
+            <el-col :xs="24" :sm="12" :md="8" :lg="8" class="register-input" v-if="parceiro.tipoPessoa == 'PF'">
+                <div>DATA DE NASCIMENTO<span></span></div>
+                <div class="birthdate-container">
+                    <el-col :xs="24" :sm="24" :md="8" :lg="7" class="birthdate-select">
+                        <el-select style="width:100%" @change="()=>{ if(!ChecarDataNascimento()){ $tools.Alert('<b>DATA DE NASCIMENTO</b> inválida'); }}" v-model="DiaNascimento" filterable placeholder="DIA" size="medium">
+                            <el-option v-for="item in this.$sdata.opcoes.days" :key="item.value" :label="item.label" :value="item.value" class="birthdate-option">
+                            </el-option>
+                        </el-select>
+                    </el-col>
+
+                    <el-col :xs="24" :sm="24" :md="8" :lg="10" class="birthdate-select">
+                        <el-select style="width:100%" @change="()=>{ if(!ChecarDataNascimento()){ $tools.Alert('<b>DATA DE NASCIMENTO</b> inválida'); } }" v-model="MesNascimento" filterable placeholder="MÊS" size="medium">
+                            <el-option v-for="item in this.$sdata.opcoes.months" :key="item.value" :label="item.label" :value="item.value" class="birthdate-option">
+                            </el-option>
+                        </el-select>
+                    </el-col>
+
+                    <el-col :xs="24" :sm="24" :md="8" :lg="7" class="birthdate-select">
+                        <el-select style="width:100%" @change="()=>{ if(!ChecarDataNascimento()){ $tools.Alert('<b>DATA DE NASCIMENTO</b> inválida'); } }" v-model="AnoNascimento" filterable placeholder="ANO" size="medium">
+                            <el-option v-for="item in this.$sdata.opcoes.years" :key="item.value" :label="item.label" :value="item.value" class="birthdate-option">
+                            </el-option>
+                        </el-select>
+                    </el-col>
+                </div>
+            </el-col>
+
+            <el-col :xs="24" :sm="12" :md="8" :lg="8" class="register-input" v-if="parceiro.tipoPessoa == 'PF'">
+                <div>SEXO <span></span></div>
+
+                <el-select filterable v-model="parceiro.sexo" class="m-4" placeholder="Selecionar" size="large" style="width:100%">
+                    <el-option v-for="item in opcoes.sexos"
+                               :key="item.id"
+                               :label="item.label"
+                               :value="item.value"></el-option>
+                </el-select>
+            </el-col>
+
+            <el-col :xs="24" :sm="12" :md="8" :lg="8" class="register-input">
+                <div>
+                    <span></span><span></span>
+                    <div v-if="parceiro.tipoPessoa == 'PF'">CRECI</div><div v-else>CRECI PJ</div>
+                </div>
+                <el-input @keyup.enter="Send()" v-model="parceiro.creci" style="width: 100%" placeholder="" maxlength="22"></el-input>
+            </el-col>
+
+            <el-col :xs="24" :sm="12" :md="8" :lg="8" class="register-input">
+                <div><p>CRECI - ESTADO</p><span></span></div>
+                <div style="height:40px" v-if="carregandoEstadosCreci">
+                    <c-loading size="30px" style="padding-left:5px"></c-loading>
+                </div>
+                <el-select v-else filterable v-model="parceiro.creciEstado" class="m-4" placeholder="Selecionar" size="large" style="width:100%" @change="(item)=>{enableFilterButton = true;}">
+                    <el-option v-for="item in opcoes.estadosCreci"
+                               :key="item.id"
+                               :label="item.label"
+                               :value="item.uf"></el-option>
+                </el-select>
             </el-col>
         </el-row>
 
+        <el-row :gutter="20">
+            <el-col :xs="24" :sm="12" :md="8" :lg="8" class="register-input">
+                <div><p>CEP</p><span></span></div>
+                <el-input v-model="this.cep.numero" placeholder="" ref="postalCode" v-maska data-maska="#####-###" @keyup="()=>{  if(cep.numero.length>=9){BuscarEndereco();} }">
+                    <template #append>
+                        <c-loading size="20px" v-if="carregandoCEP"></c-loading>
+                        <i class="fa fa-search" v-else-if="(cep.numero.length < 9)" style="color:var(--s-accent-color)" @click="$tools.Alert('Preencha todo o CEP para poder realizar a busca.')"></i>
+                        <i class="fa fa-search" v-else style="color:var(--s-accent-color);cursor:pointer" @click="BuscarEndereco"></i>
+                    </template>
+                </el-input>
+            </el-col>
 
-        <div v-else>
-
-                <div v-if="view == 'form' ">
-                    <div>
-                        <el-col :md="24">
-
-                            <el-row :gutter="20">
-
-                                <el-col :xs="24" :sm="12" :md="8" :lg="6" class="s-input">
-                                    <div>NOME<span></span></div>
-                                    <el-input @keyup.enter="Enviar()" v-model="proprietario.nome" placeholder="" maxlength="120" ref="nome" input-style="text-transform:uppercase;"></el-input>
-                                </el-col>
-                                <el-col :xs="24" :sm="12" :md="8" :lg="6" class="s-input">
-                                    <div>E-MAIL <span></span></div>
-                                    <el-input @keyup.enter="Enviar()" v-model="proprietario.email" placeholder="" maxlength="80" input-style="text-transform:lowercase;"></el-input>
-                                </el-col>
-                                <el-col :xs="24" :sm="12" :md="8" :lg="6" class="s-input">
-                                    <div>TELEFONE <span></span></div>
-                                    <el-input @keyup.enter="Enviar()" v-model="proprietario.telefone" placeholder="(11) 11111-1111" maxlength="40" input-style="text-transform:lowercase;" v-maska data-maska="(##) #####-#### ********************"></el-input>
-                                </el-col>
-                                <el-col :xs="24" :sm="12" :md="8" :lg="6" class="s-input">
-                                    <div>SEXO <span></span></div>
-
-                                    <el-select filterable v-model="proprietario.sexo" class="m-4" placeholder="Selecionar" size="large" style="width:100%">
-                                        <el-option v-for="item in opcoes.sexos"
-                                                   :key="item.id"
-                                                   :label="item.label"
-                                                   :value="item.value"></el-option>
-                                    </el-select>
-                                </el-col>
-                                <el-col :xs="24" :sm="12" :md="8" :lg="6" class="s-input">
-                                    <div>CPF<span></span></div>
-                                    <el-input @keyup.enter="Enviar()" v-model="proprietario.cpf" maxlength="22" v-maska data-maska="###.###.###-##" @blur="CheckDoc"></el-input>
-                                </el-col>
-                                <el-col :xs="24" :sm="12" :md="8" :lg="6" class="s-input-optional">
-                                    <div>RG<span></span></div>
-                                    <el-input @keyup.enter="Enviar()" v-model="proprietario.rg" maxlength="22" ref="documento"></el-input>
-                                </el-col>
-
-                                <el-col :xs="24" :sm="12" :md="8" :lg="6" class="s-input-optional">
-                                    <div><p>CEP</p><span></span></div>
-                                    <el-input v-model="cep.numero" placeholder="" ref="postalCode" v-maska data-maska="#####-###" @keyup="()=>{  if(cep.numero.length>=9){BuscarEndereco();} }">
-                                        <template #append>
-                                            <c-loading size="20px" v-if="carregandoCEP"></c-loading>
-                                            <i class="fa fa-search" v-else-if="(cep.numero.length < 9)" style="color:var(--s-accent-color)" @click="$tools.Alert('Preencha todo o CEP para poder realizar a busca.')"></i>
-                                            <i class="fa fa-search" v-else style="color:var(--s-accent-color);cursor:pointer" @click="BuscarEndereco"></i>
-                                        </template>
-                                    </el-input>
-                                </el-col>
-
-                                <el-col :xs="24" :sm="12" :md="8" :lg="6" class="s-input">
-                                    <div><p>ESTADO</p><span></span></div>
-                                    <div style="height:40px" v-if="carregandoEstados">
-                                        <c-loading size="30px" style="padding-left:5px"></c-loading>
-                                    </div>
-                                    <el-select v-else filterable v-model="proprietario.estado" class="m-4" placeholder="Selecionar" size="large" style="width:100%" @change="(item)=>{ObterCidades(item);enableFilterButton = true;}">
-                                        <el-option v-for="item in opcoes.estados"
-                                                   :key="item.id"
-                                                   :label="item.label"
-                                                   :value="item.value"></el-option>
-                                    </el-select>
-                                </el-col>
-                                <el-col :xs="24" :sm="12" :md="8" :lg="6" class="s-input">
-                                    <div><p>CIDADE</p><span></span></div>
-                                    <div style="height:40px" v-if="carregandoCidades">
-                                        <c-loading size="30px" style="padding-left:5px"></c-loading>
-                                    </div>
-                                    <el-select v-else v-model="proprietario.cidade" filterable class="m-4" placeholder="Selecionar" size="large" style="width:100%" @click="()=>{ if($validator.not(proprietario.estado)){ $tools.Alert('Selecione um <b>Estado</b> antes');} }" @change="(item)=>{ObterBairros(item);enableFilterButton = true;}">
-                                        <el-option v-for="item in opcoes.cidades"
-                                                   :key="item.id"
-                                                   :label="item.label"
-                                                   :value="item.value"></el-option>
-                                    </el-select>
-                                </el-col>
-                                <el-col :xs="24" :sm="12" :md="8" :lg="6" class="s-input">
-                                    <div><p>BAIRRO</p><span></span></div>
-                                    <div style="height:40px" v-if="carregandoBairros">
-                                        <c-loading size="30px" style="padding-left:5px"></c-loading>
-                                    </div>
-                                    <el-select v-else v-model="proprietario.bairro" filterable :clearable="true" class="m-4" placeholder="Selecionar" size="large" style="width:100%;" @click="()=>{ if($validator.not(proprietario.estado)){ $tools.Alert('Selecione <b>Estado</b> e <b>Cidade</b> antes');} }" @change="(item)=>{DefinirBairro(item);enableFilterButton = true;}">
-                                        <el-option v-for="item in opcoes.bairros"
-                                                   :key="item.id"
-                                                   :label="item.label"
-                                                   :value="item.value"></el-option>
-                                    </el-select>
-                                </el-col>
-
-
-                                <el-col :xs="24" :sm="12" :md="8" :lg="6" class="s-input">
-                                    <div>LOGRADOURO <span>&nbsp;rua, avenida, praça, etc</span></div>
-                                    <el-input @keyup.enter="Enviar()" v-model="proprietario.logradouro" placeholder="" maxlength="80" input-style="text-transform:uppercase;"></el-input>
-                                </el-col>
-                                <el-col :xs="24" :sm="12" :md="8" :lg="6" class="s-input">
-                                    <div>NÚMERO <span>&nbsp;&nbsp;informe <b>SN</b> se não houver</span></div>
-                                    <el-input @keyup.enter="Enviar()" v-model="proprietario.numero" placeholder="" maxlength="80" input-style="text-transform:uppercase;" ref="addressnumber"></el-input>
-                                </el-col>
-
-                                <el-col :xs="24" :sm="12" :md="8" :lg="6" class="s-input-optional">
-                                    <div>COMPLEMENTO <span></span></div>
-                                    <el-input @keyup.enter="Enviar()" v-model="proprietario.complemento" placeholder="" maxlength="80" input-style="text-transform:uppercase;"></el-input>
-                                </el-col>
-
-                                <el-col :xs="24" :sm="12" :md="8" :lg="6" class="s-input-optional">
-                                    <div>OBSERVAÇÕES <span></span></div>
-                                    <el-input @keyup.enter="Enviar()" v-model="proprietario.obs" placeholder="" maxlength="200" input-style="text-transform:lowercase;"></el-input>
-                                </el-col>
-
-                            </el-row>
-
-                            <el-row :gutter="20" style="margin-top:10px">
-                                <el-col :md="12" class="s-input-optional">
-                                    <q-btn label="Adicionar" color="primary" @click="Enviar()" :loading="onrequest"></q-btn><br /><br />
-                                    <!--<q-btn label="VOLTAR" outline color="primary" @click="$emit('voltar')"></q-btn>-->
-                                </el-col>
-                                <el-col :md="12" class="s-input">
-                                    <div><i class="fa fa-square"></i> campos necessários</div>
-                                </el-col>
-                            </el-row>
-
-
-
-                        </el-col>
-
-                    </div>
-
-
+            <el-col :xs="24" :sm="12" :md="8" :lg="8" class="register-input">
+                <div><p>ESTADO</p><span></span></div>
+                <div style="height:40px" v-if="carregandoEstados">
+                    <c-loading size="30px" style="padding-left:5px"></c-loading>
                 </div>
+                <el-select v-else filterable v-model="this.parceiro.estado" class="m-4" placeholder="Selecionar" size="large" style="width:100%" @change="(item)=>{ObterCidades(item);enableFilterButton = true;}">
+                    <el-option v-for="item in opcoes.estados"
+                               :key="item.id"
+                               :label="item.label"
+                               :value="item.value">
+                    </el-option>
+                </el-select>
+            </el-col>
 
-
-                <div v-if="view=='success'">
-                    <div style="max-width:360px;text-align:center">
-                        <c-info type="success" title="Sucesso" subtitle="Cadastro efetuado"></c-info>
-                        <q-btn label="Cadastrar outro" color="primary" style="width:240px;" @click="NovoCadastro"></q-btn>
-                    </div>
+            <el-col :xs="24" :sm="12" :md="8" :lg="8" class="register-input">
+                <div><p>CIDADE</p><span></span></div>
+                <div style="height:40px" v-if="carregandoCidades">
+                    <c-loading size="30px" style="padding-left:5px"></c-loading>
                 </div>
+                <el-select v-else v-model="this.parceiro.cidade" filterable class="m-4" placeholder="Selecionar" size="large" style="width:100%" @click="()=>{ if($validator.not(this.parceiro.estado)){ $tools.Alert('Selecione um <b>Estado</b> antes');} }" @change="(item)=>{ObterBairros(item);enableFilterButton = true;}">
+                    <el-option v-for="item in opcoes.cidades"
+                               :key="item.id"
+                               :label="item.label"
+                               :value="item.value"></el-option>
+                </el-select>
+            </el-col>
+        </el-row>
 
-                <div v-if="view=='fail'">
-                    <div class="title" style="color:var(--s-color-red)"><b><i class="fa fa-circle-xmark"></i> Falhou</b></div>
-                    <br /><br />
-                    <br /><span v-html="messageFail"></span>
-                    <br /><br />
-                    <q-btn color="white" text-color="indigo-10" label="VOLTAR" @click="ShowView(viewLast)" style="width:160px;" id="btn_voltar_5"></q-btn>
+        <el-row :gutter="20">
+            <el-col :xs="24" :sm="12" :md="8" :lg="8" class="register-input">
+                <div><p>BAIRRO</p><span></span></div>
+                <div style="height:40px" v-if="carregandoBairros">
+                    <c-loading size="30px" style="padding-left:5px"></c-loading>
                 </div>
+                <el-select v-else v-model="this.parceiro.bairro" filterable :clearable="true" class="m-4" placeholder="Selecionar" size="large" style="width:100%;" @click="()=>{ if($validator.not(this.parceiro.estado && this.parceiro.cidade)){ $tools.Alert('Selecione <b>Estado</b> e <b>Cidade</b> antes');} }" @change="(item)=>{DefinirBairro(item);enableFilterButton = true;}">
+                    <el-option v-for="item in opcoes.bairros"
+                               :key="item.id"
+                               :label="item.label"
+                               :value="item.value"></el-option>
+                </el-select>
+            </el-col>
 
+            <el-col :xs="24" :sm="12" :md="8" :lg="8" class="register-input">
+                <div>LOGRADOURO<span style="color:#808080">&nbsp;rua, avenida, praça, etc</span></div>
+                <el-input @keyup.enter="Enviar()" v-model="this.parceiro.logradouro" placeholder="" maxlength="80" input-style="text-transform:uppercase;"></el-input>
+            </el-col>
 
+            <el-col :xs="24" :sm="12" :md="8" :lg="8" class="register-input">
+                <div>NÚMERO<span style="color:#808080">&nbsp;informe <b>SN</b> se não houver</span></div>
+                <el-input @keyup.enter="Enviar()" v-model="this.parceiro.numero" placeholder="" maxlength="80" input-style="text-transform:uppercase;" ref="addressnumber"></el-input>
+            </el-col>
+        </el-row>
 
+        <el-row :gutter="20">
+            <el-col :xs="24" :sm="12" :md="8" :lg="8" class="register-input">
+                <div>COMPLEMENTO<span></span></div>
+                <el-input @keyup.enter="Enviar()" v-model="opcoes.complemento" placeholder="" maxlength="80" input-style="text-transform:uppercase;"></el-input>
+            </el-col>
 
+            <el-col :xs="24" :sm="12" :md="8" :lg="8" class="register-input" v-if="parceiro.idTipo != 2">
+                <div>SENHA <span style="color:#808080">&nbsp;pelo menos 4 caracteres</span></div>
+                <el-input @keyup.enter="Send()" v-model="parceiro.senha" type="password" placeholder="" maxlength="20" show-password></el-input>
+            </el-col>
 
-            </div>
+            <el-col :xs="24" :sm="12" :md="8" :lg="8" class="register-input" v-if="parceiro.idTipo != 2">
+                <div>CONFIRMAR SENHA <span style="color:#808080">&nbsp;repetir senha</span></div>
+                <el-input @keyup.enter="Send()" v-model="senhaConfirma" type="password" placeholder="" maxlength="20" show-password></el-input>
+            </el-col>
+        </el-row>
 
+        <el-row :gutter="20" style="margin-top:10px">
+            <el-col :md="12" class="s-input-optional">
+                <q-btn label="Adicionar" color="primary" @click="SalvarCadastro()" :loading="onrequest"></q-btn><br /><br />
+                <!--<q-btn label="VOLTAR" outline color="primary" @click="$emit('voltar')"></q-btn>-->
+            </el-col>
+            <el-col :md="12" class="s-input">
+                <div><i class="fa fa-square"></i> campos necessários</div>
+            </el-col>
+        </el-row>
     </div>
-
-
-
-
 </template>
 
 <script>
     module.exports = {
-        components: {
 
-        },
+        name: 'JCAdminProprietarioAdicionar',
+        components: {},
 
         data: function () {
             return {
-                onrequest: false,
+                onRequest: false,
+                fullscreenLoading: false,
                 view: "form",
+                viewLast: "form",
                 messageSuccess: "Cadastrado!",
                 messageAlert: "",
-                messageFail: "Não foi possível cadastrar, favor tentar novamente.",
+                contaNova: true,
+                messageFail: "Não foi possível autenticar, favor tentar novamente.",
                 content: "",
                 DiaNascimento: 0,
                 MesNascimento: 0,
@@ -190,6 +272,16 @@
                 carregandoEstados: false,
                 carregandoCidades: false,
                 carregandoBairros: false,
+                carregandoEstadosCreci: false,
+                carregandoCidadesCreci: false,
+                contaSelecionada: [],
+                contasAtivas: [],
+                cadastroConta: true,
+                aceitouTermos: true,
+                aceitouPoliticaPrivacidade: true,
+                estadoSelecionado: {},
+                cidadeSelecionada: {},
+                bairroSelecionado: {},
                 cep: {
                     numero: "",
                     estado: "",
@@ -197,164 +289,137 @@
                     logradouro: ""
                 },
                 opcoes: {
-                    estados: [],
                     cidades: [],
+                    estados: this.$root.localidade.estados,
+                    estadosCreci: this.$root.localidade.estados,
+                    cidadesCreci: [],
                     bairros: [],
-                    sexos: [],
+                    sexos: [{ id: 1, label: "NÃO APLICÁVEL", value: "NA" }, { id: 2, label: "MASCULINO", value: "MASCULINO" }, { id: 3, label: "FEMININO", value: "FEMININO" }],
                 },
-                proprietario: this.$models.usuario()
+                parceiro: {
+                    tipoPessoa: 'PF',
+                }
             }
-        }, computed: {
-
         },
 
+        computed: {},
         props: {},
         watch: {
         },
         created: function () {
-            //this.opcoes.estados = this.$sdata.forms.states;
+            this.proprietario = this.$models.usuario();
             this.opcoes.sexos = this.$sdata.opcoes.sexos;
             this.$sdata.ObterEstados().then(res => { this.opcoes.estados = res; });
-
         },
         mounted() {
-            window.setTimeout(() => this.$refs.nome.focus(), 500);
+            var count = 0;
+            this.parceiro.idTipo = parseInt(this.idtipo);
+            this.parceiro.tipo = this.tipo;
+            window.setTimeout(() => { this.parceiro.idPlano = 2 }, 1000);
         },
         methods: {
+            MudarTipoPessoa() {
+                if (this.parceiro.tipoPessoa == "PF")
+                    this.parceiro.cnpj = "";
+                else
+                    this.parceiro.cpf = "";
 
-
-
-            ShowView(v) {
-                this.view = v;
+                window.setTimeout(() => this.$refs.documento.focus(), 300);
             },
 
-
-           async Enviar() {
-
-                this.proprietario.idTipo = 5;
-
-                var msg = "";
-
-                if (this.$validator.not(this.proprietario.cpf))
-                    msg += "<b>CPF</b> não informado<br>";
-                else if (!this.$validator.IsCPF(this.proprietario.cpf))
-                    msg += "<b>CPF</b> inválido<br>";
-                if (this.$validator.not(this.proprietario.nome))
-                    msg += "<b>NOME</b> não informado<br>";
-
-
-
-                if (this.$validator.not(this.proprietario.email))
-                    msg += "<b>E-MAIL</b> não informado<br>";
-                else if (!this.$validator.IsEmail(this.proprietario.email))
-                    msg += "<b>E-MAIL</b> inválido<br>";
-
-                if (this.$validator.not(this.proprietario.telefone))
-                    msg += "<b>TELEFONE</b> não informado<br>";
-                else if (this.proprietario.telefone.length < 14)
-                    msg += "<b>TELEFONE</b> inválido<br>";
-
-
-                if (this.$validator.not(this.proprietario.estado))
-                    msg += "<b>ESTADO</b> não selecionado<br>";
-
-                if (this.$validator.not(this.proprietario.cidade))
-                    msg += "<b>CIDADE</b> não selecionada<br>";
-
-                if (this.$validator.not(this.proprietario.bairro))
-                    msg += "<b>BAIRRO</b> não selecionado<br>";
-
-                if (this.$validator.not(this.proprietario.logradouro))
-                    msg += "<b>LOGRADOURO</b> não informado<br>";
-
-                if (this.$validator.not(this.proprietario.numero))
-                    msg += "<b>NÚMERO</b> não informado (informe <b>SN</b> se não houver)<br>";
-
-
-                if (msg.length > 0)
-                    this.$tools.Alert(msg);
-                else{
-
-                    this.proprietario.AnoNascimento = this.AnoNascimento;
-                    this.proprietario.MesNascimento = this.MesNascimento;
-                    this.proprietario.DiaNascimento = this.DiaNascimento;
-
-                    this.onrequest = true;
-
-                    if (this.$validator.not(this.proprietario.cep))
-                        this.cep.numero = this.proprietario.cep = await this.BuscarCep();
-
-                    var request = await this.$api.Post("proprietario/adicionar", this.proprietario);
-
-                    this.onrequest = false;
-                    if (this.$validator.is(request?.status?.success)){
-                        this.$tools.AlertSuccess("Cadastro efetuado");
-                        this.proprietario = this.$models.usuario();
-                    }
-                    //else
-                    //    this.$tools.AlertSuccess("Não foi possível realizar o cadastro.");
-
-                }
+            OpenLoadingService(status) {
+                this.fullscreenLoading = status;
             },
 
-
-
-
+            MudarConta() {
+                this.parceiro.tokenConta = "";
+                if (!this.contaNova)
+                    window.setTimeout(() => this.$refs.token.focus(), 300);
+            },
 
             CheckDoc() {
                 window.setTimeout(() => {
-                        if (this.$validator.is(this.proprietario.cpf) && !this.$validator.IsCPF(this.proprietario.cpf))
+                    if (this.parceiro.tipoPessoa == "PF") {
+                        if (this.$validator.is(this.parceiro.cpf) && !this.$validator.IsCPF(this.parceiro.cpf))
                             this.$tools.Alert("CPF inválido");
+                    }
+                    else {
+                        if (this.$validator.is(this.parceiro.cnpj) && !this.$validator.IsCNPJ(this.parceiro.cnpj))
+                            this.$tools.Alert("CNPJ inválido");
+                    }
                 }, 500);
             },
 
-
             async BuscarEndereco() {
 
-                if (this.cep.numero !== this.proprietario.cep) {
+                if (this.cep.numero !== this.parceiro.cep) {
 
-                    this.carregandoCEP      = true;
-                    this.carregandoEstados  = true;
-                    this.carregandoCidades  = true;
-                    this.carregandoBairros  = true;
+                    this.carregandoCEP = true;
+                    this.carregandoEstados = true;
+                    this.carregandoCidades = true;
+                    this.carregandoBairros = true;
 
-                    this.cep.cidade         = this.proprietario.cidade     = "";
-                    this.cep.logradouro     = this.proprietario.logradouro = "";
-                    this.cep.bairro         = this.proprietario.bairro     = "";
-                    this.cep.estado         = this.proprietario.estado     = "";
+                    this.cep.cidade = this.parceiro.cidade = "";
+                    this.cep.bairro = this.parceiro.bairro = "";
+                    this.cep.estado = this.parceiro.estado = "";
+                    this.cep.logradouro = this.parceiro.logradouro = "";
 
-                    this.proprietario.cep  = this.cep.numero;
-                    let res                = await this.$sdata.BuscarEndereco(this.cep.numero);
+                    this.parceiro.cep = this.cep.numero;
+                    let res = await this.$sdata.BuscarEndereco(this.cep.numero);
 
                     if (this.$validator.is(res?.city)) {
-                        this.cep.cidade         = this.proprietario.cidade     = res.city;
-                        this.cep.logradouro     = this.proprietario.logradouro = res.address;
-                        this.cep.bairro         = this.proprietario.bairro     = res.neighborhood;
-                        this.cep.estado         = this.proprietario.estado     = res.state;
-
+                        this.cep.cidade = this.parceiro.cidade = res.city;
+                        this.cep.logradouro = this.parceiro.logradouro = res.address;
+                        this.cep.bairro = this.parceiro.bairro = res.neighborhood;
+                        this.cep.estado = this.parceiro.estado = res.state;
                         this.$refs.addressnumber.focus();
-
                     }
-
-                    this.carregandoCEP      = false;
-                    this.carregandoEstados  = false;
-                    this.carregandoCidades  = false;
-                    this.carregandoBairros  = false;
+                    this.carregandoCEP = false;
+                    this.carregandoEstados = false;
+                    this.carregandoCidades = false;
+                    this.carregandoBairros = false;
                 }
             },
 
             async BuscarCep() {
-                var endereco = this.proprietario.estado + "/" + this.proprietario.cidade.replaceAll(" ", "%20") + "/" + this.proprietario.logradouro.replaceAll(" ", "%20")
+                var endereco = this.parceiro.estado + "/" + this.parceiro.cidade.replaceAll(" ", "%20") + "/" + this.parceiro.logradouro.replaceAll(" ", "%20")
                 let res = await this.$sdata.BuscarCep(endereco);
                 return res.cep;
             },
 
-            
+            async ObterContasAtivas() {
+                this.fullscreenLoading = true;
+                try {
+                    const url = this.$api.BuildURL("parceiro/obtercontasativas");
+                    const { data } = await axios.post(url); 
+                    if (data.result) {
+                        const contas = data.result.map(item => ({
+                            id: item.id,
+                            value: item,
+                            label: item.nome
+                        }));
+                        this.contasAtivas = contas;
+                    } else {
+                        this.contasAtivas = [];
+                    }
+                } catch (error) {
+                    ce("Não foi possível obter os clientes.");
+                    if (error.response) ce(error.response);
+                    console.error(error);
+                } finally {
+                    this.fullscreenLoading = false;
+                }
+            },
+
+            SetContaAndToken() {
+                this.parceiro.tokenConta = this.contaSelecionada.value.token;
+                this.parceiro.idConta = this.contaSelecionada.value.id;
+            },
 
             ObterCidades(estado) {
 
-                this.proprietario.cidade   =   this.proprietario.bairro   = "";
-                this.proprietario.idCidade =   this.proprietario.idBairro = 0;
+                this.parceiro.logradouro = this.parceiro.bairro = this.parceiro.cidade = "";
+                this.cidadeSelecionada = this.bairroSelecionado = {};
 
                 this.carregandoCidades = true;
                 this.opcoes.bairros = [];
@@ -362,63 +427,221 @@
                 var cidades = [];
 
                 if (this.$validator.is(estado)) {
-                    this.proprietario.idEstado = this.opcoes.estados.filter((e) => e.value == estado)[0].id;
-                    this.$sdata.ObterCidades(this.proprietario.idEstado).then(res => { this.opcoes.cidades = res; this.carregandoCidades = false; });
-                }
+                    var idEstado = this.opcoes.estados.filter((e) => e.value == estado)[0].id;
+                    var url = this.$api.BuildURL("suporte/cidades/obter") + "/" + idEstado;
 
+                    axios.get(url).then((request) => {
+                        if (request.data) {
+                            request.data.result.forEach((item, index) => {
+                                cidades.push({ id: item.id, value: item.nome, label: item.label });
+                            });
+                            this.opcoes.cidades = cidades;
+                        }
+                    }).catch((error) => {
+                        ce(error);
+                        if (error.response)
+                            ce(error.response);
+                        ce("Não foi possível obter cidades.");
+                    }).finally(() => {
+                        this.carregandoCidades = false;
+                    });
+                } else
+                    this.carregandoCidades = false;
             },
 
-
             ObterBairros(cidade) {
+                var idCidade = this.opcoes.cidades.filter((c) => c.value == cidade)[0].id;
 
-                this.proprietario.bairro   = "";
-                this.proprietario.idBairro = 0;
-                
+                this.parceiro.bairro = "";
+                this.bairroSelecionado = {};
+
                 this.carregandoBairros = true;
                 this.opcoes.bairros = [];
                 var bairros = [];
 
-                if (this.$validator.is(cidade)) {
-                    this.proprietario.idCidade = this.opcoes.cidades.filter((c) => c.value == cidade)[0].id;
-                    this.$sdata.ObterBairros(this.proprietario.idCidade).then(res => { this.opcoes.bairros = res; this.carregandoBairros = false; });
-                } 
+                if (this.$validator.is(idCidade)) {
 
+                    var url = this.$api.BuildURL("suporte/bairros/obter") + "/" + idCidade;
+
+                    axios.get(url).then((request) => {
+                        if (request.data) {
+                            request.data.result.forEach((item, index) => {
+                                bairros.push({ id: item.id, value: item.nome, label: item.label });
+                            });
+                            this.opcoes.bairros = bairros;
+                        }
+                    }).catch((error) => {
+                        ce(error);
+                        if (error.response)
+                            ce(error.response);
+                        ce("Não foi possível obter bairros.");
+                    }).finally(() => {
+                        this.carregandoBairros = false;
+                    });
+
+                } else
+                    this.carregandoBairros = false;
             },
 
             DefinirBairro(bairro) {
-                this.proprietario.idBairro = this.opcoes.bairros.filter((c) => c.value == bairro)[0].id;
-                //this.proprietario.bairro = bairro.label;
-                //c2("this.proprietario", this.proprietario)
+                //this.parceiro.bairro = bairro.label;
+                //c2("this.parceiro", this.parceiro)
             },
-
-
-
 
             ChecarDataNascimento() {
                 var res = false;
                 if (this.DiaNascimento > 0 && this.MesNascimento > 0) {
                     let dt = this.$tools.FormatDateArgs(((this.AnoNascimento == 0) ? "1900" : this.AnoNascimento), this.MesNascimento, this.DiaNascimento);
-                    //let dt = this.$tools.FormatDateArgs(this.AnoNascimento,this.MesNascimento,this.DiaNascimento);
                     res = this.$validator.IsDate(dt);
                 } else
                     res = true;
                 return res;
             },
 
+            ShowView(v) {
+                this.view = v;
+            },
 
+            SalvarCadastro() {
+                this.parceiro.idTipo = 5;
+                var msg = "";
+                if (this.parceiro.tipoPessoa == "PF") {
+                    if (this.$validator.not(this.parceiro.cpf))
+                        msg += "<b>CPF</b> não informado<br>";
+                    else if (!this.$validator.IsCPF(this.parceiro.cpf))
+                        msg += "<b>CPF</b> inválido<br>";
+                    if (this.$validator.not(this.parceiro.nome))
+                        msg += "<b>NOME</b> não informado<br>";
+                }
+                else {
+                    if (this.$validator.not(this.parceiro.cnpj))
+                        msg += "<b>CNPJ</b> não informado<br>";
+                    else if (!this.$validator.IsCNPJ(this.parceiro.cnpj))
+                        msg += "<b>CNPJ</b> inválido<br>";
+                    if (this.$validator.not(this.parceiro.razao))
+                        msg += "<b>RAZÃO SOCIAL</b> não informada<br>";
+                    if (this.$validator.not(this.parceiro.nome))
+                        msg += "<b>NOME FANTASIA</b> não informado<br>";
+                    if (this.$validator.not(this.parceiro.responsavel))
+                        msg += "<b>NOME DO RESPONSÁVEL</b> não informado<br>";
+                }
 
+                if (this.$validator.not(this.parceiro.email))
+                    msg += "<b>E-MAIL</b> não informado<br>";
+                else if (!this.$validator.IsEmail(this.parceiro.email))
+                    msg += "<b>E-MAIL</b> inválido<br>";
 
+                if (this.$validator.not(this.parceiro.telefone))
+                    msg += "<b>TELEFONE</b> não informado<br>";
+                else if (this.parceiro.telefone.length < 14)
+                    msg += "<b>TELEFONE</b> inválido<br>";
 
+                if (this.parceiro.tipoPessoa == "PF") {
+                    if (this.AnoNascimento == 0 && this.MesNascimento == 0 && this.DiaNascimento == 0)
+                        msg += "<b>DATA DE NASCIMENTO</b> não informada<br>";
+                    else if (this.AnoNascimento == 0 || this.MesNascimento == 0 || this.DiaNascimento == 0)
+                        msg += "<b>DATA DE NASCIMENTO</b> incompleta<br>";
+                    else if (!this.ChecarDataNascimento())
+                        msg += "<b>DATA DE NASCIMENTO</b> inválida<br>";
+                }
 
+                if (this.$validator.not(this.parceiro.creci)) {
+                    msg += "<b>CRECI</b> não informado<br>";
+                } else if (this.parceiro.creci.length < 4)
+                    msg += "<b>CRECI</b> inválido<br>";
+                else {
+                    if (this.$validator.not(this.parceiro.creciEstado))
+                        msg += "<b>CRECI - ESTADO</b> não selecionado<br>";
+                }
 
+                if (this.$validator.not(this.parceiro.estado))
+                    msg += "<b>ESTADO</b> não selecionado<br>";
+
+                if (this.$validator.not(this.parceiro.cidade))
+                    msg += "<b>CIDADE</b> não selecionada<br>";
+
+                if (this.$validator.not(this.parceiro.bairro))
+                    msg += "<b>BAIRRO</b> não selecionado<br>";
+
+                if (this.$validator.not(this.parceiro.logradouro))
+                    msg += "<b>LOGRADOURO</b> não informado<br>";
+
+                if (this.$validator.not(this.parceiro.numero))
+                    msg += "<b>NÚMERO</b> não informado (informe <b>SN</b> se não houver)<br>";
+
+                if (this.$validator.not(this.parceiro.senha))
+                    msg += "<b>SENHA</b> não informada<br>";
+                else if (this.parceiro.senha.length < 4)
+                    msg += "<b>SENHA</b> precisa ter pelo menos 4 caracteres<br>";
+                if (this.$validator.not(this.senhaConfirma))
+                    msg += "<b>CONFIRMAR SENHA</b> não informada<br>";
+                else if (this.parceiro.senha != this.senhaConfirma)
+                    msg += "<b>SENHA e CONFIRMAR SENHA</b> não combinam<br>";
+
+                if (msg.length > 0) {
+                    this.$tools.Alert(msg);
+                } else {
+                    this.OpenLoadingService(true);
+                    this.parceiro.AnoNascimento = this.AnoNascimento;
+                    this.parceiro.MesNascimento = this.MesNascimento;
+                    this.parceiro.DiaNascimento = this.DiaNascimento;
+                    this.parceiro.tipo = this.tipo;
+                    this.ShowView('sending');
+
+                    axios.post(this.$api.BuildURL("parceiro/adicionar"), this.parceiro).then((request) => {
+                        if (request.data.status.success) {
+                            this.OpenLoadingService(false);
+                            this.$tools.AlertSuccess("Cadastro efetuado");
+                            this.$sdata = this.$models.usuario();
+                        } else {
+                            this.ShowView("form"); x
+                            this.$tools.AlertNotes(request.data);
+                        }
+                    }).catch((error) => {
+                        this.OpenLoadingService(false);
+                        this.ShowView("form");
+                        c2("error.response.data", error.response.data)
+                        if (error.response) {
+                            this.OpenLoadingService(false);
+                            this.$tools.AlertNotes(error.response.data);
+                        } else
+                            this.OpenLoadingService(false);
+                            this.$tools.Alert("Não foi possível atender a requisição");
+                    }).finally(() => {
+                        this.fullscreenLoading = false;
+                    });
+                }
+            },
         }
-
     }
-
 </script>
 
+<style>
+    .el-row {
+        width: 100% !important;
+    }
 
-<style scoped>
+    .birthdate-container {
+        display: flex;
+        flex-wrap: wrap;
+    }
+
+    .birthdate-option {
+        height: 40px;
+    }
+
+    .birthdate-select {
+        margin-bottom: 10px;
+        margin-top: 2px;
+        padding-left: 0px;
+        padding-right: 0px;
+        gap: 0px;
+    }
+
+    .register-input {
+        margin-bottom: 10px;
+        letter-spacing: 0.02em;
+        margin-top: 2px;
+        color: var(--s-color-primary);
+    }
 </style>
-
-

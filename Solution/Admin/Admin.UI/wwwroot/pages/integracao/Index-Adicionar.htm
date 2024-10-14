@@ -1,0 +1,790 @@
+﻿<template>
+    <div v-loading.fullscreen.lock="fullscreenLoading" element-loading-background="rgba(0, 0, 0, 0.7)">
+        <el-form :model="integracao" :rules="rules" ref="integracao">
+            <el-col :md="24">
+                <el-row :gutter="20">
+                    <el-col :xs="24" :sm="12" :md="8" :lg="8" class="register-input">
+                        <div>CPF/CNPJ<span></span></div>
+                        <el-input style="width:100%"
+                                  v-model="documento"
+                                  :placeholder="placeholderText"
+                                  clearable
+                                  @input="applyMask"></el-input>
+                    </el-col>
+
+                    <el-col :xs="24" :sm="12" :md="8" :lg="8" class="register-input">
+                        <div>CRM<span></span></div>
+                        <el-select v-model="opcoes.crm" filterable :disabled="isDocumentCheckFieldDisabled" placeholder="SELECIONE O CRM" :clearable="true" :value-key="'id'" class="m-4" size="large" style="width: 100%" @change="VerificarInformacoesCliente()">
+                            <el-option v-for="item in crms"
+                                       :key="item.id"
+                                       :disable="true"
+                                       :label="item.nome"
+                                       :value="item.id">
+                            </el-option>
+                        </el-select>
+                    </el-col>
+
+                    <el-col :xs="24" :sm="12" :md="8" :lg="8" class="register-input">
+                        <div>SELECIONE O PLANO</div>
+                        <el-select filterable v-model="integracao.idPlano" style="width: 100%" :disabled="true" placeholder="SELECIONE O PLANO">
+                            <el-option v-for="item in [
+                                             {nome: 'CORRETOR AUTÔNOMO ESSENCIAL por R$387/mês',  id: 2 },
+                                             {nome: 'IMOBILIÁRIA ATÉ 03 USUÁRIOS por R$499/mês',  id: 3 },
+                                             {nome: 'IMOBILIÁRIA ATÉ 05 USUÁRIOS por R$699/mês',  id: 4 }
+                                             ]"
+                                       :key="item.id"
+                                       :label="item.nome"
+                                       :value="item.id">
+                            </el-option>
+                        </el-select>
+                    </el-col>
+
+                    <el-col :xs="24" :sm="12" :md="8" :lg="8" class="register-input">
+                        <div>CHAVE API<span></span></div>
+                        <el-form-item prop="chaveApi">
+                            <el-input style="width:100%"
+                                      :disabled="disableFieldsForPartnerValidation"
+                                      v-model="integracao.chaveApi"
+                                      clearable
+                                      placeholder="Insira sua Chave API"
+                                      @change="handleChange"></el-input>
+                        </el-form-item>
+                    </el-col>
+
+                    <el-col v-if="isImoview" :xs="24" :sm="12" :md="8" :lg="8" class="register-input">
+                        <div>CÓDIGO USUÁRIO IMOVIEW<span></span></div>
+                        <el-form-item prop="codUsuario">
+                            <el-input style="width:100%"
+                                      :disabled="disableFieldsForPartnerValidation"
+                                      clearable
+                                      v-model="integracao.codUsuario"
+                                      :placeholder="placeholderUsuarioText"></el-input>
+                        </el-form-item>
+                    </el-col>
+
+                    <el-col v-if="isImoview" :xs="24" :sm="12" :md="8" :lg="8" class="register-input">
+                        <div>UNIDADE<span></span></div>
+                        <el-form-item prop="codUnidade">
+                            <el-select v-model="integracao.codUnidade" filterable :disabled="ValidarCampoUnidades()" :clearable="true" class="m-4" placeholder="INFORME A UNIDADE" size="large" style="width:100%">
+                                <el-option v-for="item in opcoes.unidades" :key="item.id" :label="item.nome" :value="item.id"></el-option>
+                            </el-select>
+                        </el-form-item>
+                    </el-col>
+
+                    <el-col v-if="isVistaSoft" :xs="24" :sm="24" :md="16" :lg="16" class="register-input">
+                        <div>URL VISTASOFT<span></span></div>
+                        <el-form-item prop="urlApi">
+                            <el-input style="width:100%"
+                                      :disabled="disableFieldsForPartnerValidation"
+                                      v-model="integracao.urlApi"
+                                      clearable
+                                      :placeholder="placeholderUrlVistaSoft"
+                                      @change="(value) => ValidarUrl(value)"></el-input>
+                        </el-form-item>
+                    </el-col>
+                </el-row>
+
+                <el-row style="width: 100%; display: flex; justify-content: flex-end; align-items: flex-end; margin-top: 20px">
+                    <el-col :xs="24" :sm="12" :md="8" :lg="6" class="register-input" :disabled="disableFieldsForPartnerValidation" style="width: 100%; display: flex; justify-content: flex-end; align-items: center;">
+                        <p>Total de bairros selecionados: {{ totalSelectedBairros }}</p>
+                        <div style="display: flex; width: 100%; align-items: flex-end;">
+                            <span style="cursor:pointer; padding-left:20px; color:var(--s-color-green)" :disabled="disableFieldsForPartnerValidation" @click="addLocationGroup">
+                                <i class="fa fa-plus-circle"></i> ADICIONAR BAIRROS PARA INTEGRAÇÃO
+                            </span>
+                        </div>
+                    </el-col>
+                    <el-divider style=""><!--resultado--></el-divider>
+                </el-row>
+
+                <el-row :gutter="20" v-if="QuantidadeBairros">
+                    <div style="width: 100%; display: flex; flex-wrap: wrap" v-for="(group, index) in locationGroups" :key="group.id" class="location-group">
+                        <div style="width: 90%; display: flex; flex-wrap: wrap">
+                            <el-col :xs="24" :sm="24" :md="12" :lg="8" class="register-input">
+                                <div><p>ESTADO</p></div>
+                                <div style="height:40px" v-if="group.carregandoEstados">
+                                    <c-loading size="30px" style="padding-left:5px"></c-loading>
+                                </div>
+                                <el-select v-else filterable :disabled="this.locationGroups[index].bairrosExistentesIntegracao" v-model="this.locationGroups[index].selectedEstado" class="m-4" placeholder="Selecionar" size="large" style="width:100%" @change="(value) => { ObterCidades(value, index); group.enableFilterButton = true }">
+                                    <el-option v-for="item in opcoes.estados" :key="item.id" :label="item.label" :value="item.id"></el-option>
+                                </el-select>
+                            </el-col>
+
+                            <el-col :xs="24" :sm="24" :md="12" :lg="8" class="register-input">
+                                <div><p>CIDADE</p></div>
+                                <div style="height:40px" v-if="this.locationGroups[index].carregandoCidades">
+                                    <c-loading size="30px" style="padding-left:5px"></c-loading>
+                                </div>
+                                <el-select v-else
+                                           :disabled="this.locationGroups[index].bairrosExistentesIntegracao"
+                                           v-model="this.locationGroups[index].selectedCities"
+                                           filterable
+                                           class="m-4"
+                                           placeholder="Selecionar"
+                                           size="large"
+                                           style="width:100%"
+                                           @change="(cities) => ObterBairros(cities, index)">
+                                    <el-option v-for="item in this.locationGroups[index].cidades"
+                                               :key="item.id"
+                                               :label="item.label"
+                                               :value="item.id"></el-option>
+                                </el-select>
+                            </el-col>
+
+                            <el-col :xs="24" :sm="24" :md="12" :lg="8" class="register-input">
+                                <div><p>BAIRROS</p></div>
+                                <div style="height:40px" v-if="this.locationGroups[index].carregandoBairros">
+                                    <c-loading size="30px" style="padding-left:5px"></c-loading>
+                                </div>
+                                <el-select v-else
+                                           :disabled="this.locationGroups[index].bairrosExistentesIntegracao"
+                                           v-model="this.locationGroups[index].selectedBairros"
+                                           filterable
+                                           class="m-4"
+                                           placeholder="Selecionar"
+                                           size="large"
+                                           style="width:100%"
+                                           @change="(selectedBairros) => handleBairrosChange(selectedBairros, group, index)">
+                                    <el-option v-for="item in this.locationGroups[index].bairros"
+                                               :key="item.id"
+                                               :label="item.label"
+                                               :value="this.locationGroups[index].bairrosExistentesIntegracao ? item.id : item"></el-option>
+                                </el-select>
+                            </el-col>
+                        </div>
+
+                        <!-- Botão Remover -->
+                        <div v-if="!this.locationGroups[index].bairrosExistentesIntegracao" style="width: 10%; display: flex; align-items: center; justify-content: center;">
+                            <span style="cursor: pointer; width: 100%; color: var(--s-color-blue); display: flex; margin-top: 10px; align-items: center; justify-content: center;" @click="removeLocationGroup(index)">
+                                <i class="fa fa-trash" style="color: #0072ff; font-size: 1.2em;"></i>
+                            </span>
+                        </div>
+                    </div>
+                </el-row>
+
+                <!-- Botão Integrar-->
+                <el-row style="width: 100%; display: flex; justify-content: flex-end; align-items: center;">
+                    <el-divider style="margin-top: 20px"><!--resultado--></el-divider>
+                    <el-col :xs="24" :sm="12" :md="8" :lg="6" class="register-input" style="width: 100%; display: flex; justify-content: flex-end; align-items: center;">
+                        <div><span></span></div>
+                        <q-btn v-if="disableButtonIntegration" label="INTEGRAR" color="primary" @click="Integrar()"></q-btn>
+                    </el-col>
+                </el-row>
+            </el-col>
+        </el-form>
+    </div>
+</template>
+
+<script>
+    import { ref } from 'vue';
+    module.exports = {
+        name: 'Buscar',
+        data() {
+            return {
+                onrequest: false,
+                busca: this.$models.busca(),
+                carregandoCidades: false,
+                disableButtonIntegration: false,
+                disableFieldsForPartnerValidation: true,
+                isDocumentCheckFieldDisabled: true,
+                disabledUnidade: true,
+                totalBairrosPermitidos: 0,
+                documento: "",
+                maxlength: 22,
+                placeholderText: ref('Digite o CPF ou CNPJ'),
+                placeholderUsuarioText: 'DIGITE O CODIGO DE USUARIO DO CRM',
+                placeholderUrlVistaSoft: 'Digite a URL de integração',
+                id: null,
+                estados: [],
+                cidades: [],
+                bairros: [],
+                idEstado: "",
+                qntdBairros: "",
+                jsonDocumento: "",
+                crms: [{ nome: 'IMOVIEW', id: 1 }, { nome: 'VISTASOFT', id: 2 }],
+                unidades: [],
+                bairrosExistentesIntegracao: false,
+                chaveApi: this.$root.perfilIntegracao?.integracao?.chaveApi || '',
+                selectedCities: [],
+                bairrosByCity: {},
+                group: [],
+                selectedEstado: null,
+                bairrosIds: [],
+                locationGroups: [],
+                bairrosSelecionados: {},
+                contadorBairros: [],
+                opcoes: {
+                    estados: [],
+                    cidades: [],
+                    bairros: [],
+                    unidades: [],
+                    crm: [],
+                    unidades: [],
+                    integracao: [],
+                    plano: [],
+                    integracao: []
+                },
+                perfilIntegracaoCadastro: {},
+                integracao: {
+                    idCliente: "",
+                    idOperador: this.$root.usuario.id,
+                    codUsuario: "",
+                    codUnidade: "",
+                    chaveApi: "",
+                    idPlano: this.$root.perfilIntegracao?.plano || [],
+                    bairros: [],
+                    urlApi: ""
+                },
+                rules: {
+                    chaveApi: [{ required: true, message: 'Por favor, insira a Chave API', trigger: 'blur' }],
+                    codUnidade: [{ required: true, message: 'Por favor, selecione a Unidade', trigger: 'blur' }],
+                    codUsuario: [{ required: true, message: 'Por favor, insira o Código de Usuário', trigger: 'blur' }],
+                    urlApi: [{ required: true, message: 'Por favor, insira a URL de Integração', trigger: 'blur' }],
+                },
+                fullscreenLoading: ref(false),
+            };
+        },
+        watch: {
+            documento() {
+                this.isDocumentCheckFieldDisabled = false;
+                if (this.documento == "") {
+                    this.LimparCamposIntegracao();
+                    this.isDocumentCheckFieldDisabled = true;
+                    this.disableFieldsForPartnerValidation = true;
+                } else if (this.opcoes.crm != "") {
+                    this.unidades = [];
+                    this.qntdBairros = 0;
+                    this.locationGroups = [];
+                    this.integracao.bairros = [];
+                    this.integracao.idPlano = [];
+                    this.integracao.idCliente = 0;
+                    this.integracao.idCliente = 0;
+                    this.integracao.chaveApi = "";
+                    this.integracao.codUsuario = "";
+                    this.integracao.codUnidade = "";
+                    this.VerificarInformacoesCliente();
+                }
+            },
+            async locationGroups(newValue) {
+                try {
+                    for (const [index, group] of newValue.entries()) {
+                    this.fullscreenLoading = true;
+                        await this.ObterCidades(group.selectedEstado, index);
+                        await new Promise(resolve => setTimeout(resolve, 400)); // Delay opcional de 400ms
+                        await this.ObterBairros(group.selectedCities, index);
+                        await new Promise(resolve => setTimeout(resolve, 400)); // Delay opcional de 400ms
+
+                        this.locationGroups[index].enableFilterButton = true; // Habilitar o botão ao finalizar
+                    }
+                } catch (error) {
+                    console.error("Erro ao carregar cidades e bairros:", error);
+                } finally {
+                    this.fullscreenLoading = false;
+                }
+            }
+        },
+        created() {
+            this.inicializarEstados();
+        },
+        computed: {
+            totalSelectedBairros() {
+                return this.locationGroups.length;
+            },
+
+            isImoview() {
+                return this.opcoes.crm === 1;
+            },
+
+            isVistaSoft() {
+                return this.opcoes.crm === 2;
+            },
+
+            processedLocationGroups() {
+                return this.locationGroups.map((group) => {
+                    if (this.bairrosExistentesIntegracao) {
+                        // Processa os dados quando bairrosExistentesIntegracao é verdadeiro
+                        return {
+                            ...group,
+                            bairros: group.bairros.map(bairro => ({
+                                id: bairro.Id,
+                                label: bairro.Nome
+                            }))
+                        };
+                    } else {
+                        // Processa os dados quando bairrosExistentesIntegracao é falso
+                        return group;
+                    }
+                });
+            }
+        },
+        methods: {
+            inicializarEstados() {
+                this.$sdata.ObterEstados().then(res => {
+                    this.opcoes.estados = res;
+                })
+            },
+
+            determineValue(item, condition) {
+                return condition ? item.id : item;
+            },
+
+            carregarDadosIniciais(bairros) {
+                this.initializeBairros(bairros);
+            },
+
+            initializeBairros(bairros) {
+                this.locationGroups = bairros.map((bairro, index) => {
+                    return {
+                        id: this.generateUniqueId(),
+                        index: index,
+                        selectedEstado: bairro.IdEstado,
+                        selectedCities: bairro.IdCidade,
+                        bairrosExistentesIntegracao: true,
+                        selectedBairros: bairro.Id,
+                        enableFilterButton: true,
+                        carregandoEstados: false,
+                        carregandoCidades: true,
+                        carregandoBairros: true,
+                        cidades: [],
+                        bairros: []
+                    };
+                });
+            },
+
+            QuantidadeBairros() {
+                return this.qntdBairros > this.locationGroups.length;
+            },
+
+            getCityLabel(id) {
+                const cidade = this.opcoes.cidades.find(city => city.id === parseInt(id));
+                return cidade ? cidade.label : '';
+            },
+
+            generateUniqueId() {
+                return '_' + Math.random().toString(36).substr(2, 9);
+            },
+
+            LimparCamposIntegracao() {
+                this.opcoes.crm = [];
+                this.unidades = [];
+                this.qntdBairros = 0;
+                this.locationGroups = [];
+                this.integracao.bairros = [];
+                this.integracao.idPlano = [];
+                this.integracao.idCliente = 0;
+                this.integracao.idCliente = 0;
+                this.integracao.chaveApi = "";
+                this.integracao.codUsuario = "";
+                this.integracao.codUnidade = "";
+            },
+
+            removeLocationGroup(index) {
+                this.locationGroups.splice(index, 1);
+                this.disableButtonIntegration = false;
+            },
+
+            addLocationGroup(bairro = null) {
+                this.disableButtonIntegration = false;
+                if (this.QuantidadeBairros()) {
+                    this.locationGroups.push({
+                        selectedEstado: [],
+                        selectedCities: [],
+                        selectedBairros: [],
+                        bairrosExistentesIntegracao: false,
+                        carregandoEstados: false,
+                        carregandoCidades: false,
+                        carregandoBairros: false,
+                        cidades: [],
+                        bairros: [],
+                        enableFilterButton: false
+                    });
+                }
+                else {
+                    if (this.qntdBairros == 0) {
+                        this.$tools.MessageAlert("Informe um Parceiro!!");
+                    } else {
+                        this.$tools.MessageAlert("Quantidade máxima de bairros atingida.");
+                    }
+                }
+            },
+
+            generateUniqueId() {
+                return '_' + Math.random().toString(36).substr(2, 9);
+            },
+
+            ValidarCampoUnidades() {
+                if (this.disabledUnidade || this.disableFieldsForPartnerValidation) {
+                    return true
+                } else {
+                    return false
+                }
+
+            },
+
+            async ObterCidades(estadoId, groupIndex) {
+                this.idEstado = estadoId;
+                this.locationGroups[groupIndex].carregandoCidades = true;
+
+                try {
+                    const res = await this.$sdata.ObterCidades(estadoId);
+                    this.locationGroups[groupIndex].cidades = res;
+                } catch (error) {
+                    console.error("Erro ao obter cidades:", error);
+                } finally {
+                    this.locationGroups[groupIndex].carregandoCidades = false;
+                }
+            },
+
+            async ObterBairros(cidade, groupIndex) {
+                this.group = this.locationGroups[groupIndex];
+                this.group.carregandoBairros = true;
+                const idCidade = cidade.id ? cidade.id : cidade;
+
+                try {
+                    const res = await this.$sdata.ObterBairros(idCidade);
+                    this.group.bairros = res.map(bairro => ({
+                        ...bairro,
+                        idCidade: idCidade,
+                        idEstado: this.idEstado
+                    }));
+                } catch (error) {
+                    console.error("Erro ao obter bairros:", error);
+                } finally {
+                    this.group.carregandoBairros = false;
+                }
+            },
+
+            handleBairrosChange(selectedBairros, group, index) {
+                this.locationGroups[index].selectedBairros = selectedBairros;
+                if (this.locationGroups[index] && selectedBairros.length === 0) {
+                    this.$tools.MessageAlert("Selecione pelo menos um bairro.");
+                } else {
+                    this.integracao.bairros.push(selectedBairros);
+                    this.disableButtonIntegration = true;
+                }
+            },
+
+            handleChange(value) {
+                switch (this.opcoes.crm) {
+                    case 1:
+                        // Chama a função BuscarUnidades quando CRM for igual a 1
+                        return this.BuscarUnidades(value);
+                    case 2:
+                        // CRM 2 não requer nenhuma ação, então apenas retorna
+                        return;
+                    default:
+                        // Lança um erro se o CRM não for válido
+                        throw new Error('CRM inválido');
+                }
+            },
+
+            async BuscarUnidades(chaveApi) {
+                try {
+                    this.fullscreenLoading = true;
+                    var chaveApiString = this.integracao.chaveApi;
+                    if (this.$validator.is(chaveApiString)) {
+                        var chaveApiEncoded = encodeURIComponent(chaveApiString);
+                        var url = this.$api.BuildURL(`api/imoview/unidades?chave=${chaveApiEncoded}`);
+                        var response = await axios.get(url)
+                            .then((response) => {
+                                if (response.data) {
+                                    this.opcoes.unidades = response.data;
+                                    this.integracao.codUnidade = response.data[0].id;
+                                    this.disabledUnidade = false;
+                                    this.fullscreenLoading = false;
+                                }
+                            })
+                            .catch((error) => {
+                                this.$tools.MessageAlert("Chave API inválida");
+                                this.integracao.codUnidade = "";
+                                this.fullscreenLoading = false;
+                            });
+                        return response;
+                    } else {
+                        this.integracao.codUnidade = "";
+                        this.fullscreenLoading = false;
+                    }
+                } catch (error) {
+                    console.error("Erro ao verificar a chave API:", error);
+                    this.fullscreenLoading = false;
+                }
+            },
+
+            async ValidarUrl(urlVistaSoft) {
+                if (urlVistaSoft) {
+                    try {
+                        this.fullscreenLoading = true;
+                        var chaveApiString = this.integracao.chaveApi;
+                        this.integracao.urlApi = this.FormatUrl(urlVistaSoft);
+
+                        if (this.$validator.is(chaveApiString) && this.$validator.is(urlVistaSoft)) {
+                            var chaveApiEncoded = encodeURIComponent(chaveApiString);
+                            var url = this.$api.BuildURL(`api/vistasoft/validarchave?chave=${chaveApiEncoded}&url=${this.integracao.urlApi}`);
+                            var response = await axios.get(url);
+                            if (response) {
+                                this.fullscreenLoading = false;
+                                ElementPlus.ElMessage({
+                                    showClose: true,
+                                    message: 'Chave Api e URL Valida!',
+                                    type: 'success',
+                                });
+                            }
+                            return response;
+                        } else {
+                            this.integracao.codUnidade = "";
+                            this.fullscreenLoading = false;
+                            this.$tools.MessageAlert("URL inválida");
+                        }
+                    } catch (error) {
+                        if (error.response && error.response.status === 400) {
+                            ElementPlus.ElMessage({
+                                showClose: true,
+                                message: 'Chave API ou a URL está inválida. Por favor, verifique se os dados estão corretos e tente novamente.',
+                                type: 'warning',
+                                duration: 3000
+                            });
+                            this.integracao.codUnidade = "";
+                        } else {
+                            console.error("Erro ao verificar a chave API:", error);
+                            this.$tools.MessageAlert("Erro ao validar a URL ou chave API.");
+                        }
+                    } finally {
+                        this.fullscreenLoading = false;
+                    }
+                }
+            },
+
+            FormatUrl(url) {
+                if (!url) {
+                    return "";
+                }
+
+                if (!url.startsWith('http://') && !url.startsWith('https://')) {
+                    url = 'http://' + url;
+                }
+
+                if (!url.endsWith('/')) {
+                    url += '/';
+                }
+
+                return url; // Retorna a URL formatada
+            },
+
+            applyMask() {
+                this.valorInserido = this.documento.replace(/\D/g, '');
+                if (this.valorInserido.length <= 11) {
+                    this.documento = this.valorInserido.replace(/(\d{3})(\d)/, '$1.$2')
+                        .replace(/(\d{3})(\d)/, '$1.$2')
+                        .replace(/(\d{3})(\d{1,2})$/, '$1-$2');
+                } else {
+                    this.documento = this.valorInserido.replace(/^(\d{2})(\d)/, '$1.$2')
+                        .replace(/^(\d{2})\.(\d{3})(\d)/, '$1.$2.$3')
+                        .replace(/\.(\d{3})(\d)/, '.$1/$2')
+                        .replace(/(\d{4})(\d)/, '$1-$2');
+                }
+            },
+
+            CrmValidationEndpoint(crm) {
+                switch (crm) {
+                    case 1:
+                        return this.$api.BuildURL('api/imoview/integracao/cliente');
+                    case 2:
+                        return this.$api.BuildURL('api/vistasoft/integracao/cliente');
+                    default:
+                        throw new Error('CRM inválido');
+                }
+            },
+
+            async VerificarInformacoesCliente(documento) {
+                if (this.$validator.is(this.documento)) {
+                    this.fullscreenLoading = true;
+                    try {
+                        var url = this.CrmValidationEndpoint(this.opcoes.crm);
+                        var request = await axios.post(url, { cpfCnpj: this.documento });
+                        if (request.data && request.status === 200) {
+                            this.disableFieldsForPartnerValidation = false;
+                            this.perfilIntegracaoCadastro = request.data;
+                            this.fullscreenLoading = false;
+                            this.AtualizarCamposCadastro(this.perfilIntegracaoCadastro);
+                        }
+                    } catch (error) {
+                        this.$tools.MessageAlert("Parceiro não encontrado!", 100);
+                        this.fullscreenLoading = false;
+                        console.error(error);
+                    }
+                } else {
+                    this.disableFieldsForPartnerValidation = true;
+                    this.LimparCamposIntegracao();
+                    this.fullscreenLoading = false;
+                }
+            },
+
+            AtualizarCamposCadastro(perfilIntegracaoCadastro) {
+                this.integracao.codUsuario = this.perfilIntegracaoCadastro.integracao?.codUsuario;
+                this.integracao.idCliente = this.perfilIntegracaoCadastro.cliente.id
+                this.integracao.idPlano = perfilIntegracaoCadastro.plano.id;
+                this.qntdBairros = this.perfilIntegracaoCadastro.plano.qtdBairros;
+                this.integracao.urlApi = this.perfilIntegracaoCadastro.integracao?.urlApi;
+                if (perfilIntegracaoCadastro && perfilIntegracaoCadastro.integracao?.bairros) {
+                    this.integracao.bairros = JSON.parse(perfilIntegracaoCadastro.integracao?.bairros);
+                    this.carregarDadosIniciais(this.integracao.bairros);
+                }
+                if (perfilIntegracaoCadastro && perfilIntegracaoCadastro.integracao) {
+                    this.integracao.chaveApi = perfilIntegracaoCadastro.integracao.chaveApi || "";
+                    if (this.opcoes.crm === 1) {
+                        this.BuscarUnidades(this.integracao.chaveApi);
+                    }
+                } else {
+                    this.integracao.chaveApi = "";
+                    this.unidades = [];
+                }
+            },
+
+            getIntegrationUrl(crm) {
+                switch (crm) {
+                    case 1:
+                        return this.$api.BuildURL('api/imoview/integracao/cliente/integrar');
+                    case 2:
+                        return this.$api.BuildURL('api/vistasoft/integracao/cliente/integrar');
+                    default:
+                        throw new Error('CRM inválido');
+                }
+            },
+
+            async Integrar() {
+                try {
+                    this.fullscreenLoading = true;
+                    const valid = await this.$refs.integracao.validate();
+                    this.integracao.codUnidade = JSON.stringify(this.integracao.codUnidade);
+
+                    if (valid) {
+                        this.loading = true;
+                        if (this.$validator.is(this.documento)) {
+                            var url = this.getIntegrationUrl(this.opcoes.crm);
+                            var request = await axios.post(url, this.integracao);
+                            if (request.data && request.data.status === 'Sucesso') {
+                                this.$tools.MessageAlert("Integração em fila de processamento!", 100);
+                                this.fullscreenLoading = false;
+                                this.VerificarInformacoesCliente(this.documento);
+                            } else {
+                                console.error(request.data.mensagem);
+                                throw new Error(request.data.mensagem || 'Erro desconhecido');
+                                this.fullscreenLoading = false;
+                            }
+                        } else {
+                            this.disableFieldsForPartnerValidation = true;
+                            this.fullscreenLoading = false;
+                        }
+                    } else {
+                        console.log('Erro de validação');
+                        this.fullscreenLoading = false;
+                    }
+                } catch (error) {
+                    this.$tools.MessageAlert(request.data.mensagem || "Preencha Todos Os Campos Obrigatorios!", 100);
+                    this.fullscreenLoading = false;
+                    console.error(error);
+                } finally {
+                    this.fullscreenLoading = false;
+                }
+            }
+        }
+    };
+</script>
+
+
+<style>
+    .fixed-bottom-row {
+        position: fixed;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        padding: 10px;
+        box-shadow: 0 -1px 5px rgba(0, 0, 0, 0.1);
+    }
+
+    .register-input {
+        width: 100%;
+        margin-bottom: 10px;
+        letter-spacing: 0.02em;
+        margin-top: 2px;
+        color: var(--s-color-primary);
+    }
+
+    .container-checkbox {
+        letter-spacing: 0.02em;
+        color: #0072ff !important;
+        font-size: 0.9em;
+        font-weight: 600;
+        margin-top: 20px;
+    }
+
+    .checkbox-group {
+        display: flex;
+        flex-wrap: wrap;
+        letter-spacing: 0.02em;
+        color: #0072ff !important;
+        font-size: 0.9em;
+        font-weight: 600;
+    }
+
+    .checkbox-container {
+        display: flex;
+        flex-wrap: wrap;
+    }
+
+    .checkbox-item {
+        width: calc(50% - 10px);
+        box-sizing: border-box;
+        margin-right: 10px;
+        margin-bottom: 10px;
+        font-size: 12px;
+        white-space: normal;
+        line-height: 1.5;
+        overflow-wrap: break-word;
+    }
+
+    @media (max-width: 992px) {
+        .checkbox-item {
+            width: calc(33.33% - 10px);
+        }
+    }
+
+    @media (max-width: 768px) {
+        .checkbox-item {
+            width: calc(50% - 10px);
+        }
+    }
+
+    @media (max-width: 576px) {
+        .checkbox-item {
+            width: calc(100% - 10px);
+        }
+    }
+
+    .el-scrollbar__thumb {
+        width: 5px !important;
+        height: 12px;
+    }
+
+    .custom-scrollbar::-webkit-scrollbar-thumb {
+        background: #0072ff;
+        border-radius: 6px;
+    }
+
+    .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+        background: #0056b3;
+    }
+
+    .el-form-item__error {
+        color: #ff0000; 
+        font-weight: bold;
+    }
+
+    .el-input__inner::placeholder {
+        text-transform: uppercase;
+    }
+
+    .custom-scrollbar::-webkit-scrollbar-track {
+        background: #f1f1f1;
+        border-radius: 6px;
+    }
+</style>

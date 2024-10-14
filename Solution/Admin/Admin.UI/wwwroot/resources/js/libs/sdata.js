@@ -7,14 +7,17 @@ export default class SData {
 
         this.api                  = new ApiClass();
 
-        this.opcoes                = {};
-        this.opcoes.estados         = this.GetStatesOptions();
-        this.opcoes.sexos          = this.GetSexsOptions();
-        this.opcoes.contactWays    = this.GetContactWaysOptions();
-        this.opcoes.days           = this.GetDaysOptions();
-        this.opcoes.months         = this.GetMonthsOptions();
-        this.opcoes.years          = this.GetYearsOptions();
-        this.opcoes.yearsReverse   = this.GetYearsOptionsReverse();
+        this.opcoes                     = {};
+        this.opcoes.estados             = this.GetStatesOptions();
+        this.opcoes.sexos               = this.GetSexsOptions();
+        this.opcoes.contactWays         = this.GetContactWaysOptions();
+        this.opcoes.days                = this.GetDaysOptions();
+        this.opcoes.months              = this.GetMonthsOptions();
+        this.opcoes.years               = this.GetYearsOptions();
+        this.opcoes.yearsReverse        = this.GetYearsOptionsReverse();
+        this.opcoes.locaisChaves        = [{id:1,value:"PROPRIETARIO",label:"Proprietário"},{id:2,value:"IMOBILIARIA",label:"Imobiliária"},{id:3,value:"LOCATARIO",label:"Locatário"},{id:4,value:"JA_CAPTEI",label:"JáCaptei"},{id:5,value:"OUTRO",label:"Outro"}];
+        this.opcoes.motivosInativacao   = [{id:1,value:"Vendido por parceiro JáCaptei",label:"Vendido por parceiro JáCaptei"},{id:2,value:"Vendido por terceiros ",label:"Vendido por terceiros "},{id:3,value:"Desistência do proprietário",label:"Desistência do proprietário"},{id:4,value:"OUTRO",label:"Outro"}];
+
         //this.opcoes.tiposImoveis   = this.ObterTiposImoveis();
         //this.locations            = locations;
 

@@ -1,0 +1,305 @@
+﻿<template>
+
+
+    <div>
+
+                <div class="row" style="width:100%;margin-bottom:40px;display:block">
+
+                    <div class="col-12" v-if="onrequest">
+                        <c-loading-page ></c-loading-page>
+                    </div>
+                    <div class="col-12" style="width:100%" v-else>
+
+                        <div class="col-12">
+                            <div style="cursor:pointer;margin:20px;margin-top:0px;color:var(--s-color-green)" @click="BuscarPendentes"><i class="fa fa-refresh"></i> atualizar</div>
+                        </div>
+
+                        <div v-if="imoveisBuscaResult.length == 0" style="margin:20px">
+                            não há imóveis pendentes de validação
+                        </div>
+                        <div v-else class="col-12" v-for="(item,index) in imoveisBuscaResult" style="margin-bottom:20px">
+
+
+                            
+                            <q-card style="width:100%;color:#fff;margin-bottom:5px">
+                                <q-card-section :class="item.validado? 'bg-teal': 'bg-orange'">
+                                    <div class="text-h10">
+                                        <span class="text-h10">
+                                            <b style="margin-right:10px;"> {{item.nome}}</b> <span style="opacity:0.88;padding-right:20px">{{$tools.FormatDateHour(item.data)}}</span>
+                                        </span>
+                                        <span class="text-h10">
+                                            <span style="float:right;font-weight:700;padding-right:5px">
+                                                <span v-if="item.validado">Validado</span>
+                                                <span v-else>Não validado <i class="fa fa-warning"></i></span>
+                                            </span>
+                                        </span>
+                                    </div>
+                                </q-card-section>
+
+                                <q-card-section>
+                                    <c-imovel-card :imovel="item"></c-imovel-card>
+                                </q-card-section>
+
+
+                                <q-card-section>
+                                    <el-row >
+                                        <el-col :md="24" style="width:100%;text-align:left;margin-bottom:4px;font-weight:800;color:var(--s-color-green)" v-if="item.validado">
+                                            <i class="fa fa-check-circle"></i>  VALIDADO
+                                        </el-col>
+                                        <el-col :md="24" style="width:100%;text-align:center;margin-bottom:4px" v-else>
+                                            <c-loading v-if="requests[index]"></c-loading>
+                                            <q-btn v-else label="Validar" :color="item.validado? 'teal':'orange'" @click="Validar(item,index)" style="width:200px;height:20px"></q-btn>
+                                        </el-col>
+                                    </el-row>
+                                </q-card-section>
+
+
+                        </div>
+
+
+                    </div>
+                </div>
+
+
+
+
+    </div>
+
+
+
+</template>
+
+
+<script>
+    module.exports = {
+
+        name: 'JCAdminimóveisPendentes',
+
+        components: {
+
+        },
+
+        data: function () {
+            return {
+                tab: "Usuarios",
+                onrequest: false,
+                showModalImages: false,
+                results: [],
+                message: "buscando...",
+                requests: [],
+                username: "",
+                imoveisBuscaResult:[],
+            }
+        }, computed: {
+
+        },
+
+        props: {
+
+        },
+        watch: {
+            //"pct":function(){ this.updateLabels(); }
+        },
+        created: function () {
+
+            //for(var i=0;i<8;i++)
+            //    this.results.push({name:"card"+i});
+        },
+        mounted() {
+           this.BuscarPendentes();
+        },
+        methods: {
+
+
+
+            async BuscarPendentes() {
+
+                this.onrequest  = true;
+                var request = await this.$api.Get("imovel/pendentes");
+                this.onrequest  = false;
+
+                if (request?.status?.success){
+                    this.buscaImovel        =  request.result;
+                    c2("this.buscaImovel",this.buscaImovel);
+                    this.imoveisBuscaResult =  this.buscaImovel.result.imoveis;
+                    if (this.$validator.is(this.imoveisBuscaResult)) {
+                        for (var i = 0; i < this.imoveisBuscaResult.length; i++)
+                            this.requests[i] = false;
+                    }
+                }else
+                    this.$tools.Alert("Não foi possível obter pendentes de validação");
+
+
+            },
+
+
+
+            Validar(item, index) {
+
+
+                    this.requests[index] = true;
+
+                    axios.post(this.$api.BuildURL("imovel/validar"), item).then((request) => {
+                        
+                        if (request.data.status.success)
+                            item.validado = true;
+                        else
+                            this.$tools.AlertNotes(request.data.result);
+
+                    }).catch((error) => {
+                        this.$tools.Alert("Não foi possível ativar");
+                        ce(error);
+                        if (error.response)
+                            ce(error.response);
+                    }).finally(() => {
+                        this.requests[index] = false;
+                    });
+
+            },
+
+
+
+            DesValidar(item, index) {
+
+
+            },
+
+
+
+            Alterar(item, index) {
+
+
+            },
+
+
+
+
+            Buscar() {
+
+
+
+
+            },
+
+
+
+
+
+
+
+
+
+
+        }
+
+    }
+
+
+
+
+
+
+
+
+</script>
+
+
+
+
+
+
+
+
+<style scoped>
+    .c-tabs {
+    }
+
+    .card-waiting {
+        display: inline-block;
+        min-width: 100px;
+        background: var(--s-accent-color);
+    }
+
+    .card-approved {
+        display: inline-block;
+        min-width: 100px;
+        background: #00c300;
+    }
+
+    .card-unconfirmed {
+        display: inline-block;
+        min-width: 100px;
+        background: #000;
+        color: #ffd891;
+    }
+
+    .card-declined {
+        display: inline-block;
+        min-width: 100px;
+    }
+
+    .card-content-waiting {
+        padding: 10px;
+        height: auto;
+        min-height: 132px;
+        vertical-align: top;
+        width: calc(100% - 420px);
+        background: linear-gradient(to right, #fff7d3 0%, #fffcf3 100%);
+    }
+
+        .card-content-waiting #title {
+            color: var(--s-accent-color);
+        }
+
+    .status-waiting {
+        width: 100%;
+        background: linear-gradient(to right, #ffd891 0%, #fff 100%);
+        color: var(--s-accent-color);
+        font-size: 11px;
+        font-weight: 700;
+        padding-left: 10px;
+    }
+
+    .card-content-approved {
+        padding: 10px;
+        display: inline-block;
+        height: auto;
+        min-height: 132px;
+        vertical-align: top;
+        width: calc(100% - 420px);
+        background: linear-gradient(to right, #dcffd3 0%, #f4fff3 100%);
+    }
+
+        .card-content-approved #title {
+            color: #008700;
+        }
+
+    .status-approved {
+        width: 100%;
+        background: linear-gradient(to right, #a7ff91 0%, #fff 100%);
+        color: #019801;
+        font-size: 11px;
+        font-weight: 700;
+        padding-left: 10px;
+    }
+
+
+    .card-content-declined {
+        padding: 10px;
+        display: inline-block;
+        height: auto;
+        min-height: 132px;
+        vertical-align: top;
+        width: calc(100% - 30px);
+        background: linear-gradient(to right, #fff7d3 0%, #fffcf3 100%);
+    }
+
+
+    .q-card__section--vert {
+        padding: 10px;
+    }
+
+
+</style>
+
+

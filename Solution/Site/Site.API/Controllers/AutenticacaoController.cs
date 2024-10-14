@@ -3,75 +3,103 @@ using System.Numerics;
 using MailKit;
 using Microsoft.AspNetCore.Authorization;
 using static JaCaptei.Model.Enums;
-using JaCaptei.Services;
 using JaCaptei.Model;
 using JaCaptei.Application;
+using Microsoft.IdentityModel.Tokens;
+using System.IdentityModel.Tokens.Jwt;
+using System.Security.Claims;
+using System.Text;
+using Microsoft.AspNetCore.Authentication;
+using JaCaptei.Site.API.Middleware.Autenticacao;
 
-namespace JaCaptei.API.Controllers {
+namespace JaCaptei.API.Controllers
+{
 
     [ApiController]
     [Route("[controller]")]
-    public class AutenticacaoController : ApiControllerBase{
+    public class AutenticacaoController : ApiControllerBase
+    {
+        AutenticacaoService autenticacaoService = new AutenticacaoService();
+        JWTokenService jwtTokenService = new JWTokenService();
+        ParceiroService serviceParceiro = new ParceiroService();
 
-        //AutenticacaoService service         =   new AutenticacaoService();
-        ParceiroService     serviceParceiro =   new ParceiroService();
-        Mail mail                           =   new Mail();
+        [HttpPost]
+        [Route("autenticar")]
+        public async Task<IActionResult> Autenticar([FromBody] Parceiro entity)
+        {
+            appReturn = autenticacaoService.Autenticar(entity);
 
-
-
-        [Route("hii")]
-        public IActionResult Hi() {
+            if (appReturn.status.success)
+            {
+                entity = appReturn.result;
+                entity.roles = "PARCEIRO";
+                entity.tokenJWT = JWTokenService.GenerateToken(entity);
+                appReturn.result    = entity;
+                var criarSessaoResult = autenticacaoService.CriarSessao(entity, HttpContext);
+                if (criarSessaoResult is ConflictObjectResult)
+                {
+                    return criarSessaoResult;
+                }
+            }
             return Result(appReturn);
         }
 
+        [HttpPost]
+        [Route("iniciarsessaoerevogartoken")]
+        public async Task<IActionResult> IniciarSessaoRevogarToken([FromBody] Parceiro entity)
+        {
+            appReturn = autenticacaoService.Autenticar(entity);
 
+            if (appReturn.status.success)
+            {
+                entity = appReturn.result;
+                entity.roles = "PARCEIRO";
+                entity.tokenJWT = JWTokenService.GenerateToken(entity);
+                appReturn.result    = entity;
+                autenticacaoService.InvalidarToken(entity, HttpContext);
+                autenticacaoService.CriarSessao(entity, HttpContext);
+            }
+            return Result(appReturn);
+        }
 
-        /*
-                [HttpGet]
-                [Route("parceiro/obter/{token}")]
-                public IActionResult ObterParceiroPeloToken(string token)
-                {
-                    appReturn = serviceParceiro.ObterPeloToken(token);
-                    if (appReturn.status.success){
-                        Parceiro entity = (Parceiro)appReturn.result;
-                        entity.tokenJWT = JWTokenService.GenerateToken(entity);
-                        appReturn.result = entity;
-                    }
-                    return Result(appReturn);
-                }
-        */
+        [HttpPost]
+        [Route("validarautenticacao")]
+        public IActionResult ValidarAutenticacao()
+        {
+            var authHeader = Request.Headers["Authorization"].FirstOrDefault();
 
+            if (authHeader != null && authHeader.StartsWith("Bearer "))
+            {
+                string token = authHeader.Substring("Bearer ".Length).Trim();
+                autenticacaoService.ValidarToken(token);
+                return Ok(autenticacaoService.ValidarToken(token));
+            }
+            return BadRequest("Cabeçalho Authorization não encontrado ou inválido.");
+        }
 
+        [HttpPost]
+        [Route("revogarsessao")]
+        public async Task<IActionResult> RevogarSessaoAsync()
+        {
+            var authHeader = Request.Headers["Authorization"].FirstOrDefault();
 
-        /*
-                [Authorize]
-                [HttpPost]
-                [Route("usuario/atualizar")]
-                public IActionResult AtualizarPerfil([FromBody] Parceiro entity)
-                {
-                    if (entity == null)
-                        appReturn.SetAsNotAcceptable("Usuário não identificado (talvez seja necessário novo username).");
-                    else
-                    {
+            if (authHeader == null || !authHeader.StartsWith("Bearer "))
+            {
+                return Unauthorized("Token de autenticação não encontrado.");
+            }
 
-                        appReturn = service.AtualizarPerfil(entity);
+            string token = authHeader.Substring("Bearer ".Length).Trim();
 
-                        if (!appReturn.status.success)
-                            return Result(appReturn);
-                    }
-                    return Result(appReturn);
-                }
+            try
+            {
+                await autenticacaoService.RevokeTokenAfterSignOutAsync(token, HttpContext);
 
-        */
-
-
-
-
-
-
-
-
-
-
+                return Ok("Token revogado com sucesso.");
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError, "Ocorreu um erro ao processar a solicitação.");
+            }
+        }
     }
 }

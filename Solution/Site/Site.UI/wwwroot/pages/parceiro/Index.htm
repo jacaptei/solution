@@ -2,7 +2,7 @@
 
 	<div class="row">
 		<div class="col-12">
-			<q-tabs v-model="view"
+			<q-tabs v-model="page"
 					dense
 					no-caps
 					align="left"
@@ -10,23 +10,19 @@
 					class="text-grey"
 					active-color="primary"
 					indicator-color="primary">
-				<q-tab name="agenda"		icon="fa fa-calendar"		label="AGENDAMENTOS"></q-tab>
 				<q-tab name="solicitacao"	icon="fa fa-bell-concierge" label="SOLICITAÇÕES"></q-tab>
 				<!--<q-tab name="register"	icon="fa fa-user-plus"			label="CADASTRE-SE"		style="width:115px"></q-tab>-->
 			</q-tabs>
-			<q-tab-panels v-model="view" animated>
+			<q-tab-panels v-model="page" animated>
 				
-				<q-tab-panel name="agenda">
-					<page_agenda />
-				</q-tab-panel>
-
 				<q-tab-panel name="solicitacao">
-					<page_solicitacao />
+					<page_solicitacao :show="show" />
 				</q-tab-panel>
 
 			</q-tab-panels>
 		</div>
 	</div>
+
 </template>
 
 
@@ -38,13 +34,13 @@
 		name: 'JaCapteiParceiroIndex777154',
 
 		components: {
-			page_agenda:		LoadComponent("./pages/parceiro/Agenda.htm"),
-            page_solicitacao:	LoadComponent("./pages/parceiro/Solicitacao.htm")
+            page_solicitacao:	LoadComponent("./pages/parceiro/solicitacoes/Index.htm")
 		},
 
 		data: function () {
 			return {
-                view: "solicitacao"
+                page: "solicitacao",
+				show: null,
 			}
 		}, computed: {
 
@@ -57,9 +53,12 @@
 
 		},
 		created: function () {
-			this.$root.SetTitle("Proprietários", "fa fa-users", null);
+			this.$root.SetTitle("Parceiros", "fa fa-users", null);
+			   if(this.$validator.is(this.$route.query?.show)) 
+					this.show = this.$route.query.show;
 		},
 		mounted() {
+
 		},
 		methods: {
 		}

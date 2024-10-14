@@ -12,6 +12,30 @@ namespace JaCaptei.API.Controllers {
 
         ParceiroService service = new ParceiroService();
 
+        [HttpGet]
+        [Route("lista/parceiros-ativos")]
+        public async Task<IActionResult> ObterParceirosAtivos()
+        {
+            try
+            {
+                // Tornar a chamada ao serviço assíncrona, se possível
+                var parceirosAtivos = await service.ObterParceirosAtivos();
+
+                // Verifica se há parceiros ativos
+                if (parceirosAtivos == null || !parceirosAtivos.Any())
+                {
+                    return NotFound("Nenhum parceiro ativo foi encontrado.");
+                }
+
+                // Retorna os parceiros ativos
+                return Ok(parceirosAtivos);
+            }
+            catch (Exception ex)
+            {
+                // Retorna uma mensagem de erro genérica para evitar expor detalhes do servidor
+                return StatusCode(500, "Ocorreu um erro ao processar sua solicitação. Por favor, tente novamente mais tarde.");
+            }
+        }
 
         [HttpPost]
         [Route("inserir")]
@@ -34,6 +58,14 @@ namespace JaCaptei.API.Controllers {
             return Result(appReturn);
         }
 
+        [HttpGet]
+        [Route("termos/aceitar")]
+        public IActionResult AceitarTermos()
+        {
+            Usuario user = ObterUsuarioAutenticado();
+            appReturn = service.AceitarTermos(user.id);
+            return Result(user);
+        }
 
         [HttpPost]
         [Route("autenticar")]
@@ -45,18 +77,10 @@ namespace JaCaptei.API.Controllers {
                 entity              = appReturn.result;
                 entity.roles        = "PARCEIRO";
                 entity.tokenJWT     = JWTokenService.GenerateToken(entity);
-                appReturn.result    = await CRM.Autenticar(entity);
-                //appReturn.result    = entity;
+                appReturn.result    = entity;
             }
-
-
             return Result(appReturn);
-
         }
-
-
-
-
 
         // parte do Admin
         // JWT Token Validator
@@ -70,9 +94,6 @@ namespace JaCaptei.API.Controllers {
             appReturn = service.Ativar(entity);
             return Result(appReturn);
         }
-
-
-
 
         [HttpPost]
         [Route("senha/solicitar")]
@@ -92,7 +113,6 @@ namespace JaCaptei.API.Controllers {
             return Result(appReturn);
         }
 
-
         [HttpPost]
         [Route("senha/alterar")]
         public IActionResult AlterarSenha([FromBody] Parceiro entity) {
@@ -103,7 +123,6 @@ namespace JaCaptei.API.Controllers {
             appReturn = service.AlterarSenha(entity);
             return Result(appReturn);
         }
-        
 
         [HttpPost]
         [Route("perfil/alterar")]
@@ -116,28 +135,11 @@ namespace JaCaptei.API.Controllers {
             return Result(appReturn);
         }
 
-
-
         [HttpGet]
         [Route("obter/{id}")]
         public IActionResult Obter(string id) {
             appReturn = service.ObterPeloId(int.Parse(id));
             return Result(appReturn);
         }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
     }
 }

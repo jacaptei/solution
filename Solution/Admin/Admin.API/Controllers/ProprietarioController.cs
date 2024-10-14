@@ -18,7 +18,7 @@ namespace JaCaptei.Administrativo.API.Controllers {
         [Route("[action]")]
         public IActionResult Adicionar([FromBody] Proprietario entity) {
 
-            Admin logado                = ObterAdminAutenticado();
+            Model.Admin logado                = ObterAdminAutenticado();
             entity.inseridoPorId        = entity.atualizadoPorId      = logado.id;
             entity.inseridoPorNome      = entity.atualizadoPorNome    = logado.nome;
 
@@ -34,8 +34,12 @@ namespace JaCaptei.Administrativo.API.Controllers {
                 appReturn.AddException("Proprietário inexistente ou inválido");
                 return Result(appReturn);
             }
+            else if(entity.id == 1) {
+                appReturn.AddException("Este proprietário não pode ser editado");
+                return Result(appReturn);
+            }
 
-            Admin logado                = ObterAdminAutenticado();
+            Model.Admin logado          = ObterAdminAutenticado();
             entity.atualizadoPorId      = logado.id;
             entity.atualizadoPorNome    = logado.nome;
 
@@ -55,7 +59,7 @@ namespace JaCaptei.Administrativo.API.Controllers {
 
         [HttpPost]
         [Route("buscar")]
-        public IActionResult Buscar([FromBody] Search busca) {
+        public IActionResult Buscar([FromBody] Busca busca) {
             busca.item = JsonConvert.DeserializeObject<Proprietario>(busca.item.ToString());
            // busca.item = JObject.Parse(busca.item);
             appReturn = service.Buscar(busca);

@@ -17,14 +17,24 @@ namespace JaCaptei.Model {
             public int              idParceiro          {get;set;}  =   0;
             public Parceiro         parceiro            {get;set;}  =   new Parceiro();
 
-            public int              idProprietario      {get;set;}  =   0;
-            public Proprietario     proprietario        {get;set;}  =   new Proprietario();
-            public string           proprietarioCaptacao{get;set;}  =   "";
+            public int              idImovel            {get;set;}  =   0;
+            public string           codImovel           {get;set;}  =   "";
+            public Imovel           imovel              {get;set;}  =   new Imovel();
+            public bool             imovelJC            {get;set;}  =   false;
+            public bool             imovelIndisponivel  {get;set;}  =   false;
+            public bool             imovelNaoEncontrado {get;set;}  =   false;
+            public bool             imovelVendido       {get;set;}  =   false;
+
+            public int              idProprietario              {get;set;}  =   0;
+            public Proprietario     proprietario                {get;set;}  =   new Proprietario();
+            public string           proprietarioCaptacao        {get;set;}  =   "";
+            public bool             proprietarioNaoEncontrado   {get;set;}  =   false;
 
             public int              idStatus            {get;set;}  =   3;
             public string           status              {get;set;}  =   "Aguardando captador";
 
             public string           url                 {get;set;}  =   "";
+            public string           titulo              {get;set;}  =   "";
             public string           descricao           {get;set;}  =   "";
             public string           avaliacao           {get;set;}  =   "";
 
@@ -60,13 +70,27 @@ namespace JaCaptei.Model {
             public bool             validadoProprietario{get;set;}  =   true;
 
             public string           acao                {get;set;}  =   "";
+            public bool             notificar           {get;set;}  =   false;
             public bool             ativo               {get;set;}  =   false;
             public bool             liberado            {get;set;}  =   false;
             public bool             agendado            {get;set;}  =   false;
+            public bool             reagendado          {get;set;}  =   false;
+            public bool             confirmado          {get;set;}  =   false;
+            public bool             visitado	        {get;set;}  =   false;
+            public bool             concluido           {get;set;}  =   false;
+            public bool             visita              {get;set;}  =   false;
+            public bool             captacao            {get;set;}  =   false;
+
             public string           token               {get;set;}  =   "";
             public long             tokenNum            {get;set;}  =   0;
 
             public string           obs                 {get;set;}  =   "";
+            public string           obsAgendamento      {get;set;}  =   "";
+            public string           obsReagendamento    {get;set;}  =   "";
+            public string           obsConfirmado	    {get;set;}  =   "";
+            public string           obsVisitado	        {get;set;}  =   "";
+            public string           obsConcluido	    {get;set;}  =   "";
+            public string           logs                {get;set;}  =   "";
 
             public int              inseridoPorId       {get;set;}
             public string           inseridoPorNome     {get;set;}  =   "";
@@ -76,6 +100,12 @@ namespace JaCaptei.Model {
             public string           atualizadoPorPerfil {get;set;}  =   "";
 
             public DateTime         dataVisita          {get;set;}  = Utils.Date.GetLocalDateTime();
+            public DateTime         dataAgendamento     {get;set;}  = Utils.Date.GetLocalDateTime();
+            public DateTime         dataReagendamento   {get;set;}  = Utils.Date.GetLocalDateTime();
+            public DateTime         dataConfirmado      {get;set;}  = Utils.Date.GetLocalDateTime();
+            public DateTime         dataVisitado        {get;set;}  = Utils.Date.GetLocalDateTime();
+            public DateTime         dataConcluido       {get;set;}  = Utils.Date.GetLocalDateTime();
+
             public DateTime         dataConsiderada     {get;set;}  = Utils.Date.GetLocalDateTime();
             public DateTime         dataAtualizacao     {get;set;}  = Utils.Date.GetLocalDateTime();
             public DateTime         data                {get;set;}  = Utils.Date.GetLocalDateTime();
@@ -87,6 +117,19 @@ namespace JaCaptei.Model {
             public double            diasDataConsiderada     {get{ return Math.Round((Utils.Date.GetLocalDateTime() - dataConsiderada).TotalDays   ); }}
             public double            horasDataConsiderada    {get{ return Math.Round((Utils.Date.GetLocalDateTime() - dataConsiderada).TotalHours  ); }}
             public double            minutosDataConsiderada  {get{ return Math.Round((Utils.Date.GetLocalDateTime() - dataConsiderada).TotalMinutes); }}
+
+            public string ObterEndereco(){
+                    string endereco = "";
+                    endereco += Utils.Validator.Is(logradouro)  ? (logradouro +", ") : "";
+                    endereco += Utils.Validator.Is(numero)      ? (numero     +", ") : "";
+                    endereco += Utils.Validator.Is(complemento) ? (complemento+", ") : "";
+                    endereco += Utils.Validator.Is(bairro)      ? (bairro+ ", ") : "";
+                    endereco += Utils.Validator.Is(cidade)      ? (cidade     +", ") : "";
+                    endereco += Utils.Validator.Is(estado)      ? (estado) : "";
+                    endereco += Utils.Validator.Is(cep)         ? (", CEP: " + cep) : "";
+                    return endereco;
+            }
+
 
     }
 

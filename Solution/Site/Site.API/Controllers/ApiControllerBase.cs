@@ -66,7 +66,9 @@ namespace JaCaptei.API.Controllers {
                 usuario.id               = int.Parse(HttpContext.User.FindFirst("_id").Value);
                 usuario.idTipoUsuario    = int.Parse(HttpContext.User.FindFirst("_idTipoUsuario").Value);
                 usuario.idConta          = int.Parse(HttpContext.User.FindFirst("_idConta").Value);
+                usuario.donoConta        = bool.Parse(HttpContext.User.FindFirst("_donoConta").Value);
                 usuario.nome             = HttpContext.User.FindFirst(ClaimTypes.Name).Value;
+                usuario.apelido          = HttpContext.User.FindFirst("_apelido").Value;
                 usuario.email            = HttpContext.User.FindFirst("_email").Value;
                 usuario.tokenUID         = HttpContext.User.FindFirst("_tokenUID").Value;
                 usuario.roles            = HttpContext.User.FindFirst(ClaimTypes.Role).Value;

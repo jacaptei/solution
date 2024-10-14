@@ -1,0 +1,603 @@
+<template>
+    <div>
+        <el-row :gutter="20" v-if="view == 'request' ">
+            <el-col :md="24" style="width:100%;text-align:center;padding:40px;padding-left:0px">
+                <c-loading size="60px"></c-loading>
+            </el-col>
+        </el-row>
+
+        <el-row :gutter="20" v-if="view == 'form' " @click="VerificarSeBloqueiaEnvioAlert">
+            <el-col :md="24">
+                <el-row :gutter="20">
+                    <el-col :xs="24" :sm="24" :md="24" :lg="24" style="color:var(--s-color-primary)">
+                        <ul>
+                            <li>O processamento iniciará no mesmo dia quando agendado de <b>Segunda à Sexta das 08h às 17h</b> e <b>Sábado até 11h</b>.</li>
+                            <li>Fora deste prazo, a data do processamento passa a contar no próximo dia útil.</li>
+                            <li><b>URL</b> ou <b>endereço</b> do imóvel são necessários.</li>
+                        </ul>
+                    </el-col>
+                </el-row>
+
+                <el-row :gutter="20" v-if="!bloqueadoEnvio && bloqueadoEnvioNaoAgendado">
+                    <el-col :md="24" style="width:100%;text-align:center;margin-bottom:10px;margin-top:20px">
+                        <el-alert style="background-color:#fff1d3;color:var(--s-color-primary)" title="Solicitações hoje apenas com agendamento." type="info" show-icon />
+                    </el-col>
+                </el-row>
+
+                <el-row :gutter="20" v-if="bloqueadoEnvio">
+                    <el-col :md="24" style="width:100%;margin-top:20px">
+                        <el-alert title="O atendimento das solicitações de hoje estão suspensas ou já foram encerradas." description="Volte a enviar suas solicitaçãoes nos dias úteis de Segunda à Sábado a partir das 8h." type="warning" show-icon />
+                        <q-btn label="Tentar Novamente" outline color="primary" style="margin:4px"></q-btn>
+                    </el-col>
+                </el-row>
+
+                <el-row :gutter="20" :style="bloqueadoEnvio? 'opacity:0.5;pointer-events:none;':'opacity:1'" v-if="carregandoImovel">
+                    <el-col :xs="24" :sm="24" :md="24" :lg="24" class="s-input" style="max-width:1700px;margin-top:10px">
+                        <c-loading></c-loading>
+                    </el-col>
+                </el-row>
+
+                <el-row :gutter="20" :style="bloqueadoEnvio? 'opacity:0.5;pointer-events:none;':'opacity:1'" v-else>
+                    <el-col :xs="24" :sm="24" :md="24" :lg="24">
+
+                            <el-row :style="bloqueadoEnvio? 'opacity:0.5;pointer-events:none;':'opacity:1'" v-if="solicitacao.imovelJC">
+                                <el-col :xs="24" :sm="24" :md="24" :lg="24" class="s-input" style="max-width:1700px;margin-top:20px;margin-bottom:0px">
+                                   <div style="color:#0bdb13;display:inline-block;padding-left:5px;font-size:17px"><i class="fa fa-check-circle"></i> imóvel JáCaptei</div>
+                                </el-col>
+                            </el-row>
+
+                            <el-row :gutter="20" :style="bloqueadoEnvio? 'opacity:0.5;pointer-events:none;':'opacity:1'">
+                                <el-col :xs="24" :sm="24" :md="24" :lg="24" class="s-input" style="max-width:1700px;margin-top:20px">
+                                    <div>CÓDIGO DE IMÓVEL <b style="color:var(--s-color-primary)">JÁ CPATEI</b> <span></span> </div>
+                                    <el-input @keyup.enter="ChecarCodImovelJaCaptei()" v-model="solicitacao.codImovel" placeholder="" maxlength="15" ref="codimovel" input-style="text-transform:uppercase;max-width:320px" @blur="ChecarCodImovelJaCaptei"></el-input>
+                                </el-col>
+                            </el-row>
+                            <el-row :gutter="20" :style="bloqueadoEnvio? 'opacity:0.5;pointer-events:none;':'opacity:1'">
+                                <el-col :xs="24" :sm="24" :md="24" :lg="24" class="s-input" style="max-width:1700px">
+                                    <div>URL<span></span> </div>
+                                    <el-input @keyup.enter="ChecarUrlImovelJaCaptei()" v-model="solicitacao.url" placeholder="" maxlength="400" ref="url" input-style="text-transform:lowercase;" @keyup="ChecarUrlImovelJaCaptei"></el-input>
+                                </el-col>
+                            </el-row>
+                            <el-row :gutter="20" :style="(bloqueadoEnvio || carregandoImovel)? 'opacity:0.5;pointer-events:none;':'opacity:1'" >
+
+                                <el-col :xs="24" :sm="12" :md="8" :lg="8" class="s-input">
+                                    <div><p>CEP</p><span></span></div>
+                                    <el-input v-model="cep.numero" placeholder="" ref="postalCode" v-maska data-maska="#####-###" @keyup="()=>{  if(cep.numero.length>=9){BuscarEndereco();} }">
+                                        <template #append>
+                                            <c-loading size="20px" v-if="carregandoCEP"></c-loading>
+                                            <i class="fa fa-search" v-else-if="(cep.numero.length < 9)" style="color:var(--s-accent-color)" @click="$tools.Alert('Preencha todo o CEP para poder realizar a busca.')"></i>
+                                            <i class="fa fa-search" v-else style="color:var(--s-accent-color);cursor:pointer" @click="BuscarEndereco"></i>
+                                        </template>
+                                    </el-input>
+                                </el-col>
+
+                                <el-col :xs="24" :sm="12" :md="8" :lg="8" class="s-input">
+                                    <div><p>ESTADO</p><span></span></div>
+                                    <div style="height:40px" v-if="carregandoEstados">
+                                        <c-loading size="30px" style="padding-left:5px"></c-loading>
+                                    </div>
+                                    <el-select :teleported="false" v-else filterable v-model="solicitacao.estado" class="m-4" placeholder="Selecionar" size="large" style="width:100%" @change="(item)=>{ObterCidades(item);enableFilterButton = true;}">
+                                        <el-option v-for="item in opcoes.estados"
+                                                   :key="item.id"
+                                                   :label="item.label"
+                                                   :value="item.uf"></el-option>
+                                    </el-select>
+                                </el-col>
+
+                                <el-col :xs="24" :sm="12" :md="8" :lg="8" class="s-input">
+                                    <div><p>CIDADE</p><span></span></div>
+                                    <div style="height:40px" v-if="carregandoCidades">
+                                        <c-loading size="30px" style="padding-left:5px"></c-loading>
+                                    </div>
+                                    <el-select v-else :teleported="false" v-model="solicitacao.cidade" filterable class="m-4" placeholder="Selecionar" size="large" style="width:100%" @click="()=>{ if($validator.not(solicitacao.estado)){ $tools.Alert('Selecione um <b>Estado</b> antes');} }" @change="(item)=>{ObterBairros(item);enableFilterButton = true;}">
+                                        <el-option v-for="item in opcoes.cidades"
+                                                   :key="item.id"
+                                                   :label="item.label"
+                                                   :value="item.value"></el-option>
+                                    </el-select>
+                                </el-col>
+
+                                <el-col :xs="24" :sm="12" :md="8" :lg="8" class="s-input">
+                                    <div><p>BAIRRO</p><span></span></div>
+                                    <div style="height:40px" v-if="carregandoBairros">
+                                        <c-loading size="30px" style="padding-left:5px"></c-loading>
+                                    </div>
+                                    <el-select v-else :teleported="false" v-model="solicitacao.bairro" filterable :clearable="true" class="m-4" placeholder="Selecionar" size="large" style="width:100%;" @click="()=>{ if($validator.not(solicitacao.estado)){ $tools.Alert('Selecione <b>Estado</b> e <b>Cidade</b> antes');} }" @change="(item)=>{DefinirBairro(item);enableFilterButton = true;}">
+                                        <el-option v-for="item in opcoes.bairros"
+                                                   :key="item.id"
+                                                   :label="item.label"
+                                                   :value="item.value"></el-option>
+                                    </el-select>
+                                </el-col>
+
+                                <el-col :xs="24" :sm="12" :md="8" :lg="8" class="s-input">
+                                    <div>LOGRADOURO <span>&nbsp;rua, avenida, praça, etc</span></div>
+                                    <el-input @keyup.enter="Enviar()" v-model="solicitacao.logradouro" placeholder="" ref="logradouro" maxlength="80" input-style="text-transform:uppercase;"></el-input>
+                                </el-col>
+
+                                <el-col :xs="24" :sm="6" :md="4" :lg="4" class="s-input">
+                                    <div>NÚMERO <span><b>SN</b> se não houver</span></div>
+                                    <el-input @keyup.enter="Enviar()" v-model="solicitacao.numero" placeholder="" maxlength="80" input-style="text-transform:uppercase;" ref="addressnumber"></el-input>
+                                </el-col>
+
+                                <el-col :xs="24" :sm="6" :md="4" :lg="4" class="s-input">
+                                    <div>COMPLEMENTO <span>&nbsp;&nbsp;opcional</span></div>
+                                    <el-input @keyup.enter="Enviar()" v-model="solicitacao.complemento" placeholder="" maxlength="80" input-style="text-transform:uppercase;"></el-input>
+                                </el-col>
+
+
+
+
+                                <el-col :xs="24" :sm="24" :md="9" :lg="9" class="s-input">
+                                    <div>DATA DESEJADA <span></span></div>
+                                    <!--<el-time-picker v-model="agenda.hora" placeholder="horário" size="large" @change="ProcessarDataVisita" style="max-width:140px"></el-time-picker>-->
+                                    <el-time-select v-model="hora" :start=horaStart :end=horaEnd step="00:15" placeholder="horário" style="max-width:140px" @change="ProcessarDataVisita" ></el-time-select>
+                                    <span style="padding-left:30px;">
+                                        <span v-if="solicitacao.dataVisita.getFullYear() > 1900" style="color:var(--s-color-primary);font-weight:700"> {{dataVisitaLabel}} <span style="padding-left:5px;color:#548fff;cursor:pointer" @click="CancelarAgendamento"><b>X</b></span></span><span v-else>sem agendamento</span>
+                                    </span>
+                                    <br />
+                                    <!--<q-date v-model="agenda.data" style="text-align:left" minimal @click="ProcessarDataVisita" :options="(date)=>{ return date >= dateRangeInit.format('yyyy/mm/dd'); }"></q-date>-->
+                                    <q-date v-model="dia" style="text-align:left" minimal @click="ProcessarDataVisita" :options="(date)=>{ return date >= dateRangeInit.format('yyyy/mm/dd'); }"></q-date>
+
+                                </el-col>
+
+                                <el-col :xs="24" :sm="24" :md="15" :lg="15" class="s-input" style="max-width:1000px">
+                                    <div>OBSERVAÇÕES<span></span></div>
+                                    <el-input @keyup.enter="Enviar()" v-model="solicitacao.obsAgendamento" placeholder="" type="textarea" maxlength="4500" :autosize="{ minRows: 8, maxRows: 16 }" ref="desc"></el-input>
+                                </el-col>
+                            </el-row>
+                            <el-row :gutter="20" style="margin-top:10px">
+                                <el-col :md="12" class="s-input-optional" v-if="!bloqueadoEnvio">
+                                    <q-btn label="Enviar" color="primary" style="width:200px;" @click="Enviar()"></q-btn>
+                                </el-col>
+                                <el-col :md="12" class="s-input-optional" v-else>
+                                    <q-btn label="Enviar" color="grey" style="width:200px;" disable></q-btn>
+                                </el-col>
+                            </el-row>
+
+                    </el-col>
+                </el-row>
+            </el-col>
+        </el-row>
+
+        <el-row :gutter="20" v-if="view == 'success' ">
+            <el-col :md="24" style="width:100%;text-align:center;padding:40px;padding-left:0px">
+                <c-info type="success" title="Sucesso" subtitle="agendamento enviado"></c-info>
+                <q-btn label="Agendar outro" style="background-color:var(--s-color-teal)" text-color="white" @click="ShowView('form')"></q-btn>
+            </el-col>
+        </el-row>
+
+        <el-row :gutter="20" v-if="view == 'fail' ">
+            <el-col :md="24" style="width:100%;text-align:center;padding:40px;padding-left:0px">
+                <div class="title" style="color:var(--s-color-red)"><b><i class="fa fa-circle-xmark"></i> Falhou</b></div>
+                <br />Não foi possível enviar solicitação,<br />favor tentar novamente.
+                <br /><br />
+                <q-btn color="white" text-color="orange-10" label="VOLTAR" @click="ShowView('form')" style="width:200px;"></q-btn>
+            </el-col>
+        </el-row>
+    </div>
+</template>
+
+<script>
+    module.exports = {
+        name: 'JaCapteiParceiroSolicitacaoAgendar821325',
+        components: {},
+        data: function () {
+            return {
+                view: "form",
+                messageSuccess: "Cadastrado!",
+                messageAlert: "",
+                carregandoImovel: false,
+                carregandoCEP: false,
+                carregandoEstados: false,
+                carregandoCidades: false,
+                carregandoBairros: false,
+                cep: {
+                    numero: "",
+                    estado: "",
+                    cidade: "",
+                    logradouro: ""
+                },
+                opcoes: {
+                    estados: this.$root.localidade.estados,
+                    cidades: [],
+                    bairros: [],
+                    sexos: [],
+                },
+                solicitacao: this.$models.solicitacao(),
+                url: "",
+                idImovel: 0,
+                codImovel: 0,
+                city: "",
+                dia:"",
+                hora:"",
+                dataVisitalabel: "sem agenda",
+                agenda: { data: new Date(1900, 1, 0, 0, 0, 0, 0), hora: null, obs: "" },
+                dateRangeInit: new Date(),
+                dateStart: new Date(),
+                dateNow: new Date(),
+                horaStart:"08:00",
+                horaEnd:"17:30",
+                dataConsiderada: new Date(),
+                bloqueadoEnvio: false,
+                bloqueadoEnvioNaoAgendado: false,
+            }
+        },
+        computed: {},
+        props: {},
+        watch: {},
+        created: function () {
+
+            this.solicitacao = this.$models.solicitacao();
+
+            if(this.$validator.not(this.solicitacao))
+                this.solicitacao = {};
+
+            this.solicitacao.dataVisita = new Date(1900, 0, 1, 0, 0, 0, 0);
+            //this.solicitacao.url = "https://localhost:52240/imovel?cod=9601&id=1202&cid=3&cnome=TESTE2&ctelefone=(11)+33515-1651&cemail=prvgnt02@gmail.com&ctipo=PF&crazao=&cfantasia=&title=JaCaptei+.+cod+9601&desc=Apartamento,+3+quartos,+1+suites,+2+vagas+em+&img=https://imagizer.imageshack.com/v2/640x480q70/922/tHBkG5.jpg&tag=imovel&r=000000";
+
+
+            this.dateRangeInit.setHours(0, 0, 0, 0);
+
+            if (this.$tools.GetDayWeek(this.dateNow) == "Sáb"){
+                if (this.dateNow.getHours() >= 11)
+                    this.dateRangeInit = this.$tools.AddDays(this.dateRangeInit, 2);
+                else{
+                    this.horaStart  = "08:00";
+                    this.horaEnd    = "12:00";
+                }
+            }else if (this.$tools.GetDayWeek(this.dateNow) == "Dom"){
+                this.dateRangeInit = this.$tools.AddDays(this.dateRangeInit, 1);
+            }else if (this.dateNow.getHours() >= 17){
+                this.dateRangeInit = this.$tools.AddDays(this.dateRangeInit, 1);
+            }
+
+
+        },
+        mounted() {
+
+            this.VerificarSeBloqueiaEnvio();
+            window.setInterval(() => this.VerificarSeBloqueiaEnvio(), 10000);
+
+            if (!this.bloqueadoEnvio)
+                window.setTimeout(() => this.$refs.codimovel.focus(), 1000);
+
+        },
+        methods: {
+
+            VerificarSeBloqueiaEnvio() {
+                var dayoff = false;
+                this.dateNow = new Date();
+                this.bloqueadoEnvio = (dayoff || this.$tools.GetDayWeek(this.dateNow) == "Dom" || this.dateNow.getHours() < 8 || this.dateNow.getHours() >= 17 || (this.$tools.GetDayWeek(this.dateNow) == "Sáb" && this.dateNow.getHours() >= 11));
+                this.bloqueadoEnvioNaoAgendado = (this.$tools.GetDayWeek(this.dateNow) == "Sáb" && this.solicitacao.dataVisita.getFullYear() == 1900);
+
+                this.bloqueadoEnvio = this.bloqueadoEnvioNaoAgendado = false;
+            },
+
+            VerificarSeBloqueiaEnvioAlert() {
+                this.VerificarSeBloqueiaEnvio();
+                if (this.bloqueadoEnvio)
+                    this.$tools.Alert("Acesso ainda não liberado.");
+            },
+
+            ShowView(v) {
+                this.view = v;
+            },
+
+            Reset() {
+                this.solicitacao = this.$models.solicitacao();
+                this.agenda = { data: new Date(1900, 0, 1, 0, 0, 0, 0), hora: null, obs: "" };
+                this.solicitacao.dataVisita = new Date(1900, 0, 1, 0, 0, 0, 0);
+                this.hora = null;
+                this.dia = null;
+                this.url = null;
+                this.idImovel = 0;
+                this.codImovel = null;
+                //this.dataVisitaLabel = "";
+            },
+
+            CancelarAgendamento() {
+                this.agenda = { data: new Date(1900, 0, 1, 0, 0, 0, 0), hora: null, obs: "" };
+                this.solicitacao.dataVisita = new Date(1900, 0, 1, 0, 0, 0, 0);
+                this.hora = null;
+                this.dia = null;
+                //this.dataVisitaLabel = "";
+            },
+
+            ProcessarDataVisita() {
+
+                if(this.$validator.is(this.dia) && this.$validator.is(this.hora) ){
+
+                
+                    this.solicitacao.dataVisita = new Date( Date.UTC(
+                        parseInt(this.dia.split("/")[0]), 
+                        (parseInt(this.dia.split("/")[1]) - 1), 
+                        parseInt(this.dia.split("/")[2]), 
+                        parseInt(this.hora.split(":")[0]), 
+                        parseInt(this.hora.split(":")[1]), 
+                        0, 0)
+                    );
+                
+                    //this.solicitacao.dataVisita = new Date(
+                    //    parseInt(this.dia.split("/")[0]), 
+                    //    (parseInt(this.dia.split("/")[1]) - 1), 
+                    //    parseInt(this.dia.split("/")[2]), 
+                    //    parseInt(this.hora.split(":")[0]), 
+                    //    parseInt(this.hora.split(":")[1]), 
+                    //    0, 0
+                    //);
+
+                    this.dataVisitaLabel = this.$tools.FormatDateHour(this.solicitacao.dataVisita);
+
+                    window.setTimeout(() => this.$refs.desc.focus(), 1000);
+
+                }
+
+            },
+
+
+
+            ChecarUrlImovelJaCaptei(){
+               
+                if(this.url != this.solicitacao.url){
+                    this.url = this.solicitacao.url;
+                    //var url = "https://localhost:52240/imovel?cod=9601&id=1202&cid=3&cnome=TESTE2&ctelefone=(11)+33515-1651&cemail=prvgnt02@gmail.com&ctipo=PF&crazao=&cfantasia=&title=JaCaptei+.+cod+9601&desc=Apartamento,+3+quartos,+1+suites,+2+vagas+em+&img=https://imagizer.imageshack.com/v2/640x480q70/922/tHBkG5.jpg&tag=imovel&r=000000";
+                    //    url = "https://jacaptei.com.br/imovel?cod=JC1388&id=1388&cid=55&cnome=TESTE+PJ&ctelefone=(11)+97530-3200&cemail=paulont@live.com&ctipo=PJ&crazao=TESTE+PJ+LTDA+ME&cfantasia=Teste&title=JaCaptei+.+cod+JC1388&desc=Apartamento,+4+quartos,+2+suites,+3+vagas+em+&img=https://imagizer.imageshack.com/v2/640x480q70/922/dKNulE.jpg&tag=imovel&r=000000";
+                    try{
+                        var baseURL = this.solicitacao.url.split("/")[2].split(":")[0];
+                        if(baseURL == "localhost" || baseURL == "jacaptei.com.br" || baseURL == "homolog.jacaptei.com.br"){
+                                this.solicitacao.idImovel = parseInt(this.solicitacao.url.split("id=")[1].split("&")[0]);
+                                this.BuscarImovel(this.solicitacao.idImovel,"");
+                        }
+                        //c(this.solicitacao.url.split("/")[2].split(":")[0]); // localhost
+                        //c(this.solicitacao.url.split("id=")[1].split("&")[0]); // 1202
+                    }catch(e){ce(e);}
+                }
+            },
+
+
+            ChecarCodImovelJaCaptei(){
+                if(this.$validator.is(this.solicitacao.codImovel) && this.codImovel != this.solicitacao.codImovel){
+                    this.codImovel = this.solicitacao.codImovel;
+                    try{
+                        this.BuscarImovel(0,this.solicitacao.codImovel);
+                    }catch(e){ce(e);}
+                }
+            },
+
+            async BuscarImovel(id,cod){
+
+                        var buscaImovel = {imovel:{}};
+                        
+                        buscaImovel.imovel.id   = id;
+                        buscaImovel.imovel.cod  = cod;
+                        buscaImovel.usuario     =   this.$root.usuario;
+        
+                        this.carregandoImovel = true;
+
+                        var request = await this.$api.Post("imovel/buscar/unidade",buscaImovel);
+
+                        if (request?.status?.success){
+                            buscaImovel                     =  request.result;
+                            this.solicitacao.imovel         =   buscaImovel.result.imoveis[0];
+                            if(this.$validator.is(this.solicitacao.imovel)){
+                                    this.solicitacao.idImovel       =   this.solicitacao.imovel.id;
+                                    this.solicitacao.codImovel      =   this.solicitacao.imovel.cod;
+                                    this.solicitacao.imovelJC       =   true;
+                                    this.solicitacao.idParceiro     =   this.$root.usuario.id;
+                                    this.solicitacao.parceiro       =   this.$root.usuario;
+                                    this.solicitacao.idProprietario =   this.solicitacao.imovel.idProprietario;
+                                    this.solicitacao.proprietario   =   this.solicitacao.imovel.proprietario;
+                                    this.solicitacao.titulo         =   this.solicitacao.imovel.titulo + ", ID #" + this.solicitacao.imovel.id + ", COD " + this.solicitacao.imovel.cod;
+                                    this.solicitacao.url            =   this.solicitacao.imovel.urlPublica;
+                                    this.solicitacao.cep            =   this.cep.numero     =   this.solicitacao.imovel.endereco.cep;
+                                    this.solicitacao.estado         =   this.solicitacao.imovel.endereco.estado;
+                                    this.solicitacao.idEstado       =   this.solicitacao.imovel.endereco.idEstado;
+                                    this.solicitacao.cidade         =   this.solicitacao.imovel.endereco.cidade;
+                                    this.solicitacao.idCidade       =   this.solicitacao.imovel.endereco.idCidade;
+                                    this.solicitacao.bairro         =   this.solicitacao.imovel.endereco.bairro;
+                                    this.solicitacao.idBairro       =   this.solicitacao.imovel.endereco.idBairro;
+                                    this.solicitacao.logradouro     =   this.solicitacao.imovel.endereco.logradouro;
+                                    this.solicitacao.numero         =   this.solicitacao.imovel.endereco.numero;
+                                    this.solicitacao.complemento    =   this.solicitacao.imovel.endereco.complementoTipo +" "+this.solicitacao.imovel.endereco.complemento;
+                                    if(this.$validator.is(this.solicitacao.imovel.endereco.andar && this.solicitacao.imovel.endereco.andar > 0))
+                                        this.solicitacao.complemento += ", " + this.solicitacao.imovel.endereco.andar +"º andar";
+                            }else{
+                                this.Reset();
+                                this.$tools.Alert("Imóvel não encontrado ou não mais disponível.")
+                            }
+                        }else{
+                            this.Reset();
+                            this.$tools.Alert("Não foi possível pesquisar imóvel.")
+                        }
+                        this.carregandoImovel = false;
+                        window.setTimeout(() => this.$refs.desc.focus(), 1000);
+                        //this.$refs.desc.focus();
+                        //c2("this.solicitacao.imovel",this.solicitacao.imovel)
+            },
+
+
+
+
+
+
+
+
+
+
+
+            async Enviar() {
+
+
+                var msg = ["", "", "", ""];
+
+                this.ProcessarDataVisita();
+                //c2("this.solicitacao.dataVisita", this.solicitacao.dataVisita);
+
+
+
+                if (this.carregandoImovel)
+                    msg[0] += "<b>Favor aguardar a pesquisa do imóvel.</b><br><br>";
+
+                if (this.solicitacao.dataVisita.getFullYear() == 1900)
+                    msg[0] += "<b>Dia e hora do agendamento não informados.</b><br><br>";
+
+
+
+                if (this.$validator.not(this.solicitacao.cod) && this.$validator.not(this.solicitacao.url))
+                    msg[1] += "<b>CÓDIGO DO IMÓVEL</b> ou <b>URL</b> não informados<br>";
+
+                if (this.$validator.not(this.solicitacao.estado))
+                    msg[2] += "<b>ESTADO</b> não selecionado<br>";
+
+                if (this.$validator.not(this.solicitacao.cidade))
+                    msg[2] += "<b>CIDADE</b> não selecionada<br>";
+
+                if (this.$validator.not(this.solicitacao.bairro))
+                    msg[2] += "<b>BAIRRO</b> não selecionado<br>";
+
+                if (this.$validator.not(this.solicitacao.logradouro))
+                    msg[2] += "<b>LOGRADOURO</b> não informado<br>";
+
+                if (this.$validator.not(this.solicitacao.numero))
+                    msg[2] += "<b>NÚMERO</b> não informado (informe <b>SN</b> se não houver)<br>";
+
+
+                //if (this.$validator.not(this.solicitacao.descricao))
+                //    msg[3] += "<b>DESCRIÇÃO</b> não informada<br>";
+
+                if (msg[1].length > 0 && msg[2].length > 0)
+                    msg[0] += "<b>CÓDIGO DO IMÓVEL</b> ou<b>URL</b> ou <b>ENDEREÇO</b> são necessários<br><br>";
+                else
+                    msg[1] = msg[2] = "";
+
+
+                if (msg[0].length > 0 || msg[3].length > 0 || (msg[1].length > 0 && msg[2].length > 0))
+                    this.$tools.Alert(msg.join(""));
+                else {
+
+                    this.ProcessarDataVisita();
+                    //c2("this.solicitacao.dataVisita", this.solicitacao.dataVisita);
+
+
+                    this.view = "request";
+
+                    if (this.$validator.not(this.solicitacao.cep))
+                        this.cep.numero = this.solicitacao.cep = await this.BuscarCep();
+                    var request = await this.$api.Post("solicitacao/agendar", this.solicitacao);
+
+                    if (request?.status?.success) {
+                        this.view = "success";
+                        this.CancelarAgendamento();
+                        //this.solicitacao = request.result;
+                        // c(request);
+                    } else {
+                        c(request);
+                        this.view = "form";
+                    }
+
+                }
+            },
+
+
+            async BuscarEndereco() {
+
+                if (this.cep.numero !== this.solicitacao.cep) {
+
+                    this.carregandoCEP = true;
+                    this.carregandoEstados = true;
+                    this.carregandoCidades = true;
+                    this.carregandoBairros = true;
+
+                    this.cep.cidade = this.solicitacao.cidade = "";
+                    this.cep.logradouro = this.solicitacao.logradouro = "";
+                    this.cep.bairro = this.solicitacao.bairro = "";
+                    this.cep.estado = this.solicitacao.estado = "";
+
+                    this.solicitacao.cep = this.cep.numero;
+                    let res = await this.$sdata.BuscarEndereco(this.cep.numero);
+
+                    if (this.$validator.is(res?.city)) {
+                        this.cep.cidade = this.solicitacao.cidade = res.city;
+                        this.cep.logradouro = this.solicitacao.logradouro = res.address;
+                        this.cep.bairro = this.solicitacao.bairro = res.neighborhood;
+                        this.cep.estado = this.solicitacao.estado = res.state;
+
+                        this.$refs.addressnumber.focus();
+
+                    }
+
+                    this.carregandoCEP = false;
+                    this.carregandoEstados = false;
+                    this.carregandoCidades = false;
+                    this.carregandoBairros = false;
+                }
+            },
+
+            async BuscarCep() {
+                var endereco = this.solicitacao.estado + "/" + this.solicitacao.cidade.replaceAll(" ", "%20") + "/" + this.solicitacao.logradouro.replaceAll(" ", "%20")
+                let res = await this.$sdata.BuscarCep(endereco);
+                return res.cep;
+            },
+
+
+
+            ObterCidades(estado) {
+
+                this.solicitacao.cidade = this.solicitacao.bairro = "";
+                this.solicitacao.idCidade = this.solicitacao.idBairro = 0;
+
+                this.opcoes.bairros = [];
+                this.opcoes.cidades = [];
+                var cidades = [];
+
+                if (this.$validator.is(estado)) {
+                    this.carregandoCidades = true;
+                    this.solicitacao.idEstado = this.opcoes.estados.filter((e) => e.uf == estado)[0].id;
+                    this.$sdata.ObterCidades(this.solicitacao.idEstado).then(res => { this.carregandoCidades = false; this.opcoes.cidades = res; });
+                }
+
+            },
+
+
+            ObterBairros(cidade) {
+
+                this.solicitacao.bairro = "";
+                this.solicitacao.idBairro = 0;
+
+                this.opcoes.bairros = [];
+                var bairros = [];
+
+                if (this.$validator.is(cidade)) {
+                    this.carregandoBairros = true;
+                    this.solicitacao.idCidade = this.opcoes.cidades.filter((c) => c.value == cidade)[0].id;
+                    this.$sdata.ObterBairros(this.solicitacao.idCidade).then(res => { this.carregandoBairros = false; c2("this.opcoes.bairros", res); this.opcoes.bairros = res; });
+                }
+
+            },
+
+            DefinirBairro(bairro) {
+                this.solicitacao.idBairro = this.opcoes.bairros.filter((c) => c.value == bairro)[0].id;
+                //this.$refs.logradouro.focus();
+                //this.solicitacao.bairro = bairro.label;
+                //c2("this.solicitacao", this.solicitacao);
+            },
+
+
+
+
+
+        }
+
+    }
+
+</script>
+
+
+<style scoped>
+    .s-input {
+        margin-bottom: 20px;
+    }
+</style>
+
+

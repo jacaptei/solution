@@ -23,9 +23,9 @@ $(document).ready(function () {
 
     const ROUTER = VueRouter.createRouter({
         mode: 'history', // Add this line
-        //history: VueRouter.createWebHashHistory(),
-        history: VueRouter.createWebHistory(),
-        //base: "home",
+        history: VueRouter.createWebHashHistory(),
+        //history: VueRouter.createWebHistory(),
+        action: "home",
         routes: routes,
         scrollBehavior(to, from, savedPosition) {
             return { x: 0, y: 0 };
@@ -45,7 +45,7 @@ $(document).ready(function () {
 
 		data: function () {
 			return {
-                    status          : {loading:false, requesting:false, pageLoading:false, dataLoading:false, online:true, success:true},
+                    status          : {mainLoading:false,loading:false, requesting:false, pageLoading:false, dataLoading:false, online:true, success:true},
                     params          : null,
                     zoom            : 1,
                     loading         : false,
@@ -54,7 +54,7 @@ $(document).ready(function () {
                     showLoginModal  : false,
                     autoLogin       : false,
                     rememberMe      : false,
-                    //test            : "root context ok",
+                    parceiroRow     : {},
                     title: {
                         label       : "HOME",
                         icon        : "fa fa-user",
@@ -68,6 +68,7 @@ $(document).ready(function () {
                     },
                     routing:{
                         title       :this.title,
+                        action      :null,
                         area        :null,
                         label       :null,
                         lastPath    :null,
@@ -76,8 +77,8 @@ $(document).ready(function () {
                         menuIndex   :null,
                     },
 
-                    admins:[],
-                    usuario:{id:0, username:"",senha:"",nome:"",apelido:"",},
+                admins: [],
+                usuario: { id: 0, username: "", senha: "", nome: "", apelido: "", autenticado:false },
                     events:["click","mousemove","mousedown","scroll","keypress","load"],
                     timeOutSession: (20 * 60 * 1000), // 20min
                     //timeOutSession: (10 * 1000), 
@@ -109,9 +110,6 @@ $(document).ready(function () {
                   this.routing.area         = to.meta.area;
                   this.routing.label        = to.meta.label;
                   
-                  //next();
-
-                
                   if(to.path !== "/login" && !this.isAuth){
                         this.routing.menuIndex = "00-00-00-00";
                         next({ path: "/login" });
@@ -182,40 +180,39 @@ $(document).ready(function () {
 
 
             // --------------------- SETUP
-			this.setupok = axios.get(this.$api.BuildURL("suporte/modelos/obter")).then((request) => {
-
-                this.status.loading = true;
-
-				this.$models.data                   = request.data;
-                this.log                            = this.$models.log();
-                this.usuario                        = this.$models.usuario();
-                this.imovel                         = this.$models.imovel();
-                this.favorito                       = this.$models.favorito();
-                this.localidade                     = this.$models.localidade();
-
-                return true;
-
-
-                //this.$sdata.ObterEstados().then(res => {console.log(res); } );
-                //this.$sdata.ObterCidades(12).then(res => {console.log(res); } );
-                //this.$sdata.ObterBairros(9668).then(res => {console.log(res); } );
-
-			}).catch((error) => {
-                ce(error);
-                return false;
-			}).finally(() => {
-                this.status.loading = false;
-			});  
-
-            if(!this.setupok)
-                window.Alert("Não foi possível iniciar o site corretamente");
-
-
+			this.setupok = false;
+            this.SetUp();
 
             
 		},
 		methods: {  
 
+                SetUp(){
+                        axios.get(this.$api.BuildURL("suporte/modelos/obter")).then((request) => {
+
+                            this.status.mainLoading = this.status.loading = true;
+
+				            this.$models.data                   = request.data;
+                            this.log                            = this.$models.log();
+                            //this.usuario                      = this.$models.usuario();
+                            this.proprietario                   = this.$models.proprietario();
+                            this.imovel                         = this.$models.imovel();
+                            this.favorito                       = this.$models.favorito();
+                            this.localidade                     = this.$models.localidade();
+
+                            this.setupok = true;
+
+                            //this.$sdata.ObterEstados().then(res => {console.log(res); } );
+                            //this.$sdata.ObterCidades(12).then(res => {console.log(res); } );
+                            //this.$sdata.ObterBairros(9668).then(res => {console.log(res); } );
+
+			            }).catch((error) => {
+                            ce(error);
+                            this.$tools.Alert("Não foi possível iniciar o site corretamente");
+			            }).finally(() => {
+                            this.status.mainLoading = this.status.loading = false;
+			            });  
+                },
 
                 SetTimeOutSession(){
                         this.timeSession = setTimeout(() => this.SignOut(), this.timeOutSession);
@@ -270,15 +267,16 @@ $(document).ready(function () {
                 },
 
                 // AUTH --------------------------------
-                async SignIn(_usuario){
+            async SignIn(_usuario){
+
+                    this.admins = (await this.$api.Get("admin/obter/todos")).result;
+
                     this.usuario = _usuario;
-                    this.usuario.autenticado = true;
-                    this.isAuth = this.isAuth = true;
+                    this.usuario.autenticado = this.isAuth  = true;
                     //this.$sdata.Storage.Set("utk"    , this.usuario.token);
                     axios.defaults.headers.common["Authorization"] = "Bearer " + this.usuario.tokenJWT; 
                     //c2("user",this.usuario);
 
-                    this.admins = (await this.$api.Get("admin/obter/todos")).result;
                     //c2("GetAdmin", this.GetAdmin(this.admins[0].id));
 
 					//this.RouteTo("/imoveis");
@@ -306,10 +304,11 @@ $(document).ready(function () {
                     this.isAuth     = false;
                     this.log        = this.$models.log();
                     this.usuario    = this.$models.usuario();
-                    this.RouteTo("/login");
                     this.$sdata.Storage.Set("utk", null);
                     this.$sdata.Storage.Set("usuario", null);
                     axios.defaults.headers.common["Authorization"] = "";
+                    window.location.reload();
+                    this.RouteTo("/login");
                 },
 
                 Exit(){
@@ -323,7 +322,7 @@ $(document).ready(function () {
 
                 // ROUTING --------------------------------
 
-                RouteTo(destiny,action=null) {
+                RouteTo(destiny,params=null) {
                     //c(action)
                     var link = { name: "home", route: "/home" };
                     if (this.$validator.IsSet(destiny) && typeof destiny === "object") {
@@ -334,11 +333,9 @@ $(document).ready(function () {
                     } else {
                         link.route = destiny;
                      }
-
-                     if(this.$validator.IsSet(action))
-                        link.route += (this.$validator.IsSet(action))? "/"+action : "/";
-
-                    this.$router.push({ path: link.route  }).catch((e) => { console.log("RouteTo Error - " + e); });
+                    
+                    this.$router.params = params;
+                    this.$router.push({ path: link.route   }).catch((e) => { console.log("RouteTo Error - " + e); });
 
                     this.$tools.ToTop();
 
@@ -437,7 +434,10 @@ $(document).ready(function () {
 	App.component("c-header"            , c_header              );
 	App.component("c-title"             , c_title               );
 	App.component("c-building-card"     , c_building_card       );
-	App.component("c-building-mini-card", c_building_mini_card  );
+	App.component("c-imovel-card"       , c_imovel_card         );
+	App.component("c-imovel-card"       , c_imovel_card         );
+	App.component("c-proprietario-card" , c_proprietario_card   );
+	App.component("c-imovel-view"       , c_imovel_view         );
 	App.component("c-menu"              , c_menu                );
 	App.component("c-menu-header"       , c_menu_header         );
 	App.component("c-card"              , c_card                );
@@ -448,6 +448,7 @@ $(document).ready(function () {
 	App.component("c-notes"             , c_notes               );
 	App.component("c-tip"               , c_tip                 );
 	App.component("c-footer"            , c_footer              );
+	App.component("c-division"          , c_division            );
 
 	// --------- MOUNT
 	App.mount("#app");

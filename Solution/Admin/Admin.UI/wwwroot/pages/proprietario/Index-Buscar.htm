@@ -20,14 +20,20 @@
                             <div>TELEFONE <span></span></div>
                             <el-input @keyup.enter="Buscar()" v-model="busca.item.telefone" placeholder="qualquer" maxlength="40" input-style="text-transform:lowercase;" v-maska data-maska="(##) #####-#### ********************"></el-input>
                         </el-col>
+                </el-row>
+                <el-row :gutter="20">
                         <el-col :xs="24" :sm="12" :md="8":lg="6" class="s-input">
                             <div>CPF<span></span></div>
                             <el-input @keyup.enter="Buscar()" v-model="busca.item.cpf" placeholder="qualquer" maxlength="22" v-maska data-maska="###.###.###-##" @blur="CheckDoc"></el-input>
                         </el-col>
                         <el-col :xs="24" :sm="12" :md="8":lg="6" class="s-input">
+                            <div>CNPJ<span></span></div>
+                            <el-input @keyup.enter="Buscar()" v-model="busca.item.cnpj" placeholder="qualquer" maxlength="22" v-maska data-maska="##.###.###/####-##" @blur="CheckDoc"></el-input>
+                        </el-col>
+                        <!--<el-col :xs="24" :sm="12" :md="8":lg="6" class="s-input">
                             <div>RG<span></span></div>
                             <el-input @keyup.enter="Buscar()" v-model="busca.item.rg" placeholder="qualquer" maxlength="22" ref="documento"></el-input>
-                        </el-col>
+                        </el-col>-->
                         <el-col :xs="24" :sm="12" :md="8":lg="6" class="s-input">
                             <div>ID<span></span></div>
                             <el-input-number @keyup.enter="Buscar()" v-model="id" placeholder="qualquer" maxlength="20" ref="id" :controls="false"></el-input-number>
@@ -87,7 +93,7 @@
 
 
 
-                            <el-table-column fixed="left" label="Ações" width="100" style="color:orange">
+                            <el-table-column fixed="left" label="Ações" width="140" style="color:orange">
                                     <template #default="scope" style="border-right:1px solid #000">
 
                                         <div v-if="scope.row.onrequest">
@@ -119,6 +125,10 @@
                                                 <div style="display:inline-block;margin-left:20px;cursor:pointer;font-size:16px;" @click="Alterar(scope)" title="editar">
                                                     <i class="fa fa-edit" :style="(scope.row.ativo)? 'color:var(--s-color-primary)' : (scope.row.excluido)? 'cursor:pointer;color:#555' : 'color:var(--s-color-red)'"></i>
                                                 </div>
+                                                    
+                                                <div style="display:inline-block;margin-left:20px;cursor:pointer;font-size:16px;" @click="$root.RouteTo('imoveis',{view:'adicionar', proprietario: scope.row})" title="adicionar imóvel">
+                                                    <i class="fa fa-house-medical" :style="(scope.row.ativo)? 'color:var(--s-color-primary)' : (scope.row.excluido)? 'cursor:pointer;color:#555' : 'color:var(--s-color-red)'"></i>
+                                                </div>
 
                                                 </div>
 
@@ -148,12 +158,18 @@
                                         <span v-else>-</span>
                                     </template>
                                 </el-table-column>
-                                <el-table-column label="RG" width="150">
+                                <el-table-column label="CNPJ" width="180">
+                                    <template #default="scope">
+                                        <a v-if="$validator.is(scope.row.cnpj)" href="javascript:void(0)" @click="$tools.Copy(scope.row.cnpj)" style="text-decoration:none;color:var(--s-color-tex-alt)"><i class="fa fa-copy" style="padding-right:3px;color:#666;text-decoration:none"></i> {{scope.row.cnpj}}  </a>
+                                        <span v-else>-</span>
+                                    </template>
+                                </el-table-column>
+                                <!--<el-table-column label="RG" width="150">
                                     <template #default="scope">
                                         <a v-if="$validator.is(scope.row.rg)" href="javascript:void(0)" @click="$tools.Copy(scope.row.rg)" style="text-decoration:none;color:var(--s-color-tex-alt)"><i class="fa fa-copy" style="padding-right:3px;color:#666;text-decoration:none"></i> {{scope.row.rg}}  </a>
                                         <span v-else>-</span>
                                     </template>
-                                </el-table-column>
+                                </el-table-column>-->
 
                             <el-table-column label="E-Mail" width="220">
                                 <template #default="scope">
@@ -301,6 +317,17 @@
 
 
             },
+
+
+            CheckDoc() {
+                //window.setTimeout(() => {
+                //        if (this.$validator.is(this.busca.item.cpf) && !this.$validator.IsCPF(this.busca.item.cpf))
+                //            this.$tools.Alert("CPF inválido");
+                //        else if (this.$validator.is(this.busca.item.cnpj) && !this.$validator.IsCNPJ(this.busca.item.cnpj))
+                //            this.$tools.Alert("CNPJ inválido");
+                //}, 500);
+            },
+
 
             async Buscar(page=1){
 

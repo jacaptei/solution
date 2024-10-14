@@ -157,6 +157,39 @@
 
                                                         <div style="margin-top:10px;font-weight:500;color:#000">
 
+                                                            <el-input v-if="item.idImovel > 0" v-model="item.titulo" readonly input-style="color:#000" @click="()=>{item.acao=='abrir-imovel'?  item.acao='fechar-imovel' :  item.acao='abrir-imovel';}">
+                                                                <template #prepend>
+                                                                    <div style="text-transform:uppercase;font-weight:660;width:110px;text-align:right;cursor:pointer;" @click="()=>{item.acao=='abrir-imovel'?  item.acao='fechar-imovel' :  item.acao='abrir-imovel';}">
+                                                                        Imóvel <i style="padding-left:4px" class="fa fa-building"></i>
+                                                                    </div>
+                                                                </template>
+                                                                <template #append>
+                                                                    <q-btn icon="fa fa-copy" flat @click="$tools.CopyLink(item.titulo)" style="width:10px" :title="item.titulo"></q-btn>
+                                                                    <q-btn icon="fa fa-up-right-from-square" flat style="margin-left:5px;width:10px" @click="$tools.OpenLink(item.url)"></q-btn>
+                                                                    <div @click="()=>{item.acao=='abrir-imovel'?  item.acao='fechar-imovel' :  item.acao='abrir-imovel';}" style="cursor:pointer;text-align:center">
+                                                                        <q-btn icon="fa fa-caret-down" flat style="margin-left:5px;width:10px" v-if="item.acao != 'abrir-imovel'"></q-btn>
+                                                                        <q-btn icon="fa fa-caret-up" flat style="margin-left:5px;width:10px" v-else></q-btn>
+                                                                    </div>
+                                                                </template>
+                                                            </el-input>
+                                                            <div v-if="item.acao=='abrir-imovel'">
+                                                                <q-card>
+                                                                    <q-card-section>
+                                                                        <div style="font-size:15px">
+                                                                           <div><a href="javascript:void(0)" @click="$tools.Copy(item.titulo)"      style="text-decoration:none;color:var(--s-color-tex-alt)">{{item.titulo}}         <i class="fa fa-copy" style="text-decoration:none;color:#999"></i></a></div>
+                                                                           <div><a href="javascript:void(0)" @click="$tools.Copy(item.idImovel)"    style="text-decoration:none;color:var(--s-color-tex-alt)">ID #{{item.idImovel}}   <i class="fa fa-copy" style="text-decoration:none;color:#999"></i></a><br /></div>
+                                                                           <div><a href="javascript:void(0)" @click="$tools.Copy(item.codImovel)"   style="text-decoration:none;color:var(--s-color-tex-alt)">COD {{item.codImovel}}  <i class="fa fa-copy" style="text-decoration:none;color:#999"></i></a><br /></div>
+                                                                           <div><a href="javascript:void(0)" @click="$tools.OpenLink(item.url)"     style="text-decoration:none;color:var(--s-color-tex-alt)">ABRIR  <i class="fa fa-up-right-from-square" style="text-decoration:none;color:#999"></i></a><br /></div>
+                                                                        </div>
+                                                                    </q-card-section>
+                                                                </q-card>
+                                                            </div>
+
+                                                        </div>
+
+
+                                                        <div style="margin-top:10px;font-weight:500;color:#000">
+
                                                             <el-input :value="$validator.is(item.proprietarioCaptacao)? item.proprietarioCaptacao : 'não informado'" readonly>
 
                                                                 <template #prepend>
@@ -227,24 +260,6 @@
 
 
                                                         <div style="margin-top:10px;font-weight:500;color:#000">
-                                                            <el-input placeholder="" :value="ObterDataVisita(item)">
-                                                                <template #prepend>
-                                                                    <div style="text-transform:uppercase;font-weight:660;width:110px;text-align:right;cursor:pointer" @click="$tools.OpenCalendar(item.dataVisita)">
-                                                                        Visita   <i style="padding-left:10px" class="fa fa-calendar" title="visita agendada"></i>
-                                                                    </div>
-                                                                </template>
-                                                                <template #append>
-                                                                    <div style="width:50px;text-align:right">
-                                                                        <q-btn icon="fa fa-copy" flat @click="()=>{ item.dataVisita.getFullYear() > 1900? $tools.Copy(item.dataVisita.format('dd/mm/yyyy, ddd, HH:MM\'h\'')) : $tools.MessageAlert('Data não especificada'); }" style="width:10px"></q-btn>
-                                                                        <q-btn icon="fa fa-up-right-from-square" flat style="margin-left:5px;width:10px" @click="$tools.OpenCalendar(item.dataVisita)"></q-btn>
-                                                                    </div>
-                                                                </template>
-                                                            </el-input>
-                                                        </div>
-
-
-
-                                                        <div style="margin-top:10px;font-weight:500;color:#000">
                                                             <el-input placeholder="" :value="item.descricao">
                                                                 <template #prepend>
                                                                     <div style="text-transform:uppercase;font-weight:700;width:110px;text-align:right;cursor:pointer" @click="()=>{item.acao=='abrir-descricao'?  item.acao='fechar-descricao' :  item.acao='abrir-descricao';}">
@@ -262,6 +277,24 @@
                                                                 <el-input v-model="item.descricao" placeholder="" type="textarea" readonly :autosize="{ minRows: 2, maxRows: 4 }" style="font-size:12pt"></el-input>
                                                             </div>
                                                         </div>
+
+
+                                                        <div style="margin-top:10px;font-weight:500;color:#000" v-if="item.visita">
+                                                            <el-input placeholder="" :value="$tools.FormatDateHour(item.dataVisita)">
+                                                                <template #prepend>
+                                                                    <div style="text-transform:uppercase;font-weight:660;width:110px;text-align:right;cursor:pointer" @click="$tools.OpenCalendar(item.dataVisita)">
+                                                                        Visita   <i style="padding-left:10px" class="fa fa-calendar" title="visita agendada"></i>
+                                                                    </div>
+                                                                </template>
+                                                                <template #append>
+                                                                    <div style="width:50px;text-align:right">
+                                                                                <q-btn icon="fa fa-copy" flat @click="()=>{ item.dataVisita.getFullYear() > 1900? $tools.Copy($tools.FormatDateHour(item.dataVisita)) : $tools.MessageAlert('Data não especificada'); }" style="width:10px"></q-btn>
+                                                                                <q-btn icon="fa fa-up-right-from-square" flat style="margin-left:5px;width:10px" @click="$tools.OpenCalendar(item.dataVisita)"></q-btn>
+                                                                    </div>
+                                                                </template>
+                                                            </el-input>
+                                                        </div>
+
 
                                                         <div style="margin-top:10px;width:100%;text-align:center">
                                                             <q-btn v-if="$root.usuario.gestor" label="REALOCAR" color="orange" text-color="white" @click="Realocar(item)" :loading="item.acao=='cancelar'" style="width:160px;margin-right:20px"></q-btn>
@@ -302,11 +335,30 @@
                                                     <div class="text-h10">
                                                         <span class="text-h10">
                                                             <b style="margin-right:10px;">ID# {{item.id}}</b>
-                                                            <i v-if="!item.validadoProprietario|| !item.validadaURL || !item.validadoEndereco" title="há dados invalidados" style="padding-left:4px;color:#fff;font-size:20px;" class="fa fa-warning"></i>
-                                                            <span v-if="item.agendado">
-                                                                <i title="agendado" style="padding-left:10px;padding-right:10px;color:#fff;font-size:17px;" class="fa fa-calendar"></i>
-                                                                {{$tools.FormatDateHour(item.dataVisita)}}
+
+                                                            <span v-if="item.visita" style="font-size:14px;">
+                                                                <span >
+                                                                    <i title="agendado" style="padding-left:10px;padding-right:10px;color:#fff;font-size:17px;" class="fa fa-calendar"></i>
+                                                                    {{$tools.FormatDateHour(item.dataVisita)}}
+                                                                </span>
+                                                                <span v-if="item.concluido && !item.visitado" style="margin-left:20px; padding: 6px; border-radius: 10px; color: #ffb0d4;">
+                                                                     NÃO VISITADO <i class="fa fa-thumbs-down"></i> 
+                                                                </span>
+                                                                <span v-else-if="item.visitado" style="margin-left:20px; padding: 6px; border-radius: 10px; color: #3cff3c;">
+                                                                     VISITADO <i class="fa fa-thumbs-up"></i> 
+                                                                </span>
+                                                                <span v-else-if="item.confirmado" style="margin-left:20px; background-color: #3cff3c; padding: 6px; border-radius: 10px; color: #003900;">
+                                                                    <i class="fa fa-check-double"></i> VISITA CONFIRMADA
+                                                                </span>
+                                                                <span v-else="!item.confirmado" style="margin-left:20px; background-color: #feff7b; padding: 6px; border-radius: 10px; color: #533800;">
+                                                                    <i class="fa fa-warning"></i> VISITA NÃO CONFIRMADA
+                                                                </span>
+                                                                <span v-if="item.reagendado && !item.visitado && !item.concluido" style="margin-left:20px; background-color: #ffc13c; padding: 6px; border-radius: 10px; color: #533800;">
+                                                                   VISITA REAGENDADA
+                                                                </span>
                                                             </span>
+                                                            <i v-else-if="!item.validadoProprietario|| !item.validadaURL || !item.validadoEndereco" title="há dados invalidados" style="padding-left:4px;color:#fff;font-size:20px;" class="fa fa-warning"></i>
+
                                                         </span>
                                                         <span class="text-h10">
                                                             <span style="float:right">
@@ -335,6 +387,117 @@
 
 
 
+
+
+
+                                                        <div style="margin-bottom:10px;font-weight:500;color:#000" v-if="item.visita">
+                                                            <el-input placeholder="" :value="$tools.FormatDateHour(item.dataVisita)" @click="AbrirEdicaoAgenda(item)">
+                                                                <template #prepend>
+                                                                    <div style="text-transform:uppercase;font-weight:660;width:110px;text-align:right;cursor:pointer">
+                                                                        Visita   <i style="padding-left:10px" class="fa fa-calendar" title="visita agendada"></i>
+                                                                    </div>
+                                                                </template>
+                                                                <template #append>
+                                                                    <q-btn icon="fa fa-copy" flat @click="()=>{ item.dataVisita.getFullYear() > 1900? $tools.Copy($tools.FormatDateHour(item.dataVisita)) : $tools.MessageAlert('Data não especificada'); }" style="width:10px"></q-btn>
+                                                                    <q-btn icon="fa fa-up-right-from-square" flat style="margin-left:5px;width:10px" @click="$tools.OpenCalendar(item.dataVisita)"></q-btn>
+                                                                    <q-btn icon="fa fa-edit" flat style="margin-left:5px;width:10px" @click="AbrirEdicaoAgenda(item)" v-if="item.acao != 'abrir-agenda'"></q-btn>
+                                                                    <q-btn icon="fa fa-close" flat style="margin-left:5px;width:10px" @click="item.acao='fechar'" v-else></q-btn>
+                                                                </template>
+                                                            </el-input>
+                                                            <div v-if="item.acao=='abrir-agenda'">
+                                                                    <q-card>
+                                                                        <q-card-section>
+                                                                            <div v-if="!item.reagendado">
+                                                                                <div class="title"><el-checkbox  v-model="item.confirmado" label="CONFIRMADA"  @change="()=>{ if(item.confirmado){ item.reagendado = false; } }" ></el-checkbox> <div style="padding-left:15px;display:inline-block;margin-top:-4px">{{$tools.FormatDateHour(item.dataVisita)}}</div></div> 
+                                                                                <div v-if="$validator.is(item.obsAgendamento)" style="margin-bottom:4px;">
+                                                                                    <el-input placeholder="" :value="item.obsAgendamento" readonly>
+                                                                                        <template #prepend>
+                                                                                               ObsParceiro
+                                                                                        </template>
+                                                                                        <template #append>
+                                                                                            <q-btn icon="fa fa-copy" flat @click="$tools.Copy(item.obsAgendamento)" style="width:10px"></q-btn>
+                                                                                        </template>
+                                                                                    </el-input>                                                                        
+                                                                                </div>
+                                                                                <div v-if="item.confirmado">
+                                                                                    <el-input v-model="item.obsConfirmado" placeholder="obs confirmação" type="textarea" :rows="2"></el-input>
+                                                                                </div>
+                                                                            </div>
+
+                                                                            <div style="margin-top:10px">
+                                                                                <div class="title">
+                                                                                    <el-checkbox v-model="item.reagendado" label="REAGENDADA" @change="()=>{ if(item.reagendado){ item.confirmado = false; } }"></el-checkbox>
+                                                                                    <el-checkbox  v-model="item.confirmado" label="CONFIRMADO REAGENDAMENTO"  v-if="item.reagendado" ></el-checkbox> 
+                                                                                </div>
+                                                                                <div v-if="item.reagendado">
+                                                                                        <!--<el-time-picker v-model="agenda.hora" placeholder="horário" size="large" @change="ProcessarDataReagendamento(item)" style="max-width:140px"></el-time-picker>-->
+                                                                                        <el-time-select v-model="item.hora" :start=horaStart :end=horaEnd step="00:15" placeholder="horário" style="max-width:140px" @change="ProcessarDataReagendamento(item)" ></el-time-select>
+                                                                                        <span style="padding-left:30px;">
+                                                                                            <span v-if="item.dataReagendamento.getFullYear() > 1900" style="color:var(--s-color-primary);font-weight:700">{{$tools.FormatDateHour(item.dataReagendamento)}}</span><span v-else>sem agendamento</span>
+                                                                                        </span>
+                                                                                        <br />
+                                                                                        <q-date v-model="item.dia" style="text-align:left;max-width:420px" minimal @click="ProcessarDataReagendamento(item)" :options="(date)=>{ return date >= new Date().format('yyyy/mm/dd'); }"></q-date>
+                                                                                        <div style="margin-top:10px">
+                                                                                            <el-input v-model="item.obsReagendamento" placeholder="obs reagendamento" type="textarea" :autosize="{ minRows: 2, maxRows: 3 }"></el-input>
+                                                                                        </div>
+                                                                                </div>
+                                                                            </div>
+                                                                            <div style="margin-top:10px">
+                                                                                <div class="title"><el-checkbox v-model="item.visitado" label="VISITADO"  @change="()=>{if(item.visitado){item.imovelVendido = false; item.imovelNaoEncontrado = false; }}"></el-checkbox></div>
+                                                                                <div v-if="item.visitado">
+                                                                                    <el-input v-model="item.obsVisitado" placeholder="obs visita" type="textarea" :autosize="{ minRows: 2, maxRows: 3 }"></el-input>
+                                                                                </div>
+                                                                            </div>
+                                                                            <div style="margin-top:10px">
+                                                                                <div class="title"><el-checkbox v-model="item.concluido" label="CONCLUÍDO"  ></el-checkbox></div>
+                                                                                <div v-if="item.concluido"v style="margin-bottom:10px">
+                                                                                    <el-checkbox v-model="item.imovelNaoEncontrado" label="IMÓVEL NÃO ENCONTRADO"   @change="()=>{if(item.imovelNaoEncontrado){item.imovelVendido = false; item.visitado = false; }}" ></el-checkbox> <el-checkbox v-model="item.imovelVendido" label="IMÓVEL VENDIDO" @change="()=>{if(item.imovelVendido){item.imovelNaoEncontrado = false; item.visitado = false; }}" ></el-checkbox>
+                                                                                    <br />
+                                                                                    <el-input v-model="item.obsConcluido" placeholder="obs conclusão" type="textarea" :autosize="{ minRows: 2, maxRows: 3 }"></el-input>
+                                                                                    <div style="text-align:right;">
+                                                                                        <q-btn label="SALVAR" color="primary" text-color="white" @click="Alterar(item)" :loading="item.acao=='alterar'" style="width:160px;margin-left:00px"></q-btn>
+                                                                                    </div>
+                                                                                </div>
+                                                                            </div>
+                                                                        </q-card-section>
+                                                                    </q-card>
+
+                                                            </div>
+                                                        </div>
+
+
+
+
+
+                                                    <div style="font-weight:500;color:#000;margin-bottom:10px" v-if="item.imovelJC">
+                                                        <el-input v-model="item.titulo" readonly input-style="color:#000" @click="()=>{item.acao=='abrir-imovel'?  item.acao='fechar-imovel' :  item.acao='abrir-imovel';}">
+                                                            <template #prepend>
+                                                                <div style="text-transform:uppercase;font-weight:660;width:110px;text-align:right;cursor:pointer;" @click="()=>{item.acao=='abrir-imovel'?  item.acao='fechar-imovel' :  item.acao='abrir-imovel';}">
+                                                                    Imóvel JC <i style="padding-left:4px" class="fa fa-building"></i>
+                                                                </div>
+                                                            </template>
+                                                            <template #append>
+                                                                <q-btn icon="fa fa-copy" flat @click="$tools.CopyLink(item.titulo)" style="width:10px" :title="item.titulo"></q-btn>
+                                                                <q-btn icon="fa fa-up-right-from-square" flat style="margin-left:5px;width:10px" @click="$tools.OpenLink(item.url)"></q-btn>
+                                                                <div @click="()=>{item.acao=='abrir-imovel'?  item.acao='fechar-imovel' :  item.acao='abrir-imovel';}" style="cursor:pointer;text-align:center">
+                                                                    <q-btn icon="fa fa-caret-down" flat style="margin-left:5px;width:10px" v-if="item.acao != 'abrir-imovel'"></q-btn>
+                                                                    <q-btn icon="fa fa-caret-up" flat style="margin-left:5px;width:10px" v-else></q-btn>
+                                                                </div>
+                                                            </template>
+                                                        </el-input>
+                                                        <div v-if="item.acao=='abrir-imovel'">
+                                                            <q-card>
+                                                                <q-card-section>
+                                                                    <div style="font-size:15px">
+                                                                       <div><a href="javascript:void(0)" @click="$tools.Copy(item.titulo)"      style="text-decoration:none;color:var(--s-color-tex-alt)">{{item.titulo}}         <i class="fa fa-copy" style="text-decoration:none;color:#999"></i></a></div>
+                                                                       <div><a href="javascript:void(0)" @click="$tools.Copy(item.idImovel)"    style="text-decoration:none;color:var(--s-color-tex-alt)">ID #{{item.idImovel}}   <i class="fa fa-copy" style="text-decoration:none;color:#999"></i></a><br /></div>
+                                                                       <div><a href="javascript:void(0)" @click="$tools.Copy(item.codImovel)"   style="text-decoration:none;color:var(--s-color-tex-alt)">COD {{item.codImovel}}  <i class="fa fa-copy" style="text-decoration:none;color:#999"></i></a><br /></div>
+                                                                       <div><a href="javascript:void(0)" @click="$tools.OpenLink(item.url)"     style="text-decoration:none;color:var(--s-color-tex-alt)">ABRIR  <i class="fa fa-up-right-from-square" style="text-decoration:none;color:#999"></i></a><br /></div>
+                                                                    </div>
+                                                                </q-card-section>
+                                                            </q-card>
+                                                        </div>
+                                                    </div>
 
 
                                                         <div style="font-weight:500;color:#000;margin-bottom:10px">
@@ -573,34 +736,6 @@
 
 
                                                         <div style="margin-top:10px;font-weight:500;color:#000">
-                                                            <el-input placeholder="" :value="ObterDataVisita(item)">
-                                                                <template #prepend>
-                                                                    <div style="text-transform:uppercase;font-weight:660;width:110px;text-align:right;cursor:pointer" @click="$tools.OpenCalendar(item.dataVisita)">
-                                                                        Visita   <i style="padding-left:10px" class="fa fa-calendar" title="visita agendada"></i>
-                                                                    </div>
-                                                                </template>
-                                                                <template #append>
-                                                                    <q-btn icon="fa fa-copy" flat @click="()=>{ item.dataVisita.getFullYear() > 1900? $tools.Copy(item.dataVisita.format('dd/mm/yyyy, ddd, HH:MM\'h\'')) : $tools.MessageAlert('Data não especificada'); }" style="width:10px"></q-btn>
-                                                                    <q-btn icon="fa fa-up-right-from-square" flat style="margin-left:5px;width:10px" @click="$tools.OpenCalendar(item.dataVisita)"></q-btn>
-                                                                    <q-btn icon="fa fa-edit" flat style="margin-left:5px;width:10px" @click="AbrirEdicaoAgenda(item)" v-if="item.acao != 'abrir-agenda'"></q-btn>
-                                                                    <q-btn icon="fa fa-close" flat style="margin-left:5px;width:10px" @click="item.acao='fechar'" v-else></q-btn>
-                                                                </template>
-                                                            </el-input>
-                                                            <div v-if="item.acao=='abrir-agenda'">
-
-                                                                <el-time-picker v-model="agenda.hora" placeholder="horário" size="large" @change="FormatarDataVisita(item)" style="max-width:140px"></el-time-picker>
-                                                                <span style="padding-left:30px;">
-                                                                    <span v-if="item.dataVisita.getFullYear() > 1900" style="color:var(--s-color-primary);font-weight:700">{{item.dataVisita.format("dd/mm/yyyy, ddd, HH:MM'h'")}}</span><span v-else>sem agendamento</span>
-                                                                </span>
-                                                                <br />
-                                                                <q-date v-model="agenda.data" style="max-width:720px" minimal @click="FormatarDataVisita(item)" :options="(date)=>{ return date >= new Date().format('yyyy/mm/dd'); }"></q-date>
-
-                                                            </div>
-                                                        </div>
-
-
-
-                                                        <div style="margin-top:10px;font-weight:500;color:#000">
                                                             <el-input placeholder="" :value="item.descricao">
                                                                 <template #prepend>
                                                                     <div style="text-transform:uppercase;font-weight:700;width:110px;text-align:right;cursor:pointer" @click="()=>{item.acao=='abrir-descricao'?  item.acao='fechar-descricao' :  item.acao='abrir-descricao';}">
@@ -620,6 +755,9 @@
                                                         </div>
 
 
+
+
+
                                                         <div>
                                                             <div style="color:var(--s-color-primary);font-weight:bold;font-size:11px">
                                                                 <div style="float:left;padding-top:5px">AVALIAR</div>
@@ -630,20 +768,40 @@
                                                             <q-btn v-if="$root.usuario.gestor" label="REALOCAR" color="orange" text-color="white" @click="Realocar(item)" :loading="item.acao=='cancelar'" style="width:160px;margin-right:20px"></q-btn>
                                                             <q-btn label="SALVAR" color="primary" text-color="white" @click="Alterar(item)" :loading="item.acao=='alterar'" style="width:160px;margin-left:00px"></q-btn>
 
-                                                            <el-popconfirm width="220"
-                                                                           confirm-button-type="success"
-                                                                           confirm-button-text="SIM"
-                                                                           cancel-button-type="cancel"
-                                                                           cancel-button-text="NÃO"
-                                                                           :icon="InfoFilled"
-                                                                           icon-color="#626AEF"
-                                                                           title="Solicitação localizada?"
-                                                                           @confirm="FinalizarComoLocalizado(item)"
-                                                                           @cancel="FinalizarComoNaoLocalizado(item)">
-                                                                <template #reference>
-                                                                    <q-btn label="FINALIZAR" color="teal" text-color="white" :loading="item.acao=='finalizar'" style="width:160px;margin-left:20px"></q-btn>
-                                                                </template>
-                                                            </el-popconfirm>
+                                                                <el-popconfirm v-if="!item.visita"
+                                                                               width="220"
+                                                                               confirm-button-type="success"
+                                                                               confirm-button-text="SIM"
+                                                                               cancel-button-type="cancel"
+                                                                               cancel-button-text="NÃO"
+                                                                               :icon="InfoFilled"
+                                                                               icon-color="#626AEF"
+                                                                               title="Solicitação localizada?"
+                                                                               @confirm="FinalizarComoLocalizado(item)"
+                                                                               @cancel="FinalizarComoNaoLocalizado(item)">
+                                                                    <template #reference>
+                                                                        <q-btn label="FINALIZAR" color="teal" text-color="white" :loading="item.acao=='finalizar'" style="width:160px;margin-left:20px"></q-btn>
+                                                                    </template>
+                                                                </el-popconfirm>
+
+
+                                                                <el-popconfirm v-if="item.visita"
+                                                                               width="220"
+                                                                               confirm-button-type="success"
+                                                                               confirm-button-text="SIM"
+                                                                               cancel-button-type="cancel"
+                                                                               cancel-button-text="NÃO"
+                                                                               :icon="InfoFilled"
+                                                                               icon-color="#626AEF"
+                                                                               title="Atendimento encerrado?"
+                                                                               @confirm="FinalizarComoLocalizado(item)"
+                                                                               @cancel="FinalizarComoNaoLocalizado(item)">
+                                                                    <template #reference>
+                                                                        <q-btn label="FINALIZAR" color="teal" text-color="white" :loading="item.acao=='finalizar'" style="width:160px;margin-left:20px"></q-btn>
+                                                                    </template>
+                                                                </el-popconfirm>
+
+
 
                                                         </div>
 
@@ -678,16 +836,45 @@
 
 
                                             <q-card style="width:100%;color:#fff;margin-bottom:5px" v-if="item.ativo">
-                                                <q-card-section style="cursor:pointer" @click="()=>{item.acaocard==('abrir-card'+item.id)?  item.acaocard=('fechar-card'+item.id) :  item.acaocard=('abrir-card'+item.id);}" :class="item.idStatus == 3? 'bg-yellow-9' : item.idStatus == 5? 'bg-primary' :  item.idStatus == 11? 'bg-red' : 'bg-teal' ">
-                                                    <div class="text-h10">
+
+
+                                            <q-card-section v-if="item.visita" style="cursor:pointer" @click="()=>{item.acaocard==('abrir-card'+item.id)?  item.acaocard=('fechar-card'+item.id) :  item.acaocard=('abrir-card'+item.id);}" :class="item.visitado? 'bg-teal' : 'bg-red' ">
+                                                <div class="text-h10">
+                                                    <span class="text-h10">
+                                                        <b style="margin-right:10px;">ID# {{item.id}}</b> <!--{{$tools.FormatDayToBR(item.data)}} {{$tools.GetDayWeek(item.data)}} {{$tools.GetHours(item.data)}}h-->
+                                                        <i v-if="!item.validadoProprietario|| !item.validadaURL || !item.validadoEndereco" title="há dados invalidados" style="padding-left:4px;color:#fff;font-size:20px;" class="fa fa-warning"></i>
+                                                        <span v-if="item.agendado">
+                                                            <i title="agendado" style="padding-left:10px;padding-right:10px;color:#fff;font-size:17px;" class="fa fa-calendar"></i>
+                                                            {{$tools.FormatDateHour(item.dataVisita)}}
+                                                        </span>
+                                                    </span>
                                                         <span class="text-h10">
-                                                            <b style="margin-right:10px;">ID# {{item.id}}</b>
-                                                            <i v-if="!item.validadoProprietario|| !item.validadaURL || !item.validadoEndereco" title="há dados invalidados" style="padding-left:4px;color:#fff;font-size:20px;" class="fa fa-warning"></i>
-                                                            <span v-if="item.agendado">
-                                                                <i title="agendado" style="padding-left:10px;padding-right:10px;color:#fff;font-size:17px;" class="fa fa-calendar"></i>
-                                                                {{$tools.FormatDateHour(item.dataVisita)}}
+                                                            <span style="float:right">
+                                                                <span style="opacity:0.7;padding-right:20px">
+                                                                    Inserida em  {{$tools.FormatDateHour(item.data)}}
+                                                                </span>
+                                                                <span v-if="item.visitado">
+                                                                    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Visitado <i class="fa fa-thumbs-up" style="padding-left:10px"></i>
+                                                                </span>
+                                                                <span v-else>
+                                                                    Não visitado <i class="fa fa-thumbs-down" style="padding-left:10px"></i>
+                                                                </span>
+                                                                <span style="margin-left:15px;">
+                                                                    <i class="fa fa-caret-down" v-if="item.acaocard != ('abrir-card'+item.id)"></i>
+                                                                    <i class="fa fa-caret-up" v-else></i>
+                                                                </span>
                                                             </span>
                                                         </span>
+                                                </div>
+                                            </q-card-section>
+
+
+                                            <q-card-section v-else style="cursor:pointer" @click="()=>{item.acaocard==('abrir-card'+item.id)?  item.acaocard=('fechar-card'+item.id) :  item.acaocard=('abrir-card'+item.id);}" :class="item.idStatus == 3? 'bg-yellow-9' : item.idStatus == 5? 'bg-primary' :  item.idStatus == 11? 'bg-red' : 'bg-teal' ">
+                                                <div class="text-h10">
+                                                    <span class="text-h10">
+                                                        <b style="margin-right:10px;">ID# {{item.id}}</b> <!--{{$tools.FormatDayToBR(item.data)}} {{$tools.GetDayWeek(item.data)}} {{$tools.GetHours(item.data)}}h-->
+                                                        <i v-if="!item.validadoProprietario|| !item.validadaURL || !item.validadoEndereco" title="há dados invalidados" style="padding-left:4px;color:#fff;font-size:20px;" class="fa fa-warning"></i>
+                                                    </span>
                                                         <span class="text-h10">
                                                             <span style="float:right">
                                                                 <span style="opacity:0.7;padding-right:20px">
@@ -704,9 +891,9 @@
                                                                     <i class="fa fa-caret-up" v-else></i>
                                                                 </span>
                                                             </span>
-                                                        </span>
-                                                    </div>
-                                                </q-card-section>
+                                                    </span>
+                                                </div>
+                                            </q-card-section>
 
                                                 <q-card-section :id="'content'+item.id" v-if="item.acaocard==('abrir-card'+item.id)" style="margin-bottom:15px">
 
@@ -946,21 +1133,6 @@
 
 
 
-                                                        <div style="margin-top:10px;font-weight:500;color:#000">
-                                                            <el-input placeholder="" :value="ObterDataVisita(item)">
-                                                                <template #prepend>
-                                                                    <div style="text-transform:uppercase;font-weight:660;width:110px;text-align:right;cursor:pointer" @click="$tools.OpenCalendar(item.dataVisita)">
-                                                                        Visita   <i style="padding-left:10px" class="fa fa-calendar" title="visita agendada"></i>
-                                                                    </div>
-                                                                </template>
-                                                                <template #append>
-                                                                    <q-btn icon="fa fa-copy" flat @click="()=>{ item.dataVisita.getFullYear() > 1900? $tools.Copy(item.dataVisita.format('dd/mm/yyyy, ddd, HH:MM\'h\'')) : $tools.MessageAlert('Data não especificada'); }" style="width:10px"></q-btn>
-                                                                    <q-btn icon="fa fa-up-right-from-square" flat style="margin-left:5px;width:10px" @click="$tools.OpenCalendar(item.dataVisita)"></q-btn>
-                                                                </template>
-                                                            </el-input>
-                                                        </div>
-
-
 
                                                         <div style="margin-top:10px;font-weight:500;color:#000">
                                                             <el-input placeholder="" :value="item.descricao">
@@ -981,6 +1153,21 @@
                                                             </div>
                                                         </div>
 
+
+
+                                                        <div style="margin-top:10px;font-weight:500;color:#000" v-if="item.visita">
+                                                            <el-input placeholder="" :value="$tools.FormatDateHour(item.dataVisita)">
+                                                                <template #prepend>
+                                                                    <div style="text-transform:uppercase;font-weight:660;width:110px;text-align:right;cursor:pointer" @click="$tools.OpenCalendar(item.dataVisita)">
+                                                                        Visita   <i style="padding-left:10px" class="fa fa-calendar" title="visita agendada"></i>
+                                                                    </div>
+                                                                </template>
+                                                                <template #append>
+                                                                           <q-btn icon="fa fa-copy" flat @click="()=>{ item.dataVisita.getFullYear() > 1900? $tools.Copy($tools.FormatDateHour(item.dataVisita)) : $tools.MessageAlert('Data não especificada'); }" style="width:10px"></q-btn>
+                                                                           <q-btn icon="fa fa-up-right-from-square" flat style="margin-left:5px;width:10px" @click="$tools.OpenCalendar(item.dataVisita)"></q-btn>
+                                                                </template>
+                                                            </el-input>
+                                                        </div>
 
                                                         <div style="margin-top:10px;font-weight:500;color:#000">
                                                             <el-input placeholder="" :value="item.avaliacao">
@@ -1084,6 +1271,7 @@
                 dataSelecionada: new Date(),
                 admins:[],
                 idAdminSelecionado: 0,
+                agenda: { data: new Date(1900, 1, 0, 0, 0, 0, 0), hora: null, obs: "" },
                 status: [{ id: 0, nome: "Todos" }, { id: 3, nome: "Aguardando" }, { id: 5, nome: "Verificando" }, { id: 9, nome: "Finalizadas" }, { id: 10, nome: "Encontradas" }, { id: 11, nome: "Não encontradas" }],
                 idStatusSelecionado: 0,
             }
@@ -1091,7 +1279,9 @@
 
         },
 
-        props: {},
+        props: {
+                visitas:			{ type: Boolean, required: false, default: false }, // grey, navy, orange
+        },
         watch: {
         },
         created: function () {
@@ -1212,8 +1402,9 @@
                 this.solicitacao.idStatus   = this.idStatusSelecionado;
                 this.solicitacao.idAdmin    = this.idAdminSelecionado;
                 this.solicitacao.data       = this.$tools.FormatFromQDate(this.dataSelecionada);
+                this.solicitacao.visita     = this.visitas;
 
-                //c2("this.solicitacao.data ", this.solicitacao.data);
+                //c2("this.solicitacao.visita ", this.solicitacao.visita);
 
                 this.view = "request";
 
@@ -1225,9 +1416,23 @@
                     this.results = request.result.result;
 
                     this.results.forEach(i => {
-                        i.dataVisita = new Date(i.dataVisita);
+
+                        i.dataVisita        = this.$tools.DateFix(i.dataVisita       );
+                        i.dataAgendamento   = this.$tools.DateFix(i.dataAgendamento  );
+                        i.dataReagendamento = this.$tools.DateFix(i.dataReagendamento);
+                        i.dataConfirmado    = this.$tools.DateFix(i.dataConfirmado   );
+                        i.dataVisitado      = this.$tools.DateFix(i.dataVisitado     );
+                        i.dataConcluido     = this.$tools.DateFix(i.dataConcluido    );
+
                         i.agendado = (i.dataVisita.getFullYear() > 1900);
                         i.acaocard = 'fechar-card' + i.id;
+                        
+                        if(i.visita)
+                            i.acao     =   'abrir-agenda';
+
+                        i.dia  = i.dataVisita.format('yyyy/mm/dd');
+                        i.hora = this.$tools.FormatHour(i.dataVisita);
+
                         // i.proprietarioCaptacao = "Teste, (11) 98498-4894, paulogneto@gmail.com";
                         if (this.$validator.is(i.proprietarioCaptacao)) {
                             var fields = i.proprietarioCaptacao.split(",");
@@ -1520,6 +1725,23 @@
             },
 
 
+    
+
+            ProcessarDataReagendamento(item) {
+
+                if(this.$validator.is(item.dia) && this.$validator.is(item.hora) ){
+
+                       item.dataReagendamento = new Date( Date.UTC(
+                             parseInt(item.dia.split("/")[0]), 
+                            (parseInt(item.dia.split("/")[1]) - 1), 
+                             parseInt(item.dia.split("/")[2]), 
+                             parseInt(item.hora.split(":")[0]), 
+                             parseInt(item.hora.split(":")[1]), 
+                            0, 0)
+                        );
+                       
+                    }
+                },
 
 
 

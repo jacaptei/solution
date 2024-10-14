@@ -29,6 +29,9 @@
             </div>
 
 
+           </div>
+            <div v-else>
+                <c-loading></c-loading>
             </div>
 
 
@@ -44,7 +47,7 @@ module.exports = {
 	
 	data: function () {
 		return {
-            liberado:true
+            liberado:false
 		}
 	},computed: {
       
@@ -57,7 +60,7 @@ module.exports = {
 	created: function () {
 	 },
 	mounted(){
-
+        window.setTimeout(()=>this.liberado = true, 2500);
 	},		  
 	methods: {
         is(val) {

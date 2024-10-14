@@ -1,0 +1,320 @@
+<template>
+    <div>
+
+
+        <el-row :gutter="20">
+            <el-col :md="24" style="width:100%;text-align:center;padding:40px;padding-left:0px">
+
+
+                    <div class="building-form-wrapper">
+                        <div  class="building-form">
+
+                        <el-row :gutter="20" style="color:#fff">
+
+                                <el-col :md="24" style="width:100%;text-align:center;font-weight:600;font-size:16pt;">
+								            Agendar visita
+                                </el-col>
+                                
+
+                                <el-col :md="24">
+                                
+                                
+                                <!--<div v-if="bloqueadoEnvio" style="margin-top:-10px;">
+                                    <el-alert title="Os agendamentos de hoje estão suspensos ou já foram encerrados." description="Volte a enviar suas solicitaçãoes nos dias úteis de Segunda à Sábado a partir das 8h." type="warning" show-icon :closable="false" />
+                                    <q-btn label="Tentar Novamente" outline color="white" style="margin:4px" @click="VerificarSeBloqueiaEnvioAlert"></q-btn>
+                                </div>-->
+
+                               <div>
+                               
+
+								<div v-if="view == 'calendar'">
+										<el-row style="color:var(--s-accent-color);width:100%;text-align:center">
+												<el-col :md="24" style="margin-top:20px"> 
+                                                    <el-time-select v-model="hora" :start=horaStart :end=horaEnd step="00:15" placeholder="horário" ></el-time-select>
+                                                </el-col>
+												<el-col :md="24"> 
+    							                     <q-date v-model="dia" style="text-align:left" minimal @click="ProcessarDataVisita" :options="(date)=>{ return date >= dateRangeInit.format('yyyy/mm/dd'); }"></q-date>
+                                				</el-col>
+										</el-row>
+										<el-row style="padding:6px;margin-top:5px;padding-bottom:-14px">
+												<el-col :md="24">
+														<q-btn id="bt-send" label="Prosseguir" color="secondary" style="font-size:18px;width:100%;height:50px;border-radius:20px" @click="CheckoutCalendar"></q-btn>
+														<div style="width:100%;text-align:center;padding-top:14px;">
+															<span v-if="loading"> <c-loading size="20px" color="white"></c-loading></span>
+															<span v-else></span>
+														</div>
+												</el-col>
+										</el-row>
+								</div>
+
+								<div v-if="view == 'obs'" style="margin-top:20px;">
+
+										<el-row style="color:var(--s-accent-color);width:100%;text-align:center">
+												<el-col :md="24"> 
+													<span style="color:white;font-size:19px;font-weight:700;color:yellow">
+															{{$tools.FormatDateToBR(solicitacao.dataVisita)}}, {{$tools.GetFullDayWeek(solicitacao.dataVisita)}}, {{hora}}h
+													</span> 	
+												</el-col>
+												<el-col :md="24"> 
+													<el-input    v-model="solicitacao.obsAgendamento"    maxlength="400"    placeholder="Observações"    show-word-limit :autosize="{ minRows: 4, maxRows: 16 }" type="textarea" ></el-input>
+												</el-col>
+										</el-row>
+
+										<el-row :gutter="20" style="padding:6px;margin-top:5px;padding-bottom:-14px">
+												<el-col :md="24">
+														<q-btn id="bt-back" label="Voltar"	 color="secondary"  style="float:left;font-size:18px;width:40%;height:50px;border-radius:20px" @click="ShowView('calendar')"></q-btn>
+														<q-btn id="bt-send" label="Concluir" color="green"		style="float:right;font-size:18px;width:50%;height:50px;border-radius:20px" @click="Enviar"></q-btn>
+												</el-col>
+										</el-row>
+
+								</div>
+
+
+								<div v-if="view == 'sending'" style="margin-top:20px;width:100%;text-align:center;color:#fff;height:140px">
+										<br />
+										<c-loading size="60px" color="white"></c-loading>
+										<!--<q-btn id="bt-back" label="Voltar"	 color="secondary"  style="float:left;font-size:18px;width:100%;height:50px;border-radius:20px;margin-top:20px" @click="ShowView('hour')"></q-btn>-->
+								</div>
+							
+
+								<div v-if="view == 'success'" style="margin-top:20px;width:100%;text-align:center;color:#fff;height:140px;line-height:22px">
+                                            <div style="margin-bottom:10px">
+											    <div class="title" style="color:var(--s-color-neon-green)"><b><i class="fa fa-circle-check"></i> Sucesso</b></div>
+											    <span style="font-weight:bold">Visita agendada!</span>
+                                            </div>
+                                            Além das notificações por e-mail, poderá acompanhar o andamento do agendamento na área de solicitações.
+											<q-btn  label="ACOMPANHAR" color="white" outline		style="float:none;font-size:15px;width:calc(100% - 40px);margin:10px;height:20px;border-radius:10px" @click="$root.ReouteToParams('parceiros',{show:'/parceiro/solicitacao/visita/buscar'})"></q-btn>
+											<q-btn  label="Ok" color="secondary"		style="float:right;font-size:18px;width:100%;height:50px;border-radius:20px;margin-bottom:10px;" @click="ShowView('calendar')"></q-btn>
+								</div>
+							
+
+								<div v-if="view == 'fail'" style="margin-top:20px;width:100%;text-align:center;color:#fff;height:140px">
+											<div class="title" style="color:#ffd800"><b><i class="fa fa-circle-xmark"></i> Falhou</b></div>
+											<span>não foi possível agendar</span>
+											<br />
+											<br />
+											<q-btn  label="Tentar novamente" color="secondary"		style="float:right;font-size:18px;width:100%;height:50px;border-radius:20px" @click="ShowView('calendar')"></q-btn>
+								</div>
+
+                                </div>
+                             </el-col>
+
+                         </el-row>
+                        </div>
+                    </div>
+
+            </el-col>
+        </el-row>
+
+
+
+    </div>
+</template>
+
+<script>
+    module.exports = {
+        name: 'JaCapteiParceiroSolicitacaoAdicionar821325',
+        components: {},
+        data: function () {
+            return {
+                view: "calendar",
+                messageSuccess: "Cadastrado!",
+                messageAlert: "",
+                carregandoCEP: false,
+                carregandoEstados: false,
+                carregandoCidades: false,
+                carregandoBairros: false,
+                cep: {
+                    numero: "",
+                    estado: "",
+                    cidade: "",
+                    logradouro: ""
+                },
+                opcoes: {
+                    estados: this.$root.localidade.estados,
+                    cidades: [],
+                    bairros: [],
+                    sexos: [],
+                },
+                solicitacao: this.$models.solicitacao(),
+                city: "",
+                dia:"",
+                hora:"",
+                horaStart:"08:00",
+                horaEnd:"17:30",
+                dataVisitalabel: "sem agenda",
+                agenda: { data: new Date(1900, 1, 0, 0, 0, 0, 0), hora: "", obs: "" },
+                dateRangeInit: new Date(),
+                dateStart: new Date(),
+                dateNow: new Date(),
+                dataConsiderada: new Date(),
+                bloqueadoEnvio: false,
+                bloqueadoEnvioNaoAgendado: false,
+            }
+        },
+        computed: {},
+        props: {
+            usuario:	{ type: Object, required: false, default: {}},
+            imovel:	    { type: Object, required: false, default: {}},
+        },
+        watch: {},
+        created: function () {
+
+            if(this.$validator.not(this.solicitacao))
+                this.solicitacao = {};
+
+            this.solicitacao.dataVisita = new Date(1900, 0, 1, 0, 0, 0, 0);
+
+            this.dateRangeInit.setHours(0, 0, 0, 0);
+
+            if (this.$tools.GetDayWeek(this.dateNow) == "Sáb"){
+                if (this.dateNow.getHours() >= 11)
+                    this.dateRangeInit = this.$tools.AddDays(this.dateRangeInit, 2);
+                else{
+                    this.horaStart  = "08:00";
+                    this.horaEnd    = "12:00";
+                }
+            }else if (this.$tools.GetDayWeek(this.dateNow) == "Dom"){
+                this.dateRangeInit = this.$tools.AddDays(this.dateRangeInit, 1);
+            }else if (this.dateNow.getHours() >= 17){
+                this.dateRangeInit = this.$tools.AddDays(this.dateRangeInit, 1);
+            }
+        },
+        mounted() {
+
+            if(this.$validator.not(this.solicitacao))
+                this.solicitacao={};
+
+            this.VerificarSeBloqueiaEnvio();
+            window.setInterval(() => this.VerificarSeBloqueiaEnvio(), 10000);
+
+            //c2("(this.agenda.data",this.agenda.data);
+            //c2("(this.agenda.data.getFullYear()",this.agenda.data.getFullYear());
+            //this.ShowView("success");
+        },
+        methods: {
+
+            CheckoutCalendar(){
+
+               if(this.$validator.not(this.hora))
+                    this.$tools.Alert("Selecione o horário da visita.")
+               else if(this.$validator.not(this.dia))
+                    this.$tools.Alert("Selecione o dia da visita.")
+                else{
+                    this.ProcessarDataVisita();
+                    this.ShowView("obs");
+                }
+
+            },
+
+            VerificarSeBloqueiaEnvio() {
+                var dayoff = false;
+                this.dateNow = new Date();
+                this.bloqueadoEnvio = (dayoff || this.$tools.GetDayWeek(this.dateNow) == "Dom" || this.dateNow.getHours() < 8 || this.dateNow.getHours() >= 17 || (this.$tools.GetDayWeek(this.dateNow) == "Sáb" && this.dateNow.getHours() >= 11));
+                this.bloqueadoEnvioNaoAgendado = (this.$tools.GetDayWeek(this.dateNow) == "Sáb" && this.solicitacao.dataVisita.getFullYear() == 1900);
+            },
+
+            VerificarSeBloqueiaEnvioAlert() {
+                this.VerificarSeBloqueiaEnvio();
+                if (this.bloqueadoEnvio)
+                    this.$tools.Alert("Acesso ainda não liberado.");
+            },
+
+            ShowView(v) {
+                this.view = v;
+            },
+
+            CancelarAgendamento() {
+                //this.agenda = { data: new Date(1900, 0, 1, 0, 0, 0, 0), hora: null, obs: "" };
+                //this.solicitacao.dataVisita = new Date(Date.UTC(1900, 0, 1, 0, 0, 0, 0));
+                //this.dataVisitaLabel = "";
+            },
+
+            ProcessarDataVisita() {
+ 
+                this.solicitacao.dataVisita = new Date( Date.UTC(
+                    parseInt(this.dia.split("/")[0]), 
+                    (parseInt(this.dia.split("/")[1]) - 1), 
+                    parseInt(this.dia.split("/")[2]), 
+                    parseInt(this.hora.split(":")[0]), 
+                    parseInt(this.hora.split(":")[1]), 
+                    0, 0)
+                );
+                
+                //this.solicitacao.dataVisita = new Date(
+                //    parseInt(this.dia.split("/")[0]), 
+                //    (parseInt(this.dia.split("/")[1]) - 1), 
+                //    parseInt(this.dia.split("/")[2]), 
+                //    parseInt(this.hora.split(":")[0]), 
+                //    parseInt(this.hora.split(":")[1]), 
+                //    0, 0
+                //);
+
+            },
+
+
+
+
+            async Enviar() {
+
+                
+                this.ProcessarDataVisita();
+                
+                this.solicitacao.url = window.location.href;
+
+                if (this.$validator.not(this.solicitacao.url))
+                    msg[1] += "<b>URL</b> não informada<br>";
+
+
+                this.solicitacao.idParceiro     =   this.usuario.id;
+                this.solicitacao.parceiro       =   this.usuario;
+                this.solicitacao.idProprietario =   this.imovel.idProprietario;
+                this.solicitacao.proprietario   =   this.imovel.proprietario;
+                this.solicitacao.idImovel       =   this.imovel.id;
+                this.solicitacao.codImovel      =   this.imovel.cod;
+                this.solicitacao.titulo         =   this.imovel.titulo + ", ID #" + this.imovel.id + ", COD " + this.imovel.cod;
+                this.solicitacao.imovel         =   this.imovel;
+                this.solicitacao.cep            =   this.imovel.endereco.cep;
+                this.solicitacao.estado         =   this.imovel.endereco.estado;
+                this.solicitacao.cidade         =   this.imovel.endereco.cidade;
+                this.solicitacao.bairro         =   this.imovel.endereco.bairro;
+                this.solicitacao.logradouro     =   this.imovel.endereco.logradouro;
+                this.solicitacao.numero         =   this.imovel.endereco.numero;
+                this.solicitacao.complemento    =   this.imovel.endereco.complementoTipo +" "+this.imovel.endereco.complemento;
+                if(this.$validator.is(this.imovel.endereco.andar && this.imovel.endereco.andar > 0))
+                    this.solicitacao.complemento += ", " + this.imovel.endereco.andar +"º andar";
+
+                //c2("this.solicitacao", this.solicitacao);
+
+
+                    this.ShowView("sending");
+                    var request = await this.$api.Post("solicitacao/adicionar", this.solicitacao);
+
+                    if (request?.status?.success) {
+                        this.ShowView("success");
+                        //this.solicitacao = request.result;
+                        // c(request);
+                    } else {
+                        c(request);
+                        this.ShowView("fail");
+                    }
+
+            },
+
+
+
+
+        }
+
+    }
+
+</script>
+
+
+<style scoped>
+    .s-input {
+        margin-bottom: 20px;
+    }
+</style>
+
+

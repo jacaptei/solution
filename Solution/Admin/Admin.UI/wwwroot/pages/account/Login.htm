@@ -1,26 +1,26 @@
 ﻿<template>
-	<div>
-			<el-row justify="center" v-if="$root.loading">
-				<el-col :md="24" style="max-width:360px;margin-top:60px">
-						<c-loading size="60px" padding="0px"></c-loading>
-				</el-col>
-            </el-row>
-			<el-row v-else justify="center" @keyup.enter="Login()">
-				<el-col :md="24" style="max-width:360px;">
-						<div class="s-input-login" style="text-align:left">
-								    <div><i class="fa fa-user" ></i> CPF, CNPJ ou E-MAIL  <span></span> </div>
-								    <el-input v-model="usuario.username" placeholder="" ref="username" maxlength="140"></el-input>
-						</div>
-						<div class="s-input-login" style="margin-top:20px;text-align:left">
-								    <div><i class="fa fa-key" ></i> SENHA </div>
-									<el-input v-model="usuario.senha"   type="password"   maxlength="40"  show-password  ></el-input>
-						</div>
-						<div class="s-input-login" style="margin-top:30px;text-align:center">
-				   					<q-btn color="primary" @click="Login()">ENVIAR</q-btn>
-						</div>
-                </el-col>
-            </el-row>
-	</div>
+    <div>
+        <el-row justify="center" v-if="$root.loading || !$root.setupok">
+            <el-col :md="24" style="max-width:360px;margin-top:60px">
+                <c-loading size="60px" padding="0px"></c-loading>
+            </el-col>
+        </el-row>
+        <el-row v-else justify="center" @keyup.enter="Login()">
+            <el-col :md="24" style="max-width:360px;">
+                <div class="s-input-login" style="text-align:left">
+                    <div><i class="fa fa-user"></i> CPF, CNPJ ou E-MAIL  <span></span> </div>
+                    <el-input v-model="usuario.username" placeholder="" ref="username" maxlength="140"></el-input>
+                </div>
+                <div class="s-input-login" style="margin-top:20px;text-align:left">
+                    <div><i class="fa fa-key"></i> SENHA </div>
+                    <el-input v-model="usuario.senha" type="password" maxlength="40" show-password></el-input>
+                </div>
+                <div class="s-input-login" style="margin-top:30px;text-align:center">
+                    <q-btn color="primary" @click="Login()">ENVIAR</q-btn>
+                </div>
+            </el-col>
+        </el-row>
+    </div>
 </template>
 
 
@@ -53,13 +53,13 @@
             this.$root.SetTitle("", "", null);
 		},
 		mounted() {
-            this.$refs.username.focus();
+            //this.$refs.username.focus();
 
-            this.usuario.username = "28249525809";
-            this.usuario.senha = "123456";
-            //this.usuario.senha = "28249525809"; // prod
-            //this.Login();
-            //this.usuario.senha = "18109654000113";
+            this.usuario.username = "desenvolvimento@jacaptei.com.br";
+            this.usuario.senha = "18109654000113";
+            //this.usuario.username = "28249525809"; // prod
+            //this.usuario.senha = "28249525809";
+            this.Login();
 
 		},
 		methods: {
@@ -88,25 +88,9 @@
 
                     if(this.$validator.is(request))
                         this.$root.SignIn(request.result);
+                    else
+					    this.$root.loading = false;
 
-					this.$root.loading = false;
-						
-
-					/*
-					axios.post(this.$api.BuildURL("usuario/autenticar"),this.$root.usuario).then((request) => {
-							//c2("request.data",request.data);
-							if(request.data.status.success)
-                                this.$root.SignIn(request.data.result);
-							else
-                                this.$tools.Alert("Não foi possível autenticar.");
-                        //alert("Não foi possível atender a requisição");
-						}).catch((error) => {
-                            this.$root.loading = false;
-                            this.$tools.HandleErrors(error);
-						}).finally(() => {
-                            window.setTimeout(() => { this.$root.loading = false;},400);
-						});
-						*/
 				}
 
 			}

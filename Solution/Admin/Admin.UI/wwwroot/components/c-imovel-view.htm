@@ -1,0 +1,680 @@
+<template>
+
+    <el-col>
+
+        <el-row v-if="view=='all'">
+
+
+        <el-row :gutter="20">
+            <el-col :span="24">
+                        <el-row :gutter="20">
+
+
+                             <el-col :md="12" :xs="24" class="card">
+                                      <el-card>
+                                        <template #header>
+                                          <div class="card-header">
+                                            <span>Dados Gerais</span>
+                                          </div>
+                                        </template>
+                                          <el-row>
+                                                <el-col :span=12> Tipo de imóvel<div style="font-weight: 700;"><span> {{imovel.tipo.label}}</span></div></el-col>
+                                                <el-col :span=6> Índice         <div style="font-weight: 700;"><span v-if="$validator.is(imovel.documentacao.indiceCadastral)"> {{imovel.documentacao.indiceCadastral}}</span><span v-else>-</span></div></el-col>
+                                                <el-col :span=3> ID#            <div style="font-weight: 700;"><span> {{imovel.id}}</span></div></el-col>
+                                                <el-col :span=3> CÓD            <div style="font-weight: 700;"><span> {{imovel.cod}}</span></div></el-col>
+                                          </el-row>
+                                          <el-row style="margin-top:10px">
+                                              <el-col :span=24> 
+                                                 Localização       
+                                                <div id="location" style="cursor:pointer;font-weight: 700;">
+                                                    <span @click="$tools.OpenMapImovel(imovel)">
+                                                        <i class="fa fa-external-link-square-alt" style="margin-right:3px"></i>
+                                                        <span v-if="$validator.is(imovel.endereco.logradouro)">{{imovel.endereco.logradouro}}, </span>
+                                                        <span v-if="$validator.is(imovel.endereco.numero)">{{imovel.endereco.numero}}, </span>
+                                                        <span v-if="$validator.is(imovel.endereco.complementoTipo)" style="padding-right:3px">{{imovel.endereco.complementoTipo}} </span>
+                                                        <span v-if="$validator.is(imovel.endereco.complemento)"> {{imovel.endereco.complemento}} </span>
+                                                        <span v-if="$validator.is(imovel.endereco.andar && imovel.endereco.andar > 0)">, {{imovel.endereco.andar}}º andar  </span>
+                                                        <br />
+                                                        <span v-if="$validator.is(imovel.endereco.bairro)">{{imovel.endereco.bairro}} </span>
+                                                        <span v-if="$validator.is(imovel.endereco.cidade)">, {{imovel.endereco.cidade}} </span>
+                                                        <span v-if="$validator.is(imovel.endereco.estado)">, {{imovel.endereco.estado}}  </span>
+                                                    </span>
+                                                    <span>
+                                                        <i class="fa fa-copy" style="padding-left:10px;color:#666;text-decoration:none" @click="$tools.Copy($tools.BuildAddressImovel(imovel))"></i>
+                                                    </span>
+                                                </div>
+                                              </el-col>
+                                          </el-row>
+                                          <el-row style="margin-top:10px">
+                                                <el-col :lg=6 :md=6 :sm=24 :xs=24> Status       
+                                                        <div v-if="imovel.ativo"        class="checkiconstatus"><i class="fa fa-check"></i> Ativo </div>
+                                                        <div v-if="imovel.validado"     class="checkiconstatus"><i class="fa fa-check"></i> Validado </div>
+                                                        <div v-if="imovel.visivel"      class="checkiconstatus"><i class="fa fa-check"></i> Visível</div>
+                                                        <div v-if="!imovel.excluido"    class="checkiconstatus"><i class="fa fa-check"></i> Não excluído</div>
+                                                        <div v-if="!imovel.ativo"       class="inactive" @click="$tools.Alert(imovel.motivoInativacao,'Motivo da inativação')" style="cursor:pointer"><i class="fa fa-xmark"></i> Inativo <a href="javascript:void(0)" style="color:var(--s-color-red);text-decoration:none"><i class="fa fa-message"></i></a></div>
+                                                        <div v-if="!imovel.validado"     class="inactive"><i class="fa fa-xmark"></i> Não validado </div>
+                                                        <div v-if="!imovel.visivel"    class="inactive"><i class="fa fa-xmark"></i> Não visível </div>
+                                                        <div v-if="imovel.excluido"     class="inactive"><i class="fa fa-xmark"></i> Excluído</div>
+                                                </el-col>
+                                                <el-col :lg=6 :md=6 :sm=24 :xs=24> Construtora          <div style="font-weight: 700;"><span v-if="construtora > 0"> {{imovel.construtora}}</span><span v-else>-</span></div></el-col>
+                                                <el-col :lg=6 :md=6 :sm=24 :xs=24> Ano da construção    <div style="font-weight: 700;"><span v-if="imovel.anoConstrucao > 0"> {{imovel.anoConstrucao}}</span><span v-else>-</span></div></el-col>
+                                          </el-row>
+                                          <el-row style="margin-top:10px">
+                                                <el-col :lg=12 :md=12 :sm=24 :xs=24> Local das chaves     <div style="font-weight: 700;"><span v-if="$validator.is(imovel.localChaves)"> {{imovel.localChaves}}</span><span v-else>-</span></div></el-col>
+                                                <el-col :lg=12 :md=12 :sm=24 :xs=24> Identificador das chaves    <div style="font-weight: 700;"><span v-if="$validator.is(imovel.idChaves)"> {{imovel.idChaves}}</span><span v-else>-</span></div></el-col>
+                                          </el-row>
+                                          <el-row style="margin-top:10px">
+                                                <el-col :lg=8 :md=10 :sm=12 :xs=12 v-if="imovel.venda                          " class="checkicon"><i class="fa fa-check"></i> Venda                </el-col>
+                                                <el-col :lg=8 :md=10 :sm=12 :xs=12 v-if="imovel.locacao                        " class="checkicon"><i class="fa fa-check"></i> Locação              </el-col>
+                                                <el-col :lg=8 :md=10 :sm=12 :xs=12 v-if="imovel.disposicao.ocupado             " class="checkicon"><i class="fa fa-check"></i> Ocupado               </el-col>
+                                                <el-col :lg=8 :md=10 :sm=12 :xs=12 v-if="imovel.disposicao.aceitaFinanciamento " class="checkicon"><i class="fa fa-check"></i> Aceita financiamento  </el-col>
+                                                <el-col :lg=8 :md=10 :sm=12 :xs=12 v-if="imovel.disposicao.aceitaPermuta       " class="checkicon"><i class="fa fa-check"></i> Aceita permuta        </el-col>
+                                                <el-col :lg=8 :md=10 :sm=12 :xs=12 v-if="imovel.disposicao.placa               " class="checkicon"><i class="fa fa-check"></i> Placa                 </el-col>
+                                                <el-col :lg=8 :md=10 :sm=12 :xs=12 v-if="imovel.residencial                    " class="checkicon"><i class="fa fa-check"></i> Residencial          </el-col>
+                                                <el-col :lg=8 :md=10 :sm=12 :xs=12 v-if="imovel.comercial                      " class="checkicon"><i class="fa fa-check"></i> Comercial            </el-col>
+                                          </el-row>
+                                          <el-row>
+                                                <el-col :lg=8 :md=10 :sm=12 :xs=12 v-if="!imovel.venda                          " class="nocheckicon"><i class="fa fa-xmark"></i> Venda                </el-col>
+                                                <el-col :lg=8 :md=10 :sm=12 :xs=12 v-if="!imovel.locacao                        " class="nocheckicon"><i class="fa fa-xmark"></i> Locação              </el-col>
+                                                <el-col :lg=8 :md=10 :sm=12 :xs=12 v-if="!imovel.disposicao.ocupado             " class="nocheckicon"><i class="fa fa-xmark"></i> Ocupado               </el-col>
+                                                <el-col :lg=8 :md=10 :sm=12 :xs=12 v-if="!imovel.disposicao.aceitaFinanciamento " class="nocheckicon"><i class="fa fa-xmark"></i> Aceita financiamento  </el-col>
+                                                <el-col :lg=8 :md=10 :sm=12 :xs=12 v-if="!imovel.disposicao.aceitaPermuta       " class="nocheckicon"><i class="fa fa-xmark"></i> Aceita permuta        </el-col>
+                                                <el-col :lg=8 :md=10 :sm=12 :xs=12 v-if="!imovel.disposicao.placa               " class="nocheckicon"><i class="fa fa-xmark"></i> Placa                 </el-col>
+                                                <el-col :lg=8 :md=10 :sm=12 :xs=12 v-if="!imovel.residencial                    " class="nocheckicon"><i class="fa fa-xmark"></i> Residencial          </el-col>
+                                                <el-col :lg=8 :md=10 :sm=12 :xs=12 v-if="!imovel.comercial                      " class="nocheckicon"><i class="fa fa-xmark"></i> Comercial            </el-col>
+                                          </el-row>
+                                      </el-card>
+                            </el-col>
+                             <el-col :md="12" :xs="24" class="card">
+                                      <el-card>
+                                        <template #header>
+                                          <div class="card-header">
+                                            <span @click="$tools.Copy(imovel.descricao)">Descrição  <i class="fa fa-copy" style="padding-left:10px;color:#666;text-decoration:none;cursor:pointer"></i></span>
+                                          </div>
+                                        </template>
+                                          <el-row>
+                                              <div style="font-size:16px;line-height:28px;max-height:370px;overflow-y:auto;padding-right:10px">
+                                                  <span v-if="$validator.not(imovel.descricao)" style="color:#bbb">sem descrição</span>
+                                                  <span v-else>{{imovel.descricao}}</span>
+                                              </div>
+                                          </el-row>
+                                      </el-card>
+                            </el-col>
+
+                             <el-col :span="24" class="card">
+                                      <el-card>
+                                        <template #header>
+                                          <div class="card-header">
+                                            Imagens
+                                          </div>
+                                        </template>
+                                          <el-row>
+                                                    <el-col :span="24">
+                                                        <el-row class="row" style="max-height:400px;overflow-y:auto">
+                                                            <el-col :span="col-6" v-for="(item,index) in imovel.imagens" :key="index" @click="OpenModalImages(index)" style="text-align:center">
+                                                                <!--<img :src="item" style="width: 100%; padding:10px;padding-top:5px;padding-bottom:5px;border:5px solid #fff"  />-->  <!--fits = ['fill', 'contain', 'cover', 'none', 'scale-down']-->
+                                                                <el-image style="cursor:pointer;max-width:240px;max-height:240px;padding-right:10px;padding-top:0px" :src="item.urlThumb" fit="cover"></el-image>  <!--fits = ['fill', 'contain', 'cover', 'none', 'scale-down']-->
+                                                            </el-col>
+                                                        </el-row>
+                                                    </el-col>
+                                          </el-row>
+                                      </el-card>
+                            </el-col>
+
+                            <el-col :md="12" :xs="24" class="card">
+                                      <el-card>
+                                        <template #header>
+                                          <div class="card-header">
+                                            Valores
+                                          </div>
+                                        </template>
+                                        <el-row>
+                                                <el-col :lg=12 :md=12 :sm=24 :xs=24 style="margin-bottom:10px" >                           Venda          <div style="font-weight: 700;">{{$tools.FormatMoneyBR(imovel.valor.venda)}}       </div></el-col>
+                                                <el-col :lg=12 :md=12 :sm=24 :xs=24 style="margin-bottom:10px">    Condomínio     <div style="font-weight: 700;">{{$tools.FormatMoneyBR(imovel.valor.condominio)}}  </div></el-col>
+                                                <el-col :lg=12 :md=12 :sm=24 :xs=24 style="margin-bottom:10px">    IPTU mensal    <div style="font-weight: 700;">{{$tools.FormatMoneyBR(imovel.valor.iptuMensal)}}  </div></el-col>
+                                                <el-col :lg=12 :md=12 :sm=24 :xs=24 style="margin-bottom:10px">    IPTU anual     <div style="font-weight: 700;">{{$tools.FormatMoneyBR(imovel.valor.iptuAnual)}}   </div></el-col>
+                                                <el-col :lg=12 :md=12 :sm=24 :xs=24>    Comissão       <div style="font-weight: 700;">{{imovel.valor.comissao}}%    </div></el-col>
+                                        </el-row>
+                                      </el-card>
+                            </el-col>
+                            
+                            <el-col :md="12" :xs="24" class="card">
+                                      <el-card>
+                                        <template #header>
+                                          <div class="card-header">
+                                            Áreas
+                                          </div>
+                                        </template>
+                                        <el-row>
+                                                <el-col :lg=8 :md=8 :sm=24 :xs=24 style="margin-bottom:10px" >                         Interna        <div style="font-weight: 700;">{{imovel.area.interna}} m²   </div></el-col>
+                                                <el-col :lg=8 :md=8 :sm=24 :xs=24 style="margin-bottom:10px">  Externa        <div style="font-weight: 700;">{{imovel.area.externa}} m²   </div></el-col>
+                                                <el-col :lg=8 :md=8 :sm=24 :xs=24>  Total          <div style="font-weight: 700;">{{imovel.area.total}} m²     </div></el-col>
+                                        </el-row>
+                                      </el-card>
+                            </el-col>
+
+
+
+                        </el-row>
+
+
+                        <el-row :gutter="20">
+
+                           <el-col :md="12" :xs="24" class="card">
+                                      <el-card>
+                                        <template #header>
+                                          <div class="card-header">
+                                            <span>Características Internas</span>
+                                          </div>
+                                        </template>
+                                          <el-row>
+                                                <el-col :lg=4 :md=8 :sm=8 :xs=12> <i class="icons mdi mdi-bed-king"></i>     Quartos     <div style="font-size: 17px;font-weight: 700;text-align:center;max-width:100px;margin-top:-4px">{{imovel.interno.totalQuartos}}</div></el-col>
+                                                <el-col :lg=5 :md=8 :sm=8 :xs=12> <i class="icons fa fa-shower"></i>         Banheiros   <div style="font-size: 17px;font-weight: 700;text-align:center;max-width:100px;margin-top:-4px">{{imovel.interno.totalBanheiros}}</div></el-col>
+                                                <el-col :lg=5 :md=8 :sm=8 :xs=12> <i class="icons fa fa-bath"></i>           Suítes      <div style="font-size: 17px;font-weight: 700;text-align:center;max-width:100px;margin-top:-4px">{{imovel.interno.totalSuites}}</div></el-col>
+                                                <el-col :lg=5 :md=8 :sm=8 :xs=12> <i class="icons fa fa-tv "></i>            Salas       <div style="font-size: 17px;font-weight: 700;text-align:center;max-width:100px;margin-top:-4px">{{imovel.interno.totalSalas}}</div></el-col>
+                                                <el-col :lg=5 :md=8 :sm=8 :xs=12> <i class="icons fa fa-square "></i>        Varandas    <div style="font-size: 17px;font-weight: 700;text-align:center;max-width:100px;margin-top:-4px">{{imovel.interno.totalVarandas}}</div></el-col>
+                                          </el-row>
+                                          <el-row style="margin-top:10px">
+                                                <el-col :lg=8 :md=10 :sm=12 :xs=12 v-if="imovel.interno.aguaIndividual    " class="checkicon"><i class="fa fa-check"></i> Água individual    </el-col>
+                                                <el-col :lg=8 :md=10 :sm=12 :xs=12 v-if="imovel.interno.aquecedorGas      " class="checkicon"><i class="fa fa-check"></i> Aquecedor gás      </el-col>
+                                                <el-col :lg=8 :md=10 :sm=12 :xs=12 v-if="imovel.interno.aquecedorEletrico " class="checkicon"><i class="fa fa-check"></i> Aquecedor elétrico </el-col>
+                                                <el-col :lg=8 :md=10 :sm=12 :xs=12 v-if="imovel.interno.aquecedorSolar    " class="checkicon"><i class="fa fa-check"></i> Aquecedor solar    </el-col>
+                                                <el-col :lg=8 :md=10 :sm=12 :xs=12 v-if="imovel.interno.arCondicionado    " class="checkicon"><i class="fa fa-check"></i> Ar condicionado    </el-col>
+                                                <el-col :lg=8 :md=10 :sm=12 :xs=12 v-if="imovel.interno.areaServico       " class="checkicon"><i class="fa fa-check"></i> Área servico       </el-col>
+                                                <el-col :lg=8 :md=10 :sm=12 :xs=12 v-if="imovel.interno.areaPrivativa     " class="checkicon"><i class="fa fa-check"></i> Área privativa     </el-col>
+                                                <el-col :lg=8 :md=10 :sm=12 :xs=12 v-if="imovel.interno.armarioBanheiro   " class="checkicon"><i class="fa fa-check"></i> Armário banheiro   </el-col>
+                                                <el-col :lg=8 :md=10 :sm=12 :xs=12 v-if="imovel.interno.armarioCozinha    " class="checkicon"><i class="fa fa-check"></i> Armário cozinha    </el-col>
+                                                <el-col :lg=8 :md=10 :sm=12 :xs=12 v-if="imovel.interno.armarioQuarto     " class="checkicon"><i class="fa fa-check"></i> Armário quarto     </el-col>
+                                                <el-col :lg=8 :md=10 :sm=12 :xs=12 v-if="imovel.interno.banheiro          " class="checkicon"><i class="fa fa-check"></i> Banheiro           </el-col>
+                                                <el-col :lg=8 :md=10 :sm=12 :xs=12 v-if="imovel.interno.boxDespejo        " class="checkicon"><i class="fa fa-check"></i> Box despejo        </el-col>
+                                                <el-col :lg=8 :md=10 :sm=12 :xs=12 v-if="imovel.interno.churrasqueira     " class="checkicon"><i class="fa fa-check"></i> Churrasqueira      </el-col>
+                                                <el-col :lg=8 :md=10 :sm=12 :xs=12 v-if="imovel.interno.closet            " class="checkicon"><i class="fa fa-check"></i> Closet             </el-col>
+                                                <el-col :lg=8 :md=10 :sm=12 :xs=12 v-if="imovel.interno.dce               " class="checkicon"><i class="fa fa-check"></i> Dce                </el-col>
+                                                <el-col :lg=8 :md=10 :sm=12 :xs=12 v-if="imovel.interno.despensa          " class="checkicon"><i class="fa fa-check"></i> Despensa           </el-col>
+                                                <el-col :lg=8 :md=10 :sm=12 :xs=12 v-if="imovel.interno.escritorio        " class="checkicon"><i class="fa fa-check"></i> Escritório         </el-col>
+                                                <el-col :lg=8 :md=10 :sm=12 :xs=12 v-if="imovel.interno.gasCanalizado     " class="checkicon"><i class="fa fa-check"></i> Gás canalizado     </el-col>
+                                                <el-col :lg=8 :md=10 :sm=12 :xs=12 v-if="imovel.interno.hidromassagem     " class="checkicon"><i class="fa fa-check"></i> Hidromassagem      </el-col>
+                                                <el-col :lg=8 :md=10 :sm=12 :xs=12 v-if="imovel.interno.lavabo            " class="checkicon"><i class="fa fa-check"></i> Lavabo             </el-col>
+                                                <el-col :lg=8 :md=10 :sm=12 :xs=12 v-if="imovel.interno.mobilidado        " class="checkicon"><i class="fa fa-check"></i> Mobilidado         </el-col>
+                                                <el-col :lg=8 :md=10 :sm=12 :xs=12 v-if="imovel.interno.quarto            " class="checkicon"><i class="fa fa-check"></i> Quarto             </el-col>
+                                                <el-col :lg=8 :md=10 :sm=12 :xs=12 v-if="imovel.interno.rouparia          " class="checkicon"><i class="fa fa-check"></i> Rouparia           </el-col>
+                                                <el-col :lg=8 :md=10 :sm=12 :xs=12 v-if="imovel.interno.sala              " class="checkicon"><i class="fa fa-check"></i> Sala               </el-col>
+                                                <el-col :lg=8 :md=10 :sm=12 :xs=12 v-if="imovel.interno.solManha          " class="checkicon"><i class="fa fa-check"></i> Sol manhã          </el-col>
+                                                <el-col :lg=8 :md=10 :sm=12 :xs=12 v-if="imovel.interno.suite             " class="checkicon"><i class="fa fa-check"></i> Suite              </el-col>
+                                                <el-col :lg=8 :md=10 :sm=12 :xs=12 v-if="imovel.interno.varanda           " class="checkicon"><i class="fa fa-check"></i> Varanda            </el-col>
+                                                <el-col :lg=8 :md=10 :sm=12 :xs=12 v-if="imovel.interno.varandaGourmet    " class="checkicon"><i class="fa fa-check"></i> Varanda gourmet    </el-col>
+                                                <el-col :lg=8 :md=10 :sm=12 :xs=12 v-if="imovel.interno.vistaMar          " class="checkicon"><i class="fa fa-check"></i> Vista mar          </el-col>
+                                          </el-row>
+                                          <el-row>
+                                                <el-col :lg=8 :md=10 :sm=12 :xs=12 v-if="!imovel.interno.aguaIndividual    " class="nocheckicon"><i class="fa fa-xmark"></i> Água individual    </el-col>
+                                                <el-col :lg=8 :md=10 :sm=12 :xs=12 v-if="!imovel.interno.aquecedorGas      " class="nocheckicon"><i class="fa fa-xmark"></i> Aquecedor gás      </el-col>
+                                                <el-col :lg=8 :md=10 :sm=12 :xs=12 v-if="!imovel.interno.aquecedorEletrico " class="nocheckicon"><i class="fa fa-xmark"></i> Aquecedor elétrico </el-col>
+                                                <el-col :lg=8 :md=10 :sm=12 :xs=12 v-if="!imovel.interno.aquecedorSolar    " class="nocheckicon"><i class="fa fa-xmark"></i> Aquecedor solar    </el-col>
+                                                <el-col :lg=8 :md=10 :sm=12 :xs=12 v-if="!imovel.interno.arCondicionado    " class="nocheckicon"><i class="fa fa-xmark"></i> Ar condicionado    </el-col>
+                                                <el-col :lg=8 :md=10 :sm=12 :xs=12 v-if="!imovel.interno.areaServico       " class="nocheckicon"><i class="fa fa-xmark"></i> Área servico       </el-col>
+                                                <el-col :lg=8 :md=10 :sm=12 :xs=12 v-if="!imovel.interno.areaPrivativa     " class="nocheckicon"><i class="fa fa-xmark"></i> Área privativa     </el-col>
+                                                <el-col :lg=8 :md=10 :sm=12 :xs=12 v-if="!imovel.interno.armarioBanheiro   " class="nocheckicon"><i class="fa fa-xmark"></i> Armário banheiro   </el-col>
+                                                <el-col :lg=8 :md=10 :sm=12 :xs=12 v-if="!imovel.interno.armarioCozinha    " class="nocheckicon"><i class="fa fa-xmark"></i> Armário cozinha    </el-col>
+                                                <el-col :lg=8 :md=10 :sm=12 :xs=12 v-if="!imovel.interno.armarioQuarto     " class="nocheckicon"><i class="fa fa-xmark"></i> Armário quarto     </el-col>
+                                                <el-col :lg=8 :md=10 :sm=12 :xs=12 v-if="!imovel.interno.banheiro          " class="nocheckicon"><i class="fa fa-xmark"></i> Banheiro           </el-col>
+                                                <el-col :lg=8 :md=10 :sm=12 :xs=12 v-if="!imovel.interno.boxDespejo        " class="nocheckicon"><i class="fa fa-xmark"></i> Box despejo        </el-col>
+                                                <el-col :lg=8 :md=10 :sm=12 :xs=12 v-if="!imovel.interno.churrasqueira     " class="nocheckicon"><i class="fa fa-xmark"></i> Churrasqueira      </el-col>
+                                                <el-col :lg=8 :md=10 :sm=12 :xs=12 v-if="!imovel.interno.closet            " class="nocheckicon"><i class="fa fa-xmark"></i> Closet             </el-col>
+                                                <el-col :lg=8 :md=10 :sm=12 :xs=12 v-if="!imovel.interno.dce               " class="nocheckicon"><i class="fa fa-xmark"></i> Dce                </el-col>
+                                                <el-col :lg=8 :md=10 :sm=12 :xs=12 v-if="!imovel.interno.despensa          " class="nocheckicon"><i class="fa fa-xmark"></i> Despensa           </el-col>
+                                                <el-col :lg=8 :md=10 :sm=12 :xs=12 v-if="!imovel.interno.escritorio        " class="nocheckicon"><i class="fa fa-xmark"></i> Escritório         </el-col>
+                                                <el-col :lg=8 :md=10 :sm=12 :xs=12 v-if="!imovel.interno.gasCanalizado     " class="nocheckicon"><i class="fa fa-xmark"></i> Gás canalizado     </el-col>
+                                                <el-col :lg=8 :md=10 :sm=12 :xs=12 v-if="!imovel.interno.hidromassagem     " class="nocheckicon"><i class="fa fa-xmark"></i> Hidromassagem      </el-col>
+                                                <el-col :lg=8 :md=10 :sm=12 :xs=12 v-if="!imovel.interno.lavabo            " class="nocheckicon"><i class="fa fa-xmark"></i> Lavabo             </el-col>
+                                                <el-col :lg=8 :md=10 :sm=12 :xs=12 v-if="!imovel.interno.mobilidado        " class="nocheckicon"><i class="fa fa-xmark"></i> Mobilidado         </el-col>
+                                                <el-col :lg=8 :md=10 :sm=12 :xs=12 v-if="!imovel.interno.quarto            " class="nocheckicon"><i class="fa fa-xmark"></i> Quarto             </el-col>
+                                                <el-col :lg=8 :md=10 :sm=12 :xs=12 v-if="!imovel.interno.rouparia          " class="nocheckicon"><i class="fa fa-xmark"></i> Rouparia           </el-col>
+                                                <el-col :lg=8 :md=10 :sm=12 :xs=12 v-if="!imovel.interno.sala              " class="nocheckicon"><i class="fa fa-xmark"></i> Sala               </el-col>
+                                                <el-col :lg=8 :md=10 :sm=12 :xs=12 v-if="!imovel.interno.solManha          " class="nocheckicon"><i class="fa fa-xmark"></i> Sol da manhã       </el-col>
+                                                <el-col :lg=8 :md=10 :sm=12 :xs=12 v-if="!imovel.interno.suite             " class="nocheckicon"><i class="fa fa-xmark"></i> Suite              </el-col>
+                                                <el-col :lg=8 :md=10 :sm=12 :xs=12 v-if="!imovel.interno.varanda           " class="nocheckicon"><i class="fa fa-xmark"></i> Varanda            </el-col>
+                                                <el-col :lg=8 :md=10 :sm=12 :xs=12 v-if="!imovel.interno.varandaGourmet    " class="nocheckicon"><i class="fa fa-xmark"></i> Varanda gourmet    </el-col>
+                                                <el-col :lg=8 :md=10 :sm=12 :xs=12 v-if="!imovel.interno.vistaMar          " class="nocheckicon"><i class="fa fa-xmark"></i> Vista para mar     </el-col>
+                                          </el-row>
+                                      </el-card>
+                            </el-col>
+                            <el-col :md="12" :xs="24" class="card">
+                                      <el-card>
+                                        <template #header>
+                                          <div class="card-header">
+                                            <span>Características Externas</span>
+                                          </div>
+                                        </template>
+                                          <el-row>
+                                                <el-col :lg=4 :md=8 :sm=8 :xs=12> <i class="icons fa fa-car"></i>           Vagas       <div style="font-size: 17px;font-weight: 700;text-align:center;max-width:100px;margin-top:-4px">{{imovel.externo.totalVagas}}</div></el-col>
+                                                <el-col :lg=5 :md=8 :sm=8 :xs=12> <i class="icons fa fa-building"></i>      Elevadores  <div style="font-size: 17px;font-weight: 700;text-align:center;max-width:100px;margin-top:-4px">{{imovel.externo.totalElevadores}}</div></el-col>
+                                                <el-col :lg=5 :md=8 :sm=8 :xs=12> <i class="icons fa fa-arrow-up-9-1"></i>  Andares     <div style="font-size: 17px;font-weight: 700;text-align:center;max-width:100px;margin-top:-4px">{{imovel.externo.totalAndares}}</div></el-col>
+                                          </el-row>
+                                          <el-row style="margin-top:5px">
+                                                <el-col :lg=8 :md=10 :sm=12 :xs=12 v-if="imovel.externo.academia         " class="checkicon"><i class="fa fa-check"></i> Academia            </el-col>
+                                                <el-col :lg=8 :md=10 :sm=12 :xs=12 v-if="imovel.externo.alarme           " class="checkicon"><i class="fa fa-check"></i> Alarme              </el-col>
+                                                <el-col :lg=8 :md=10 :sm=12 :xs=12 v-if="imovel.externo.cercaEletrica    " class="checkicon"><i class="fa fa-check"></i> Cerca elétrica      </el-col>
+                                                <el-col :lg=8 :md=10 :sm=12 :xs=12 v-if="imovel.externo.churrasqueira    " class="checkicon"><i class="fa fa-check"></i> Churrasqueira       </el-col>
+                                                <el-col :lg=8 :md=10 :sm=12 :xs=12 v-if="imovel.externo.circuitoTV       " class="checkicon"><i class="fa fa-check"></i> Circuito TV         </el-col>
+                                                <el-col :lg=8 :md=10 :sm=12 :xs=12 v-if="imovel.externo.elevador         " class="checkicon"><i class="fa fa-check"></i> Elevador            </el-col>
+                                                <el-col :lg=8 :md=10 :sm=12 :xs=12 v-if="imovel.externo.interfone        " class="checkicon"><i class="fa fa-check"></i> Interfone           </el-col>
+                                                <el-col :lg=8 :md=10 :sm=12 :xs=12 v-if="imovel.externo.jardim           " class="checkicon"><i class="fa fa-check"></i> Jardim              </el-col>
+                                                <el-col :lg=8 :md=10 :sm=12 :xs=12 v-if="imovel.externo.lavanderia       " class="checkicon"><i class="fa fa-check"></i> Lavanderia          </el-col>
+                                                <el-col :lg=8 :md=10 :sm=12 :xs=12 v-if="imovel.externo.portaoEletronico " class="checkicon"><i class="fa fa-check"></i> Portão eletrônico   </el-col>
+                                                <el-col :lg=8 :md=10 :sm=12 :xs=12 v-if="imovel.externo.portaria24h      " class="checkicon"><i class="fa fa-check"></i> Portaria 24h        </el-col>
+                                                <el-col :lg=8 :md=10 :sm=12 :xs=12 v-if="imovel.externo.sauna            " class="checkicon"><i class="fa fa-check"></i> Sauna               </el-col>
+                                                <el-col :lg=8 :md=10 :sm=12 :xs=12 v-if="imovel.externo.vaga             " class="checkicon"><i class="fa fa-check"></i> Vaga                </el-col>
+                                          </el-row>
+                                          <el-row>
+                                                <el-col :lg=8 :md=10 :sm=12 :xs=12 v-if="!imovel.externo.academia         " class="nocheckicon"><i class="fa fa-xmark"></i> Academia            </el-col>
+                                                <el-col :lg=8 :md=10 :sm=12 :xs=12 v-if="!imovel.externo.alarme           " class="nocheckicon"><i class="fa fa-xmark"></i> Alarme              </el-col>
+                                                <el-col :lg=8 :md=10 :sm=12 :xs=12 v-if="!imovel.externo.cercaEletrica    " class="nocheckicon"><i class="fa fa-xmark"></i> Cerca elétrica      </el-col>
+                                                <el-col :lg=8 :md=10 :sm=12 :xs=12 v-if="!imovel.externo.churrasqueira    " class="nocheckicon"><i class="fa fa-xmark"></i> Churrasqueira       </el-col>
+                                                <el-col :lg=8 :md=10 :sm=12 :xs=12 v-if="!imovel.externo.circuitoTV       " class="nocheckicon"><i class="fa fa-xmark"></i> Circuito TV         </el-col>
+                                                <el-col :lg=8 :md=10 :sm=12 :xs=12 v-if="!imovel.externo.elevador         " class="nocheckicon"><i class="fa fa-xmark"></i> Elevador            </el-col>
+                                                <el-col :lg=8 :md=10 :sm=12 :xs=12 v-if="!imovel.externo.interfone        " class="nocheckicon"><i class="fa fa-xmark"></i> Interfone           </el-col>
+                                                <el-col :lg=8 :md=10 :sm=12 :xs=12 v-if="!imovel.externo.jardim           " class="nocheckicon"><i class="fa fa-xmark"></i> Jardim              </el-col>
+                                                <el-col :lg=8 :md=10 :sm=12 :xs=12 v-if="!imovel.externo.lavanderia       " class="nocheckicon"><i class="fa fa-xmark"></i> Lavanderia          </el-col>
+                                                <el-col :lg=8 :md=10 :sm=12 :xs=12 v-if="!imovel.externo.portaoEletronico " class="nocheckicon"><i class="fa fa-xmark"></i> Portão eletrônico   </el-col>
+                                                <el-col :lg=8 :md=10 :sm=12 :xs=12 v-if="!imovel.externo.portaria24h      " class="nocheckicon"><i class="fa fa-xmark"></i> Portaria 24h        </el-col>
+                                                <el-col :lg=8 :md=10 :sm=12 :xs=12 v-if="!imovel.externo.sauna            " class="nocheckicon"><i class="fa fa-xmark"></i> Sauna               </el-col>
+                                                <el-col :lg=8 :md=10 :sm=12 :xs=12 v-if="!imovel.externo.vaga             " class="nocheckicon"><i class="fa fa-xmark"></i> Vaga                </el-col>
+                                          </el-row>
+                                      </el-card>
+
+                            <div style="margin:20px"></div>
+
+                                      <el-card>
+                                        <template #header>
+                                          <div class="card-header">
+                                            <span>Lazer</span>
+                                          </div>
+                                        </template>
+                                          <el-row>
+                                                <el-col :lg=8 :md=10 :sm=12 :xs=12 v-if="imovel.lazer.cinema              " class="checkicon"><i class="fa fa-check"></i> Cinema                 </el-col>
+                                                <el-col :lg=8 :md=10 :sm=12 :xs=12 v-if="imovel.lazer.hidromassagem       " class="checkicon"><i class="fa fa-check"></i> Hidromassagem          </el-col>
+                                                <el-col :lg=8 :md=10 :sm=12 :xs=12 v-if="imovel.lazer.piscina             " class="checkicon"><i class="fa fa-check"></i> Piscina                </el-col>
+                                                <el-col :lg=8 :md=10 :sm=12 :xs=12 v-if="imovel.lazer.playground          " class="checkicon"><i class="fa fa-check"></i> Playground             </el-col>
+                                                <el-col :lg=8 :md=10 :sm=12 :xs=12 v-if="imovel.lazer.quadraPoliesportiva " class="checkicon"><i class="fa fa-check"></i> Quadra poliesportiva   </el-col>
+                                                <el-col :lg=8 :md=10 :sm=12 :xs=12 v-if="imovel.lazer.quadraTenis         " class="checkicon"><i class="fa fa-check"></i> Quadra tênis           </el-col>
+                                                <el-col :lg=8 :md=10 :sm=12 :xs=12 v-if="imovel.lazer.salaoFestas         " class="checkicon"><i class="fa fa-check"></i> Salão de festas        </el-col>
+                                                <el-col :lg=8 :md=10 :sm=12 :xs=12 v-if="imovel.lazer.salaoJogos          " class="checkicon"><i class="fa fa-check"></i> Salão de jogos         </el-col>
+                                                <el-col :lg=8 :md=10 :sm=12 :xs=12 v-if="imovel.lazer.salaoMassagem       " class="checkicon"><i class="fa fa-check"></i> Salão de massagem      </el-col>
+                                          </el-row>
+                                          <el-row>
+                                                <el-col :lg=8 :md=10 :sm=12 :xs=12 v-if="!imovel.lazer.cinema              " class="nocheckicon"><i class="fa fa-xmark"></i> Cinema                 </el-col>
+                                                <el-col :lg=8 :md=10 :sm=12 :xs=12 v-if="!imovel.lazer.hidromassagem       " class="nocheckicon"><i class="fa fa-xmark"></i> Hidromassagem          </el-col>
+                                                <el-col :lg=8 :md=10 :sm=12 :xs=12 v-if="!imovel.lazer.piscina             " class="nocheckicon"><i class="fa fa-xmark"></i> Piscina                </el-col>
+                                                <el-col :lg=8 :md=10 :sm=12 :xs=12 v-if="!imovel.lazer.playground          " class="nocheckicon"><i class="fa fa-xmark"></i> Playground             </el-col>
+                                                <el-col :lg=8 :md=10 :sm=12 :xs=12 v-if="!imovel.lazer.quadraPoliesportiva " class="nocheckicon"><i class="fa fa-xmark"></i> Quadra poliesportiva   </el-col>
+                                                <el-col :lg=8 :md=10 :sm=12 :xs=12 v-if="!imovel.lazer.quadraTenis         " class="nocheckicon"><i class="fa fa-xmark"></i> Quadra tênis           </el-col>
+                                                <el-col :lg=8 :md=10 :sm=12 :xs=12 v-if="!imovel.lazer.salaoFestas         " class="nocheckicon"><i class="fa fa-xmark"></i> Salão de festas        </el-col>
+                                                <el-col :lg=8 :md=10 :sm=12 :xs=12 v-if="!imovel.lazer.salaoJogos          " class="nocheckicon"><i class="fa fa-xmark"></i> Salão de jogos         </el-col>
+                                                <el-col :lg=8 :md=10 :sm=12 :xs=12 v-if="!imovel.lazer.salaoMassagem       " class="nocheckicon"><i class="fa fa-xmark"></i> Salão de massagem      </el-col>
+                                          </el-row>
+                                      </el-card>
+
+                            </el-col>
+
+
+                            <el-col :md="12" :xs="24" class="card">
+
+                                      <el-card>
+                                        <template #header>
+                                          <div class="card-header">
+                                            <span>Documentação</span>
+                                          </div>
+                                        </template>
+                                          <el-row style="margin-bottom:10px">
+                                                <el-col :lg=12 :md=12 :sm=24 :xs=24 style="margin-bottom:10px"> Índice cadastral<div style="font-weight: 700"><span v-if="$validator.is(imovel.documentacao.indiceCadastral)"   >{{imovel.documentacao.indiceCadastral}}   </span><span v-else>-</span></div></el-col>
+                                                <el-col :lg=12 :md=12 :sm=24 :xs=24 style="margin-bottom:10px"> Cartório        <div style="font-weight: 700"><span v-if="$validator.is(imovel.documentacao.cartorio)"          >{{imovel.documentacao.cartorio}}          </span><span v-else>-</span></div></el-col>
+                                                <el-col :lg=12 :md=12 :sm=24 :xs=24 style="margin-bottom:10px"> Folha cartório  <div style="font-weight: 700"><span v-if="$validator.is(imovel.documentacao.cartorioFolha)"     >{{imovel.documentacao.cartorioFolha}}     </span><span v-else>-</span></div></el-col>
+                                                <el-col :lg=12 :md=12 :sm=24 :xs=24 style="margin-bottom:10px"> Livro cartório  <div style="font-weight: 700"><span v-if="$validator.is(imovel.documentacao.cartorioLivro)"     >{{imovel.documentacao.cartorioLivro}}     </span><span v-else>-</span></div></el-col>
+                                                <el-col :lg=12 :md=12 :sm=24 :xs=24 style="margin-bottom:10px"> Matrícula       <div style="font-weight: 700"><span v-if="$validator.is(imovel.documentacao.matricula)"         >{{imovel.documentacao.matricula}}         </span><span v-else>-</span></div></el-col>
+                                                <el-col :lg=12 :md=12 :sm=24 :xs=24 style="margin-bottom:00px"> Vencimento venda<div style="font-weight: 700"><span v-if="$validator.is(imovel.documentacao.vencimentoVenda)"   >{{imovel.documentacao.vencimentoVenda}}   </span><span v-else>-</span></div></el-col>
+                                          </el-row>
+                                      </el-card>
+
+                            </el-col>
+                            
+                            <el-col :md="12" :xs="24" class="card">
+
+                                      <el-card>
+                                        <template #header>
+                                          <div class="card-header">
+                                            <span>Histórico</span>
+                                          </div>
+                                        </template>
+                                          <el-row style="margin-bottom:10px">
+                                                <el-col :lg=12 :md=12 :sm=24 :xs=24> Captado por <div style="font-weight: 700">{{imovel.captador}} </div></el-col>
+                                         </el-row>
+                                          <el-row style="margin-bottom:10px">
+                                                <el-col :lg=12 :md=12 :sm=24 :xs=24> Atualizado em  <div style="font-weight: 700;">{{$tools.FormatDateHourToBR(imovel.dataAtualizacao)}} <span style="font-weight:normal;color:#555555">{{$tools.GetHours(imovel.dataAtualizacao)}}h</span></div></el-col>
+                                                <el-col :lg=12 :md=12 :sm=24 :xs=24> Atualizado por <div style="font-weight: 700;">{{imovel.atualizadoPorNome}}</div></el-col>
+                                         </el-row>
+                                          <el-row style="margin-bottom:10px">
+                                                <el-col :lg=12 :md=12 :sm=24 :xs=24> Inserido em  <div style="font-weight: 700;">{{$tools.FormatDateHourToBR(imovel.data)}} <span style="font-weight:normal;color:#555555">{{$tools.GetHours(imovel.data)}}h</span></div></el-col>
+                                                <el-col :lg=12 :md=12 :sm=24 :xs=24> Inserido por <div style="font-weight: 700;">{{imovel.inseridoPorNome}}</div></el-col>
+                                          </el-row>
+                                      </el-card>
+
+                            </el-col>
+
+
+                        </el-row>
+
+            </el-col>
+        </el-row>
+
+
+            
+            <el-dialog v-model="showModalImages" :title="imovel.titulo" :id="'caroussel'+id">
+
+                <q-carousel v-model="imageIndex"
+                            arrows
+                            navigation
+                            swipeable
+                            animated
+                            infinite>
+                    <template v-slot:navigation-icon="{ active, btnProps, onClick }">
+                        <q-btn v-if="active" size="5px" color="orange"></q-btn>
+                        <q-btn v-else size="4px" color="white" @click="onClick"></q-btn>
+                    </template>
+
+                    <q-carousel-slide v-for="(item,index) in imovel.imagens" :name="index" :img-src="item.url"></q-carousel-slide>
+
+                </q-carousel>
+
+            </el-dialog>
+
+
+
+        </div>
+
+
+    </div>
+
+
+
+
+
+</template>
+
+<script>
+module.exports = {
+
+    components: {
+
+	},
+
+        data: function () {
+            return {
+                view             : "all",
+                showModalImages  : false,
+                imageIndex       : 0,
+                favoritando      : false
+            }
+        }, computed: {
+
+        },
+
+        props: {
+            id:		{ type: Number, required: false, default: 0 },
+            imovel:	{ type: Object, required: false, default: {}},
+        },
+        watch: {
+        },
+        created: function () {
+
+	    },
+	    mounted(){
+
+	    },
+	    methods: {
+
+            OpenModalImages(index){
+                this.imageIndex=index;
+                //window.setTimeout(()=>this.showModalImages=true,2000)
+                this.showModalImages=true;
+
+            },
+
+
+            Open(id,target="_blank"){
+                this.$root.RouteTo('imovel/'+id);
+            },
+    
+            OpenProprietario(id,target="_blank"){
+                this.$root.RouteTo('proprietario/'+id);
+            },
+
+
+
+	    }
+
+}
+
+</script>
+
+
+<!--<script setup>
+const isCollapse = ref(true);
+const handleOpen = function(key, keyPath){
+  c(key, keyPath);
+}
+const handleClose = function(key, keyPath){
+  c(key, keyPath);
+}
+</script>-->
+
+<style scoped>
+
+
+    .card{
+        padding-bottom:20px;
+        font-weight: normal;
+    }
+
+    .checkiconstatus{
+        color:var(--s-color-green);
+    }
+
+    .checkicon{
+        color:var(--s-color-primary);
+    }
+
+    .nocheckicon{
+        color:var(--s-color-red);
+        opacity:0.5;
+    }
+
+    .active{
+        font-weight:700;
+        color:var(--s-color-primary);
+    }
+
+    .inactive{
+        font-weight:700;
+        color:var(--s-color-red);
+    }
+
+    img {
+        display: flex;
+        justify-content: center;
+        width: 100%;
+        height: 100%;
+    }
+
+
+    #imovel-card {
+        min-height:198px;
+        width: 100%;
+        border-radius: 20px;
+        margin-left: 0px;
+        /*border:solid 2px #efefef;*/
+        box-shadow: rgba(99, 99, 99, 0.1) 0px 2px 8px 0px;
+        box-shadow: rgba(0, 0, 0, 0.16) 0px 1px 4px;
+        box-shadow: rgb(0 0 0 / 0.14) 1px 1px 6px 2px;
+    }
+    
+
+    #proprietario-card {
+        min-height:198px;
+        width: 100%;
+        border-radius: 20px;
+        margin-left: 0px;
+        /*border:solid 2px #efefef;*/
+        box-shadow: rgba(99, 99, 99, 0.1) 0px 2px 8px 0px;
+        box-shadow: rgba(0, 0, 0, 0.16) 0px 1px 4px;
+        box-shadow: rgb(0 0 0 / 0.14) 1px 1px 6px 2px;
+    }
+
+    #imovel-card-xs {
+        width: auto;
+        height: auto;
+        border-radius: 14px;
+        padding: 10px;
+        /*border:solid 2px #efefef;*/
+        box-shadow: rgba(99, 99, 99, 0.1) 0px 2px 8px 0px;
+        box-shadow: rgba(0, 0, 0, 0.16) 0px 1px 4px;
+    }
+
+
+    #carousel-thumbs {
+        /*height:240px;*/
+        display: inline-block;
+        padding: 0px;
+        max-width: 250px;
+        width: inherit;
+        float: left;
+    }
+
+    
+    #proprietario-thumb {
+        /*height:240px;*/
+        display: inline-block;
+        padding: 0px;
+        max-width: 250px;
+        width: inherit;
+        height: 198px;
+        border-radius: 20px 0px 0px 20px;        float: left;
+        color:#fff;
+        background-color:var(--s-color-primary);
+        text-align:center;
+    }
+
+
+
+    #carousel-thumbs-xs {
+        display: block;
+        padding: 0px;
+        width: 100%;
+    }
+
+    #imovel-body {
+        display: inline-block;
+        padding-left:12px;
+        width: 75%;
+    }
+    
+    #proprietario-body {
+        display: inline-block;
+        padding-left:12px;
+        width: 75%;
+    }
+
+    #imovel-body-xs {
+        display: block;
+        padding: 10px;
+        /*width: calc(100% - 20px);*/
+    }
+
+    #title {
+        font-size: 18px;
+        /*line-height: 24px;*/
+        font-weight: 600;
+        color: var(--s-color-primary);
+    }
+
+    #subtitle {
+        font-size: 16px;
+        padding-top: 6px;
+        font-weight: 700;
+        color: var(--s-color-text);
+    }
+
+
+    .icons {
+        width: 28px;
+        display: inline-block;
+        text-align: center;
+        line-height: 32px;
+        color: var(--s-accent-color);
+    }
+
+
+    #location {
+        font-size: 15px;
+        line-height: 28px;
+        font-weight: 500;
+        color: #131A2E;
+        color: #6a728a;
+        padding: 6px 0px 4px 0px;
+    }
+
+
+    #caracteristicas {
+        font-size: 15px;
+        line-height: 16px;
+        font-weight: 500;
+        color: #131A2E;
+        color: #6a728a;
+        padding: 0px;
+    }
+
+
+    #value {
+        font-size: 22px;
+        font-weight: 700;
+        color: var(--s-accent-color);
+        padding: 14px 0px 14px 0px;
+    }
+
+
+
+
+
+
+    .el-carousel__item {
+        background-color: #d3dce6;
+    }
+
+        .el-carousel__item div:nth-child(2) {
+            z-index: 100000;
+            color: #fff;
+            text-shadow: -1px -1px 0 #353535, 1px -1px 0 #353535, -1px 1px 0 #353535, 1px 1px 0 #353535;
+            margin-top: -26px;
+            text-align: left;
+            padding-left: 10px;
+        }
+
+        .el-carousel__item div:nth-child(3) {
+            z-index: 100000;
+            color: #fff;
+            text-shadow: -1px -1px 0 #353535, 1px -1px 0 #353535, -1px 1px 0 #353535, 1px 1px 0 #353535;
+            margin-top: -26px;
+            text-align: right;
+            padding-right: 10px;
+        }
+
+
+
+        .el-carousel__item span {
+            color: #475669;
+            opacity: 0.75;
+            margin: 0;
+            text-align: center;
+        }
+</style>
+
+
