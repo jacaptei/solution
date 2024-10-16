@@ -16,6 +16,10 @@ export default class Api {
         else if (this.ENDPOINT == "https://api.localhost:55149/") {
             this.ENDPOINT = "https://localhost:55150/";
         }
+        else if (this.ENDPOINT == "https://api.localhost:52240/") {
+            this.ENDPOINT = "https://localhost:52220/"; 
+        }
+
         this.tools = new ToolClass();
     }
 
