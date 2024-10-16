@@ -1,103 +1,148 @@
 ﻿<template>
-    <el-row :gutter="20">
-        <!-- Coluna de membros -->
+    <el-row :gutter="20" style="margin: 10px">
         <el-col :span="12">
-            <el-card shadow="hover" class="card">
-                <h3>Membros do plano</h3>
-                <p>{{ membros.length }} / 6 contas usadas</p>
+            <el-card shadow="hover" class="card membros-card">
+                <h3>Membros do Plano</h3>
+                <p>{{ membros.length }} de {{ limiteUsuarios }} parceiros cadastrados</p>
 
                 <el-divider></el-divider>
 
-                <el-list>
-                    <el-list-item v-for="(membro, index) in membros"
-                                  :key="index"
-                                  class="membro-item">
-                        <el-avatar :src="membro.avatar"
-                                   v-if="membro.avatar"
-                                   size="medium" />
-                        <el-avatar icon="el-icon-user" v-else size="medium" />
-                        <span class="membro-nome">{{ membro.nome }}</span>
-                        <el-tag v-if="membro.admin" type="info" size="small">
-                            Administrador do plano
-                        </el-tag>
-                    </el-list-item>
-                </el-list>
+                <div v-for="(membro, index) in membros" :key="index" class="membro">
+                    <div class="avatar-container">
+                        <el-avatar :src="membro.avatar || 'https://cube.elemecdn.com/0/88/03b0d39583f48206768a7534e55bcpng.png'" size="medium" />
+                    </div>
+
+                    <div class="membro-info">
+                        <p class="membro-nome">{{ membro.nome }}</p>
+                    </div>
+
+                    <el-button type="primary" size="small">View</el-button>
+                </div>
             </el-card>
         </el-col>
 
-        <!-- Coluna de convite -->
         <el-col :span="12">
-            <el-card shadow="hover" class="card">
-                <h3>Convidar uma pessoa</h3>
+            <el-card shadow="hover">
+                <h3>Convidar uma Pessoa</h3>
                 <p>
                     Para convidar alguém, envie o link abaixo ou crie um convite usando um
                     serviço de mensagem ou e-mail.
                 </p>
-                <el-input v-model="linkConvite"
-                          class="input-link"
-                          suffix-icon="el-icon-link"
-                          readonly />
+                <div style="display: flex; align-items: center;">
+                    <el-input v-model="linkConvite"
+                              readonly
+                              class="custom-input"
+                              placeholder="Seu link de convite aqui">
+                        <template #suffix>
+                            <i class="el-icon-link"></i>
+                        </template>
+                    </el-input>
+                    <el-button type="primary" style="margin-left: 10px" @click="gerarLinkConvite">Gerar Link de Convite</el-button>
+                </div>
+                    <el-divider></el-divider>
 
-                <el-space direction="vertical" class="convite-botoes">
-                    <el-button icon="el-icon-message" type="primary" size="medium">Messenger</el-button>
-                    <el-button icon="el-icon-chat-dot-round" size="medium">WhatsApp</el-button>
-                    <el-button icon="el-icon-message" size="medium">E-mail</el-button>
-                </el-space>
-
-                <el-button type="info"
-                           plain
-                           class="kids-button"
-                           :disabled="true">
-                    Criar uma conta Kids
-                </el-button>
+                    <el-button type="success" icon="whatsapp-icon" @click="abrirWhatsapp">
+                        WhatsApp
+                    </el-button>
+                    <el-button size="medium">E-mail</el-button>
             </el-card>
         </el-col>
     </el-row>
 </template>
 
-<script>export default {
-  data() {
-    return {
-      linkConvite: "https://www.spotify.com/br-pt/invite",
-      membros: [
-        { nome: "Você", admin: true, avatar: "https://via.placeholder.com/150" },
-        { nome: "Rafael Mendes", avatar: "https://via.placeholder.com/150" },
-        { nome: "Stephanie Lopes", avatar: "https://via.placeholder.com/150" },
-        { nome: "Isaias Vaz" },
-        { nome: "Victor Souza" },
-        { nome: "Mateusbruno" },
-      ],
-    };
-  },
-};</script>
+<script>
+    module.exports = {
+        data() {
+            return {
+                linkConvite: "https://www.spotify.com/br-pt/invite",
+                membros: [],
+                limiteUsuarios: 6,
+            };
+        },
+        mounted() {
+            console.log(this.$root.usuario.idConta, this.$root.usuario.tokenConta);
+            this.obterUsuariosConta();
+            this.gerarLinkConvite();
+        },
+        methods: {
+            obterUsuariosConta() {
+                const url = this.$api.BuildURL(`parceiro/obtercontaporid/${this.$root.usuario.idConta}`);
+                axios.get(url)
+                    .then((request) => {
+                        if (request.data && request.data.result) {
+                            this.membros = request.data.result; // Atualiza a lista de membros
+                            console.log(this.membros);
+                        } else {
+                            this.membros = []; // Limpa a lista se não houver membros
+                        }
+                    })
+                    .catch((error) => {
+                        console.error(error);
+                        if (error.response) {
+                            console.error(error.response);
+                        }
+                        console.error("Não foi possível alterar dados.");
+                    });
+            },
+            gerarLinkConvite() {
+                const baseUrl = "https://jacaptei.com.br/convite"; // Substitua pelo seu URL base
+                const params = new URLSearchParams({
+                    idConta: this.$root.usuario.idConta,
+                    tokenConta: this.$root.usuario.tokenConta // Adicionando o token aqui
+                });
 
-<style scoped>
-    .card {
-        margin-bottom: 20px;
-        padding: 15px;
+                this.linkConvite = `${baseUrl}?${params.toString()}`;
+                this.$message.success('Link de convite gerado com sucesso!'); // Exibe mensagem de sucesso
+            }
+        }
+    };
+</script>
+
+<style>
+    .membros-card {
+        padding: 20px;
     }
 
-    .membro-item {
+    .membro {
         display: flex;
         align-items: center;
+        justify-content: space-between;
         margin: 10px 0;
+        padding: 10px 0;
+        border-bottom: 1px solid #f0f0f0;
+    }
+
+    .membro-info {
+        flex-grow: 1;
+        margin-left: 10px;
     }
 
     .membro-nome {
-        margin-left: 10px;
-        flex-grow: 1;
+        font-weight: bold;
+        margin: 0;
     }
 
-    .input-link {
-        margin: 10px 0;
+    .membro-username {
+        color: #666;
+        font-size: 0.9rem;
+        margin: 0;
     }
 
-    .convite-botoes > * {
+    .view-all-btn {
         width: 100%;
-    }
-
-    .kids-button {
-        width: 100%;
+        text-align: center;
         margin-top: 10px;
+    }
+
+    .custom-input {
+        border-radius: 12px; /* Arredonda os cantos */
+        background-color: #f5f7fa; /* Cor de fundo */
+        padding: 10px; /* Espaçamento interno */
+        border: 1px solid #e4e7ed; /* Cor da borda */
+    }
+
+    .custom-input .el-icon-link {
+        color: #b0b0b0; /* Cor do ícone */
+        margin-left: 8px; /* Espaçamento à esquerda do ícone */
     }
 </style>
