@@ -36,7 +36,7 @@
                                             <el-table :data="bairroScope.row.bairro.imoveis" max-height="650" table-layout="auto" :header-cell-style="{ fontWeight: 'bold' }" fixed-header>
                                                 <el-table-column label="ID da Importação" prop="id" align="center" />
                                                 <el-table-column label="Código do Imóvel JaCaptei" prop="cod" align="center" />
-                                                <el-table-column label="Código do Imóvel Imoview" prop="imoviewResponse.codigo" align="center" />
+                                                <el-table-column :label="crmLabel" prop="imoviewResponse.codigo" align="center" />
                                                 <el-table-column label="Data de Importação" prop="data" width="150" align="center">
                                                     <template #default="scope">
                                                         {{ formatarDataHora(scope.row.data) }}
@@ -188,7 +188,8 @@
             <el-row gutter=20>
                 <el-col :xs="24" :sm="24" :md="24" :lg="24" class="register-input">
                     <span>CRM</span>
-                    <el-select v-model="listaCrmIntegracao" @change="filtrarParceiroIntegracao" placeholder="Escolha o CRM" style="width: 100%">
+                    <el-select v-model="listaCrmIntegracao"
+                               @change="filtrarParceiroIntegracao" placeholder="Escolha o CRM" style="width: 100%">
                         <el-option v-for="item in crmOptions"
                                    :key="item.id"
                                    :label="item.nome"
@@ -229,10 +230,13 @@
             const filtrosVisiveis = ref(false);
             const fullscreenLoading = ref(false);
             const instance = getCurrentInstance();
+            const crmSelecionado = ref('');
+            const urlStatusIntegracao = ref('');
             let intervalId = null;
+            const crmLabel = ref("");
             const crmOptions = ref([
                 { nome: 'IMOVIEW', id: 1 },
-                { nome: 'VISTASOFT', id: 2, disabled: true },
+                { nome: 'VISTASOFT', id: 2 },
             ]);
             const optionsRefresh = ref([
                 { label: 'Desativar', value: 0 },
@@ -244,7 +248,48 @@
                 { label: '5 minutos', value: 300 },
                 { label: '10 minutos', value: 600 },
             ]);
-            const acompanhar = ref([]);
+            const acompanhar = ref([{
+                "plano": "IMOBILIÁRIA 03 USUÁRIOS",
+                "status": "Concluido",
+                "bairros": [
+                    {
+                        "bairro": {
+                            "nome": "Carmo",
+                            "imoveis": [
+                                {
+                                    "id": 1,
+                                    "cod": "7575",
+                                    "data": "2024-10-15T11:47:27.869359",
+                                    "status": "Concluido",
+                                    "apiResponse": {
+                                        "Codigo": "RD1744042",
+                                        "status": 200,
+                                        "message": "Ok"
+                                    },
+                                    "atualizadoEm": "2024-10-15T12:06:15.577776"
+                                },
+                                {
+                                    "id": 2,
+                                    "cod": "JC1355",
+                                    "data": "2024-10-15T11:47:29.216367",
+                                    "status": "Concluido",
+                                    "apiResponse": {
+                                        "Codigo": "RD1744043",
+                                        "status": 200,
+                                        "message": "Ok"
+                                    },
+                                    "atualizadoEm": "2024-10-15T12:45:16.30322"
+                                }
+                            ],
+                            "idCidade": "2754"
+                        }
+                    }
+                ],
+                "cliente": "RD IMOVEIS",
+                "criadoEm": "2024-10-15T11:47:25.820966",
+                "integracao": 1,
+                "atualizadoEm": "2024-10-15T11:47:30.289413"
+            }]);
 
             watch(acompanhar, (newVal) => {
                 totalImoveis.value = newVal.reduce((total, integracao) => {
@@ -258,6 +303,24 @@
 
             watch(refreshInterval, (newValue) => {
                 startAutoRefresh();
+            });
+
+            watch(listaIntegracao, () => {
+                if (crmSelecionado.value) {
+                    filtrarStatusParceiroIntegracao(crmSelecionado.value);
+                } else {
+                    console.warn("CRM não está definido.");
+                }
+            });
+
+            watch(crmSelecionado, (newVal) => {
+                if (newVal === 1) {
+                    crmLabel.value = "Código do Imóvel Imoview";
+                } else if (newVal === 2) {
+                    crmLabel.value = "Código do Imóvel Vistasoft";
+                } else {
+                    crmLabel.value = ""; 
+                }
             });
 
             onMounted(() => {
@@ -284,9 +347,9 @@
             });
 
             const startAutoRefresh = () => {
-                if (intervalId) clearInterval(intervalId); // Limpa o intervalo existente
+                if (intervalId) clearInterval(intervalId);
                 if (refreshInterval.value > 0) {
-                    intervalId = setInterval(refreshData, refreshInterval.value * 1000); // Define novo intervalo
+                    intervalId = setInterval(refreshData, refreshInterval.value * 1000);
                 }
             };
 
@@ -298,12 +361,23 @@
             };
 
             const filtrarParceiroIntegracao = async (crm) => {
+                crmSelecionado.value = crm;
                 const url = validarUrlParaBuscarParceiroIntegracao(crm);
                 if (!url) {
                     console.error("URL inválida para o parceiro de integração.");
                     return;
                 }
+                listaIntegracao.value = [];
                 await getListaIntegracoes(url);
+                isDisabled();
+            };
+
+            const filtrarStatusParceiroIntegracao = async (crm) => {
+                urlStatusIntegracao.value = validarUrlParaBuscarStatusIntegracao(crm);
+                if (!urlStatusIntegracao.value) {
+                    console.error("URL inválida para o parceiro de integração.");
+                    return;
+                }
                 isDisabled();
             };
 
@@ -341,6 +415,18 @@
                         return instance.proxy.$api.BuildURL("api/imoview/integracao/listar");
                     case 2:
                         return instance.proxy.$api.BuildURL("api/vistasoft/integracao/listar");
+                    default:
+                        console.error("CRM inválido:", crm);
+                        return null;
+                }
+            };
+
+            const validarUrlParaBuscarStatusIntegracao = (crm) => {
+                switch (crm) {
+                    case 1:
+                        return instance.proxy.$api.BuildURL("api/imoview/integracao/status");
+                    case 2:
+                        return instance.proxy.$api.BuildURL("api/vistasoft/integracao/status");
                     default:
                         console.error("CRM inválido:", crm);
                         return null;
@@ -391,8 +477,7 @@
                     fullscreenLoading.value = true;
                     filtros.value.Integracao = listaIntegracao.value.value;
                     filtros.value.Cliente = listaIntegracao.value.label;
-                    const url = instance.proxy.$api.BuildURL("api/imoview/integracao/status");
-                    const response = await axios.post(url, filtros.value);
+                    const response = await axios.post(urlStatusIntegracao.value, filtros.value);
                     acompanhar.value = [response.data];
                     acompanhar.value = acompanhar.value.map(integracao => {
                         return {
@@ -458,7 +543,9 @@
                 fullscreenLoading,
                 optionsRefresh,
                 startAutoRefresh,
-                refreshInterval
+                refreshInterval,
+                crmSelecionado,
+                crmLabel
             };
         },
     };
