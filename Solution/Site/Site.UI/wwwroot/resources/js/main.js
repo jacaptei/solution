@@ -64,7 +64,7 @@ $(document).ready(function () {
                     showTermsAndPolicyModal: false,
                     autoLogin       : false,
                     rememberMe      : false,
-                    onRequest       : false,
+                    onRequest: false,
                     title: {
                         label       : "HOME",
                         icon        : "fa fa-user",
@@ -112,7 +112,6 @@ $(document).ready(function () {
         beforeCreate: function () {
 		},
         created: function () {
-
             this.RestoreSession();
             this.localidade.estados = this.$sdata.forms.states;
 
@@ -270,8 +269,11 @@ $(document).ready(function () {
             window.location.hash.replace("/#", "");
             if (this.$validator.IsSet(tag)) {
                 tag = tag.split("?")[0];
-                if (tag != "imovel")
+                if (tag !== "imovel" && tag !== "convite") {
                     link = this.RouteTo(tag);
+                } else {
+                    console.log(`Tag é ${tag}, mantendo rota atual.`);
+                }
             }
             else
                 this.RouteTo({ name: name, route: link });

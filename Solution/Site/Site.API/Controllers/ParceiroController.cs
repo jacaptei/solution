@@ -149,5 +149,14 @@ namespace JaCaptei.API.Controllers {
             appReturn = service.ObterContaPorId(int.Parse(idConta));
             return Result(appReturn);
         }
+
+        [HttpGet]
+        [Route("[action]/{token}")]
+        public IActionResult ObterContaPeloToken(string token)
+        {
+            appReturn = service.ObterContaPeloToken(token);
+            return Result(appReturn);
+        }
+
     }
 }

@@ -198,9 +198,7 @@
 <script>
     module.exports = {
         name: 'JaCapteiConviteMembros',
-        components: {
-
-        },
+        components: {},
 
         data: function () {
             return {
@@ -245,89 +243,21 @@
                     sexos: [{ id: 1, label: "NÃO APLICÁVEL", value: "NA" }, { id: 2, label: "MASCULINO", value: "MASCULINO" }, { id: 3, label: "FEMININO", value: "FEMININO" }],
                 }
             }
-        }, computed: {
-
         },
+        computed: {},
         created: function () {
-
             try {
                 var queryParams = this.$tools.HandleParams();
                 this.cod = queryParams.cod;
-            } catch (e) { }
-
-            if (this.$validator.is(this.$route.query)) {
-
-                if (this.$validator.not(this.$route.query.id) && this.$validator.not(this.$route.query.cod)) {
-                    this.indisponivel = true;
-                } else {
-
-                    this.id = this.$tools.ParseInt(this.$route.query.id);
-                    this.cod = this.$route.query.cod;
-
-                    this.corretor.id = this.$route.query.cid;
-                    this.corretor.nome = this.$route.query.cnome;
-                    this.corretor.razao = this.$route.query.crazao;
-                    this.corretor.fantasia = this.$route.query.cfantasia;
-                    this.corretor.telefone = this.$route.query.ctelefone;
-                    this.corretor.email = this.$route.query.cemail;
-                    this.corretor.tipo = this.$route.query.ctipo;
-
-                    this.queryImage = this.$route.query.img;
-                }
-
-            } else {
-
-                var params = this.$tools.HandleParams();
-                if (this.$validator.not(params.id) && this.$validator.not(params.cod))
-                    this.indisponivel = true;
-                else {
-                    this.id = this.$tools.ParseInt(params.id);
-                    this.cod = params.cod;
-                    this.corretor.id = params.cid;
-                    this.corretor.nome = params.cnome;
-                    this.corretor.razao = params.crazao;
-                    this.corretor.fantasia = params.cfantasia;
-                    this.corretor.telefone = params.ctelefone;
-                    this.corretor.email = params.cemail;
-                    this.corretor.tipo = params.ctipo;
-                }
-            }
+                this.BuscarContaPeloToken();
+            } catch (e) {}
         },
 
-        mounted() {
-            window.setTimeout(() => {
-
-                try {
-                    if (!this.is(this.$root?.usuario) || !this.is(this.$root?.usuario?.id > 0)) {
-                        var usr = "jcuser" + this.corretor.id;
-                        var usuario = this.$sdata.Storage.Get(usr);
-                        if (usuario?.id > 0 && usuario?.tokenJWT) {
-                            this.$root.usuario = usuario;
-                            this.$root.SignIn();
-                        }
-                    }
-                } catch (e) {
-                    console.log(e);
-                } finally {
-                    if (!this.indisponivel)
-                        this.Buscar();
-                }
-            }, 2000);
-        },
+        mounted() {},
         methods: {
-            async Buscar() {
-
-                var buscaImovel = { imovel: {} };
-                buscaImovel.imovel.id = this.$validator.not(this.id) ? 0 : this.id;
-                buscaImovel.imovel.cod = this.$validator.not(this.cod) ? "" : this.cod;
-
-                if (this.$root.isAuth)
-                    buscaImovel.usuario = this.$root.usuario;
-
-                this.onRequest = true;
-                this.indisponivel = false;
-
-                var request = await this.$api.Post("imovel/buscar/unidade", buscaImovel);
+            async BuscarContaPeloToken() {
+                var buscarConta = [];
+                var request = await this.$api.Get(`parceiro/obtercontapelotoken/${encodeURIComponent(this.cod)}`);
 
                 if (request?.status?.success) {
                     buscaImovel = request.result;

@@ -797,6 +797,21 @@ namespace JaCaptei.Application{
             return entityDB;
         }
 
+        public Conta ObterContaPorToken(string token)
+        {
+            try
+            {
+                Conta entityDB = new Conta();
+                using (var conn = new DBcontext().GetConn())
+                    entityDB = conn.Query<Conta>(e => e.token == token).FirstOrDefault();
+                return entityDB;
+            }
+            catch
+            {
+                throw new Exception();
+            }
+        }
+
         public List<ContaId> ObterContaPorId(int idConta)
         {
             const string sql = @"

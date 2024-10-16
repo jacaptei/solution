@@ -43,6 +43,28 @@ namespace JaCaptei.Application
             DAO.VerificaQuantidadeUsuariosAtivos(idConta, operador.id, operador.nome, true);
             return appReturn;
         }
+        public AppReturn ObterContaPeloToken(string token)
+        {
+            if (string.IsNullOrWhiteSpace(token))
+            {
+                appReturn.SetAsBadRequest("Token não informado.");
+                return appReturn;
+            }
+
+            var entities = DAO.ObterContaPorToken(token);
+
+            if (entities == null)
+            {
+                appReturn.SetAsNotFound("Conta não encontrada.");
+                return appReturn;
+            }
+
+            appReturn.result = entities;
+            var operador = new Model.Admin();
+            //DAO.VerificaQuantidadeUsuariosAtivos(entities.First().IdConta, operador.id, operador.nome, true);
+
+            return appReturn;
+    }
 
         public AppReturn ObterPeloId(int id)
         {

@@ -516,9 +516,9 @@
                 copiarlinkLoading: false,
                 copiarlinkMensagem: "",
 
-                corretor:{id:0},
+                corretor: { id: 0 },
 
-                usuario:{},
+                usuario: {},
 
             }
 
@@ -528,36 +528,36 @@
         },
         created: function () {
 
-            try{
+            try {
                 var p = this.$tools.HandleParams();
-                this.id  = p.id;
+                this.id = p.id;
                 this.cod = p.cod;
-            }catch(e){}
+            } catch (e) { }
 
-           //c2("this.$route.query.id", this.$route.query.id)
+            //c2("this.$route.query.id", this.$route.query.id)
 
             if (this.$validator.is(this.$route.query)) {
 
-                if(this.$validator.not(this.$route.query.id) && this.$validator.not(this.$route.query.cod)){
+                if (this.$validator.not(this.$route.query.id) && this.$validator.not(this.$route.query.cod)) {
                     this.indisponivel = true;
-                }else {
+                } else {
 
-                    this.id  =  this.$tools.ParseInt(this.$route.query.id);
+                    this.id = this.$tools.ParseInt(this.$route.query.id);
                     this.cod = this.$route.query.cod;
 
-                    this.corretor.id        = this.$route.query.cid;
-                    this.corretor.nome      = this.$route.query.cnome;
-                    this.corretor.razao     = this.$route.query.crazao;
-                    this.corretor.fantasia  = this.$route.query.cfantasia;
-                    this.corretor.telefone  = this.$route.query.ctelefone;
-                    this.corretor.email     = this.$route.query.cemail;
-                    this.corretor.tipo      = this.$route.query.ctipo;
+                    this.corretor.id = this.$route.query.cid;
+                    this.corretor.nome = this.$route.query.cnome;
+                    this.corretor.razao = this.$route.query.crazao;
+                    this.corretor.fantasia = this.$route.query.cfantasia;
+                    this.corretor.telefone = this.$route.query.ctelefone;
+                    this.corretor.email = this.$route.query.cemail;
+                    this.corretor.tipo = this.$route.query.ctipo;
 
                     this.queryImage = this.$route.query.img;
                     //c(this.queryImage)
                 }
 
-            }else{
+            } else {
 
                 var params = this.$tools.HandleParams();
 
@@ -565,26 +565,26 @@
                     this.indisponivel = true;
                 else {
                     //c2("params", params)
-                    this.id     = this.$tools.ParseInt(params.id);
-                    this.cod    = params.cod;
+                    this.id = this.$tools.ParseInt(params.id);
+                    this.cod = params.cod;
 
-                    this.corretor.id             = params.cid             ;
-                    this.corretor.nome           = params.cnome           ;
-                    this.corretor.razao          = params.crazao          ;
-                    this.corretor.fantasia       = params.cfantasia       ;
-                    this.corretor.telefone       = params.ctelefone       ;
-                    this.corretor.email          = params.cemail          ;
+                    this.corretor.id = params.cid;
+                    this.corretor.nome = params.cnome;
+                    this.corretor.razao = params.crazao;
+                    this.corretor.fantasia = params.cfantasia;
+                    this.corretor.telefone = params.ctelefone;
+                    this.corretor.email = params.cemail;
                     this.corretor.tipo = params.ctipo;
                 }
 
 
             }
 
-            if(this.corretor.id > 0){
-                if(this.corretor.telefone)
+            if (this.corretor.id > 0) {
+                if (this.corretor.telefone)
                     this.corretor.linkWhats = "https://api.whatsapp.com/send?phone=+55" + this.corretor.telefone.replaceAll("(", "").replaceAll(")", "").replaceAll("-", "").replaceAll(" ", "");
-                if(this.corretor.linkMail)
-                    this.corretor.linkMail  = "mailto:" + this.corretor.email;
+                if (this.corretor.linkMail)
+                    this.corretor.linkMail = "mailto:" + this.corretor.email;
 
                 //var usr = "jcuser"+this.corretor.id;
                 //var usuario = this.$sdata.Storage.Get(usr);
@@ -615,25 +615,25 @@
 
         mounted() {
 
-         window.setTimeout(()=> {
-            
-            try{
-                if(!this.is(this.$root?.usuario) || !this.is(this.$root?.usuario?.id > 0)){
-                    var usr = "jcuser"+this.corretor.id;
-                    var usuario = this.$sdata.Storage.Get(usr);
-                    if (usuario?.id > 0 && usuario?.tokenJWT){
-                        this.$root.usuario = usuario;
-                        this.$root.SignIn();
+            window.setTimeout(() => {
+
+                try {
+                    if (!this.is(this.$root?.usuario) || !this.is(this.$root?.usuario?.id > 0)) {
+                        var usr = "jcuser" + this.corretor.id;
+                        var usuario = this.$sdata.Storage.Get(usr);
+                        if (usuario?.id > 0 && usuario?.tokenJWT) {
+                            this.$root.usuario = usuario;
+                            this.$root.SignIn();
+                        }
                     }
+                } catch (e) {
+                    console.log(e);
+                } finally {
+                    if (!this.indisponivel)
+                        this.Buscar();
                 }
-           }catch(e){ 
-               console.log(e);
-           }finally{
-             if(!this.indisponivel)
-                this.Buscar();
-           }
-                    
-         }, 2000);
+
+            }, 2000);
 
 
         },
@@ -645,7 +645,7 @@
 
 
             UpdateMetatags() {
-                try { 
+                try {
 
                     //document.getElementByName("msapplication-TileImage"     ).content = this.image.url;
 
@@ -653,10 +653,10 @@
                     var image = "https://imagizer.imageshack.com/v2/320x240q70/" + imageSplit[0].replace("img", "") + "/" + imageSplit[2];
 
 
-                    document.getElementById("msapplication-TileImage"   ).content = image;
-                    document.getElementById("og_site_name"              ).content = "JáCaptei #"+this.imovel.id;
-                    document.getElementById("og_description"            ).content = this.$imovelHandler.BuildTitle(this.imovel);
-                    document.getElementById("og_url"                    ).content = this.url;
+                    document.getElementById("msapplication-TileImage").content = image;
+                    document.getElementById("og_site_name").content = "JáCaptei #" + this.imovel.id;
+                    document.getElementById("og_description").content = this.$imovelHandler.BuildTitle(this.imovel);
+                    document.getElementById("og_url").content = this.url;
                     document.getElementById("og_image").content = image;
 
                     /*
@@ -676,10 +676,9 @@
 
 
             CopiarLink() {
-                
                 //var link = this.$imovelHandler.BuildLink(this.imovel, this.image?.url, (this.$root.isAuth? this.$root.usuario : null));
                 var link = window.location.href;
-                
+
                 navigator.clipboard.writeText(link);
 
                 this.copiarlinkLoading = true;
@@ -687,18 +686,14 @@
                     this.copiarlinkMensagem = "link copiado para área de transferência";
                     this.copiarlinkLoading = false;
                 }, 600);
-
             },
-
-
-
 
 
             BuildMapAddress() {
                 var res = "";
-                if (this.$root.isAuth){
+                if (this.$root.isAuth) {
                     res += this.$validator.is(this.imovel.endereco.logradouro) ? this.imovel.endereco.logradouro + "," : "";
-                    res += this.$validator.is(this.imovel.endereco.numero    )? this.imovel.endereco.numero   +",":"";
+                    res += this.$validator.is(this.imovel.endereco.numero) ? this.imovel.endereco.numero + "," : "";
                 }
                 res += this.$validator.is(this.imovel.endereco.bairro) ? this.imovel.endereco.bairro + "," : "";
                 res += this.$validator.is(this.imovel.endereco.cidade) ? this.imovel.endereco.cidade + "," : "";
@@ -728,60 +723,55 @@
                 this.imageIndex = index;
                 //window.setTimeout(()=>this.showModalImages=true,2000)
                 this.showModalImages = true;
+            },
 
+            async Buscar() {
+                var buscaImovel = { imovel: {} };
+                buscaImovel.imovel.id = this.$validator.not(this.id) ? 0 : this.id;
+                buscaImovel.imovel.cod = this.$validator.not(this.cod) ? "" : this.cod;
+
+                if (this.$root.isAuth)
+                    buscaImovel.usuario = this.$root.usuario;
+
+                this.onRequest = true;
+                this.indisponivel = false;
+
+                var request = await this.$api.Post("imovel/buscar/unidade", buscaImovel);
+
+                if (request?.status?.success) {
+                    buscaImovel = request.result;
+                    this.imovel = buscaImovel.result.imoveis[0];
+                    if (this.$validator.not(this.imovel))
+                        this.indisponivel = true;
+                    else
+                        this.SetupImagens();
+                } else
+                    this.indisponivel = true;
+                this.onRequest = false;
             },
 
 
-            async Buscar(){
-
-                        var buscaImovel = {imovel:{}};
-                        buscaImovel.imovel.id  = this.$validator.not(this.id)?  0 : this.id;
-                        buscaImovel.imovel.cod = this.$validator.not(this.cod)? "": this.cod;
-        
-                        if(this.$root.isAuth)
-                            buscaImovel.usuario = this.$root.usuario;
-
-                        this.onRequest    = true;
-                        this.indisponivel = false;
-
-                        var request = await this.$api.Post("imovel/buscar/unidade",buscaImovel);
-
-                        if (request?.status?.success){
-                            buscaImovel  =  request.result;
-                            this.imovel  =  buscaImovel.result.imoveis[0];
-                            if(this.$validator.not(this.imovel))
-                                this.indisponivel = true;
-                            else
-                                this.SetupImagens();
-                        }else
-                            this.indisponivel = true;
-
-                        this.onRequest = false;
-
-            },
-
-
-            SetupImagens(){
+            SetupImagens() {
 
                 var limitTotalThumbs = 4;
                 var _url = "";
 
-                if(this.imovel?.imagens.length == 0)
-                    this.thumbs.push( { url: "../resources/images/noimages.jpg" });
-                else{
+                if (this.imovel?.imagens.length == 0)
+                    this.thumbs.push({ url: "../resources/images/noimages.jpg" });
+                else {
 
                     this.imagesTotal = this.imovel.imagens.length;
-                    this.image       = this.imovel.imagens[0];
+                    this.image = this.imovel.imagens[0];
 
-                    this.imovel.imagens.forEach( img => {
-                                                    if(limitTotalThumbs > -1){
-                                                        _url = (limitTotalThumbs == 0)? "../resources/images/moreimages.jpg" :  img.urlMedium ;
-                                                        this.thumbs.push({ url: _url });
-                                                        limitTotalThumbs--;
-                                                     }
-                                                }
-                                        );
-                    
+                    this.imovel.imagens.forEach(img => {
+                        if (limitTotalThumbs > -1) {
+                            _url = (limitTotalThumbs == 0) ? "../resources/images/moreimages.jpg" : img.urlMedium;
+                            this.thumbs.push({ url: _url });
+                            limitTotalThumbs--;
+                        }
+                    }
+                    );
+
                 }
             },
 
@@ -799,26 +789,26 @@
 
                 this.results = [];
 
-                this.imovel     = {};
+                this.imovel = {};
                 var imovelBusca = {};
                 imovelBusca.imovel = {};
-                imovelBusca.imovel.id  = this.id;
+                imovelBusca.imovel.id = this.id;
                 imovelBusca.imovel.cod = this.cod;
 
-               //c2("imovelBusca.imovel.id", imovelBusca.imovel.id);
-               //c2("imovelBusca.imovel.cod", imovelBusca.imovel.cod);
+                //c2("imovelBusca.imovel.id", imovelBusca.imovel.id);
+                //c2("imovelBusca.imovel.cod", imovelBusca.imovel.cod);
 
                 axios.post(this.$api.BuildURL("imovel/buscar/unidade"), imovelBusca).then((request) => {
-                    
+
                     //c2("request.data", request.data);
                     //c2("request.data", request.data.result.crmResult.result);
                     //c2("request.data", request.data.result.crmResult);
-                    
+
                     if (request.data.status.success) {
 
                         if (this.$validator.not(request.data.result.crmResult) || this.$validator.not(request.data.result.crmResult.result.records) || request.data.result?.crmResult?.result?.records?.length == 0)
                             this.indisponivel = true;
-                        else{
+                        else {
 
                             var imoveisRes = request.data.result.crmResult.result.records;
                             var imagensRes = JSON.parse(request.data.result.result.imagensJson);
@@ -827,49 +817,49 @@
                             var i = 0;
                             var imovelCRM = imoveisRes[i];
 
-                            imovelCRM.id  = this.id;
+                            imovelCRM.id = this.id;
                             imovelCRM.cod = this.cod;
 
                             //this.imovel.imagens = this.imagesData.sort((a, b) => 0.5 - Math.random()).slice(0, 4);
 
                             var imovel = this.$imovelHandler.ParseCRM(this.imovel, imovelCRM, i);
-                           
+
                             imovel.imagens = [];
                             imovel.thumbs = [];
                             //this.imovel.imagens       = request.data.result.images.filter(img => img.idImovel == this.imovel.id);
 
-                            var imgtemp = {url:""};
-                            if (this.$validator.is(imagensRes) && this.$validator.is(imagensRes?.result[imovel.idCRM])){
-                                imagensRes.result[imovel.idCRM].forEach(    
-                                    img =>{ 
+                            var imgtemp = { url: "" };
+                            if (this.$validator.is(imagensRes) && this.$validator.is(imagensRes?.result[imovel.idCRM])) {
+                                imagensRes.result[imovel.idCRM].forEach(
+                                    img => {
                                         try {
                                             //if(img.url != "https://imagizer.imageshack.com/img924/2018/FhaS7d.png"){
-                                                    imovel.imagens.push(img);
-                                                    imgtemp.url = this.$imovelHandler.GetThumbnail(img, "1024x768");
-                                                    if (imgtemp.url !== "/resources/images/noimages.jpg")
-                                                        imovel.thumbs.push(imgtemp);
-                                                    else
-                                                        imovel.thumbs.push(img);
+                                            imovel.imagens.push(img);
+                                            imgtemp.url = this.$imovelHandler.GetThumbnail(img, "1024x768");
+                                            if (imgtemp.url !== "/resources/images/noimages.jpg")
+                                                imovel.thumbs.push(imgtemp);
+                                            else
+                                                imovel.thumbs.push(img);
                                             // }
                                         } catch (e) {
-                                            ce(""+e)
+                                            ce("" + e)
                                             imovel.thumbs.push({ url: "https://jacaptei.com.br/resources/images/noimages.jpg" });
                                             imovel.imagens.push({ url: "https://jacaptei.com.br/resources/images/noimages.jpg" });
                                         }
-                                     }
+                                    }
                                 );
                             }
 
-                            try{
+                            try {
                                 if (this.$validator.is(this.queryImage))
                                     this.image = imovel.imagens.filter((i) => i.url.split("/").reverse()[0] == this.queryImage.split("/").reverse()[0])[0];
                             } catch (e) { }
-                            
+
                             this.imovel = imovel;
                             //c2("this.imovel", this.imovel);
 
-                            this.images      = this.imovel.imagens;
-                            this.image       = this.imovel.imagens[0];
+                            this.images = this.imovel.imagens;
+                            this.image = this.imovel.imagens[0];
                             this.imagesTotal = this.imovel.imagens.length;
 
                             this.CompletarLinksCorretor(this.imovel);
