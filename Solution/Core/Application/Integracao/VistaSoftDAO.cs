@@ -233,7 +233,7 @@ namespace JaCaptei.Application.Integracao
 	'data', ii.""dataInclusao"",
 	'atualizadoEm', ii.""dataAtualizacao"",
 	'status', ii.status,
-	'apiResponse', ii.""apiResponse""
+	'apiResponse', text(ii.""apiResponse"")
 	) )
 						FROM ""ImportacaoBairroVistaSoft"" ibi inner join ""ImportacaoImovelVistaSoft"" ii on ii.""idImportacaoBairro"" = ibi.id
                         WHERE ibi.""idIntegracaoBairro"" = ib.""id"" and ii.status = 'Concluido')      
