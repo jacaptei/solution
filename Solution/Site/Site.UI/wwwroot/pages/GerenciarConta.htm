@@ -14,6 +14,7 @@
 
                     <div class="membro-info">
                         <p class="membro-nome">{{ membro.nome }}</p>
+                        <span v-if="membro.donoConta" class="admin-badge">Admin</span>
                     </div>
 
                     <el-button type="primary" size="small">View</el-button>
@@ -23,7 +24,7 @@
 
         <el-col :span="12">
             <el-card shadow="hover" class="invite-card">
-                <h3>Convidar uma Pessoa</h3>
+                <h5><strong>Envie um convite para um colaborador da sua imobiliária se juntar ao time!</strong></h5>
                 <p class="invite-description">
                     Para convidar alguém, envie o link abaixo ou crie um convite usando um serviço de mensagem ou e-mail.
                 </p>
@@ -36,7 +37,7 @@
                             <img src="../resources/images/icons/link.svg"
                                  alt="linkAccount"
                                  class="link-icon"
-                                 @click="copiarLink" />
+                                 @click="copiarLinkDeConvite" />
                         </template>
                     </el-input>
                     <el-button type="primary" @click="gerarLinkConvite" class="generate-button">Gerar Link de Convite</el-button>
@@ -47,7 +48,7 @@
                         <img src="../resources/images/icons/whatsapp.svg" alt="WhatsApp" class="social-icon" />
                         WhatsApp
                     </el-button>
-                    <el-button type="medium" class="social-button">
+                    <el-button type="medium" @click="abrirEmail" class="social-button">
                         <img src="../resources/images/icons/email.svg" alt="email" class="social-icon" />
                         E-mail
                     </el-button>
@@ -61,7 +62,7 @@
     module.exports = {
         data() {
             return {
-                linkConvite: "https://www.spotify.com/br-pt/invite",
+                linkConvite: "",
                 membros: [],
                 limiteUsuarios: 6,
             };
@@ -90,14 +91,35 @@
                     });
             },
             gerarLinkConvite() {
-                const baseUrl = "https://jacaptei.com.br/convite";
-                const params = new URLSearchParams({
-                    idConta: this.$root.usuario.idConta,
-                    tokenConta: this.$root.usuario.tokenConta
-                });
-
-                this.linkConvite = `${baseUrl}?${params.toString()}`;
+                const baseUrl = this.$api.BuildURL("convite");
+                this.linkConvite = `${baseUrl}?cod=${this.$root.usuario.tokenConta}`;
                 this.$message.success('Link de convite gerado com sucesso!');
+            },
+            copiarLinkDeConvite() {
+                navigator.clipboard.writeText(this.linkConvite)
+                    .then(() => {
+                        this.$tools.MessageSuccess("Link copiado para área de transferência");
+                    })
+                    .catch((error) => {
+                        console.error("Erro ao copiar o link: ", error);
+                        this.$tools.MessageError("Falha ao copiar o link.");
+                    });
+            },
+            abrirWhatsapp() {
+                const linkConviteFormatted = this.linkConvite.startsWith('http') ? this.linkConvite : `https://${this.linkConvite}`;
+                const message = encodeURIComponent(`Olá! Confira este link: ${linkConviteFormatted}`);
+                const whatsappUrl = `https://wa.me/?text=${message}`;
+
+                window.open(whatsappUrl, '_blank');
+            },
+            abrirEmail() {
+                const linkConviteFormatted = this.linkConvite.startsWith('http') ? this.linkConvite : `https://${this.linkConvite}`;
+                const subject = encodeURIComponent("Convite para se juntar");
+                const body = encodeURIComponent(`Olá! Confira este link: ${linkConviteFormatted}`);
+
+                const mailtoUrl = `mailto:?subject=${subject}&body=${body}`;
+
+                window.open(mailtoUrl, '_blank');
             }
         }
     };
@@ -207,5 +229,13 @@
         width: 20px;
         height: 20px;
         margin-right: 5px;
+    }
+
+    .admin-badge {
+        background-color: #f56c6c;
+        color: white;
+        padding: 2px 8px;
+        border-radius: 12px;
+        font-size: 0.8rem;
     }
 </style>
