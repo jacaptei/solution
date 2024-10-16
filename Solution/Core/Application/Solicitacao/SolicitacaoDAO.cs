@@ -545,9 +545,8 @@ namespace JaCaptei.Application {
             string  filter              = " WHERE s.ativo = 'TRUE' AND s.\"idStatus\" < 9 ";
             string  filterFinalizados   = " WHERE s.ativo = 'TRUE' AND s.\"idStatus\" > 9 ";
 
-            filter              += "AND s.\"idParceiro\" = " + entity.idParceiro.ToString();
-            filterFinalizados   += "AND s.\"idParceiro\" = " + entity.idParceiro.ToString();
-            /*
+            //filter              += "AND s.\"idParceiro\" = " + entity.idParceiro.ToString();
+            //filterFinalizados   += "AND s.\"idParceiro\" = " + entity.idParceiro.ToString();
             if(entity.parceiro.donoConta && entity.parceiro.idConta > 0) {
                 filter              += "AND p.\"idConta\" = " + entity.parceiro.idConta.ToString();
                 filterFinalizados   += "AND p.\"idConta\" = " + entity.parceiro.idConta.ToString();
@@ -555,7 +554,6 @@ namespace JaCaptei.Application {
                 filter              += "AND s.\"idParceiro\" = " + entity.idParceiro.ToString();
                 filterFinalizados   += "AND s.\"idParceiro\" = " + entity.idParceiro.ToString(); // + " AND s.data >= '" + (DateTime.Now.AddMonths(-3).AddDays(-1)).ToString("yyyy-MM-dd") + "' ";
             }
-            */
 
             string  sql             = "SELECT JSON_AGG(res)  FROM  ( " + select + filter                + " ORDER BY s.data DESC            ) res ";
             string sqlFinalizados   = "SELECT JSON_AGG(resf) FROM  ( " + select + filterFinalizados     + " ORDER BY s.data DESC LIMIT 200  ) resf ";
@@ -593,9 +591,8 @@ namespace JaCaptei.Application {
             string  filter              = " WHERE s.ativo = 'TRUE' AND s.visita = 'FALSE' AND s.\"idStatus\" < 9 ";
             string  filterFinalizados   = " WHERE s.ativo = 'TRUE' AND s.visita = 'FALSE' AND s.\"idStatus\" > 9 ";
 
-            filter              += "AND s.\"idParceiro\" = " + entity.idParceiro.ToString();
-            filterFinalizados   += "AND s.\"idParceiro\" = " + entity.idParceiro.ToString();
-            /*
+            //filter              += "AND s.\"idParceiro\" = " + entity.idParceiro.ToString();
+            //filterFinalizados   += "AND s.\"idParceiro\" = " + entity.idParceiro.ToString();
             if(entity.parceiro.donoConta && entity.parceiro.idConta > 0) {
                 filter              += "AND p.\"idConta\" = " + entity.parceiro.idConta.ToString();
                 filterFinalizados   += "AND p.\"idConta\" = " + entity.parceiro.idConta.ToString();
@@ -603,7 +600,6 @@ namespace JaCaptei.Application {
                 filter              += "AND s.\"idParceiro\" = " + entity.idParceiro.ToString();
                 filterFinalizados   += "AND s.\"idParceiro\" = " + entity.idParceiro.ToString(); // + " AND s.data >= '" + (DateTime.Now.AddMonths(-3).AddDays(-1)).ToString("yyyy-MM-dd") + "' ";
             }
-            */
 
             string  sql             = "SELECT JSON_AGG(res)  FROM  ( " + select + filter                + " ORDER BY s.data DESC            ) res ";
             string sqlFinalizados   = "SELECT JSON_AGG(resf) FROM  ( " + select + filterFinalizados     + " ORDER BY s.data DESC LIMIT 200  ) resf ";
