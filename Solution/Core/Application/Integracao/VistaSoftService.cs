@@ -597,12 +597,12 @@ namespace JaCaptei.Application.Integracao
 
         public Task<List<IntegracaoComboDTO>> GetIntegracoes()
         {
-            throw new NotImplementedException();
+            return _vistaSoftDAO.GetIntegracoes();
         }
 
-        public Task<IntegracaoReport?> GetReportIntegracao(IntegracaoComboDTO integracao)
+        public Task<IntegracaoReportVS?> GetReportIntegracao(IntegracaoComboDTO integracao)
         {
-            throw new NotImplementedException();
+            return _vistaSoftDAO.GetReportIntegracao(integracao);
         }
         public async Task ReprocessarImoveisPendentes()
         {

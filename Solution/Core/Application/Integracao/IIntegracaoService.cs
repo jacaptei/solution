@@ -10,7 +10,7 @@ namespace JaCaptei.Application.Integracao
         void Dispose();
         //Task EnviarEmailImoveisInativos();
         Task<List<IntegracaoComboDTO>> GetIntegracoes();
-        Task<IntegracaoReport?> GetReportIntegracao(IntegracaoComboDTO integracao);
+        //Task<IntegracaoReport?> GetReportIntegracao(IntegracaoComboDTO integracao);
         //Task<bool> ImportarImovel(ImportacaoImovelEvent import);
         Task<bool> ImportarIntegracao(IntegracaoEvent integracaoEvent);
         //Task<ImoviewIncluirResponse?> IncluirImovel(ImoviewAddImovelRequest req, List<ImagemDTO> imagens, string chave);
