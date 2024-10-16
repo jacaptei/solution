@@ -31,11 +31,23 @@ public class BairroReportModel
     public BairroReport bairro { get; set; }
 }
 
+public class BairroReportVSModel
+{
+    public BairroReportVS bairro { get; set; }
+}
+
 public class BairroReport
 {
     public string nome { get; set; }
     public string idCidade { get; set; }
     public List<ImovelReport> imoveis { get; set; }
+}
+
+public class BairroReportVS
+{
+    public string nome { get; set; }
+    public string idCidade { get; set; }
+    public List<ImovelReportVS> imoveis { get; set; }
 }
 
 public class ImovelReport
@@ -47,6 +59,17 @@ public class ImovelReport
     public string atualizadoEm { get; set; }
     public ImoviewResponseModel imoviewResponse { get; set; }
 }
+
+public class ImovelReportVS
+{
+    public int id { get; set; }
+    public string cod { get; set; }
+    public DateTime data { get; set; }
+    public string status { get; set; }
+    public string atualizadoEm { get; set; }
+    public string apiResponse { get; set; }
+}
+
 
 public class ImoviewResponseModel
 {
@@ -66,3 +89,13 @@ public class IntegracaoReport
     public DateTime atualizadoEm { get; set; }
 }
 
+public class IntegracaoReportVS
+{
+    public string plano { get; set; }
+    public string status { get; set; }
+    public List<BairroReportVSModel> bairros { get; set; }
+    public string cliente { get; set; }
+    public DateTime criadoEm { get; set; }
+    public int integracao { get; set; }
+    public DateTime atualizadoEm { get; set; }
+}
