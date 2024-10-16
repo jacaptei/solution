@@ -1,22 +1,32 @@
 ﻿<template>
     <div v-loading.fullscreen.lock="fullscreenLoading" element-loading-background="rgba(0, 0, 0, 0.7)">
-        <div style="display: flex; width:100%; align-items: center; justify-content:end; margin-bottom: 30px">
-            <el-icon @click="abrirModalFiltro" style="cursor: pointer; margin-right: 8px; color: #409EFF; font-size: 24px;">
-                <Filter />
-            </el-icon>
-            <el-icon @click="refreshData" style="cursor: pointer; color: #409EFF; font-size: 24px;">
-                <Refresh />
-            </el-icon>
-            <el-select v-model="refreshInterval"
-                       placeholder="Selecione o intervalo"
-                       size="small"
-                       style="width: 140px; margin-left: 8px"
-                       @change="startAutoRefresh">
-                <el-option v-for="item in optionsRefresh"
-                           :key="item.value"
-                           :label="item.label"
-                           :value="item.value" />
-            </el-select>
+        <div style="display: flex; justify-content: space-between; align-items: center; width: 100%; margin-bottom: 30px;">
+            <div style="line-height: 1.6; font-size: 18px; color: #0072ff">
+                Você está vizualizando as Importações do <strong>{{ crmTitle }}</strong>.
+                <!--<br />
+                Foram importados <strong>{{ totalImoveis }} imóveis</strong> {{verificarStatusBairro}}.-->
+            </div>
+
+            <div style="display: flex; align-items: center; gap: 8px;">
+                <el-icon @click="abrirModalFiltro" style="cursor: pointer; color: #409EFF; font-size: 24px;">
+                    <Filter />
+                </el-icon>
+
+                <el-icon @click="refreshData" style="cursor: pointer; color: #409EFF; font-size: 24px;">
+                    <Refresh />
+                </el-icon>
+
+                <el-select v-model="refreshInterval"
+                           placeholder="Selecione o intervalo"
+                           size="small"
+                           style="width: 140px;"
+                           @change="startAutoRefresh">
+                    <el-option v-for="item in optionsRefresh"
+                               :key="item.value"
+                               :label="item.label"
+                               :value="item.value" />
+                </el-select>
+            </div>
         </div>
 
         <!-- Tabela principal de Integrações -->
@@ -36,7 +46,11 @@
                                             <el-table :data="bairroScope.row.bairro.imoveis" max-height="650" table-layout="auto" :header-cell-style="{ fontWeight: 'bold' }" fixed-header>
                                                 <el-table-column label="ID da Importação" prop="id" align="center" />
                                                 <el-table-column label="Código do Imóvel JaCaptei" prop="cod" align="center" />
-                                                <el-table-column label="Código do Imóvel Imoview" prop="imoviewResponse.codigo" align="center" />
+                                                <el-table-column :label="crmLabel" align="center">
+                                                    <template #default="scope">
+                                                        {{ getResponse(scope.row).Codigo }}
+                                                    </template>
+                                                </el-table-column>
                                                 <el-table-column label="Data de Importação" prop="data" width="150" align="center">
                                                     <template #default="scope">
                                                         {{ formatarDataHora(scope.row.data) }}
@@ -80,16 +94,13 @@
                                                 </el-table-column>
                                                 <el-table-column label="Resposta" align="center">
                                                     <template #default="scope">
-                                                        <div v-if="scope.row.status && !scope.row.imoviewResponse?.erro">
-                                                            <!-- Exibe a mensagem de status se imoviewResponse.erro for null -->
-                                                            <span>{{ scope.row.status }}</span>
-                                                        </div>
-                                                        <div v-else-if="!scope.row.imoviewResponse?.erro">
-                                                            <!-- Exibe a mensagem se não houver erro -->
-                                                            <span>{{ scope.row.imoviewResponse.mensagem }}</span>
+                                                        <div v-if="getResponse(scope.row).erro">
+                                                            <span class="error">Erro: {{ getResponse(scope.row).mensagem || 'Erro desconhecido' }}</span>
                                                         </div>
                                                         <div v-else>
-                                                            <span class="error">Erro: {{ scope.row.imoviewResponse.mensagem }}</span>
+                                                            <span>
+                                                                {{ getResponse(scope.row).message || scope.row.status }}
+                                                            </span>
                                                         </div>
                                                     </template>
                                                 </el-table-column>
@@ -148,7 +159,7 @@
             </el-table-column>
             <el-table-column label="Total de Imóveis Importados" prop="totalImoveis" align="center">
                 <template #default="scope">
-                    {{ totalImoveis }}
+                    <span style="font-size: 16px;"><strong>{{ totalImoveis }}</strong></span>
                 </template>
             </el-table-column>
             <el-table-column label="Última Atualização" prop="atualizadoEm" align="center">
@@ -188,7 +199,8 @@
             <el-row gutter=20>
                 <el-col :xs="24" :sm="24" :md="24" :lg="24" class="register-input">
                     <span>CRM</span>
-                    <el-select v-model="listaCrmIntegracao" @change="filtrarParceiroIntegracao" placeholder="Escolha o CRM" style="width: 100%">
+                    <el-select v-model="listaCrmIntegracao"
+                               @change="filtrarParceiroIntegracao" placeholder="Escolha o CRM" style="width: 100%">
                         <el-option v-for="item in crmOptions"
                                    :key="item.id"
                                    :label="item.nome"
@@ -219,20 +231,26 @@
     export default {
         setup() {
             const options = ref({});
+            const crmTitle = ref('');
+            const acompanhar = ref([]);
             const totalImoveis = ref(0);
+            const responseProp = ref('');
             const collapseItems = ref([]);
             const idIntegracao = ref(null);
+            const crmSelecionado = ref('');
+            const refreshInterval = ref(0);
             const listaIntegracao = ref([]);
             const quantidadeBairros = ref(0);
             const listaCrmIntegracao = ref([]);
-            const refreshInterval = ref(0);
             const filtrosVisiveis = ref(false);
+            const urlStatusIntegracao = ref('');
             const fullscreenLoading = ref(false);
             const instance = getCurrentInstance();
             let intervalId = null;
+            const crmLabel = ref("");
             const crmOptions = ref([
                 { nome: 'IMOVIEW', id: 1 },
-                { nome: 'VISTASOFT', id: 2, disabled: true },
+                { nome: 'VISTASOFT', id: 2 },
             ]);
             const optionsRefresh = ref([
                 { label: 'Desativar', value: 0 },
@@ -244,7 +262,27 @@
                 { label: '5 minutos', value: 300 },
                 { label: '10 minutos', value: 600 },
             ]);
-            const acompanhar = ref([]);
+            
+            const getResponse = (imovel) => {
+                const response = imovel[responseProp.value] || {};
+
+                if (typeof response === 'string') {
+                    try {
+                        const parsed = JSON.parse(response);
+
+                        if (parsed.message === 'Ok') parsed.message = 'Concluído';
+
+                        return parsed;
+                    } catch (e) {
+                        console.error('Erro ao parsear JSON:', e);
+                        return {}; // Retorna objeto vazio em caso de erro
+                    }
+                }
+
+                if (response.message === 'Ok') response.message = 'Concluído';
+
+                return response;
+            };
 
             watch(acompanhar, (newVal) => {
                 totalImoveis.value = newVal.reduce((total, integracao) => {
@@ -258,6 +296,29 @@
 
             watch(refreshInterval, (newValue) => {
                 startAutoRefresh();
+            });
+
+            watch(listaIntegracao, () => {
+                if (crmSelecionado.value) {
+                    filtrarStatusParceiroIntegracao(crmSelecionado.value);
+                } else {
+                    console.warn("CRM não está definido.");
+                }
+            });
+
+            watch(crmSelecionado, (newVal) => {
+                if (newVal === 1) {
+                    crmLabel.value = "Código do Imóvel Imoview";
+                    responseProp.value = "imoviewResponse";
+                    crmTitle.value = "IMOVIEW"
+                } else if (newVal === 2) {
+                    crmLabel.value = "Código do Imóvel Vistasoft";
+                    responseProp.value = "apiResponse";
+                    crmTitle.value = "VISTASOFT"
+                } else {
+                    crmLabel.value = "";
+                    responseProp.value = "";
+                }
             });
 
             onMounted(() => {
@@ -284,9 +345,9 @@
             });
 
             const startAutoRefresh = () => {
-                if (intervalId) clearInterval(intervalId); // Limpa o intervalo existente
+                if (intervalId) clearInterval(intervalId);
                 if (refreshInterval.value > 0) {
-                    intervalId = setInterval(refreshData, refreshInterval.value * 1000); // Define novo intervalo
+                    intervalId = setInterval(refreshData, refreshInterval.value * 1000);
                 }
             };
 
@@ -298,12 +359,23 @@
             };
 
             const filtrarParceiroIntegracao = async (crm) => {
+                crmSelecionado.value = crm;
                 const url = validarUrlParaBuscarParceiroIntegracao(crm);
                 if (!url) {
                     console.error("URL inválida para o parceiro de integração.");
                     return;
                 }
+                listaIntegracao.value = [];
                 await getListaIntegracoes(url);
+                isDisabled();
+            };
+
+            const filtrarStatusParceiroIntegracao = async (crm) => {
+                urlStatusIntegracao.value = validarUrlParaBuscarStatusIntegracao(crm);
+                if (!urlStatusIntegracao.value) {
+                    console.error("URL inválida para o parceiro de integração.");
+                    return;
+                }
                 isDisabled();
             };
 
@@ -347,10 +419,22 @@
                 }
             };
 
+            const validarUrlParaBuscarStatusIntegracao = (crm) => {
+                switch (crm) {
+                    case 1:
+                        return instance.proxy.$api.BuildURL("api/imoview/integracao/status");
+                    case 2:
+                        return instance.proxy.$api.BuildURL("api/vistasoft/integracao/status");
+                    default:
+                        console.error("CRM inválido:", crm);
+                        return null;
+                }
+            };
+
             const verificarStatusBairro = (bairro) => {
                 const imoveis = bairro.bairro?.imoveis;
-                const temErro = imoveis.some(imovel => imovel.imoviewResponse?.erro);
-                const temSucesso = imoveis.some(imovel => !imovel.imoviewResponse?.erro);
+                const temErro = imoveis.some(imovel => getResponse(imovel).erro);
+                const temSucesso = imoveis.some(imovel => !getResponse(imovel).erro);
                 const temPendente = imoveis.some(imovel => imovel.status === 'Aguardando');
                 const emProcessamento = imoveis.some(imovel => imovel.status === 'Processando');
 
@@ -391,8 +475,7 @@
                     fullscreenLoading.value = true;
                     filtros.value.Integracao = listaIntegracao.value.value;
                     filtros.value.Cliente = listaIntegracao.value.label;
-                    const url = instance.proxy.$api.BuildURL("api/imoview/integracao/status");
-                    const response = await axios.post(url, filtros.value);
+                    const response = await axios.post(urlStatusIntegracao.value, filtros.value);
                     acompanhar.value = [response.data];
                     acompanhar.value = acompanhar.value.map(integracao => {
                         return {
@@ -458,7 +541,11 @@
                 fullscreenLoading,
                 optionsRefresh,
                 startAutoRefresh,
-                refreshInterval
+                refreshInterval,
+                crmSelecionado,
+                crmLabel,
+                getResponse,
+                crmTitle,
             };
         },
     };

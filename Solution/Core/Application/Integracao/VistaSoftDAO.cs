@@ -2,6 +2,8 @@
 using JaCaptei.Model.DTO;
 using JaCaptei.Model.Entities;
 
+using Newtonsoft.Json;
+
 using Npgsql;
 
 using RepoDb;
@@ -202,6 +204,51 @@ namespace JaCaptei.Application.Integracao
         internal async Task<DateTime?> ObterUltimaAtualizacao()
         { 
             return await _conn.ExecuteScalarAsync<DateTime>("SELECT max(\"dataAtualizacao\") FROM \"ImportacaoImovelVistaSoft\";");
+        }
+
+        internal async Task<List<IntegracaoComboDTO>> GetIntegracoes()
+        {
+            const string queryIntegracoesCombo = "SELECT i.id as \"Integracao\", p.nome as \"Cliente\"  FROM \"IntegracaoVistaSoft\" i INNER JOIN \"Parceiro\"   p ON p.id = i.\"idCliente\"  ";
+            var res = await _conn.ExecuteQueryAsync<IntegracaoComboDTO>(queryIntegracoesCombo);
+            return res.ToList();
+        }
+
+        internal async Task<IntegracaoReportVS?> GetReportIntegracao(IntegracaoComboDTO integracao)
+        {
+            var idIntegracao = integracao.Integracao;
+            const string queryReport = @"SELECT 
+	jsonb_build_object(
+    'integracao', i.id, 
+    'cliente', p.nome, 
+    'criadoEm', i.""dataInclusao"", 
+    'plano', pl.nome, 
+    'status', i.status, 
+    'atualizadoEm', i.""dataAtualizacao"",
+    'bairros', (SELECT jsonb_agg(
+        jsonb_build_object(
+            'bairro', jsonb_build_object('nome', ib.bairro ->> 'Nome', 'idCidade', ib.bairro ->> 'IdCidade'
+	,'imoveis' , (SELECT jsonb_agg(jsonb_build_object(
+	'id', ii.id,
+	'cod', ii.""codImovel"",
+	'data', ii.""dataInclusao"",
+	'atualizadoEm', ii.""dataAtualizacao"",
+	'status', ii.status,
+	'apiResponse', text(ii.""apiResponse"")
+	) )
+						FROM ""ImportacaoBairroVistaSoft"" ibi inner join ""ImportacaoImovelVistaSoft"" ii on ii.""idImportacaoBairro"" = ibi.id
+                        WHERE ibi.""idIntegracaoBairro"" = ib.""id"" and ii.status = 'Concluido')      
+        ))
+    ) 
+    FROM ""IntegracaoBairroVistaSoft"" ib 
+    WHERE ib.""idIntegracao"" = i.id))
+FROM 
+    public.""IntegracaoVistaSoft"" i 
+    INNER JOIN ""Parceiro"" p ON p.id = i.""idCliente"" 
+    INNER JOIN ""Plano"" pl ON pl.id = i.""idPlano""
+WHERE i.id = @idIntegracao;";
+            var reportStr = (await _conn.ExecuteQueryAsync<string>(queryReport, new { idIntegracao })).FirstOrDefault();
+            var report = JsonConvert.DeserializeObject<IntegracaoReportVS>(reportStr);
+            return report;
         }
     }
 }

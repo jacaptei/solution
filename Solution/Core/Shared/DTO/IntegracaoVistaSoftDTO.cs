@@ -78,6 +78,7 @@
         public string Status { get; set; } = "Venda"; // 	Venda, Vendido, Suspenso, etc.
         public string Situacao { get; set; } = "Usado";
         public string Ocupacao { get; set; } = "DESOCUPADO";
+        public string DescricaoWeb {  get; set; }
 
         public string Endereco { get; set; }
         public string Numero { get; set; }
@@ -113,6 +114,7 @@
         public string Status { get; set; } = "Venda"; // 	Venda, Vendido, Suspenso, etc.
         public string Situacao { get; set; } = "Usado";
         public string Ocupacao { get; set; } = "DESOCUPADO";
+        public string DescricaoWeb { get; set; }
 
         public string Endereco { get; set; }
         public string Numero { get; set; }

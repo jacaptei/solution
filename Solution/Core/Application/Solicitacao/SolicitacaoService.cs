@@ -40,7 +40,7 @@ namespace JaCaptei.Application {
             if(!appReturn.status.success)
                 return appReturn;
 
-            entity = BLO.Normalizar(entity);
+            entity = BLO.NormalizarAdicionar(entity);
 
             try {
                 LocalidadeService localidade = new LocalidadeService();
@@ -86,7 +86,7 @@ namespace JaCaptei.Application {
             if(!appReturn.status.success)
                 return appReturn;
 
-            entity = BLO.Normalizar(entity);
+            entity = BLO.NormalizarAdicionar(entity);
 
             try {
                 LocalidadeService localidade = new LocalidadeService();
@@ -463,7 +463,8 @@ namespace JaCaptei.Application {
                 if(entity.visita) {
                     mail.message += "<br><br><b>Data:</b><br>";
                     mail.message += entity.dataVisita.ToString("dd/MM/yyyy', 'HH:mm'h'");
-                } else {
+                }
+                // else {
                     mail.message += "<br><br><b>Proprietário:</b>";
                     if(Utils.Validator.Is(entity.proprietarioCaptacao)) {
                         mail.message    += "<br>"+ ((entity.proprietarioNaoEncontrado) ? "não encontrado" : entity.proprietarioCaptacao.Replace(",","<br>"));
@@ -471,7 +472,7 @@ namespace JaCaptei.Application {
                         //    mail.message += "<br><b style='color:#ff3333'>Proprietário inválido</b>";
                     } else
                         mail.message    += "<br>não encontrado";
-                }
+                //}
 
                 //string endereco = entity.ObterEndereco();
                 string endereco = "";

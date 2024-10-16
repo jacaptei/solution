@@ -14,7 +14,7 @@ namespace JaCaptei.Model {
 
             public bool   habilitadoFazerSolicitacoes               {get;set;} = true;
             public bool   habilitadoFazerSolicitacoesAgendadas      {get;set;} = true;
-            public bool   habilitadoFazerSolicitacoesNaoAgendadas   {get;set;} = true;
+            public bool   habilitadoFazerSolicitacoesNaoAgendadas   {get;set;} = false;
 
             public short  limiteSolicitacoesDiarias                 {get;set;} = 5;
             public short  limiteSolicitacoesDiariasAgendadas        {get;set;} = 5;

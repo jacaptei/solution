@@ -868,6 +868,14 @@ namespace JaCaptei.Application{
             return entities;
         }
 
+        public ParceiroSettings ObterSettings(int id) {
+            ParceiroSettings settings = null;
+            using(var conn = new DBcontext().GetConn())
+                settings = conn.Query<ParceiroSettings>(e => e.idParceiro == id).FirstOrDefault();
+            //entities = conn.Query<Parceiro>(e => e.ativo == false && e.confirmado == true).ToList();
+            return settings;
+        }
+
 
         //                              FUNCOES ADMIN
         // -----------------------------------------------------------------

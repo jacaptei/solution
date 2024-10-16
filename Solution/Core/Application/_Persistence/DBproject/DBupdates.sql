@@ -43,3 +43,9 @@ UPDATE "Solicitacao" SET "proprietarioNaoEncontrado" = true where "proprietarioC
 */
 
 -- ----------- ATUALIZADO EM 03 OUT 2024 -----------
+
+
+ALTER TABLE "ImovelEndereco" ALTER COLUMN numero TYPE VARCHAR(40);
+
+
+
