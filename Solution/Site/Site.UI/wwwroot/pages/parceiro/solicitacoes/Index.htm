@@ -10,8 +10,8 @@
 					class="text-grey"
 					active-color="primary"
 					indicator-color="primary">
-				<q-tab name="visita"	icon="fa fa-calendar"	label="VISITAS"></q-tab>
-				<q-tab name="captacao"	icon="fa fa-magnet"		label="CAPTAÇÕES"></q-tab>
+				<q-tab name="visita"	icon="fa fa-calendar"	label="VISITAS"		></q-tab>
+				<q-tab name="captacao"	icon="fa fa-magnet"		label="CAPTAÇÕES"	v-if="$root.usuario.settings.habilitadoFazerSolicitacoesNaoAgendadas"></q-tab>
 				<!--<q-tab name="register"	icon="fa fa-user-plus"			label="CADASTRE-SE"		style="width:115px"></q-tab>-->
 			</q-tabs>
 			<q-tab-panels v-model="page" animated>

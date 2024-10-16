@@ -52,6 +52,10 @@ namespace JaCaptei.Application
             return appReturn;
         }
 
+        public ParceiroSettings ObterSettings(int id){
+            return DAO.ObterSettings(id);
+        }
+
         public AppReturn ObterPeloToken(string token)
         {
 

@@ -229,7 +229,7 @@ CREATE	TABLE "ImovelEndereco"(
                        
 	logradouro						VARCHAR(100)		DEFAULT '',
 	"logradouroNorm"	            VARCHAR(100)		DEFAULT '',
-	numero          	            VARCHAR(24)			DEFAULT '',
+	numero          	            VARCHAR(40)			DEFAULT '',
 	bloco             	            VARCHAR(24)			DEFAULT '',
 	andar          	                VARCHAR(40)			DEFAULT '',
 	unidade                         VARCHAR(40)		    DEFAULT '',

@@ -58,6 +58,7 @@ namespace JaCaptei.Site.API.Middleware.Autenticacao
                 appReturn.SetAsNotFound("Parceiro não encontrado.");
             else
             {
+                parceiroAutenticado.settings = new ParceiroService().ObterSettings(parceiroAutenticado.id);
                 parceiroAutenticado.RemoverDadosSensiveis();
                 if (!parceiroAutenticado.ativo)
                     appReturn.SetAsGone("Parceiro não ativo.");

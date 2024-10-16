@@ -84,6 +84,35 @@ namespace JaCaptei.Application {
                 entity.complemento          =   Utils.String.HigienizeToUpper(entity.complemento);
                 entity.logradouroNorm       =   Utils.String.NormalizeToUpper(entity.logradouro);
 
+            return entity;
+
+        }
+
+        
+
+
+        public Solicitacao NormalizarAdicionar(Solicitacao entity) {
+
+            if(entity is null)
+                return entity;
+
+                entity.cep                  =   Utils.String.HigienizeToUpper(entity.cep);
+                entity.cepNorm              =   Utils.String.NormalizeToUpper(entity.cep);
+
+                entity.estado               =   Utils.String.HigienizeToUpper(entity.estado);
+                entity.estadoNorm           =   Utils.String.NormalizeToUpper(entity.estado);
+                entity.cidade               =   Utils.String.HigienizeToUpper(entity.cidade);
+                entity.cidadeNorm           =   Utils.String.NormalizeToUpper(entity.cidade);
+                entity.bairro               =   Utils.String.HigienizeToUpper(entity.bairro);
+                entity.bairroNorm           =   Utils.String.NormalizeToUpper(entity.bairro);
+
+                entity.logradouro           =   Utils.String.HigienizeToUpper(entity.logradouro);
+                entity.logradouroNorm       =   Utils.String.NormalizeToUpper(entity.logradouro);
+                entity.numero               =   Utils.String.HigienizeToUpper(entity.numero);
+                entity.complemento          =   Utils.String.HigienizeToUpper(entity.complemento);
+                entity.complemento          =   Utils.String.HigienizeToUpper(entity.complemento);
+                entity.logradouroNorm       =   Utils.String.NormalizeToUpper(entity.logradouro);
+
                 entity.data                 =   
                 entity.dataAtualizacao      = 
                 entity.dataConsiderada      =   Utils.Date.GetLocalDateTime();
