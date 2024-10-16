@@ -15,6 +15,7 @@ public class ImovelDTOProfile : Profile
     {
         CreateMap<ImovelFullDTO, ImovelVistaSoftDTO>()
             .ForMember(dest => dest.Categoria,               opt => opt.MapFrom(src => src.ImovelTipo.label))
+            .ForMember(dest => dest.DescricaoWeb,            opt => opt.MapFrom(src => src.Imovel.descricao))
 
             .ForMember(dest => dest.Endereco,                opt => opt.MapFrom(src => src.ImovelEndereco.logradouro))
             .ForMember(dest => dest.Numero,                  opt => opt.MapFrom(src => src.ImovelEndereco.numero))
@@ -44,6 +45,7 @@ public class ImovelDTOProfile : Profile
 
         CreateMap<ImovelVistaSoftDTO, ImovelVistaSoftAddDTO>()
              .ForMember(dest => dest.Categoria,              opt => opt.MapFrom(src => src.Categoria))
+             .ForMember(dest => dest.DescricaoWeb,           opt => opt.MapFrom(src => src.DescricaoWeb))
 
             .ForMember(dest => dest.Endereco,                opt => opt.MapFrom(src => src.Endereco))
             .ForMember(dest => dest.Numero,                  opt => opt.MapFrom(src => src.Numero))

@@ -459,7 +459,19 @@ namespace JaCaptei.Application.Integracao
                     if (importacaoImovel.Status == StatusIntegracao.Concluido.GetDescription())
                         return false;
                     if (importacaoImovel.Status == StatusIntegracao.Processando.GetDescription())
-                        return false;
+                    {
+                        try
+                        {
+                            var lastUpdate = importacaoImovel.DataAtualizacao > importacaoImovel.DataInclusao ? importacaoImovel.DataAtualizacao : importacaoImovel.DataInclusao;
+                            var timeDiff = DateTime.UtcNow - lastUpdate;
+                            if (timeDiff.TotalMinutes < 5)
+                                return false;
+                        }
+                        catch (Exception ex)
+                        {
+                            _logger?.LogError("Erro ao validar data de atualização. {ex}", ex);
+                        }
+                    }
                     importacaoImovel.DataAtualizacao = DateTime.UtcNow;
                     importacaoImovel.Status = StatusIntegracao.Processando.GetDescription();
                     await _retryPolicy.ExecuteAsync(() => _vistaSoftDAO.UpdateImportacaoImovel(importacaoImovel));
@@ -585,12 +597,12 @@ namespace JaCaptei.Application.Integracao
 
         public Task<List<IntegracaoComboDTO>> GetIntegracoes()
         {
-            throw new NotImplementedException();
+            return _vistaSoftDAO.GetIntegracoes();
         }
 
-        public Task<IntegracaoReport?> GetReportIntegracao(IntegracaoComboDTO integracao)
+        public Task<IntegracaoReportVS?> GetReportIntegracao(IntegracaoComboDTO integracao)
         {
-            throw new NotImplementedException();
+            return _vistaSoftDAO.GetReportIntegracao(integracao);
         }
         public async Task ReprocessarImoveisPendentes()
         {

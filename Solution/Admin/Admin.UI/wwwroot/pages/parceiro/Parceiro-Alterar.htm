@@ -1,21 +1,16 @@
 ﻿<template>
-
-
-
-	<div>
-
-		<div>
-
-			<el-row justify="center" v-if="onloading">
-				<el-col :md="24" style="color:var(--s-color-primary)">
-					<c-loading padding="20px"></c-loading>
-				</el-col>
-			</el-row>
-			<div v-else-if="!onloading && ($validator.not(parceiro) || parceiro?.id==0)">
-				Registro não encontrado.
-			</div>
-			<div v-else>
-				<div>
+    <div v-loading.fullscreen.lock="fullscreenLoading" element-loading-background="rgba(0, 0, 0, 0.7)">
+        <div>
+            <el-row justify="center" v-if="onloading">
+                <el-col :md="24" style="color:var(--s-color-primary)">
+                    <c-loading padding="20px"></c-loading>
+                </el-col>
+            </el-row>
+            <div v-else-if="!onloading && ($validator.not(parceiro) || parceiro?.id==0)">
+                Registro não encontrado.
+            </div>
+            <div v-else>
+                <div>
                     <el-col :md="24">
 
                         <el-row :gutter="20">
@@ -48,20 +43,20 @@
 
 
                             <!--<el-col :xs="24" :sm="12" :md="8" :lg="6" class="s-input" v-if="parceiro.donoConta">
-            <div>
-                PLANO<span></span>
-            </div>
-            <el-select filterable v-model="parceiro.idPlano" class="m-4" placeholder="Selecionar" size="large" style="width:100%">
-                <el-option v-for="item in [
-                                                {label: 'CORRETOR AUTÔNOMO ESSENCIAL',  value: 2 },
-                                                {label: 'IMOBILIÁRIA ATÉ 03 USUÁRIOS',  value: 3 },
-                                                {label: 'IMOBILIÁRIA ATÉ 05 USUÁRIOS',  value: 4 }
-                                            ]"
-                           :key="item.value"
-                           :label="item.label"
-                           :value="item.value"></el-option>
-            </el-select>
-        </el-col>-->
+                                <div>
+                                    PLANO<span></span>
+                                </div>
+                                <el-select filterable v-model="parceiro.idPlano" class="m-4" placeholder="Selecionar" size="large" style="width:100%">
+                                    <el-option v-for="item in [
+                                                                    {label: 'CORRETOR AUTÔNOMO ESSENCIAL',  value: 2 },
+                                                                    {label: 'IMOBILIÁRIA ATÉ 03 USUÁRIOS',  value: 3 },
+                                                                    {label: 'IMOBILIÁRIA ATÉ 05 USUÁRIOS',  value: 4 }
+                                                                ]"
+                                               :key="item.value"
+                                               :label="item.label"
+                                               :value="item.value"></el-option>
+                                </el-select>
+                            </el-col>-->
                         </el-row>
                         <el-row :gutter="20">
 
@@ -247,14 +242,14 @@
                             <el-col :md="12" style="float:right;text-align:right" v-if="!parceiro.excluido">
 
                                 <el-popconfirm width="220"
-                                                confirm-button-text="SIM"
-                                                cancel-button-text="Não"
-                                                :icon="InfoFilled"
-                                                icon-color="var(--s-color-primary)"
-                                                :title="'Excluir ID#'+parceiro.id+' . '+parceiro.nome+'?'"
-                                                @confirm="Excluir()">
+                                               confirm-button-text="SIM"
+                                               cancel-button-text="Não"
+                                               :icon="InfoFilled"
+                                               icon-color="var(--s-color-primary)"
+                                               :title="'Excluir ID#'+parceiro.id+' . '+parceiro.nome+'?'"
+                                               @confirm="Excluir()">
                                     <template #reference>
-                                            <q-btn label="EXCLUIR" color="red" :loading="onrequest" style="width:120px;margin-right:20px" icon="fa fa-trash"></q-btn>
+                                        <q-btn label="EXCLUIR" color="red" :loading="onrequest" style="width:120px;margin-right:20px" icon="fa fa-trash"></q-btn>
                                     </template>
                                 </el-popconfirm>
 
@@ -265,17 +260,17 @@
 
                     </el-col>
 
-				</div>
+                </div>
 
 
-			</div>
+            </div>
 
 
 
 
-		</div>
+        </div>
 
-	</div>
+    </div>
 
 
 
@@ -283,320 +278,323 @@
 </template>
 
 <script>
-	module.exports = {
+    import { ref, getCurrentInstance } from 'vue';
+    module.exports = {
 
         name: 'JCAdminParceiroAlterar',
 
-		components: {
+        components: {
 
-		},
+        },
 
-		data: function () {
-			return {
-				onloading: true,
-				onrequest: false,
-				view: "form",
-				content: "",
-				DiaNascimento: 0,
-				MesNascimento: 0,
-				AnoNascimento: 0,
-				senhaConfirma: "",
-				carregandoCEP: false,
-				carregandoEstados: false,
-				carregandoCidades: false,
-				carregandoBairros: false,
-				novaSenha:"",
-				cep: {
-					numero: "",
-					estado: "",
-					cidade: "",
-					logradouro: ""
-				},
-				opcoes: {
-					estados: [],
-					cidades: [],
-					bairros: [],
-					sexos: [],
-				},
-				parceiro: this.$models.parceiro()
-			}
-		}, computed: {
-
-		},
-
-		props: {
+        data: function () {
+            return {
+                onloading: true,
+                onrequest: false,
+                nomeParceiro: false,
+                view: "form",
+                content: "",
+                DiaNascimento: 0,
+                MesNascimento: 0,
+                AnoNascimento: 0,
+                senhaConfirma: "",
+                carregandoCEP: false,
+                carregandoEstados: false,
+                carregandoCidades: false,
+                carregandoBairros: false,
+                fullscreenLoading: false,
+                instance: getCurrentInstance(),
+                novaSenha: "",
+                cep: {
+                    numero: "",
+                    estado: "",
+                    cidade: "",
+                    logradouro: ""
+                },
+                opcoes: {
+                    estados: [],
+                    cidades: [],
+                    bairros: [],
+                    sexos: [],
+                },
+                parceiro: this.$models.parceiro(),
+            }
+        }, computed: {
+        },
+        watch: {
+            'parceiro.nome': function (newValue) {
+                this.$root.SetTitle("Parceiro #" + newValue, "fa fa-user-alt", null);
+            }
+        },
+        props: {
             id: { type: Number, required: true, default: 0 },
-		},
-		watch: {
-		},
-		created: function () {
-			this.opcoes.sexos = this.$sdata.opcoes.sexos;
-			this.$sdata.ObterEstados().then(res => { this.opcoes.estados = res; });
-		},
-		mounted() {
-		//	window.setTimeout(() => this.$refs.nome.focus(), 500);
-			this.Obter(this.id);
-		},
-		methods: {
+        },
+        watch: {
+        },
+        created: async function () {
+            this.fullscreenLoading = true;
+            await this.Obter(this.id);
+            await this.$root.SetTitle("Parceiro #" + this.parceiro.nome, "fa fa-user-alt", null);
+            this.opcoes.sexos = this.$sdata.opcoes.sexos;
+            this.opcoes.estados = await this.$sdata.ObterEstados();
+            this.instance.proxy.$root.parceiroRow = this.parceiro;
+            this.fullscreenLoading = false;
+        },
+        mounted() { },
+        methods: {
 
-			async Obter(id){
+            async Obter(id) {
 
                 this.onloading = true;
                 var request = await this.$api.Get(("parceiro/obter/" + id));
                 this.onloading = false;
 
-				if(request?.status?.success) {
+                if (request?.status?.success) {
 
                     this.parceiro = request.result;
-                    
-					this.carregandoCidades = true; 
-                    this.carregandoBairros = true; 
+                    this.carregandoCidades = true;
+                    this.carregandoBairros = true;
                     this.$sdata.ObterCidades(this.parceiro.idEstado).then(res => { this.opcoes.cidades = res; this.carregandoCidades = false; });
                     this.$sdata.ObterBairros(this.parceiro.idCidade).then(res => { this.opcoes.bairros = res; this.carregandoBairros = false; });
 
-					if(this.$validator.not(this.parceiro.cep))
+                    if (this.$validator.not(this.parceiro.cep))
                         this.cep.numero = this.parceiro.cep = await this.BuscarCep();
-					else
-						this.cep.numero=this.parceiro.cep;
+                    else
+                        this.cep.numero = this.parceiro.cep;
 
-					this.DiaNascimento = this.parceiro.diaNascimento;
-					this.MesNascimento = this.parceiro.mesNascimento;
-					this.AnoNascimento = this.parceiro.anoNascimento;
-
-
-				}
-
+                    this.DiaNascimento = this.parceiro.diaNascimento;
+                    this.MesNascimento = this.parceiro.mesNascimento;
+                    this.AnoNascimento = this.parceiro.anoNascimento;
+                }
+            },
 
 
-			},
+            async Enviar() {
 
+                this.parceiro.idTipo = 5;
 
-			async Enviar() {
+                var msg = "";
 
-				this.parceiro.idTipo = 5;
-
-				var msg = "";
-
-                if(this.parceiro.tipoPessoa=="PF") {
-                    if(this.$validator.not(this.parceiro.cpf))
-                        msg+="<b>CPF</b> não informado<br>";
-                    else if(!this.$validator.IsCPF(this.parceiro.cpf))
-                        msg+="<b>CPF</b> inválido<br>";
-                    if(this.$validator.not(this.parceiro.nome))
-                        msg+="<b>NOME</b> não informado<br>";
+                if (this.parceiro.tipoPessoa == "PF") {
+                    if (this.$validator.not(this.parceiro.cpf))
+                        msg += "<b>CPF</b> não informado<br>";
+                    else if (!this.$validator.IsCPF(this.parceiro.cpf))
+                        msg += "<b>CPF</b> inválido<br>";
+                    if (this.$validator.not(this.parceiro.nome))
+                        msg += "<b>NOME</b> não informado<br>";
                 }
                 else {
-                    if(this.$validator.not(this.parceiro.cnpj))
-                        msg+="<b>CNPJ</b> não informado<br>";
-                    else if(!this.$validator.IsCNPJ(this.parceiro.cnpj))
-                        msg+="<b>CNPJ</b> inválido<br>";
-                    if(this.$validator.not(this.parceiro.razao))
-                        msg+="<b>RAZÃO SOCIAL</b> não informada<br>";
-                    if(this.$validator.not(this.parceiro.nome))
-                        msg+="<b>NOME FANTASIA</b> não informado<br>";
-                    if(this.$validator.not(this.parceiro.responsavel))
-                        msg+="<b>NOME DO RESPONSÁVEL</b> não informado<br>";
+                    if (this.$validator.not(this.parceiro.cnpj))
+                        msg += "<b>CNPJ</b> não informado<br>";
+                    else if (!this.$validator.IsCNPJ(this.parceiro.cnpj))
+                        msg += "<b>CNPJ</b> inválido<br>";
+                    if (this.$validator.not(this.parceiro.razao))
+                        msg += "<b>RAZÃO SOCIAL</b> não informada<br>";
+                    if (this.$validator.not(this.parceiro.nome))
+                        msg += "<b>NOME FANTASIA</b> não informado<br>";
+                    if (this.$validator.not(this.parceiro.responsavel))
+                        msg += "<b>NOME DO RESPONSÁVEL</b> não informado<br>";
                 }
 
 
-				if (this.$validator.not(this.parceiro.email))
-					msg += "<b>E-MAIL</b> não informado<br>";
-				else if (!this.$validator.IsEmail(this.parceiro.email))
-					msg += "<b>E-MAIL</b> inválido<br>";
+                if (this.$validator.not(this.parceiro.email))
+                    msg += "<b>E-MAIL</b> não informado<br>";
+                else if (!this.$validator.IsEmail(this.parceiro.email))
+                    msg += "<b>E-MAIL</b> inválido<br>";
 
-				if (this.$validator.not(this.parceiro.telefone))
-					msg += "<b>TELEFONE</b> não informado<br>";
-				else if (this.parceiro.telefone.length < 14)
-					msg += "<b>TELEFONE</b> inválido<br>";
+                if (this.$validator.not(this.parceiro.telefone))
+                    msg += "<b>TELEFONE</b> não informado<br>";
+                else if (this.parceiro.telefone.length < 14)
+                    msg += "<b>TELEFONE</b> inválido<br>";
 
-                if(this.$validator.not(this.parceiro.creci)) {
+                if (this.$validator.not(this.parceiro.creci)) {
                     msg += "<b>CRECI</b> não informado<br>";
-                } else if(this.parceiro.creci.length < 4)
+                } else if (this.parceiro.creci.length < 4)
                     msg += "<b>CRECI</b> inválido<br>";
                 else {
-                    if(this.$validator.not(this.parceiro.creciEstado))
+                    if (this.$validator.not(this.parceiro.creciEstado))
                         msg += "<b>CRECI - ESTADO</b> não selecionado<br>";
                 }
 
-				if (this.$validator.not(this.parceiro.estado))
-					msg += "<b>ESTADO</b> não selecionado<br>";
+                if (this.$validator.not(this.parceiro.estado))
+                    msg += "<b>ESTADO</b> não selecionado<br>";
 
-				if (this.$validator.not(this.parceiro.cidade))
-					msg += "<b>CIDADE</b> não selecionada<br>";
+                if (this.$validator.not(this.parceiro.cidade))
+                    msg += "<b>CIDADE</b> não selecionada<br>";
 
-				if (this.$validator.not(this.parceiro.bairro))
-					msg += "<b>BAIRRO</b> não selecionado<br>";
+                if (this.$validator.not(this.parceiro.bairro))
+                    msg += "<b>BAIRRO</b> não selecionado<br>";
 
-				if (this.$validator.not(this.parceiro.logradouro))
-					msg += "<b>LOGRADOURO</b> não informado<br>";
+                if (this.$validator.not(this.parceiro.logradouro))
+                    msg += "<b>LOGRADOURO</b> não informado<br>";
 
-				if (this.$validator.not(this.parceiro.numero))
-					msg += "<b>NÚMERO</b> não informado (informe <b>SN</b> se não houver)<br>";
+                if (this.$validator.not(this.parceiro.numero))
+                    msg += "<b>NÚMERO</b> não informado (informe <b>SN</b> se não houver)<br>";
 
-                if(this.parceiro.excluido) {
-                    if(this.$validator.not(this.novaSenha))
-                        msg+="<b>SENHA</b> não informada<br>";
-                    else if(this.novaSenha.length<4)
-                        msg+="<b>SENHA</b> precisa ter pelo menos 4 caracteres<br>";
+                if (this.parceiro.excluido) {
+                    if (this.$validator.not(this.novaSenha))
+                        msg += "<b>SENHA</b> não informada<br>";
+                    else if (this.novaSenha.length < 4)
+                        msg += "<b>SENHA</b> precisa ter pelo menos 4 caracteres<br>";
                 }
 
 
 
-				if (msg.length > 0)
-					this.$tools.Alert(msg);
-				else {
+                if (msg.length > 0)
+                    this.$tools.Alert(msg);
+                else {
 
-					this.parceiro.AnoNascimento = this.AnoNascimento;
-					this.parceiro.MesNascimento = this.MesNascimento;
-					this.parceiro.DiaNascimento = this.DiaNascimento;
+                    this.parceiro.AnoNascimento = this.AnoNascimento;
+                    this.parceiro.MesNascimento = this.MesNascimento;
+                    this.parceiro.DiaNascimento = this.DiaNascimento;
 
-                    if(this.parceiro.excluido || this.$validator.is(this.novaSenha))
-						this.parceiro.senha = this.parceiro.senhaConfirma = (this.novaSenha.length>0)? this.novaSenha : "";
+                    if (this.parceiro.excluido || this.$validator.is(this.novaSenha))
+                        this.parceiro.senha = this.parceiro.senhaConfirma = (this.novaSenha.length > 0) ? this.novaSenha : "";
 
-					this.onrequest = true;
-					var request = await this.$api.Post("parceiro/alterar", this.parceiro);
-					this.onrequest = false;
+                    this.onrequest = true;
+                    var request = await this.$api.Post("parceiro/alterar", this.parceiro);
+                    this.onrequest = false;
 
-                    if(this.$validator.is(request?.status?.success)) {
-                        this.parceiro.excluido=false;
+                    if (this.$validator.is(request?.status?.success)) {
+                        this.parceiro.excluido = false;
                         this.$tools.AlertSuccess("Salvo!");
                     }
-					//else
-					//    this.$tools.AlertSuccess("Não foi possível realizar o cadastro.");
+                    //else
+                    //    this.$tools.AlertSuccess("Não foi possível realizar o cadastro.");
 
-				}
-			},
+                }
+            },
 
 
 
 
             async Excluir() {
 
-                this.onrequest  = true;
-                var request     = await this.$api.Post("parceiro/excluir",this.parceiro);
-                this.onrequest  = false;
-                
-                if(request?.status?.success) {
-                    this.parceiro.excluido=true;
+                this.onrequest = true;
+                var request = await this.$api.Post("parceiro/excluir", this.parceiro);
+                this.onrequest = false;
+
+                if (request?.status?.success) {
+                    this.parceiro.excluido = true;
                     this.$tools.AlertSuccess("Excluído!");
                 }
 
             },
 
 
-			CheckDoc() {
-				window.setTimeout(() => {
-					if (this.$validator.is(this.parceiro.cpf) && !this.$validator.IsCPF(this.parceiro.cpf))
-						this.$tools.Alert("CPF inválido");
-				}, 500);
-			},
+            CheckDoc() {
+                window.setTimeout(() => {
+                    if (this.$validator.is(this.parceiro.cpf) && !this.$validator.IsCPF(this.parceiro.cpf))
+                        this.$tools.Alert("CPF inválido");
+                }, 500);
+            },
 
 
-			async BuscarEndereco() {
+            async BuscarEndereco() {
 
-				if (this.cep.numero !== this.parceiro.cep) {
+                if (this.cep.numero !== this.parceiro.cep) {
 
-					this.carregandoCEP = true;
-					this.carregandoEstados = true;
-					this.carregandoCidades = true;
-					this.carregandoBairros = true;
+                    this.carregandoCEP = true;
+                    this.carregandoEstados = true;
+                    this.carregandoCidades = true;
+                    this.carregandoBairros = true;
 
-					this.cep.cidade = this.parceiro.cidade = "";
-					this.cep.logradouro = this.parceiro.logradouro = "";
-					this.cep.bairro = this.parceiro.bairro = "";
-					this.cep.estado = this.parceiro.estado = "";
+                    this.cep.cidade = this.parceiro.cidade = "";
+                    this.cep.logradouro = this.parceiro.logradouro = "";
+                    this.cep.bairro = this.parceiro.bairro = "";
+                    this.cep.estado = this.parceiro.estado = "";
 
-					this.parceiro.cep = this.cep.numero;
-					let res = await this.$sdata.BuscarEndereco(this.cep.numero);
+                    this.parceiro.cep = this.cep.numero;
+                    let res = await this.$sdata.BuscarEndereco(this.cep.numero);
 
-					if (this.$validator.is(res?.city)) {
-						this.cep.cidade = this.parceiro.cidade = res.city;
-						this.cep.logradouro = this.parceiro.logradouro = res.address;
-						this.cep.bairro = this.parceiro.bairro = res.neighborhood;
-						this.cep.estado = this.parceiro.estado = res.state;
+                    if (this.$validator.is(res?.city)) {
+                        this.cep.cidade = this.parceiro.cidade = res.city;
+                        this.cep.logradouro = this.parceiro.logradouro = res.address;
+                        this.cep.bairro = this.parceiro.bairro = res.neighborhood;
+                        this.cep.estado = this.parceiro.estado = res.state;
 
-						this.$refs.addressnumber.focus();
+                        this.$refs.addressnumber.focus();
 
-					}
+                    }
 
-					this.carregandoCEP = false;
-					this.carregandoEstados = false;
-					this.carregandoCidades = false;
-					this.carregandoBairros = false;
-				}
-			},
-
-
-			
-			async BuscarCep() {
-				var endereco = this.parceiro.estado + "/" + this.parceiro.cidade.replaceAll(" ", "%20") + "/" + this.parceiro.logradouro.replaceAll(" ", "%20")
-				var res = await this.$sdata.BuscarCep(endereco);
-				c2("Buscar CEP",res.cep)
-				return res.cep;
-			},
+                    this.carregandoCEP = false;
+                    this.carregandoEstados = false;
+                    this.carregandoCidades = false;
+                    this.carregandoBairros = false;
+                }
+            },
 
 
 
-
-			ObterCidades(estado) {
-
-				this.parceiro.cidade = this.parceiro.bairro = "";
-
-				this.carregandoCidades = true;
-				this.opcoes.bairros = [];
-				this.opcoes.cidades = [];
-				var cidades = [];
-
-				if (this.$validator.is(estado)) {
-					var idEstado = this.opcoes.estados.filter((e) => e.value == estado)[0].id;
-					this.$sdata.ObterCidades(idEstado).then(res => { this.opcoes.cidades = res; this.carregandoCidades = false; });
-				}
-
-			},
-
-
-			ObterBairros(cidade) {
-
-				this.parceiro.bairro = "";
-
-				this.carregandoBairros = true;
-				this.opcoes.bairros = [];
-				var bairros = [];
-
-				if (this.$validator.is(cidade)) {
-					var idCidade = this.opcoes.cidades.filter((c) => c.value == cidade)[0].id;
-					this.$sdata.ObterBairros(idCidade).then(res => { this.opcoes.bairros = res; this.carregandoBairros = false; });
-				}
-
-			},
-
-			DefinirBairro(bairro) {
-				//this.parceiro.bairro = bairro.label;
-				//c2("this.parceiro", this.parceiro)
-			},
-
-
-
-			ChecarDataNascimento() {
-				var res = false;
-				if (this.DiaNascimento > 0 && this.MesNascimento > 0) {
-					let dt = this.$tools.FormatDateArgs(((this.AnoNascimento == 0) ? "1900" : this.AnoNascimento), this.MesNascimento, this.DiaNascimento);
-					//let dt = this.$tools.FormatDateArgs(this.AnoNascimento,this.MesNascimento,this.DiaNascimento);
-					res = this.$validator.IsDate(dt);
-				} else
-					res = true;
-				return res;
-			},
+            async BuscarCep() {
+                var endereco = this.parceiro.estado + "/" + this.parceiro.cidade.replaceAll(" ", "%20") + "/" + this.parceiro.logradouro.replaceAll(" ", "%20")
+                var res = await this.$sdata.BuscarCep(endereco);
+                c2("Buscar CEP", res.cep)
+                return res.cep;
+            },
 
 
 
 
+            ObterCidades(estado) {
+
+                this.parceiro.cidade = this.parceiro.bairro = "";
+
+                this.carregandoCidades = true;
+                this.opcoes.bairros = [];
+                this.opcoes.cidades = [];
+                var cidades = [];
+
+                if (this.$validator.is(estado)) {
+                    var idEstado = this.opcoes.estados.filter((e) => e.value == estado)[0].id;
+                    this.$sdata.ObterCidades(idEstado).then(res => { this.opcoes.cidades = res; this.carregandoCidades = false; });
+                }
+
+            },
+
+
+            ObterBairros(cidade) {
+
+                this.parceiro.bairro = "";
+
+                this.carregandoBairros = true;
+                this.opcoes.bairros = [];
+                var bairros = [];
+
+                if (this.$validator.is(cidade)) {
+                    var idCidade = this.opcoes.cidades.filter((c) => c.value == cidade)[0].id;
+                    this.$sdata.ObterBairros(idCidade).then(res => { this.opcoes.bairros = res; this.carregandoBairros = false; });
+                }
+
+            },
+
+            DefinirBairro(bairro) {
+                //this.parceiro.bairro = bairro.label;
+                //c2("this.parceiro", this.parceiro)
+            },
 
 
 
-		}
+            ChecarDataNascimento() {
+                var res = false;
+                if (this.DiaNascimento > 0 && this.MesNascimento > 0) {
+                    let dt = this.$tools.FormatDateArgs(((this.AnoNascimento == 0) ? "1900" : this.AnoNascimento), this.MesNascimento, this.DiaNascimento);
+                    //let dt = this.$tools.FormatDateArgs(this.AnoNascimento,this.MesNascimento,this.DiaNascimento);
+                    res = this.$validator.IsDate(dt);
+                } else
+                    res = true;
+                return res;
+            },
 
-	}
+
+
+
+
+
+
+        }
+
+    }
 
 </script>
 

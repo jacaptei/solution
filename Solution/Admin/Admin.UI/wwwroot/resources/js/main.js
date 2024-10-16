@@ -54,7 +54,7 @@ $(document).ready(function () {
                     showLoginModal  : false,
                     autoLogin       : false,
                     rememberMe      : false,
-                    //test            : "root context ok",
+                    parceiroRow     : {},
                     title: {
                         label       : "HOME",
                         icon        : "fa fa-user",
