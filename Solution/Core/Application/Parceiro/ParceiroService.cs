@@ -240,7 +240,7 @@ namespace JaCaptei.Application
                     appReturn.AddException("Aguarde a liberação de seu acesso (será notificado via e-mail.");
                 else if (entityDB.excluido)
                     appReturn.AddException("Login indisponível. Entre em contato e verifique se sua conta ainda é válida.");
-                else if (!entityDB.ativo || !entityDB.ativoCRM)
+                else if (!entityDB.ativo)
                     appReturn.AddException("Acesso indisponível. Entre em contato e verifique se sua conta ainda está ativa.");
                 else
                     appReturn.AddException("Já existe um Parceiro cadastrado com este CPF, CNPJ ou E-mail.");
