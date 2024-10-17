@@ -70,7 +70,8 @@ namespace JaCaptei.API.Middleware
         {
             "/imovel/buscar/unidade",
             "/imovel/buscar/listas-inteligencia-artificial",
-            "/esqueci-senha"
+            "/esqueci-senha",
+            "/parceiro/obtercontapelotoken"
         };
     }
 }

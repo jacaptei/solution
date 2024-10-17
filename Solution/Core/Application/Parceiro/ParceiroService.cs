@@ -1,6 +1,7 @@
 ﻿using JaCaptei.Model;
 using JaCaptei.Application.Services;
 using JaCaptei.Application.DAL;
+using static System.Net.Mime.MediaTypeNames;
 
 namespace JaCaptei.Application
 {
@@ -51,20 +52,30 @@ namespace JaCaptei.Application
                 return appReturn;
             }
 
-            var entities = DAO.ObterContaPorToken(token);
+            bool validadeToken = DAO.ValidarToken(token);
 
-            if (entities == null)
+            if (!validadeToken)
+            {
+                appReturn.SetAsBadRequest("Token inválido.");
+                return appReturn;
+            }
+
+            var entity = DAO.ObterContaPorToken(token);
+
+            if (entity == null)
             {
                 appReturn.SetAsNotFound("Conta não encontrada.");
                 return appReturn;
             }
 
-            appReturn.result = entities;
-            var operador = new Model.Admin();
-            //DAO.VerificaQuantidadeUsuariosAtivos(entities.First().IdConta, operador.id, operador.nome, true);
+            appReturn.result = entity;
+
+            // Se necessário, você pode adicionar a lógica de verificação de usuários ativos aqui
+            // var operador = new Model.Admin();
+            // DAO.VerificaQuantidadeUsuariosAtivos(entity.IdConta, operador.id, operador.nome, true);
 
             return appReturn;
-    }
+        }
 
         public AppReturn ObterPeloId(int id)
         {
@@ -195,6 +206,25 @@ namespace JaCaptei.Application
 
         public ParceiroSettings ObterSettings(int id){
             return DAO.ObterSettings(id);
+        } 
+        
+        public AppReturn GerarToken(int idConta){
+            var conta = ObterContaPorId(idConta);
+            if (conta == null)
+            {
+                return new AppReturn
+                {
+                    result = "Conta não encontrada."
+                };
+            }
+            
+            var tokenConvite = Guid.NewGuid().ToString();
+            DateTime expiraEm = DateTime.UtcNow.AddHours(1);
+            DAO.SalvarTokenConvite(idConta, tokenConvite, expiraEm);
+            return new AppReturn
+            {
+                result = tokenConvite
+            };
         }
 
         public AppReturn ObterPeloToken(string token)
@@ -296,6 +326,79 @@ namespace JaCaptei.Application
                 mail.Send();
             }
 
+            return appReturn;
+        }
+
+        public AppReturn AdicionarParceiroAssociado (Parceiro entity)
+        {
+            try
+            {
+                var endereçoConvidado = DAO.ObterDadosEndereco(entity.idConta);
+                entity.cep = endereçoConvidado.result.estado;
+                entity.estado = endereçoConvidado.result.estado;
+                entity.cidade = endereçoConvidado.result.cidade;
+                entity.bairro = endereçoConvidado.result.bairro;
+                entity.logradouro = endereçoConvidado.result.logradouro;
+                entity.numero = endereçoConvidado.result.numero;
+                entity.complemento = endereçoConvidado.result.complemento;
+                entity = BLO.Normalizar(entity);
+                Parceiro entityDB = DAO.ObterPorCamposChaves(entity);
+
+                if (entityDB != null && entityDB.id > 0)
+                {
+                    if (!entityDB.confirmado)
+                    {
+                        appReturn.AddException("Já existe um Parceiro cadastrado com este CPF, CNPJ ou E-mail. Confirme através do link enviado pelo e-mail.");
+                    }
+                    else if (!entityDB.validado)
+                    {
+                        appReturn.AddException("Aguarde a liberação de seu acesso (notificação via e-mail).");
+                    }
+                    else if (entityDB.excluido)
+                    {
+                        appReturn.AddException("Login indisponível. Entre em contato para verificar a validade da conta.");
+                    }
+                    else if (!entityDB.ativo)
+                    {
+                        appReturn.AddException("Acesso indisponível. Entre em contato para verificar a ativação da conta.");
+                    }
+                    else
+                    {
+                        appReturn.AddException("Já existe um Parceiro cadastrado com este CPF, CNPJ ou E-mail.");
+                    }
+                    return appReturn;
+                }
+
+                try
+                {
+                    LocalidadeService localidade = new LocalidadeService();
+                    if (entity.idEstado == 0)
+                        entity.idEstado = localidade.ObterIdEstado(entity.estado)?.result?.id ?? 0; // Usar null-coalescing para evitar nulos
+                    if (entity.idCidade == 0)
+                        entity.idCidade = localidade.ObterIdCidade(entity.idEstado, entity.cidade)?.result?.id ?? 0;
+                    if (entity.idBairro == 0)
+                        entity.idBairro = localidade.ObterIdBairro(entity.idCidade, entity.bairro)?.result?.id ?? 0;
+                }
+                catch (Exception ex)
+                {
+                    appReturn.AddException("Erro ao obter informações de localidade: " + ex.Message);
+                    return appReturn;
+                }
+                appReturn = DAO.Adicionar(entity);
+            }
+            catch (Exception ex)
+            {
+                appReturn.AddException("Erro ao adicionar parceiro associado: " + ex.Message);
+                return appReturn;
+            }
+            if (appReturn.status.success)
+            {
+                Mail mail = new Mail();
+                mail.emailTo = entity.email;
+                mail.about = "Confirme seu cadastro";
+                mail.message = "Olá " + entity.apelido + ".<br><br>Clique (ou copie e cole no navegador) o link abaixo para confirmar seu cadastro:<br><a href='" + Config.settings.baseURL + "/confirma?t=" + entity.token + "' target='_blank' style='color:#ef5924'>" + Config.settings.baseURL + "/confirma?t=" + entity.token + "</a>";
+                mail.Send();
+            }
             return appReturn;
         }
 

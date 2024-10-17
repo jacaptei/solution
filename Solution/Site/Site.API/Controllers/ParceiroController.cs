@@ -144,9 +144,9 @@ namespace JaCaptei.API.Controllers {
 
         [HttpGet]
         [Route("[action]/{idConta}")]
-        public IActionResult ObterContaPorId(string idConta)
+        public IActionResult ObterContaPorId(int idConta)
         {
-            appReturn = service.ObterContaPorId(int.Parse(idConta));
+            appReturn = service.ObterContaPorId(idConta);
             return Result(appReturn);
         }
 
@@ -158,5 +158,41 @@ namespace JaCaptei.API.Controllers {
             return Result(appReturn);
         }
 
+        [HttpGet("gerar-token")]
+        public IActionResult GerarToken([FromQuery] int idConta)
+        {
+            try
+            {
+                var tokenContive = ObterContaPorId(idConta);
+                appReturn.result = service.GerarToken(idConta);
+                if (appReturn == null)
+                {
+                    return NotFound("Conta não encontrada.");
+                }
+                return Ok(appReturn);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, "Erro ao gerar o token: " + ex.Message);
+            }
+        }
+        
+        [HttpPost("cadastro-convite")]
+        public IActionResult CadastroViaConvite([FromBody] Parceiro novoParceiro)
+        {
+            try
+            {
+                appReturn = service.AdicionarParceiroAssociado(novoParceiro);
+                if (appReturn == null)
+                {
+                    return NotFound("Conta não encontrada.");
+                }
+                return Ok(appReturn);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, "Erro ao gerar o token: " + ex.Message);
+            }
+        }
     }
 }

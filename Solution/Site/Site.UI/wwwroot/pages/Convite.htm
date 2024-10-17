@@ -1,117 +1,97 @@
 ﻿<template>
     <div class="container">
         <div style="text-align: center; width: 100%;">
-            <div style="text-align:center;width:100%;">
-                <p class="title">
-                    Crie Sua Finalize o seu Registro e faça parte do Time {{usuario}}
+            <div style="text-align:center;width:100%; margin-bottom: 20px;">
+                <p class="title" style="font-size: 24px; font-weight: bold; line-height: 1.5;">
+                    Conclua seu registro e faça parte do time de sucesso da <br>
+                    <span style="text-transform: uppercase;">{{ this.dadosConta.razao }}</span>!
                 </p>
             </div>
 
-            <div class="invite-form" id="form" v-if="view == 'form' ">
+            <div class="invite-form" id="form" v-if="view == 'form'">
                 <el-col :md="24">
                     <el-row :gutter="20">
                         <el-col :xs="24" :sm="24" :md="24" :lg="24" class="input-form">
                             <div>
-                                <span></span><span></span>
                                 <div>NOME COMPLETO</div>
                             </div>
-                            <el-input @keyup.enter="Send()" v-model="$root.usuario.nome" placeholder="" maxlength="80" input-style="text-transform:uppercase;"></el-input>
+                            <el-input @keyup.enter="Send()" v-model="nome" placeholder="" maxlength="80" input-style="text-transform:uppercase;"></el-input>
                         </el-col>
                         <el-col :xs="24" :sm="24" :md="24" :lg="24" class="input-form">
                             <div>CPF<span></span></div>
-                            <el-input @keyup.enter="Send()" v-model="$root.usuario.cpf" maxlength="22" v-maska data-maska="###.###.###-##" @blur="CheckDoc" ref="documento"></el-input>
+                            <el-input @keyup.enter="Send()" v-model="cpf" maxlength="22" v-maska data-maska="###.###.###-##"></el-input>
                         </el-col>
                         <el-col :xs="24" :sm="24" :md="24" :lg="24" class="input-form">
                             <div>E-MAIL <span></span></div>
-                            <el-input @keyup.enter="Send()" v-model="$root.usuario.email" placeholder="" maxlength="80" input-style="text-transform:lowercase;"></el-input>
+                            <el-input @keyup.enter="Send()" v-model="email" placeholder="" maxlength="80" input-style="text-transform:lowercase;"></el-input>
                         </el-col>
                         <el-col :xs="24" :sm="24" :md="24" :lg="24" class="input-form">
                             <div>TELEFONE <span></span></div>
-                            <el-input @keyup.enter="Send()" v-model="$root.usuario.telefone" placeholder="(11) 11111-1111" maxlength="40" input-style="text-transform:lowercase;" v-maska data-maska="(##) #####-#### ********************"></el-input>
+                            <el-input @keyup.enter="Send()" v-model="telefone" placeholder="(11) 11111-1111" maxlength="40" input-style="text-transform:lowercase;" v-maska data-maska="(##) #####-####"></el-input>
                         </el-col>
                         <el-col :xs="24" class="input-form">
                             <div>DATA DE NASCIMENTO</div>
                             <div class="birth-date">
-                                <el-select v-model="DiaNascimento"
-                                           filterable
-                                           placeholder="DIA"
-                                           size="medium">
-                                    <el-option v-for="item in $sdata.forms.days"
-                                               :key="item.value"
-                                               :label="item.label"
-                                               :value="item.value"></el-option>
+                                <el-select v-model="DiaNascimento" filterable placeholder="DIA" size="medium">
+                                    <el-option v-for="item in $sdata.forms.days" :key="item.value" :label="item.label" :value="item.value"></el-option>
                                 </el-select>
 
-                                <el-select v-model="MesNascimento"
-                                           filterable
-                                           placeholder="MÊS"
-                                           size="medium">
-                                    <el-option v-for="item in $sdata.forms.months"
-                                               :key="item.value"
-                                               :label="item.label"
-                                               :value="item.value"></el-option>
+                                <el-select v-model="MesNascimento" filterable placeholder="MÊS" size="medium">
+                                    <el-option v-for="item in $sdata.forms.months" :key="item.value" :label="item.label" :value="item.value"></el-option>
                                 </el-select>
 
-                                <el-select v-model="AnoNascimento"
-                                           filterable
-                                           placeholder="ANO"
-                                           size="medium">
-                                    <el-option v-for="item in $sdata.forms.years"
-                                               :key="item.value"
-                                               :label="item.label"
-                                               :value="item.value"></el-option>
+                                <el-select v-model="AnoNascimento" filterable placeholder="ANO" size="medium">
+                                    <el-option v-for="item in $sdata.forms.years" :key="item.value" :label="item.label" :value="item.value"></el-option>
                                 </el-select>
                             </div>
                         </el-col>
 
-                        <el-col :xs="24" :sm="24" :md="24" :lg="24" v-if="$root.usuario.tipoPessoa == 'PF'" class="input-form">
+                        <el-col :xs="24" :sm="24" :md="24" :lg="24" class="input-form">
                             <div>SEXO <span></span></div>
-                            <el-select filterable v-model="$root.usuario.sexo" class="m-4" placeholder="Selecionar" size="large" style="width:100%">
-                                <el-option v-for="item in opcoes.sexos"
-                                           :key="item.id"
-                                           :label="item.label"
-                                           :value="item.value"></el-option>
+                            <el-select filterable v-model="sexo" class="m-4" placeholder="Selecionar" size="large" style="width:100%">
+                                <el-option v-for="item in opcoes.sexos" :key="item.id" :label="item.label" :value="item.value"></el-option>
                             </el-select>
                         </el-col>
 
-                        <el-col :xs="24" :sm="24" :md="12" :lg="12" class="input-form">
+                        <el-col :xs="24" :sm="12" :md="12" :lg="12" class="input-form">
                             <div>
-                                <span></span><span></span>
                                 <div>CRECI</div>
                             </div>
-                            <el-input @keyup.enter="Send()" v-model="$root.usuario.creci" placeholder="" maxlength="22"></el-input>
+                            <el-input @keyup.enter="Send()" v-model="creci" placeholder="" maxlength="22"></el-input>
                         </el-col>
 
-                        <el-col :xs="24" :sm="24" :md="24" :lg="12" class="input-form">
+                        <el-col :xs="24" :sm="24" :md="12" :lg="12" class="input-form">
                             <div><p>CRECI - ESTADO</p><span></span></div>
                             <div style="height:40px" v-if="carregandoEstadosCreci">
                                 <c-loading size="30px" style="padding-left:5px"></c-loading>
                             </div>
-                            <el-select v-else filterable v-model="$root.usuario.creciEstado" class="m-4" placeholder="Selecionar" size="large" style="width:100%" @change="(item)=>{enableFilterButton = true;}">
-                                <el-option v-for="item in opcoes.estadosCreci"
-                                           :key="item.id"
-                                           :label="item.label"
-                                           :value="item.uf"></el-option>
+                            <el-select v-else filterable v-model="creciEstado" class="m-4" placeholder="Selecionar" size="large" style="width:100%" @change="(item)=>{enableFilterButton = true;}">
+                                <el-option v-for="item in opcoes.estadosCreci" :key="item.id" :label="item.label" :value="item.uf"></el-option>
                             </el-select>
                         </el-col>
 
-                        <el-col :xs="24" :sm="24" :md="24" :lg="24" v-if="$root.usuario.idTipo != 2" class="input-form">
-                            <div>SENHA <span style="color:#808080">&nbsp;pelo menos 4 caracteres</span></div>
-                            <el-input @keyup.enter="Send()" v-model="$root.usuario.senha" type="password" placeholder="" maxlength="20" show-password></el-input>
+                        <el-col :xs="24" :sm="24" :md="24" :lg="24" class="input-form">
+                            <div>SENHA</div>
+                            <el-input @keyup.enter="Send()"
+                                      v-model="senha"
+                                      type="password"
+                                      placeholder="A senha deve ter pelo menos 8 caracteres, incluindo letras maiúsculas, minúsculas, números e caracteres especiais."
+                                      maxlength="20"
+                                      show-password></el-input>
                         </el-col>
 
-                        <el-col :xs="24" :sm="24" :md="24" :lg="24" v-if="$root.usuario.idTipo != 2" class="input-form">
-                            <div>CONFIRMAR SENHA <span style="color:#808080">&nbsp;repetir senha</span></div>
-                            <el-input @keyup.enter="Send()" v-model="senhaConfirma" type="password" placeholder="" maxlength="20" show-password></el-input>
+                        <el-col :xs="24" :sm="24" :md="24" :lg="24" class="input-form">
+                            <div>CONFIRMAR SENHA</div>
+                            <el-input @keyup.enter="Send()" v-model="senhaConfirma" type="password" placeholder="repita a senha" maxlength="20" show-password></el-input>
                         </el-col>
                     </el-row>
 
                     <el-row :gutter="20">
                         <el-col :md="24" style="margin:10px">
                             <div>
-                                <el-checkbox v-model="$root.usuario.aceitouTermos">aceito os termos e condições de uso <a href="files/JaCaptei_Termos_de_Uso.pdf" target="_blank" style="font-weight:800;color:var(--s-accent-color)"> <i class="fa fa-up-right-from-square" style="padding-left:10px;padding-right:4px;font-size:14px;color:var(--s-accent-color)"></i> ver termos</a></el-checkbox>
+                                <el-checkbox v-model="aceitouTermos">aceito os termos e condições de uso <a href="files/JaCaptei_Termos_de_Uso.pdf" target="_blank" style="font-weight:800;color:var(--s-accent-color)"> <i class="fa fa-up-right-from-square" style="padding-left:10px;padding-right:4px;font-size:14px;color:var(--s-accent-color)"></i> ver termos</a></el-checkbox>
                                 <br />
-                                <el-checkbox v-model="$root.usuario.aceitouPoliticaPrivacidade">aceito a política de privacidade dos dados <a href="files/JaCaptei_Politica_Privacidade.pdf" target="_blank" style="font-weight:800;color:var(--s-accent-color)"> <i class="fa fa-up-right-from-square" style="padding-left:10px;padding-right:4px;font-size:14px;color:var(--s-accent-color)"></i> ver política</a></el-checkbox>
+                                <el-checkbox v-model="aceitouPoliticaPrivacidade">aceito a política de privacidade dos dados <a href="files/JaCaptei_Politica_Privacidade.pdf" target="_blank" style="font-weight:800;color:var(--s-accent-color)"> <i class="fa fa-up-right-from-square" style="padding-left:10px;padding-right:4px;font-size:14px;color:var(--s-accent-color)"></i> ver política</a></el-checkbox>
                             </div>
                         </el-col>
                     </el-row>
@@ -124,7 +104,7 @@
 
                     <el-row :gutter="20" style="margin-top:20px">
                         <el-col :md="12">
-                            Já tem cadastro? faça o   <el-button type="primary" link @click="$root.Login()">LOGIN</el-button>
+                            Já tem cadastro? faça o <el-button type="primary" link @click="$root.Login()">LOGIN</el-button>
                         </el-col>
                         <el-col :md="12" style="text-align:end;padding-right:10px">
                             Exceto <i>Complemento</i>, todos os campos são necessários.
@@ -149,44 +129,11 @@
                 <q-btn color="white" text-color="indigo-10" label="VOLTAR" @click="ShowView(viewLast)" style="width:160px;" id="btn_voltar_5"></q-btn>
             </div>
 
-            <div v-else-if="view=='success'" style="min-height:374px">
-                <div>
-                    <br />
-                    <br />
-                    <div class="title" style="color:#fff"><b><i class="fa fa-circle-check" style="color:#fff"></i> Sucesso</b></div>
-                    <br />
-                    <span style="font-size:17px;color:#fff"><b>Cadastro efetuado!</b></span>
-                    <br />
-                    <br />
-                    <div v-if="$root.usuario.idTipo == 1">
-                        <span style="font-size:17px;color:#fff;font-weight:700;padding:10px">Lhe enviamos um e-mail com um link para você <b>CONFIRMAR O CADASTRO.</b><br />E-mail enviado por <b>site@jacaptei.com.br</b>, verifique a caixa de SPAM se não receber.</span>
-                        <br />
-                        <br />
-                        <q-btn label="Ok" color="secondary" style="font-size:18px;width:50%;height:50px;border-radius:20px" @click="ShowView('form')"></q-btn>
-                    </div>
-                    <div v-else-if="$root.usuario.idTipo == 2">
-                        <div style="font-size:17px;color:#fff;font-weight:700;padding:10px">Agora é só entrar em contato para vender seu imóvel</div>
-                        <div style="background-color:#fff;color:var(--s-accent-color);font-weight:700;padding:10px">
-                            <q-btn color="green-7" style="font-size:20px;min-width:320px;width:50%;height:30px;border-radius:20px" @click="VenderAgora()">
-                                <i class="fab fa-whatsapp" style="font-size:26px;margin-right:10px;font-weight:500"></i>	VENDER AGORA  (31) 4003-9998
-                            </q-btn>
-                        </div>
-                        <br />
-                        <br />
-                        <q-btn label="voltar" color="secondary" style="font-size:18px;width:240px;height:50px;border-radius:20px" @click="ShowView('form')"></q-btn>
-                    </div>
-                    <div v-else>
-                        <br />
-                        <br />
-                        <q-btn label="Ok" color="secondary" style="font-size:18px;width:50%;height:50px;border-radius:20px" @click="ShowView('form')"></q-btn>
-                    </div>
-                </div>
-            </div>
-
-            <div v-else-if="view=='fail'">
-                <div class="title" style="color:var(--s-color-red)"><b><i class="fa fa-circle-xmark"></i> Falhou</b></div>
+            <div v-else-if="view=='success'">
                 <br /><br />
-                <br /><span v-html="messageFail"></span>
+                <div class="title" style="color:var(--s-color-yellow)"><b><i class="fa-solid fa-check-circle"></i> Sucesso</b></div>
+                <br /><br />
+                <span v-html="messageAlert"></span>
                 <br /><br />
                 <q-btn color="white" text-color="indigo-10" label="VOLTAR" @click="ShowView(viewLast)" style="width:160px;" id="btn_voltar_5"></q-btn>
             </div>
@@ -215,10 +162,22 @@
                 contaNova: true,
                 messageFail: "Não foi possível autenticar, favor tentar novamente.",
                 content: "",
+                nome: "",
+                cpf: "",
+                email: "",
+                telefone: "",
+                dataNascimento: "",
+                sexo: "",
+                creci: "",
+                creciEstado: "",
+                senha: "",
+                senhaConfirma: "",
+                aceitouTermos: "",
+                aceitouPoliticaPrivacidade: "",
                 DiaNascimento: 0,
                 MesNascimento: 0,
                 AnoNascimento: 0,
-                senhaConfirma: "",
+                dadosConta: [],
                 carregandoCEP: false,
                 carregandoEstados: false,
                 carregandoCidades: false,
@@ -250,27 +209,145 @@
                 var queryParams = this.$tools.HandleParams();
                 this.cod = queryParams.cod;
                 this.BuscarContaPeloToken();
-            } catch (e) {}
+            } catch (e) { }
         },
 
-        mounted() {},
+        mounted() { },
         methods: {
             async BuscarContaPeloToken() {
                 var buscarConta = [];
-                var request = await this.$api.Get(`parceiro/obtercontapelotoken/${encodeURIComponent(this.cod)}`);
-
-                if (request?.status?.success) {
-                    buscaImovel = request.result;
-                    this.imovel = buscaImovel.result.imoveis[0];
-                    if (this.$validator.not(this.imovel))
-                        this.indisponivel = true;
-                    else
-                        this.SetupImagens();
+                const url = this.$api.BuildURL(`parceiro/obtercontapelotoken/${encodeURIComponent(this.cod)}`)
+                var request = await axios.get(url);
+                if (request.status == 200) {
+                    this.dadosConta = request.data.result;
+                    console.log(this.dadosConta);
                 } else
                     this.indisponivel = true;
 
                 this.onRequest = false;
             },
+            async Send() {
+                if (!this.nome || !this.cpf || !this.email || !this.telefone) {
+                    this.messageAlert = "Todos os campos são obrigatórios.";
+                    this.view = 'alert';
+                    return;
+                }
+
+                if (!this.CheckDoc(this.cpf)) {
+                    this.messageAlert = "CPF inválido.";
+                    this.view = 'alert';
+                    return;
+                }
+
+                const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+                if (!emailPattern.test(this.email)) {
+                    this.messageAlert = "E-mail inválido.";
+                    this.view = 'alert';
+                    return;
+                }
+
+                if (!this.IsStrongPassword(this.senha)) {
+                    this.messageAlert = "A senha deve ter pelo menos 8 caracteres, incluindo letras maiúsculas, minúsculas, números e caracteres especiais.";
+                    this.view = 'alert';
+                    return;
+                }
+
+                if (this.senha !== this.senhaConfirma) {
+                    this.messageAlert = "As senhas não coincidem.";
+                    this.view = 'alert';
+                    return;
+                }
+
+                this.view = 'sending';
+
+                try {
+                    const url = this.$api.BuildURL(`parceiro/cadastro-convite`);
+
+                    const dataNascimento = `${this.AnoNascimento}-${String(this.MesNascimento).padStart(2, '0')}-${String(this.DiaNascimento).padStart(2, '0')}`;
+
+                    const response = await axios.post(url, {
+                        nome: this.nome,
+                        cpf: this.cpf,
+                        email: this.email,
+                        telefone: this.telefone,
+                        idConta: this.dadosConta.id,
+                        dataNascimento: dataNascimento,
+                        sexo: this.sexo,
+                        creci: this.creci,
+                        anoNascimento: this.AnoNascimento,
+                        mesNascimento: this.MesNascimento,
+                        diaNascimento: this.DiaNascimento,
+                        dataNascimento: dataNascimento,
+                        creciEstado: this.creciEstado,
+                        senha: this.senha,
+                        aceitouTermos: this.aceitouTermos,
+                        aceitouPoliticaPrivacidade: this.aceitouPoliticaPrivacidade,
+                        tokenConta: this.dadosConta.token,
+                        tokenConvite: this.dadosConta.tokenConvite,
+                    });
+
+                    if (response.data.success) {
+                        this.view = 'success';
+                    } else {
+                        this.messageFail = response.data.message || "Erro ao cadastrar. Tente novamente.";
+                        this.view = 'fail';
+                    }
+                } catch (error) {
+                    console.error(error);
+                    this.messageFail = "Erro ao conectar ao servidor. Tente novamente.";
+                    this.view = 'fail';
+                }
+            },
+
+            ShowView(v) {
+                this.view = v;
+            },
+
+            IsStrongPassword(password) {
+                const lengthCriteria = password.length >= 8;
+                const upperCaseCriteria = /[A-Z]/.test(password);
+                const lowerCaseCriteria = /[a-z]/.test(password);
+                const numberCriteria = /[0-9]/.test(password);
+                const specialCharacterCriteria = /[!@#$%^&*]/.test(password);
+
+                return lengthCriteria && upperCaseCriteria && lowerCaseCriteria && numberCriteria && specialCharacterCriteria;
+            },
+
+            CheckDoc(cpf) {
+                cpf = cpf.replace(/\D/g, '');
+
+                if (cpf.length !== 11 || /^(\d)\1{10}$/.test(cpf)) {
+                    return false; // CPF inválido
+                }
+
+                let soma = 0;
+                let digito1;
+                let digito2;
+
+                for (let i = 0; i < 9; i++) {
+                    soma += parseInt(cpf[i]) * (10 - i);
+                }
+                digito1 = (soma * 10) % 11;
+                if (digito1 === 10 || digito1 === 11) {
+                    digito1 = 0;
+                }
+
+                if (digito1 !== parseInt(cpf[9])) {
+                    return false; // CPF inválido
+                }
+
+                soma = 0;
+
+                for (let i = 0; i < 10; i++) {
+                    soma += parseInt(cpf[i]) * (11 - i);
+                }
+                digito2 = (soma * 10) % 11;
+                if (digito2 === 10 || digito2 === 11) {
+                    digito2 = 0;
+                }
+
+                return digito2 === parseInt(cpf[10]); // Retorna true se o CPF for válido
+            }
         }
     }
 </script>

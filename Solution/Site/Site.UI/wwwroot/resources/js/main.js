@@ -271,8 +271,6 @@ $(document).ready(function () {
                 tag = tag.split("?")[0];
                 if (tag !== "imovel" && tag !== "convite") {
                     link = this.RouteTo(tag);
-                } else {
-                    console.log(`Tag é ${tag}, mantendo rota atual.`);
                 }
             }
             else

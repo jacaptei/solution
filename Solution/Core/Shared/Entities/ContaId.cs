@@ -20,6 +20,7 @@
         public bool? ativo { get; set; }
         public bool? excluido { get; set; }
         public bool? donoConta { get; set; }
+        public string? tokenConvite { get; set; }
         public double? valorMensal { get; set; }
         public int? limiteUsuarios { get; set; }
         public int? totalUsuarios { get; set; }

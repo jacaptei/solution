@@ -32,7 +32,7 @@
                     <el-input v-model="linkConvite"
                               readonly
                               placeholder="Seu link de convite aqui"
-                              class="link-input">
+                              class="link-input" disabled="true">
                         <template #prefix>
                             <img src="../resources/images/icons/link.svg"
                                  alt="linkAccount"
@@ -90,10 +90,23 @@
                         console.error("Não foi possível alterar dados.");
                     });
             },
-            gerarLinkConvite() {
-                const baseUrl = window.location.origin;
-                this.linkConvite = `${baseUrl}/convite?cod=${encodeURIComponent(this.$root.usuario.tokenConta)}`;
-                this.$message.success('Link de convite gerado com sucesso!');
+            async gerarLinkConvite() {
+                try {
+                    const url = this.$api.BuildURL(`parceiro/gerar-token?idConta=${this.$root.usuario.idConta}`);
+                    const response = await axios.get(url);
+                    const { result } = response.data.result;
+                    if (result) {
+                        const token = result;
+                        const baseUrl = window.location.origin;
+                        this.linkConvite = `${baseUrl}/convite?cod=${encodeURIComponent(token)}`;
+                        this.$message.success('Link de convite gerado com sucesso!');
+                    } else {
+                        throw new Error("Token não encontrado na resposta.");
+                    }
+                } catch (error) {
+                    console.error("Erro ao gerar link: ", error);
+                    this.$message.error('Falha ao gerar o link de convite.');
+                }
             },
             copiarLinkDeConvite() {
                 navigator.clipboard.writeText(this.linkConvite)
@@ -123,9 +136,7 @@
 
                 const subject = encodeURIComponent("Convite para se juntar");
                 const body = encodeURIComponent(`Olá! Confira este link: ${linkConviteFormatted}`);
-
                 const mailtoUrl = `mailto:?subject=${subject}&body=${body}`;
-
                 window.open(mailtoUrl, '_blank');
             }
         }
@@ -175,10 +186,10 @@
         border: 1px solid #e4e7ed; /* Cor da borda */
     }
 
-    .custom-input .el-icon-link {
-        color: #b0b0b0; /* Cor do ícone */
-        margin-left: 8px; /* Espaçamento à esquerda do ícone */
-    }
+        .custom-input .el-icon-link {
+            color: #b0b0b0; /* Cor do ícone */
+            margin-left: 8px; /* Espaçamento à esquerda do ícone */
+        }
 
     .invite-card {
         padding: 20px;

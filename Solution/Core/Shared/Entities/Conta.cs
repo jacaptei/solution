@@ -19,6 +19,7 @@ namespace JaCaptei.Model
         public string cnpj { get; set; } = "";
         public long cnpjNum { get; set; } = 0;
         public string token { get; set; } = "";
+        public string tokenConvite { get; set; } = "";
         public int limiteUsuarios { get; set; } = 1;
         public int totalUsuarios { get; set; } = 1;
         public DateTime dataAtualizacao { get; set; } = DateTime.Now;
@@ -29,6 +30,7 @@ namespace JaCaptei.Model
         public int atualizadoPorId { get; set; }
         public string atualizadoPorNome { get; set; } = "";
         public string atualizadoPorPerfil { get; set; } = "";
+        public DateTime tokenExpiraEm { get; set; } = DateTime.Now;
     }
 }
 
