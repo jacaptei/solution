@@ -33,8 +33,9 @@
                         <el-input v-model="linkConvite"
                                   readonly
                                   placeholder="Seu link de convite aqui"
-                                  class="link-input" disabled="true"
-                                  @click="copiarLinkDeConvite" >
+                                  class="link-input"
+                                  :disabled="!permiteMaisCadastro"
+                                  @click="copiarLinkDeConvite">
                             <template #prefix>
                                 <img src="../resources/images/icons/link.svg"
                                      alt="linkAccount"
@@ -42,7 +43,12 @@
                                      @click="copiarLinkDeConvite" />
                             </template>
                         </el-input>
-                        <el-button type="primary" @click="gerarLinkConvite" class="generate-button">Gerar Link de Convite</el-button>
+                        <el-button type="primary"
+                                   :disabled="!permiteMaisCadastro"
+                                   @click="gerarLinkConvite"
+                                   class="generate-button">
+                            Gerar Link de Convite
+                        </el-button>
                     </div>
                     <el-divider></el-divider>
                     <div class="invite-button-container">
@@ -74,59 +80,82 @@
         async created() {
         },
         mounted() {
-            this.obterUsuariosConta();
-            this.gerarLinkConvite();
+            if (!this.$root.isAuth)
+               return this.$root.RouteTo("home");
+            this.inicializarDados();
+        },
+        computed: {
+            permiteMaisCadastro() {
+                return this.membros.length < this.limiteUsuarios;
+            }
         },
         methods: {
-            obterUsuariosConta() {
-                const url = this.$api.BuildURL(`parceiro/obtercontaporid/${this.$root.usuario.idConta}`);
-                axios.get(url)
-                    .then((request) => {
-                        if (request.data && request.data.result) {
-                            const conta = request.data.result;
-                            this.membros = (conta || []).sort((a, b) => b.donoConta - a.donoConta);
-                            console.log(this.membros[0].limiteUsuarios);
-                            this.limiteUsuarios = this.membros[0].limiteUsuarios;
-                        } else {
-                            this.membros = [];
-                        }
-                    })
-                    .catch((error) => {
-                        console.error(error);
-                        if (error.response) {
-                            console.error(error.response);
-                        }
-                        console.error("Não foi possível alterar dados.");
-                    });
+            async inicializarDados() {
+                await this.obterUsuariosConta();
+                this.gerarLinkConvite();
             },
-            async gerarLinkConvite() {
+
+            async obterUsuariosConta() {
                 try {
-                    const url = this.$api.BuildURL(`parceiro/gerar-token?idConta=${this.$root.usuario.idConta}&tokenConta=${this.$root.usuario.tokenConta}`);
+                    const url = this.$api.BuildURL(`parceiro/obtercontaporid/${this.$root.usuario.idConta}`);
                     const response = await axios.get(url);
-                    const { result } = response.data.result;
-                    if (result) {
-                        const token = result;
-                        const baseUrl = window.location.origin;
-                        this.linkConvite = `${baseUrl}/convite?cod=${encodeURIComponent(token)}`;
-                        this.$message.success('Link de convite gerado com sucesso!');
+
+                    if (response.data && response.data.result) {
+                        const conta = response.data.result;
+                        this.membros = (conta || []).sort((a, b) => b.donoConta - a.donoConta);
+                        console.log(this.membros[0].limiteUsuarios);
+                        this.limiteUsuarios = this.membros[0].limiteUsuarios;
                     } else {
-                        throw new Error("Token não encontrado na resposta.");
+                        this.membros = [];
                     }
                 } catch (error) {
-                    console.error("Erro ao gerar link: ", error);
-                    this.$message.error('Falha ao gerar o link de convite.');
+                    console.error("Erro ao obter os usuários:", error);
+                    this.$message.error("Não foi possível carregar os dados da conta.");
                 }
             },
-            copiarLinkDeConvite() {
-                navigator.clipboard.writeText(this.linkConvite)
-                    .then(() => {
-                        this.$tools.MessageSuccess("Link copiado para área de transferência");
-                    })
-                    .catch((error) => {
-                        console.error("Erro ao copiar o link: ", error);
-                        this.$tools.MessageError("Falha ao copiar o link.");
-                    });
+
+            async gerarLinkConvite() {
+                if (!this.permiteMaisCadastro) {
+                    this.$message.error('Limite de usuários atingido!');
+                    return;
+                }
+
+                try {
+                    const url = this.$api.BuildURL(
+                        `parceiro/gerar-token?idConta=${this.$root.usuario.idConta}&tokenConta=${this.$root.usuario.tokenConta}`
+                    );
+
+                    const response = await axios.get(url);
+                    const { result } = response.data.result;
+
+                    if (!result) throw new Error('Token não encontrado na resposta.');
+
+                    const token = result;
+                    const baseUrl = window.location.origin;
+                    this.linkConvite = `${baseUrl}/convite?cod=${encodeURIComponent(token)}`;
+
+                    this.$message.success('Link de convite gerado com sucesso!');
+                    this.copiarLinkDeConvite();
+                } catch (error) {
+                    console.error('Erro ao gerar link:', error);
+                    this.$message.error('Falha ao gerar o link de convite. Tente novamente mais tarde.');
+                }
             },
+
+            async copiarLinkDeConvite() {
+                if (!this.permiteMaisCadastro) {
+                    this.$message.error('Limite de usuários atingido!');
+                    return;
+                }
+
+                try {
+                    await navigator.clipboard.writeText(this.linkConvite);
+                    this.$message.success('Link copiado com sucesso!');
+                } catch {
+                    this.$message.error('Falha ao copiar o link. Verifique as permissões do navegador.');
+                }
+            },
+
             abrirWhatsapp() {
                 const linkConviteFormatted = this.linkConvite.startsWith('http')
                     ? this.linkConvite
