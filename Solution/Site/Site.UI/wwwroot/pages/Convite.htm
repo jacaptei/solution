@@ -1,14 +1,13 @@
 ﻿<template>
-    <div v-loading.fullscreen.lock="fullscreenLoading" element-loading-background="rgba(0, 0, 0, 0.7)">
+    <div v-loading.fullscreen.lock="fullscreenLoading" element-loading-background="rgba(0, 0, 0, 0.7)" style="background-color: #FAFAF6;">
         <div class="container">
             <div style="text-align: center; width: 100%;">
                 <div style="text-align:center;width:100%; margin-bottom: 20px;" v-if="view == 'form'">
                     <p class="title" style="font-size: 24px; font-weight: bold; line-height: 1.5;">
-                        Conclua seu registro e faça parte do time de sucesso da <br>
-                        <span style="text-transform: uppercase;">{{ this.dadosConta.nome }}</span>!
+                        🎉 Conclua seu registro e faça parte time 🎉<br>
+                        <span style="text-transform: uppercase; font-weight: bold; color: #ef5924;">{{ this.dadosConta.nome }}!</span>
                     </p>
                 </div>
-
                 <div class="invite-form" id="form" v-if="view == 'form'">
                     <el-col :md="24">
                         <el-row :gutter="20">
@@ -16,15 +15,15 @@
                                 <div>
                                     <div>NOME COMPLETO</div>
                                 </div>
-                                <el-input @keyup.enter="Send()" v-model="nome" placeholder="" maxlength="80" input-style="text-transform:uppercase;"></el-input>
+                                <el-input @keyup.enter="Send()" v-model="nome" placeholder="e.g. Bonnie Green" maxlength="80" input-style="text-transform:uppercase;"></el-input>
                             </el-col>
                             <el-col :xs="24" :sm="24" :md="24" :lg="24" class="input-form">
                                 <div>CPF<span></span></div>
-                                <el-input @keyup.enter="Send()" v-model="cpf" maxlength="22" v-maska data-maska="###.###.###-##"></el-input>
+                                <el-input @keyup.enter="Send()" v-model="cpf" placeholder="Digite seu CPF (apenas números)" maxlength="22" v-maska data-maska="###.###.###-##"></el-input>
                             </el-col>
                             <el-col :xs="24" :sm="24" :md="24" :lg="24" class="input-form">
                                 <div>E-MAIL <span></span></div>
-                                <el-input @keyup.enter="Send()" v-model="email" placeholder="" maxlength="80" input-style="text-transform:lowercase;"></el-input>
+                                <el-input @keyup.enter="Send()" v-model="email" placeholder="name@email.com" maxlength="80" input-style="text-transform:lowercase;"></el-input>
                             </el-col>
                             <el-col :xs="24" :sm="24" :md="24" :lg="24" class="input-form">
                                 <div>TELEFONE <span></span></div>
@@ -58,7 +57,7 @@
                                 <div>
                                     <div>CRECI</div>
                                 </div>
-                                <el-input @keyup.enter="Send()" v-model="creci" placeholder="" maxlength="22"></el-input>
+                                <el-input @keyup.enter="Send()" v-model="creci" placeholder="Ex: 123456" maxlength="22"></el-input>
                             </el-col>
 
                             <el-col :xs="24" :sm="24" :md="12" :lg="12" class="input-form">
@@ -80,7 +79,7 @@
                                           maxlength="20"
                                           show-password>
                                 </el-input>
-                                <div v-if="senha.length > 0"
+                                <div style="margin-left: 8px" v-if="senha.length > 0"
                                      :class="{
                                             'text-success': status === 'success',
                                             'text-warning': status === 'warning',
@@ -91,10 +90,9 @@
 
                             <el-col :xs="24" :sm="24" :md="24" :lg="24" class="input-form">
                                 <div>CONFIRMAR SENHA</div>
-                                <el-input @input="validatePasswordMatch"
-                                          v-model="senhaConfirma"
+                                <el-input v-model="senhaConfirma"
                                           type="password"
-                                          placeholder="Repita a senha"
+                                          placeholder="Repita a Senha"
                                           maxlength="20"
                                           show-password>
                                 </el-input>
@@ -105,11 +103,10 @@
                         </el-row>
 
                         <el-row :gutter="20">
-                            <el-col :md="24" style="margin:10px">
-                                <div>
-                                    <el-checkbox v-model="aceitouTermos">aceito os termos e condições de uso <a href="files/JaCaptei_Termos_de_Uso.pdf" target="_blank" style="font-weight:800;color:var(--s-accent-color)"> <i class="fa fa-up-right-from-square" style="padding-left:10px;padding-right:4px;font-size:14px;color:var(--s-accent-color)"></i> ver termos</a></el-checkbox>
-                                    <br />
-                                    <el-checkbox v-model="aceitouPoliticaPrivacidade">aceito a política de privacidade dos dados <a href="files/JaCaptei_Politica_Privacidade.pdf" target="_blank" style="font-weight:800;color:var(--s-accent-color)"> <i class="fa fa-up-right-from-square" style="padding-left:10px;padding-right:4px;font-size:14px;color:var(--s-accent-color)"></i> ver política</a></el-checkbox>
+                            <el-col :md="24" style="margin-bottom:10px">
+                                <div style="display: flex; justify-content: flex-start; flex-direction: column">
+                                    <el-checkbox style="color: #FAFAF6" v-model="aceitouTermos">aceito os termos e condições de uso <a href="files/JaCaptei_Termos_de_Uso.pdf" target="_blank" style="font-weight:800;color:var(--s-accent-color)"> <i class="fa fa-up-right-from-square" style="padding-left:10px;padding-right:4px;font-size:14px;color:var(--s-accent-color)"></i> ver termos</a></el-checkbox>
+                                    <el-checkbox style="color: #FAFAF6" v-model="aceitouPoliticaPrivacidade">aceito a política de privacidade dos dados <a href="files/JaCaptei_Politica_Privacidade.pdf" target="_blank" style="font-weight:800;color:var(--s-accent-color)"> <i class="fa fa-up-right-from-square" style="padding-left:10px;padding-right:4px;font-size:14px;color:var(--s-accent-color)"></i> ver política</a></el-checkbox>
                                 </div>
                             </el-col>
                         </el-row>
@@ -122,7 +119,9 @@
 
                         <el-row :gutter="20" style="margin-top:20px">
                             <el-col :md="12">
-                                Já tem cadastro? faça o <el-button type="primary" link @click="$root.Login()">LOGIN</el-button>
+                                <div style="display: flex">
+                                    <p style="color: #FAFAF6">Já tem cadastro? faça o </p><el-button type="primary" link @click="$root.Login()">LOGIN</el-button>
+                                </div>
                             </el-col>
                         </el-row>
                     </el-col>
@@ -132,17 +131,26 @@
                            :title="dialogTitle"
                            width="400px"
                            align-center
-                           class="custom-dialog">
-                    <div class="dialog-content">
-                        <!--<el-icon color="#F56C6C" class="warning-icon">
-                            <i class="el-icon-warning-outline"></i>
-                        </el-icon>-->
-                        <p class="dialog-message">{{ dialogContent }}</p>
+                           class="custom-dialog"
+                           center>
+
+                    <!-- Ícone Dinâmico -->
+                    <div class="icon-container">
+                        <el-icon :color="iconColor" size="50">
+                            <i :class="iconClass"></i>
+                        </el-icon>
                     </div>
 
+                    <!-- Mensagem -->
+                    <div class="dialog-content">
+                        <p class="dialog-message" v-html="dialogContent"></p>
+                    </div>
+
+                    <!-- Rodapé com Botão -->
                     <template #footer>
                         <div class="dialog-footer">
                             <el-button class="custom-button"
+                                       :type="buttonType"
                                        size="large"
                                        @click="handleConfirm">
                                 {{ confirmText }}
@@ -186,6 +194,8 @@
                 creciEstado: "",
                 senha: "",
                 senhaConfirma: "",
+                status: "",
+                statusConfirmaSenha: "",
                 passwordStrengthClass: "",
                 aceitouTermos: "",
                 fullscreenLoading: false,
@@ -193,7 +203,6 @@
                 messageType: "",
                 DiaNascimento: 0,
                 MesNascimento: 0,
-                status: "",
                 AnoNascimento: 0,
                 dadosConta: [],
                 carregandoCEP: false,
@@ -238,6 +247,33 @@
                     default:
                         return "";
                 }
+            },
+            iconClass() {
+                switch (this.messageType) {
+                    case 'success':
+                        return 'el-icon-circle-check';
+                    case 'error':
+                        return 'el-icon-circle-close';
+                    case 'warning':
+                        return 'el-icon-warning';
+                    default:
+                        return 'el-icon-info';
+                }
+            },
+            iconColor() {
+                switch (this.messageType) {
+                    case 'success':
+                        return '#67C23A'; // Verde
+                    case 'error':
+                        return '#F56C6C'; // Vermelho
+                    case 'warning':
+                        return '#E6A23C'; // Amarelo
+                    default:
+                        return '#909399'; // Cinza
+                }
+            },
+            buttonType() {
+                return this.messageType === 'error' ? 'danger' : 'primary';
             },
         },
         async created() {
@@ -285,21 +321,6 @@
                 this.dialogVisible = true;
             },
 
-            handleWarning(exception) {
-                if (error && error.includes('Token inválido')) {
-                    this.dialogTitle = 'Token Expirado';
-                    this.dialogContent = 'O token fornecido é inválido ou expirou. Por favor, gere um novo token para continuar com o cadastro.';
-                    this.messageType = 'error';
-                    this.view = '';
-                } else {
-                    this.dialogTitle = 'Erro';
-                    this.dialogContent = error.info || 'Erro ao conectar ao servidor. Tente novamente.';
-                    this.messageType = 'error';
-                    this.confirmText = 'Tentar Novamente';
-                }
-                this.dialogVisible = true;
-            },
-
             async BuscarContaPeloToken() {
                 const url = this.$api.BuildURL(`parceiro/obtercontapelotoken/${encodeURIComponent(this.cod)}`);
                 try {
@@ -324,13 +345,11 @@
                 this.dialogVisible = true;
             },
 
-            showDialog(title, content, confirmText) {
-                this.fullscreenLoading = false;
+            showDialog(title, content, type = 'info', confirmText = 'OK') {
                 this.dialogTitle = title;
                 this.dialogContent = content;
-                this.messageType = 'sucess';
-                this.dialogVisible = true;
-                //this.confirmText = confirmText;
+                this.messageType = type;
+                this.confirmText = confirmText;
                 this.dialogVisible = true;
             },
 
@@ -431,13 +450,17 @@
                         tokenConvite: this.dadosConta.tokenConvite,
                     });
                     if (response.data.status.success) {
-                        this.showDialog('Sucesso', 'Cadastrado com sucesso!', 'OK');
-                    } else {
+                        this.showDialog(
+                            'Sucesso',
+                            'Seu cadastro foi realizado com sucesso!<br>Você receberá um e-mail com um link para <b>confirmar o cadastro</b>.',
+                            'success',
+                            'Confirmar'
+                        );                    } else {
                         const errorMessage = response.data.status.notes[0]?.info || 'Erro ao cadastrar. Tente novamente.';
-                        this.showDialog('Erro', errorMessage, 'Tentar Novamente');
+                        this.showDialog('Erro', errorMessage, 'error', 'Tentar Novamente');
                     }
                 } catch (error) {
-                    this.showDialog('Erro', 'Erro ao conectar ao servidor. Tente novamente.', 'Tentar Novamente');
+                    this.showDialog('Erro', 'Erro ao conectar ao servidor. Tente novamente.', 'error', 'Tentar Novamente');
                 } finally {
                     this.fullscreenLoading = false;
                 }
@@ -471,12 +494,6 @@
                 } else if (this.passwordStrengthPercentage >= 60) {
                     this.status = "warning";
                 } else {
-                    this.status = "danger";
-                }
-            },
-
-            validatePasswordMatch() {
-                if (this.senhaConfirma && this.senhaConfirma !== this.senha) {
                     this.status = "danger";
                 }
             },
@@ -568,7 +585,7 @@
     }
 
     .invite-form {
-        background-color: #dedede;
+        background-color: #000;
         padding: 20px;
         border-radius: 8px;
         box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
@@ -649,9 +666,33 @@
         border-color: #d43f3a;
     }
 
+    .custom-dialog {
+        text-align: center;
+    }
+
+    .icon-container {
+        margin-bottom: 20px;
+    }
+
+    .dialog-content p {
+        font-size: 16px;
+        line-height: 1.6;
+        color: #606266;
+    }
+
+    .dialog-footer {
+        margin-top: 20px;
+    }
+
+    .custom-button {
+        width: 100%;
+        border-radius: 8px;
+    }
+
     @media (max-width: 600px) {
         .invite-form {
             padding: 15px;
+            
         }
 
         .birth-date {
