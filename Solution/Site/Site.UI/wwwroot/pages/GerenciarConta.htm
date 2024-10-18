@@ -3,23 +3,29 @@
         <el-row :gutter="20" style="margin: 10px">
             <el-col :span="12">
                 <el-card shadow="hover" class="card membros-card">
-                    <h3>Membros do Plano</h3>
-                    <p>{{ membros.length }} de {{ limiteUsuarios }} parceiros cadastrados</p>
+                        <h3>Membros do Plano</h3>
+                        <p>{{ membros.length }} de {{ limiteUsuarios }} parceiros cadastrados</p>
 
-                    <el-divider></el-divider>
+                        <el-divider style="margin-bottom: 10px"></el-divider>
 
-                    <div v-for="(membro, index) in membros" :key="index" class="membro">
-                        <div class="avatar-container">
-                            <el-avatar :src="membro.avatar || '../resources/images/icons/Jacaptei.svg'"
-                                       size="medium" />
-                        </div>
+                        <el-scrollbar height="430px">
+                            <div style="padding: 10px">
+                                <div v-for="(membro, index) in membros" :key="index" class="membro">
+                                    <div class="avatar-container">
+                                        <el-avatar :src="membro.avatar || '../resources/images/icons/Jacaptei.svg'"
+                                                   size="medium" />
+                                    </div>
 
-                        <div class="membro-info">
-                            <p class="membro-nome">{{ membro.nome }}</p>
-                            <span v-if="membro.donoConta" class="admin-badge">Admin</span>
-                        </div>
-                        <el-button type="primary" @click="abrirDialog(membro)" class="el-icon--right" :icon="Search">View</el-button>
-                    </div>
+                                    <div class="membro-info">
+                                        <p class="membro-nome">{{ membro.nome }}</p>
+                                        <span v-if="membro.donoConta" class="admin-badge">Gestor</span>
+                                    </div>
+                                    <!--<el-button @click="abrirDialog(membro)" type="primary" >
+                                        Informações<el-icon class="el-icon--right"><Edit /></el-icon>
+                                    </el-button>-->
+                                </div>
+                            </div>
+                        </el-scrollbar>
                 </el-card>
             </el-col>
 
@@ -221,13 +227,14 @@
         align-items: center;
         justify-content: space-between;
         margin: 10px 0;
-        padding: 10px 0;
+/*        padding: 10px 0;*/
         border-bottom: 1px solid #f0f0f0;
     }
 
     .membro-info {
         flex-grow: 1;
         margin-left: 10px;
+        margin-bottom: 10px;
     }
 
     .el-button {
@@ -262,10 +269,10 @@
         border: 1px solid #e4e7ed; /* Cor da borda */
     }
 
-        .custom-input .el-icon-link {
-            color: #b0b0b0; /* Cor do ícone */
-            margin-left: 8px; /* Espaçamento à esquerda do ícone */
-        }
+    .custom-input .el-icon-link {
+        color: #b0b0b0; /* Cor do ícone */
+        margin-left: 8px; /* Espaçamento à esquerda do ícone */
+    }
 
     .invite-card {
         padding: 20px;
@@ -326,7 +333,7 @@
     }
 
     .admin-badge {
-        background-color: #f56c6c;
+        background-color: #EF5924;
         color: white;
         padding: 2px 8px;
         border-radius: 12px;
