@@ -817,7 +817,7 @@ namespace JaCaptei.Application
             }
             return appReturn;
         }
-        public AppReturn VerificaQuantidadeUsuariosAtivos(int idConta, int atualizadoPorId, string atualizadoPorNome, bool ativo)
+        public AppReturn VerificaQuantidadeUsuariosAtivos(int idConta, int atualizadoPorId = 2, string atualizadoPorNome = "JACAPTEI ADMIN", bool ativo = true)
         {
             var appReturn = new AppReturn();
             try
@@ -916,9 +916,10 @@ namespace JaCaptei.Application
 
                     if (conta != null && conta.id > 0)
                     {
+                        VerificaQuantidadeUsuariosAtivos(conta.id, 2, "JACAPTEI ADMIN", true);
                         if (conta.totalUsuarios >= conta.limiteUsuarios)
                         {
-                            appReturn.AddException("Esta conta não contempla mais usuários.");
+                            appReturn.AddException("O número máximo de usuários para esta conta foi atingido. Para adicionar um novo usuário, será necessário excluir um existente.");
                         }
                     }
                     else
@@ -1181,14 +1182,8 @@ namespace JaCaptei.Application
                 appReturn.AddException("Não foi possível alterar parceiro (registro não encontrado ou inválido).");
                 appReturn.status.exception = ex.ToString();
             }
-
             return appReturn;
-
         }
-
-
-
-
 
         public AppReturn Excluir(Parceiro entity)
         {
@@ -1268,11 +1263,8 @@ namespace JaCaptei.Application
                 appReturn.AddException("Não foi possível excluir parceiro (registro não encontrado ou inválido).");
                 appReturn.status.exception = ex.ToString();
             }
-
             return appReturn;
-
         }
-
 
         public AppReturn ObterContasAtivas()
         {
@@ -1292,11 +1284,6 @@ namespace JaCaptei.Application
 
             return appReturn;
         }
-
-
-
-
-
 
         public AppReturn Buscar(Busca busca)
         {
@@ -1436,7 +1423,6 @@ namespace JaCaptei.Application
             var conn = _context.GetConn();
             return (await conn.QueryAsync<Plano>(p => p.id == parceiro.idPlano)).FirstOrDefault();
         }
-
         public void Dispose()
         {
             _context?.GetConn()?.Close();

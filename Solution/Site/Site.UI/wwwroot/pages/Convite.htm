@@ -17,18 +17,22 @@
                                 </div>
                                 <el-input @keyup.enter="Send()" v-model="nome" placeholder="e.g. Bonnie Green" maxlength="80" input-style="text-transform:uppercase;"></el-input>
                             </el-col>
+
                             <el-col :xs="24" :sm="24" :md="24" :lg="24" class="input-form">
                                 <div>CPF<span></span></div>
                                 <el-input @keyup.enter="Send()" v-model="cpf" placeholder="Digite seu CPF (apenas números)" maxlength="22" v-maska data-maska="###.###.###-##"></el-input>
                             </el-col>
+
                             <el-col :xs="24" :sm="24" :md="24" :lg="24" class="input-form">
                                 <div>E-MAIL <span></span></div>
                                 <el-input @keyup.enter="Send()" v-model="email" placeholder="name@email.com" maxlength="80" input-style="text-transform:lowercase;"></el-input>
                             </el-col>
+
                             <el-col :xs="24" :sm="24" :md="24" :lg="24" class="input-form">
                                 <div>TELEFONE <span></span></div>
                                 <el-input @keyup.enter="Send()" v-model="telefone" placeholder="(11) 11111-1111" maxlength="40" input-style="text-transform:lowercase;" v-maska data-maska="(##) #####-####"></el-input>
                             </el-col>
+
                             <el-col :xs="24" class="input-form">
                                 <div>DATA DE NASCIMENTO</div>
                                 <div class="birth-date">
@@ -133,13 +137,6 @@
                            align-center
                            class="custom-dialog"
                            center>
-
-                    <!-- Ícone Dinâmico -->
-                    <div class="icon-container">
-                        <el-icon :color="iconColor" size="50">
-                            <i :class="iconClass"></i>
-                        </el-icon>
-                    </div>
 
                     <!-- Mensagem -->
                     <div class="dialog-content">
@@ -298,20 +295,24 @@
             format() {
                 return '';
             },
+
             handleConfirm() {
-                if (this.messageType === 'success' || this.messageType === 'error') {
+                if (this.messageType === 'success' ||
+                    (this.messageType === 'error' && this.confirmText !== 'Tentar Novamente')) {
                     this.$router.push({ name: 'home' });
-                } else if (this.messageType === 'alert') {
+                }
+                else if (this.messageType === 'alert' || this.confirmText === 'Tentar Novamente') {
                     this.dialogVisible = false;
                 }
             },
 
             handleError(error) {
                 if (error && error.includes('Token inválido')) {
+                    this.view = '';
                     this.dialogTitle = 'Token Expirado';
                     this.dialogContent = 'O token fornecido é inválido ou expirou. Por favor, gere um novo token para continuar com o cadastro.';
                     this.messageType = 'error';
-                    this.view = '';
+                    this.confirmText = 'Confirmar';
                 } else {
                     this.dialogTitle = 'Erro';
                     this.dialogContent = error.info || 'Erro ao conectar ao servidor. Tente novamente.';
@@ -354,7 +355,6 @@
             },
 
             validateFields() {
-                // Verifica campos obrigatórios
                 const emptyFields = this.getEmptyRequiredFields();
                 if (emptyFields.length > 0) {
                     const message = `Os seguintes campos são obrigatórios: ${emptyFields.join(', ')}.`;
@@ -455,7 +455,8 @@
                             'Seu cadastro foi realizado com sucesso!<br>Você receberá um e-mail com um link para <b>confirmar o cadastro</b>.',
                             'success',
                             'Confirmar'
-                        );                    } else {
+                        );
+                    } else {
                         const errorMessage = response.data.status.notes[0]?.info || 'Erro ao cadastrar. Tente novamente.';
                         this.showDialog('Erro', errorMessage, 'error', 'Tentar Novamente');
                     }
@@ -545,10 +546,6 @@
         padding: 20px;
         box-sizing: border-box;
         border-radius: 8px;
-        /*background-image: url('../resources/images/');*/ /* Caminho da imagem */
-        background-size: cover; /* A imagem cobre todo o container */
-        background-position: center; /* Centraliza a imagem */
-        background-repeat: no-repeat; /* Evita que a imagem se repita */
     }
 
     .input-form {
@@ -634,13 +631,19 @@
         align-items: center;
         justify-content: center;
         margin-top: 10px;
-        margin-bottom: 20px;
+        margin-bottom: 10px;
         text-align: center;
+        font-family: Marine;
     }
 
     .warning-icon {
         font-size: 48px;
         margin-bottom: 10px;
+    }
+
+    .el-dialog__body{
+        padding-bottom: 0px;
+        padding-top: 10px;
     }
 
     .dialog-message {
@@ -677,7 +680,7 @@
     .dialog-content p {
         font-size: 16px;
         line-height: 1.6;
-        color: #606266;
+        color: #000000;
     }
 
     .dialog-footer {
