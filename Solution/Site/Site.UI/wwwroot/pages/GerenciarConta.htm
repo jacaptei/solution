@@ -1,0 +1,348 @@
+﻿<template>
+    <div>
+        <el-row :gutter="20" style="margin: 10px">
+            <el-col :span="12">
+                <el-card shadow="hover" class="card membros-card">
+                        <h3>Membros do Plano</h3>
+                        <p>{{ membros.length }} de {{ limiteUsuarios }} parceiros cadastrados</p>
+
+                        <el-divider style="margin-bottom: 10px"></el-divider>
+
+                        <el-scrollbar height="430px">
+                            <div style="padding: 10px">
+                                <div v-for="(membro, index) in membros" :key="index" class="membro">
+                                    <div class="avatar-container">
+                                        <el-avatar :src="membro.avatar || '../resources/images/icons/Jacaptei.svg'"
+                                                   size="medium" />
+                                    </div>
+
+                                    <div class="membro-info">
+                                        <p class="membro-nome">{{ membro.nome }}</p>
+                                        <span v-if="membro.donoConta" class="admin-badge">Gestor</span>
+                                    </div>
+                                    <!--<el-button @click="abrirDialog(membro)" type="primary" >
+                                        Informações<el-icon class="el-icon--right"><Edit /></el-icon>
+                                    </el-button>-->
+                                </div>
+                            </div>
+                        </el-scrollbar>
+                </el-card>
+            </el-col>
+
+            <el-col :span="12">
+                <el-card shadow="hover" class="invite-card">
+                    <h5><strong>Envie um convite para um colaborador da sua imobiliária se juntar ao time!</strong></h5>
+                    <p class="invite-description">
+                        Para convidar alguém, envie o link abaixo ou crie um convite usando um serviço de mensagem ou e-mail.
+                    </p>
+                    <div class="invite-input-container">
+                        <el-input v-model="linkConvite"
+                                  readonly
+                                  placeholder="Seu link de convite aqui"
+                                  class="link-input"
+                                  :disabled="!permiteMaisCadastro"
+                                  @click="copiarLinkDeConvite">
+                            <template #prefix>
+                                <img src="../resources/images/icons/link.svg"
+                                     alt="linkAccount"
+                                     class="link-icon"
+                                     @click="copiarLinkDeConvite" />
+                            </template>
+                        </el-input>
+                        <el-button type="primary"
+                                   :disabled="!permiteMaisCadastro"
+                                   @click="gerarLinkConvite"
+                                   class="generate-button">
+                            Gerar Link de Convite
+                        </el-button>
+                    </div>
+                    <el-divider></el-divider>
+                    <div class="invite-button-container">
+                        <el-button type="success" @click="abrirWhatsapp" class="social-button">
+                            <img src="../resources/images/icons/whatsapp.svg" alt="WhatsApp" class="social-icon" />
+                            WhatsApp
+                        </el-button>
+                        <el-button type="medium" @click="abrirEmail" class="social-button">
+                            <img src="../resources/images/icons/email.svg" alt="email" class="social-icon" />
+                            E-mail
+                        </el-button>
+                    </div>
+                </el-card>
+            </el-col>
+            <!-- Diálogo de Visualização -->
+            <el-dialog v-model="dialogVisible"
+                       title="Detalhes do Membro"
+                       width="500px"
+                       @close="limparDialog">
+                <div v-if="membroSelecionado">
+                    <p><strong>Nome:</strong> {{ membroSelecionado.nome }}</p>
+                    <p>
+                        <strong>Dono da Conta:</strong>
+                        {{ membroSelecionado.donoConta ? 'Sim' : 'Não' }}
+                    </p>
+                    <p><strong>Avatar:</strong></p>
+                    <el-avatar :src="membroSelecionado.avatar || '../resources/images/icons/Jacaptei.svg'"
+                               size="large" />
+                </div>
+
+                <span slot="footer" class="dialog-footer">
+                    <el-button @click="dialogVisible = false">Fechar</el-button>
+                </span>
+            </el-dialog>
+        </el-row>
+    </div>
+</template>
+
+<script>
+    module.exports = {
+        data() {
+            return {
+                linkConvite: "",
+                membros: [],
+                limiteUsuarios: 0,
+                idConta: "",
+                dialogVisible: false,
+                membroSelecionado: null,
+            };
+        },
+        async created() {
+        },
+        mounted() {
+            if (!this.$root.isAuth)
+               return this.$root.RouteTo("home");
+            this.inicializarDados();
+        },
+        computed: {
+            permiteMaisCadastro() {
+                return this.membros.length < this.limiteUsuarios;
+            }
+        },
+        methods: {
+            async inicializarDados() {
+                await this.obterUsuariosConta();
+                this.gerarLinkConvite();
+            },
+
+            async obterUsuariosConta() {
+                try {
+                    const url = this.$api.BuildURL(`parceiro/obtercontaporid/${this.$root.usuario.idConta}`);
+                    const response = await axios.get(url);
+
+                    if (response.data && response.data.result) {
+                        const conta = response.data.result;
+                        this.membros = (conta || []).sort((a, b) => b.donoConta - a.donoConta);
+                        this.limiteUsuarios = this.membros[0].limiteUsuarios;
+                    } else {
+                        this.membros = [];
+                    }
+                } catch (error) {
+                    console.error("Erro ao obter os usuários:", error);
+                    this.$message.error("Não foi possível carregar os dados da conta.");
+                }
+            },
+
+            abrirDialog(membro) {
+                this.membroSelecionado = membro; // Define o membro clicado
+                this.dialogVisible = true; // Abre o diálogo
+            },
+
+            limparDialog() {
+                this.membroSelecionado = null; // Limpa os dados ao fechar o diálogo
+            },
+
+            async gerarLinkConvite() {
+                if (!this.permiteMaisCadastro) {
+                    this.$message.error('Limite de usuários atingido não sendo possivel gerar o convite!');
+                    return;
+                }
+
+                try {
+                    const url = this.$api.BuildURL(
+                        `parceiro/gerar-token?idConta=${this.$root.usuario.idConta}&tokenConta=${this.$root.usuario.tokenConta}`
+                    );
+
+                    const response = await axios.get(url);
+                    const { result } = response.data.result;
+
+                    if (!result) throw new Error('Token não encontrado na resposta.');
+
+                    const token = result;
+                    const baseUrl = window.location.origin;
+                    this.linkConvite = `${baseUrl}/convite?cod=${encodeURIComponent(token)}`;
+
+                    this.$message.success('Link de convite gerado com sucesso!');
+                    this.copiarLinkDeConvite();
+                } catch (error) {
+                    console.error('Erro ao gerar link:', error);
+                    this.$message.error('Falha ao gerar o link de convite. Tente novamente mais tarde.');
+                }
+            },
+
+            async copiarLinkDeConvite() {
+                if (!this.permiteMaisCadastro) {
+                    this.$message.error('Limite de usuários atingido!');
+                    return;
+                }
+
+                try {
+                    await navigator.clipboard.writeText(this.linkConvite);
+                    this.$message.success('Link copiado com sucesso!');
+                } catch {
+                    this.$message.error('Falha ao copiar o link. Verifique as permissões do navegador.');
+                }
+            },
+
+            abrirWhatsapp() {
+                const linkConviteFormatted = this.linkConvite.startsWith('http')
+                    ? this.linkConvite
+                    : `https://${this.linkConvite}`;
+
+                const message = encodeURIComponent(`Olá! Acesse esse link e faça seu cadastro: ${linkConviteFormatted}`);
+                const whatsappUrl = `https://wa.me/?text=${message}`;
+
+                window.open(whatsappUrl, '_blank');
+            },
+
+            abrirEmail() {
+                const linkConviteFormatted = this.linkConvite.startsWith('http')
+                    ? this.linkConvite
+                    : `https://${this.linkConvite}`;
+
+                const subject = encodeURIComponent("Convite para se juntar");
+                const body = encodeURIComponent(`Olá! Acesse esse link e faça seu cadastro: ${linkConviteFormatted}`);
+                const mailtoUrl = `mailto:?subject=${subject}&body=${body}`;
+                window.open(mailtoUrl, '_blank');
+            }
+        }
+    };
+</script>
+
+<style>
+    .membros-card {
+        padding: 20px;
+    }
+
+    .membro {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        margin: 10px 0;
+/*        padding: 10px 0;*/
+        border-bottom: 1px solid #f0f0f0;
+    }
+
+    .membro-info {
+        flex-grow: 1;
+        margin-left: 10px;
+        margin-bottom: 10px;
+    }
+
+    .el-button {
+        transition: none !important;
+    }
+
+    .el-button:hover {
+        box-shadow: none !important;
+    }
+
+    .membro-nome {
+        font-weight: bold;
+        margin: 0;
+    }
+
+    .membro-username {
+        color: #666;
+        font-size: 0.9rem;
+        margin: 0;
+    }
+
+    .view-all-btn {
+        width: 100%;
+        text-align: center;
+        margin-top: 10px;
+    }
+
+    .custom-input {
+        border-radius: 12px; /* Arredonda os cantos */
+        background-color: #f5f7fa; /* Cor de fundo */
+        padding: 10px; /* Espaçamento interno */
+        border: 1px solid #e4e7ed; /* Cor da borda */
+    }
+
+    .custom-input .el-icon-link {
+        color: #b0b0b0; /* Cor do ícone */
+        margin-left: 8px; /* Espaçamento à esquerda do ícone */
+    }
+
+    .invite-card {
+        padding: 20px;
+    }
+
+    .invite-title {
+        margin-bottom: 10px;
+        font-size: 1.5rem;
+    }
+
+    .invite-description {
+        margin-bottom: 20px;
+        font-size: 1rem;
+        color: #666;
+    }
+
+    .invite-input-container {
+        display: flex;
+        align-items: center;
+        margin-bottom: 20px;
+    }
+
+    .link-input {
+        flex-grow: 1; /* Faz o input ocupar o espaço restante */
+        margin-right: 10px; /* Espaçamento entre input e botão */
+        border-radius: 4px; /* Bordas arredondadas */
+        border: 1px solid #dcdfe6; /* Cor da borda */
+        background-color: #f5f7fa; /* Cor de fundo */
+    }
+
+    .link-icon {
+        width: 20px;
+        height: 20px;
+        margin-right: 10px;
+        cursor: pointer;
+    }
+
+    .generate-button {
+        min-width: 150px; /* Tamanho mínimo do botão */
+        height: 40px; /* Altura do botão */
+    }
+
+    .invite-button-container {
+        display: flex;
+        gap: 10px;
+    }
+
+    .social-button {
+        flex-grow: 1;
+        display: flex;
+        align-items: center;
+    }
+
+    .social-icon {
+        width: 20px;
+        height: 20px;
+        margin-right: 5px;
+    }
+
+    .admin-badge {
+        background-color: #EF5924;
+        color: white;
+        padding: 2px 8px;
+        border-radius: 12px;
+        font-size: 0.8rem;
+    }
+
+    .el-avatar {
+        background-color: transparent !important;
+        border: none;
+        box-shadow: none;
+    }
+</style>

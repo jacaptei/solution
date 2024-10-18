@@ -1,6 +1,8 @@
 ﻿using JaCaptei.Model;
 using JaCaptei.Application.Services;
 using JaCaptei.Application.DAL;
+using static System.Net.Mime.MediaTypeNames;
+using JaCaptei.Model.DTO;
 
 namespace JaCaptei.Application
 {
@@ -41,6 +43,38 @@ namespace JaCaptei.Application
                 appReturn.result = entities;
             }
             DAO.VerificaQuantidadeUsuariosAtivos(idConta, operador.id, operador.nome, true);
+            return appReturn;
+        }
+        public AppReturn ObterContaPeloToken(string token)
+        {
+            if (string.IsNullOrWhiteSpace(token))
+            {
+                appReturn.SetAsBadRequest("Token não informado.");
+                return appReturn;
+            }
+
+            bool validadeToken = DAO.ValidarTokenParaCadastro(token);
+
+            if (!validadeToken)
+            {
+                appReturn.SetAsBadRequest("Token inválido.");
+                return appReturn;
+            }
+
+            var entity = DAO.ObterContaPorToken(token);
+
+            if (entity == null)
+            {
+                appReturn.SetAsNotFound("Conta não encontrada.");
+                return appReturn;
+            }
+
+            appReturn.result = entity;
+
+            // Se necessário, você pode adicionar a lógica de verificação de usuários ativos aqui
+            // var operador = new Model.Admin();
+            // DAO.VerificaQuantidadeUsuariosAtivos(entity.IdConta, operador.id, operador.nome, true);
+
             return appReturn;
         }
 
@@ -173,6 +207,33 @@ namespace JaCaptei.Application
 
         public ParceiroSettings ObterSettings(int id){
             return DAO.ObterSettings(id);
+        } 
+        
+        public AppReturn GerarToken(int idConta, string tokenConta){
+            Conta tokenValido = DAO.ValidarGeracaoToken(tokenConta);
+            if (tokenValido != null)
+            {
+                appReturn.AddException("Token da conta ainda é válido.");
+                appReturn.result = tokenValido.tokenConvite;
+                return appReturn;
+            }
+
+            var conta = ObterContaPorId(idConta);
+            if (conta == null)
+            {
+                return new AppReturn
+                {
+                    result = "Conta não encontrada."
+                };
+            }
+            
+            var tokenConvite = Guid.NewGuid().ToString();
+            DateTime expiraEm = DateTime.UtcNow.AddHours(1);
+            DAO.SalvarTokenConvite(idConta, tokenConvite, expiraEm);
+            return new AppReturn
+            {
+                result = tokenConvite
+            };
         }
 
         public AppReturn ObterPeloToken(string token)
@@ -226,7 +287,6 @@ namespace JaCaptei.Application
 
         public AppReturn Adicionar(Parceiro entity)
         {
-
             appReturn = BLO.Validar(entity);
 
             if (!appReturn.status.success)
@@ -244,7 +304,7 @@ namespace JaCaptei.Application
                     appReturn.AddException("Aguarde a liberação de seu acesso (será notificado via e-mail.");
                 else if (entityDB.excluido)
                     appReturn.AddException("Login indisponível. Entre em contato e verifique se sua conta ainda é válida.");
-                else if (!entityDB.ativo || !entityDB.ativoCRM)
+                else if (!entityDB.ativo)
                     appReturn.AddException("Acesso indisponível. Entre em contato e verifique se sua conta ainda está ativa.");
                 else
                     appReturn.AddException("Já existe um Parceiro cadastrado com este CPF, CNPJ ou E-mail.");
@@ -273,8 +333,124 @@ namespace JaCaptei.Application
                 mail.message = "Olá " + entity.apelido + ".<br><br>Clique (ou copie e cole no navegador) o link abaixo para confirmar seu cadastro:<br><a href='" + Config.settings.baseURL + "/confirma?t=" + entity.token + "' target='_blank' style='color:#ef5924'>" + Config.settings.baseURL + "/confirma?t=" + entity.token + "</a>";
                 mail.Send();
             }
+            return appReturn;
+        }
+
+        public AppReturn AdicionarParceiroAssociado(Parceiro entity)
+        {
+            var appReturn = new AppReturn();
+
+            try
+            {
+                var limiteUsuarios = DAO.VerificarLimiteUsuariosConta(entity.tokenConta);
+                if (!limiteUsuarios.status.success)
+                {
+                    appReturn.AddException("Esta conta não contempla mais usuários.");
+                    return appReturn;
+                }
+
+                // Obter dados do endereço associado à conta
+                var enderecoConvidado = DAO.ObterDadosEndereco(entity.idConta);
+                if (enderecoConvidado?.result == null)
+                {
+                    appReturn.AddException("Erro ao obter endereço do convidado.");
+                    return appReturn;
+                }
+
+                // Preencher os dados de endereço na entidade
+                PreencherEndereco(entity, enderecoConvidado.result);
+
+                // Normalizar entidade e verificar existência no banco
+                entity = BLO.Normalizar(entity);
+                var entityDB = DAO.ObterPorCamposChaves(entity);
+
+                if (VerificarParceiroExistente(entityDB, appReturn))
+                    return appReturn;
+
+                // Obter dados de localidade (Estado, Cidade, Bairro)
+                try
+                {
+                    PreencherLocalidade(entity);
+                }
+                catch (Exception ex)
+                {
+                    appReturn.AddException("Erro ao obter informações de localidade: " + ex.Message);
+                    return appReturn;
+                }
+                // Adicionar parceiro no banco
+                appReturn = DAO.Adicionar(entity);
+            }
+            catch (Exception ex)
+            {
+                appReturn.AddException("Erro ao adicionar parceiro associado: " + ex.Message);
+                return appReturn;
+            }
+
+            // Enviar e-mail de confirmação
+            if (appReturn.status.success)
+            {
+                EnviarEmailConfirmacao(entity);
+            }
 
             return appReturn;
+        }
+
+        // Função para preencher dados de endereço na entidade
+        private void PreencherEndereco(Parceiro entity, Parceiro endereco)
+        {
+            entity.cep = endereco.cep;
+            entity.estado = endereco.estado;
+            entity.cidade = endereco.cidade;
+            entity.bairro = endereco.bairro;
+            entity.logradouro = endereco.logradouro;
+            entity.numero = endereco.numero;
+            entity.complemento = endereco.complemento;
+        }
+
+        // Verifica se um parceiro já existe e adiciona mensagens de erro no appReturn
+        private bool VerificarParceiroExistente(Parceiro entityDB, AppReturn appReturn)
+        {
+            if (entityDB == null || entityDB.id <= 0) return false;
+
+            if (!entityDB.confirmado)
+                appReturn.AddException("Já existe um Parceiro cadastrado. Confirme pelo link enviado por e-mail.");
+            else if (!entityDB.validado)
+                appReturn.AddException("Aguarde a liberação de seu acesso (notificação via e-mail).");
+            else if (entityDB.excluido)
+                appReturn.AddException("Login indisponível. Verifique a validade da conta.");
+            else if (!entityDB.ativo)
+                appReturn.AddException("Acesso indisponível. Verifique a ativação da conta.");
+            else
+                appReturn.AddException("Já existe um Parceiro cadastrado com este CPF, CNPJ ou E-mail.");
+
+            return true;
+        }
+
+        // Função para preencher dados de localidade
+        private void PreencherLocalidade(Parceiro entity)
+        {
+            var localidade = new LocalidadeService();
+
+            entity.idEstado = localidade.ObterIdEstado(entity.estado)?.result?.id ?? 0;
+            entity.idCidade = localidade.ObterIdCidade(entity.idEstado, entity.cidade)?.result?.id ?? 0;
+            entity.idBairro = localidade.ObterIdBairro(entity.idCidade, entity.bairro)?.result?.id ?? 0;
+        }
+
+        // Função para enviar e-mail de confirmação
+        private void EnviarEmailConfirmacao(Parceiro entity)
+        {
+            var mail = new Mail
+            {
+                emailTo = entity.email,
+                about = "Confirme seu cadastro",
+                message = $@"
+            Olá {entity.apelido}.<br><br>
+            Clique (ou copie e cole no navegador) o link abaixo para confirmar seu cadastro:<br>
+            <a href='{Config.settings.baseURL}/confirma?t={entity.token}' target='_blank' style='color:#ef5924'>
+                {Config.settings.baseURL}/confirma?t={entity.token}
+            </a>"
+            };
+            mail.Send();
         }
 
         public AppReturn Confirmar(string token)

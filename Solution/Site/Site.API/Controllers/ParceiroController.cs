@@ -141,5 +141,71 @@ namespace JaCaptei.API.Controllers {
             appReturn = service.ObterPeloId(int.Parse(id));
             return Result(appReturn);
         }
+
+        [HttpGet]
+        [Route("[action]/{idConta}")]
+        public IActionResult ObterContaPorId(int idConta)
+        {
+            appReturn = service.ObterContaPorId(idConta);
+            return Result(appReturn);
+        }
+
+        [HttpGet]
+        [Route("[action]/{token}")]
+        public IActionResult ObterContaPeloToken(string token)
+        {
+            appReturn = service.ObterContaPeloToken(token);
+            return Result(appReturn);
+        }
+
+        [HttpGet("gerar-token")]
+        public IActionResult GerarToken([FromQuery] int idConta, string tokenConta)
+        {
+            try
+            {
+                appReturn.result = service.GerarToken(idConta, tokenConta);
+                if (appReturn == null)
+                {
+                    return NotFound("Conta não encontrada.");
+                }
+                return Ok(appReturn);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, "Erro ao gerar o token: " + ex.Message);
+            }
+        }
+
+        [HttpPost("cadastro-convite")]
+        public ActionResult<AppReturn> CadastroViaConvite([FromBody] Parceiro novoParceiro)
+        {
+            if (novoParceiro == null)
+            {
+                return BadRequest("Parceiro não pode ser nulo.");
+            }
+
+            try
+            {
+                var appReturn = service.AdicionarParceiroAssociado(novoParceiro);
+
+                if (appReturn == null)
+                {
+                    return NotFound("Conta não encontrada.");
+                }
+                return Ok(appReturn);
+            }
+            catch (ArgumentException ex)
+            {
+                return BadRequest($"Erro de argumento: {ex.Message}");
+            }
+            catch (InvalidOperationException ex)
+            {
+                return Conflict($"Operação inválida: {ex.Message}");
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, "Erro interno do servidor. Tente novamente mais tarde.");
+            }
+        }
     }
 }

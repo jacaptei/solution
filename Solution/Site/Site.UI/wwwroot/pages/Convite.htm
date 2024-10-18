@@ -1,0 +1,709 @@
+﻿<template>
+    <div v-loading.fullscreen.lock="fullscreenLoading" element-loading-background="rgba(0, 0, 0, 0.7)">
+        <div class="container">
+            <div style="text-align: center; width: 100%;">
+                <div style="text-align:center;width:100%; margin-bottom: 20px;" v-if="view == 'form'">
+                    <p class="title" style="font-size: 24px; font-weight: bold; line-height: 1.5;">
+                        🎉 Conclua seu registro e faça parte time 🎉<br>
+                        <span style="text-transform: uppercase; font-weight: bold; color: #ef5924;">{{ this.dadosConta.nome }}!</span>
+                    </p>
+                </div>
+                <div class="invite-form" id="form" v-if="view == 'form'">
+                    <el-col :md="24">
+                        <el-row :gutter="20">
+                            <el-col :xs="24" :sm="24" :md="24" :lg="24" class="input-form">
+                                <div>
+                                    <div>NOME COMPLETO</div>
+                                </div>
+                                <el-input @keyup.enter="Send()" v-model="nome" placeholder="e.g. Bonnie Green" maxlength="80" input-style="text-transform:uppercase;"></el-input>
+                            </el-col>
+
+                            <el-col :xs="24" :sm="24" :md="24" :lg="24" class="input-form">
+                                <div>CPF<span></span></div>
+                                <el-input @keyup.enter="Send()" v-model="cpf" placeholder="Digite seu CPF (apenas números)" maxlength="22" v-maska data-maska="###.###.###-##"></el-input>
+                            </el-col>
+
+                            <el-col :xs="24" :sm="24" :md="24" :lg="24" class="input-form">
+                                <div>E-MAIL <span></span></div>
+                                <el-input @keyup.enter="Send()" v-model="email" placeholder="name@email.com" maxlength="80" input-style="text-transform:lowercase;"></el-input>
+                            </el-col>
+
+                            <el-col :xs="24" :sm="24" :md="24" :lg="24" class="input-form">
+                                <div>TELEFONE <span></span></div>
+                                <el-input @keyup.enter="Send()" v-model="telefone" placeholder="(11) 11111-1111" maxlength="40" input-style="text-transform:lowercase;" v-maska data-maska="(##) #####-####"></el-input>
+                            </el-col>
+
+                            <el-col :xs="24" class="input-form">
+                                <div>DATA DE NASCIMENTO</div>
+                                <div class="birth-date">
+                                    <el-select v-model="DiaNascimento" filterable placeholder="DIA" size="medium">
+                                        <el-option v-for="item in $sdata.forms.days" :key="item.value" :label="item.label" :value="item.value"></el-option>
+                                    </el-select>
+
+                                    <el-select v-model="MesNascimento" filterable placeholder="MÊS" size="medium">
+                                        <el-option v-for="item in $sdata.forms.months" :key="item.value" :label="item.label" :value="item.value"></el-option>
+                                    </el-select>
+
+                                    <el-select v-model="AnoNascimento" filterable placeholder="ANO" size="medium">
+                                        <el-option v-for="item in $sdata.forms.years" :key="item.value" :label="item.label" :value="item.value"></el-option>
+                                    </el-select>
+                                </div>
+                            </el-col>
+
+                            <el-col :xs="24" :sm="24" :md="24" :lg="24" class="input-form">
+                                <div>SEXO <span></span></div>
+                                <el-select filterable v-model="sexo" class="m-4" placeholder="Selecionar" size="large" style="width:100%">
+                                    <el-option v-for="item in opcoes.sexos" :key="item.id" :label="item.label" :value="item.value"></el-option>
+                                </el-select>
+                            </el-col>
+
+                            <el-col :xs="24" :sm="12" :md="12" :lg="12" class="input-form">
+                                <div>
+                                    <div>CRECI</div>
+                                </div>
+                                <el-input @keyup.enter="Send()" v-model="creci" placeholder="Ex: 123456" maxlength="22"></el-input>
+                            </el-col>
+
+                            <el-col :xs="24" :sm="24" :md="12" :lg="12" class="input-form">
+                                <div><p>CRECI - ESTADO</p><span></span></div>
+                                <div style="height:40px" v-if="carregandoEstadosCreci">
+                                    <c-loading size="30px" style="padding-left:5px"></c-loading>
+                                </div>
+                                <el-select v-else filterable v-model="creciEstado" class="m-4" placeholder="Selecionar" size="large" style="width:100%" @change="(item)=>{enableFilterButton = true;}">
+                                    <el-option v-for="item in opcoes.estadosCreci" :key="item.id" :label="item.label" :value="item.uf"></el-option>
+                                </el-select>
+                            </el-col>
+
+                            <el-col :xs="24" :sm="24" :md="24" :lg="24" class="input-form">
+                                <div>SENHA</div>
+                                <el-input @input="checkPasswordStrength"
+                                          v-model="senha"
+                                          type="password"
+                                          placeholder="Mínimo 6 caracteres, incluindo letras, números e símbolos."
+                                          maxlength="20"
+                                          show-password>
+                                </el-input>
+                                <div style="margin-left: 8px" v-if="senha.length > 0"
+                                     :class="{
+                                            'text-success': status === 'success',
+                                            'text-warning': status === 'warning',
+                                            'text-danger': status === 'danger'}">
+                                    {{ feedbackMessage }}
+                                </div>
+                            </el-col>
+
+                            <el-col :xs="24" :sm="24" :md="24" :lg="24" class="input-form">
+                                <div>CONFIRMAR SENHA</div>
+                                <el-input v-model="senhaConfirma"
+                                          type="password"
+                                          placeholder="Repita a Senha"
+                                          maxlength="20"
+                                          show-password>
+                                </el-input>
+                                <div v-if="senhaConfirma.length > 0 && senhaConfirma !== senha" class="text-danger">
+                                    As senhas não coincidem.
+                                </div>
+                            </el-col>
+                        </el-row>
+
+                        <el-row :gutter="20">
+                            <el-col :md="24" style="margin-bottom:10px">
+                                <div style="display: flex; justify-content: flex-start; flex-direction: column">
+                                    <el-checkbox style="color: #FAFAF6" v-model="aceitouTermos">aceito os termos e condições de uso <a href="files/JaCaptei_Termos_de_Uso.pdf" target="_blank" style="font-weight:800;color:var(--s-accent-color)"> <i class="fa fa-up-right-from-square" style="padding-left:10px;padding-right:4px;font-size:14px;color:var(--s-accent-color)"></i> ver termos</a></el-checkbox>
+                                    <el-checkbox style="color: #FAFAF6" v-model="aceitouPoliticaPrivacidade">aceito a política de privacidade dos dados <a href="files/JaCaptei_Politica_Privacidade.pdf" target="_blank" style="font-weight:800;color:var(--s-accent-color)"> <i class="fa fa-up-right-from-square" style="padding-left:10px;padding-right:4px;font-size:14px;color:var(--s-accent-color)"></i> ver política</a></el-checkbox>
+                                </div>
+                            </el-col>
+                        </el-row>
+
+                        <el-row :gutter="20">
+                            <el-col :md="24" style="margin-top:0px">
+                                <q-btn label="Enviar" color="primary" @click="Send()" style="width: 100%; height: 40px;"></q-btn>
+                            </el-col>
+                        </el-row>
+
+                        <el-row :gutter="20" style="margin-top:20px">
+                            <el-col :md="12">
+                                <div style="display: flex">
+                                    <p style="color: #FAFAF6">Já tem cadastro? faça o </p><el-button type="primary" link @click="$root.Login()">LOGIN</el-button>
+                                </div>
+                            </el-col>
+                        </el-row>
+                    </el-col>
+                </div>
+
+                <el-dialog v-model="dialogVisible"
+                           :title="dialogTitle"
+                           width="400px"
+                           align-center
+                           class="custom-dialog"
+                           center>
+
+                    <!-- Mensagem -->
+                    <div class="dialog-content">
+                        <p class="dialog-message" v-html="dialogContent"></p>
+                    </div>
+
+                    <!-- Rodapé com Botão -->
+                    <template #footer>
+                        <div class="dialog-footer">
+                            <el-button class="custom-button"
+                                       :type="buttonType"
+                                       size="large"
+                                       @click="handleConfirm">
+                                {{ confirmText }}
+                            </el-button>
+                        </div>
+                    </template>
+                </el-dialog>
+            </div>
+        </div>
+    </div>
+</template>
+
+
+<script>
+    module.exports = {
+        name: 'JaCapteiConviteMembros',
+        components: {},
+
+        data: function () {
+            return {
+                onRequest: true,
+                id: null,
+                cod: null,
+                url: window.location,
+                usuario: {},
+                onRequest: false,
+                view: "form",
+                viewLast: "form",
+                messageSuccess: "Cadastrado!",
+                messageAlert: "",
+                contaNova: true,
+                messageFail: "Não foi possível autenticar, favor tentar novamente.",
+                content: "",
+                nome: "",
+                cpf: "",
+                email: "",
+                telefone: "",
+                dataNascimento: "",
+                sexo: "",
+                creci: "",
+                creciEstado: "",
+                senha: "",
+                senhaConfirma: "",
+                status: "",
+                statusConfirmaSenha: "",
+                passwordStrengthClass: "",
+                aceitouTermos: "",
+                fullscreenLoading: false,
+                aceitouPoliticaPrivacidade: "",
+                messageType: "",
+                DiaNascimento: 0,
+                MesNascimento: 0,
+                AnoNascimento: 0,
+                dadosConta: [],
+                carregandoCEP: false,
+                dialogVisible: false,
+                carregandoEstados: false,
+                carregandoCidades: false,
+                carregandoBairros: false,
+                carregandoEstadosCreci: false,
+                carregandoCidadesCreci: false,
+                estadoSelecionado: {},
+                cidadeSelecionada: {},
+                bairroSelecionado: {},
+                cep: {
+                    numero: "",
+                    estado: "",
+                    cidade: "",
+                    logradouro: ""
+                },
+                opcoes: {
+                    cidades: [],
+                    estados: this.$root.localidade.estados,
+                    estadosCreci: this.$root.localidade.estados,
+                    cidadesCreci: [],
+                    bairros: [],
+                    sexos: [{ id: 1, label: "NÃO APLICÁVEL", value: "NA" }, { id: 2, label: "MASCULINO", value: "MASCULINO" }, { id: 3, label: "FEMININO", value: "FEMININO" }],
+                },
+                dialogVisible: false,
+                dialogTitle: '',
+                dialogContent: '',
+                confirmText: 'Confirmar',
+            }
+        },
+        computed: {
+            feedbackMessage() {
+                switch (this.status) {
+                    case "success":
+                        return "É uma ótima senha!";
+                    case "warning":
+                        return "Senha média. Considere adicionar mais complexidade.";
+                    case "danger":
+                        return "Senha fraca. Tente incluir letras maiúsculas, números e símbolos.";
+                    default:
+                        return "";
+                }
+            },
+            iconClass() {
+                switch (this.messageType) {
+                    case 'success':
+                        return 'el-icon-circle-check';
+                    case 'error':
+                        return 'el-icon-circle-close';
+                    case 'warning':
+                        return 'el-icon-warning';
+                    default:
+                        return 'el-icon-info';
+                }
+            },
+            iconColor() {
+                switch (this.messageType) {
+                    case 'success':
+                        return '#67C23A'; // Verde
+                    case 'error':
+                        return '#F56C6C'; // Vermelho
+                    case 'warning':
+                        return '#E6A23C'; // Amarelo
+                    default:
+                        return '#909399'; // Cinza
+                }
+            },
+            buttonType() {
+                return this.messageType === 'error' ? 'danger' : 'primary';
+            },
+        },
+        async created() {
+            try {
+                this.fullscreenLoading = true;
+                const queryParams = this.$tools.HandleParams();
+                if (queryParams.cod) {
+                    this.cod = queryParams.cod;
+                    await this.BuscarContaPeloToken();
+                    this.fullscreenLoading = false;
+                } else {
+                    console.warn('Código não encontrado nos parâmetros!');
+                }
+            } catch (e) {
+                console.error('Erro ao buscar conta pelo token:', e);
+            } finally {
+                this.fullscreenLoading = false;
+            }
+        },
+        mounted() { },
+        methods: {
+            format() {
+                return '';
+            },
+
+            handleConfirm() {
+                if (this.messageType === 'success' ||
+                    (this.messageType === 'error' && this.confirmText !== 'Tentar Novamente')) {
+                    this.$router.push({ name: 'home' });
+                }
+                else if (this.messageType === 'alert' || this.confirmText === 'Tentar Novamente') {
+                    this.dialogVisible = false;
+                }
+            },
+
+            handleError(error) {
+                if (error && error.includes('Token inválido')) {
+                    this.view = '';
+                    this.dialogTitle = 'Token Expirado';
+                    this.dialogContent = 'O token fornecido é inválido ou expirou. Por favor, gere um novo token para continuar com o cadastro.';
+                    this.messageType = 'error';
+                    this.confirmText = 'Confirmar';
+                } else {
+                    this.dialogTitle = 'Erro';
+                    this.dialogContent = error.info || 'Erro ao conectar ao servidor. Tente novamente.';
+                    this.messageType = 'error';
+                    this.confirmText = 'Tentar Novamente';
+                }
+                this.dialogVisible = true;
+            },
+
+            async BuscarContaPeloToken() {
+                const url = this.$api.BuildURL(`parceiro/obtercontapelotoken/${encodeURIComponent(this.cod)}`);
+                try {
+                    const request = await axios.get(url);
+                    if (request.status === 200) {
+                        this.dadosConta = request.data.result;
+                    } else {
+                        this.handleError(request);
+                    }
+                } catch (error) {
+                    this.handleError(error.response ? error.response.data.status.notes[0].info : { info: 'Erro desconhecido ao conectar ao servidor. Tente novamente.' });
+                } finally {
+                    this.onRequest = false;
+                }
+            },
+
+            showAlert(message) {
+                this.fullscreenLoading = false;
+                this.dialogTitle = 'Alerta';
+                this.dialogContent = message;
+                this.messageType = 'alert';
+                this.dialogVisible = true;
+            },
+
+            showDialog(title, content, type = 'info', confirmText = 'OK') {
+                this.dialogTitle = title;
+                this.dialogContent = content;
+                this.messageType = type;
+                this.confirmText = confirmText;
+                this.dialogVisible = true;
+            },
+
+            validateFields() {
+                const emptyFields = this.getEmptyRequiredFields();
+                if (emptyFields.length > 0) {
+                    const message = `Os seguintes campos são obrigatórios: ${emptyFields.join(', ')}.`;
+                    this.showAlert(message);
+                    throw new Error(message);
+                }
+
+                // Valida CPF
+                if (!this.CheckDoc(this.cpf)) {
+                    const message = 'CPF inválido.';
+                    this.showAlert(message);
+                    throw new Error(message);
+                }
+
+                const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+                if (!emailPattern.test(this.email)) {
+                    const message = 'E-mail inválido.';
+                    this.showAlert(message);
+                    throw new Error(message);
+                }
+
+                // Valida Senha
+                let message = '';
+                if (this.senha.length < 6) {
+                    message += '- A senha deve ter pelo menos 6 caracteres.\n';
+                }
+                if (!/[A-Z]/.test(this.senha)) {
+                    message += '- A senha deve incluir pelo menos uma letra maiúscula.\n';
+                }
+                if (!/[a-z]/.test(this.senha)) {
+                    message += '- A senha deve incluir pelo menos uma letra minúscula.\n';
+                }
+                if (!/[0-9]/.test(this.senha)) {
+                    message += '- A senha deve incluir pelo menos um número.\n';
+                }
+                if (!/[!@#$%^&*]/.test(this.senha)) {
+                    message += '- A senha deve incluir pelo menos um caractere especial.\n';
+                }
+
+                if (message) {
+                    this.showAlert(message.trim());
+                    throw new Error(message.trim());
+                }
+
+                // Verifica se as senhas coincidem
+                if (this.senha !== this.senhaConfirma) {
+                    const message = 'As senhas não coincidem.';
+                    this.showAlert(message);
+                    throw new Error(message);
+                }
+                return true;
+            },
+
+            getEmptyRequiredFields() {
+                const requiredFields = {
+                    Nome: this.nome,
+                    CPF: this.cpf,
+                    Email: this.email,
+                    Telefone: this.telefone,
+                    'Data de Nascimento': this.AnoNascimento || this.MesNascimento || this.AnoNascimento,
+                    CRECI: this.creci,
+                    'Estado do CRECI': this.creciEstado,
+                    Senha: this.senha,
+                    'Confirmação de Senha': this.senhaConfirma,
+                };
+                return Object.keys(requiredFields).filter(field => !requiredFields[field]);
+            },
+
+            async Send() {
+                this.fullscreenLoading = true;
+                if (!this.validateFields()) return;
+                const dataNascimento = `${this.AnoNascimento}-${String(this.MesNascimento).padStart(2, '0')}-${String(this.DiaNascimento).padStart(2, '0')}`;
+
+                try {
+                    const url = this.$api.BuildURL(`parceiro/cadastro-convite`);
+                    const response = await axios.post(url, {
+                        nome: this.nome,
+                        cpf: this.cpf,
+                        email: this.email,
+                        telefone: this.telefone,
+                        idConta: this.dadosConta.id,
+                        dataNascimento,
+                        sexo: this.sexo,
+                        creci: this.creci,
+                        anoNascimento: this.AnoNascimento,
+                        mesNascimento: this.MesNascimento,
+                        diaNascimento: this.DiaNascimento,
+                        creciEstado: this.creciEstado,
+                        senha: this.senha,
+                        aceitouTermos: this.aceitouTermos,
+                        aceitouPoliticaPrivacidade: this.aceitouPoliticaPrivacidade,
+                        tokenConta: this.dadosConta.token,
+                        tokenConvite: this.dadosConta.tokenConvite,
+                    });
+                    if (response.data.status.success) {
+                        this.showDialog(
+                            'Sucesso',
+                            'Seu cadastro foi realizado com sucesso!<br>Você receberá um e-mail com um link para <b>confirmar o cadastro</b>.',
+                            'success',
+                            'Confirmar'
+                        );
+                    } else {
+                        const errorMessage = response.data.status.notes[0]?.info || 'Erro ao cadastrar. Tente novamente.';
+                        this.showDialog('Erro', errorMessage, 'error', 'Tentar Novamente');
+                    }
+                } catch (error) {
+                    this.showDialog('Erro', 'Erro ao conectar ao servidor. Tente novamente.', 'error', 'Tentar Novamente');
+                } finally {
+                    this.fullscreenLoading = false;
+                }
+            },
+
+            isStrongPassword(password) {
+                return (
+                    password.length >= 6 &&
+                    /[A-Z]/.test(password) &&
+                    /[a-z]/.test(password) &&
+                    /[0-9]/.test(password) &&
+                    /[!@#$%^&*]/.test(password)
+                );
+            },
+
+            checkPasswordStrength() {
+                const password = this.senha || "";
+                const criteria = [
+                    { regex: /.{6,}/, label: "Mínimo 6 caracteres" },
+                    { regex: /[A-Z]/, label: "Letra maiúscula" },
+                    { regex: /[a-z]/, label: "Letra minúscula" },
+                    { regex: /[0-9]/, label: "Número" },
+                    { regex: /[!@#$%^&*]/, label: "Caractere especial" }
+                ];
+
+                const metCriteria = criteria.filter(c => c.regex.test(password)).length;
+                this.passwordStrengthPercentage = (metCriteria / criteria.length) * 100;
+
+                if (this.passwordStrengthPercentage === 100) {
+                    this.status = "success";
+                } else if (this.passwordStrengthPercentage >= 60) {
+                    this.status = "warning";
+                } else {
+                    this.status = "danger";
+                }
+            },
+
+            CheckDoc(cpf) {
+                cpf = cpf.replace(/\D/g, '');
+
+                if (cpf.length !== 11 || /^(\d)\1{10}$/.test(cpf)) {
+                    return false; // CPF inválido
+                }
+
+                let soma = 0;
+                let digito1;
+                let digito2;
+
+                for (let i = 0; i < 9; i++) {
+                    soma += parseInt(cpf[i]) * (10 - i);
+                }
+                digito1 = (soma * 10) % 11;
+                if (digito1 === 10 || digito1 === 11) {
+                    digito1 = 0;
+                }
+
+                if (digito1 !== parseInt(cpf[9])) {
+                    return false; // CPF inválido
+                }
+
+                soma = 0;
+
+                for (let i = 0; i < 10; i++) {
+                    soma += parseInt(cpf[i]) * (11 - i);
+                }
+                digito2 = (soma * 10) % 11;
+                if (digito2 === 10 || digito2 === 11) {
+                    digito2 = 0;
+                }
+
+                return digito2 === parseInt(cpf[10]); // Retorna true se o CPF for válido
+            }
+        }
+    }
+</script>
+
+<style scoped>
+    .container {
+        width: 100%;
+        max-width: 600px;
+        margin: 0 auto;
+        padding: 20px;
+        box-sizing: border-box;
+        border-radius: 8px;
+    }
+
+    .input-form {
+        letter-spacing: 0.02em;
+        color: #EF5924;
+        margin-top: 2px;
+        display: flex;
+        flex-direction: column;
+        align-items: flex-start;
+        margin-bottom: 15px;
+        width: 100%;
+        font-weight: bold;
+    }
+
+    .el-progress {
+        width: 100% !important;
+        display: block;
+    }
+    .header {
+        text-align: center;
+        margin-bottom: 20px;
+    }
+
+    .text-success {
+        color: green; /* ou a cor verde desejada */
+    }
+
+    .text-warning {
+        color: orange; /* ou a cor amarela desejada */
+    }
+
+    .text-danger {
+        color: red; /* ou a cor vermelha desejada */
+    }
+
+    .invite-form {
+        background-color: #000;
+        padding: 20px;
+        border-radius: 8px;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    }
+
+    .birth-date {
+        display: flex;
+        gap: 10px;
+    }
+
+    .submit-button {
+        margin-top: 20px;
+    }
+
+    .custom-dialog .el-dialog__header {
+        text-align: center;
+        font-weight: bold;
+        font-size: 20px;
+    }
+
+    .weak-password {
+        border: 1px solid red;
+        transition: border 0.3s ease-in-out;
+    }
+
+    .strong-password {
+        border: 1px solid green;
+        transition: border 0.3s ease-in-out;
+    }
+
+    .dialog-footer .el-button {
+        background-color: #EF5924 !important;
+    }
+
+    .custom-button {
+        background-color: #EF5924;
+        border-color: #EF5924;
+        color: #EF5924;
+        width: 100%;
+        transition: background-color 0.3s ease;
+    }
+
+    .dialog-content {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        margin-top: 10px;
+        margin-bottom: 10px;
+        text-align: center;
+        font-family: Marine;
+    }
+
+    .warning-icon {
+        font-size: 48px;
+        margin-bottom: 10px;
+    }
+
+    .el-dialog__body{
+        padding-bottom: 0px;
+        padding-top: 10px;
+    }
+
+    .dialog-message {
+        font-size: 16px;
+        color: #606266;
+        margin: 0;
+        line-height: 1.5;
+    }
+
+    .dialog-footer {
+        text-align: center;
+    }
+
+    .dialog-footer .el-button {
+        background-color: #f56c6c;
+        border-color: #f56c6c;
+        color: white;
+        width: 100%;
+    }
+
+    .dialog-footer .el-button:hover {
+        background-color: #d9534f;
+        border-color: #d43f3a;
+    }
+
+    .custom-dialog {
+        text-align: center;
+    }
+
+    .icon-container {
+        margin-bottom: 20px;
+    }
+
+    .dialog-content p {
+        font-size: 16px;
+        line-height: 1.6;
+        color: #000000;
+    }
+
+    .dialog-footer {
+        margin-top: 20px;
+    }
+
+    .custom-button {
+        width: 100%;
+        border-radius: 8px;
+    }
+
+    @media (max-width: 600px) {
+        .invite-form {
+            padding: 15px;
+            
+        }
+
+        .birth-date {
+            flex-direction: column;
+        }
+
+        .submit-button {
+            margin-top: 10px;
+        }
+    }
+</style>

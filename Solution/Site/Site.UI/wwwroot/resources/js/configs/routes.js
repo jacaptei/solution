@@ -13,6 +13,7 @@ const Login = httpVueLoader(getVersionedUrl("/pages/account/Index.htm"));
 const Home = httpVueLoader(getVersionedUrl("/pages/Home.htm"));
 const Busca = httpVueLoader(getVersionedUrl("/pages/Busca.htm"));
 const Imovel = httpVueLoader(getVersionedUrl("/pages/Imovel.htm"));
+const Convite = httpVueLoader(getVersionedUrl("/pages/Convite.htm"));
 const Parceiros = httpVueLoader(getVersionedUrl("/pages/Parceiros.htm"));
 const Proprietarios = httpVueLoader(getVersionedUrl("/pages/Proprietarios.htm"));
 const Jaindiquei = httpVueLoader(getVersionedUrl("/pages/Jaindiquei.htm"));
@@ -21,6 +22,7 @@ const Ajuda = httpVueLoader(getVersionedUrl("/pages/Ajuda.htm"));
 const Confirma = httpVueLoader(getVersionedUrl("/pages/Confirma.htm"));
 const Senha = httpVueLoader(getVersionedUrl("/pages/Senha.htm"));
 const Perfil = httpVueLoader(getVersionedUrl("/pages/Perfil.htm"));
+const Conta = httpVueLoader(getVersionedUrl("/pages/GerenciarConta.htm"));
 const Admin = httpVueLoader(getVersionedUrl("/pages/Admin.htm"));
 const TermosPolitica = httpVueLoader(getVersionedUrl("/pages/TermosPolitica.htm"));
 const Tests = httpVueLoader(getVersionedUrl("/pages/tests/Tests.htm"));
@@ -34,6 +36,7 @@ const routes = [
     { name: "termos-e-politicas", path: "/termos-e-politicas", component: TermosPolitica, meta: { area: "TERMOS", label: "TERMOS E POLITICAS", menuIndex: "00-00-00-00", keypath: "00-00-00-00" } },
     { name: "busca", path: "/busca", component: Busca, meta: { area: "BUSCA", label: "BUSCAR", menuIndex: "02-00-00-00", keypath: "02-00-00-00" } },
     { name: "imovel", path: "/imovel", component: Imovel, meta: { area: "IMOVEL", label: "IMÓVEL", menuIndex: "02-00-00-00", keypath: "02-00-00-00" } },
+    { name: "convite", path: "/convite", component: Convite, meta: { area: "CONVITE", label: "CONVITE", menuIndex: "01-00-00-00", keypath: "01-00-00-00" } },
     { name: "building", path: "/building", component: Imovel, meta: { area: "IMOVEL", label: "IMÓVEL", menuIndex: "02-00-00-00", keypath: "02-00-00-00" } },
     { name: "proprietarios", path: "/proprietarios", component: Proprietarios, meta: { area: "PROPRIETARIOS", label: "PROPRIETÁRIOS", menuIndex: "03-00-00-00", keypath: "03-00-00-00" } },
     { name: "parceiros", path: "/parceiros", component: Parceiros, meta: { area: "PARCEIROS", label: "PARCEIROS", menuIndex: "04-00-00-00", keypath: "04-00-00-00" } },
@@ -44,6 +47,7 @@ const routes = [
     { name: "confirma", path: "/confirma", component: Confirma, meta: { area: "CONFIRMA", label: "CONFIRMA", menuIndex: "01-00-00-00", keypath: "01-00-00-00" } },
     { name: "senha", path: "/senha", component: Senha, meta: { area: "SENHA", label: "SENHA", menuIndex: "01-00-00-00", keypath: "01-00-00-00" } },
     { name: "perfil", path: "/perfil", component: Perfil, meta: { area: "PERFIL", label: "PERFIL", menuIndex: "01-00-00-00", keypath: "01-00-00-00" } },
+    { name: "conta", path: "/conta", component: Conta, meta: { area: "CONTA", label: "GERENCIAR CONTAS", menuIndex: "01-00-00-00", keypath: "01-00-00-00" } },
     { name: "tests", path: "/tests", component: Tests, meta: { area: "TESTS", menuIndex: "----", keypath: "----" } },
     { name: "manutencao", path: "/manutencao", component: Manutencao, meta: { area: "MANUTENCAO", label: "MANUTENÇÃO", menuIndex: "00-00-00-00", keypath: "00-00-00-00" } },
     { name: "", path: "/:notFound", component: Notfound, meta: { area: "404", label: "PÁGINA INEXISTENTE", menuIndex: "00-00-00-00", keypath: "00-00-00-00" } },

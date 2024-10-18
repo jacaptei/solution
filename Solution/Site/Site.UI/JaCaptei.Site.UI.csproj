@@ -15,6 +15,10 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Content Remove="wwwroot\pages\tests\GerenciarConta.html" />
+  </ItemGroup>
+
+  <ItemGroup>
     <PackageReference Include="MailKit" Version="4.3.0" />
     <PackageReference Include="Microsoft.AspNetCore.SpaServices" Version="3.1.32" />
     <PackageReference Include="Microsoft.AspNetCore.StaticFilesEx" Version="1.0.0.4" />

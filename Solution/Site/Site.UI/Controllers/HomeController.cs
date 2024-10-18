@@ -13,28 +13,16 @@ namespace UI.Controllers {
             _logger = logger;
         }
 
-        //[Route("")]
-        //[Route("/")]
-        //[Route("home")]
-        //[Route("busca")]
-        //[Route("proprietarios")]
-        //[Route("parceiros")]
-        //[Route("perfil")]
-        //[Route("sobre")]
-        //[Route("ajuda")]
-        //public IActionResult Index() {
-        //    return View();
-        //}
-
-
         [Route("")]
         [Route("home")]
         [Route("busca")]
         [Route("proprietarios")]
         [Route("parceiros")]
         [Route("perfil")]
+        [Route("conta")]
         [Route("sobre")]
         [Route("ajuda")]
+        [Route("convite")]
         [Route("imovel")]
         [Route("jaindiquei")]
         [Route("confirma")]

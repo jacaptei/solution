@@ -1,6 +1,4 @@
 <template>
-
-
     <div>
         <div style="margin-top:40px;text-align:center;width:100%">
             <div class="form-area" id="form-area" style="background:var(--s-accent-color);min-height:540px">
@@ -148,19 +146,19 @@
                                     </el-select>
                                 </el-col>
                                 <!--<el-col :sm="12"  :md="6"  :lg="8" class="s-input">
-                        <div><p>CRECI - CIDADE</p><span></span></div>
-                        <div style="height:40px" v-if="carregandoCidadesCreci">
-                            <c-loading size="30px" style="padding-left:5px"></c-loading>
-                        </div>
-                        <el-select v-else v-model="$root.usuario.creciCidade" filterable class="m-4" placeholder="Selecionar" size="large" style="width:100%" @click="()=>{ if($validator.not($root.usuario.creciEstado)){ $tools.Alert('Selecione um <b>Estado</b> antes');} }" @change="(item)=>{$root.usuario.creciCidade = item.label;enableFilterButton = true;}">
-                                <el-option
-                                    v-for="item in opcoes.cidadesCreci"
-                                    :key="item.id"
-                                    :label="item.label"
-                                    :value="item"
-                                ></el-option>
-                        </el-select>
-        </el-col>-->
+                                                <div><p>CRECI - CIDADE</p><span></span></div>
+                                                <div style="height:40px" v-if="carregandoCidadesCreci">
+                                                    <c-loading size="30px" style="padding-left:5px"></c-loading>
+                                                </div>
+                                                <el-select v-else v-model="$root.usuario.creciCidade" filterable class="m-4" placeholder="Selecionar" size="large" style="width:100%" @click="()=>{ if($validator.not($root.usuario.creciEstado)){ $tools.Alert('Selecione um <b>Estado</b> antes');} }" @change="(item)=>{$root.usuario.creciCidade = item.label;enableFilterButton = true;}">
+                                                        <el-option
+                                                            v-for="item in opcoes.cidadesCreci"
+                                                            :key="item.id"
+                                                            :label="item.label"
+                                                            :value="item"
+                                                        ></el-option>
+                                                </el-select>
+                                </el-col>-->
 
                                 <el-col :xs="24" :sm="12" :md="8" :lg="10" class="s-input">
                                     <div><p>CEP</p><span></span></div>
@@ -266,7 +264,7 @@
 
                         </el-col>
 
-                        </div>
+                    </div>
 
 
                 </div>
@@ -358,7 +356,7 @@
                 viewLast: "form",
                 messageSuccess: "Cadastrado!",
                 messageAlert: "",
-                contaNova:true,
+                contaNova: true,
                 messageFail: "Não foi possível autenticar, favor tentar novamente.",
                 content: "",
                 DiaNascimento: 0,
@@ -371,9 +369,9 @@
                 carregandoBairros: false,
                 carregandoEstadosCreci: false,
                 carregandoCidadesCreci: false,
-                estadoSelecionado:{},
-                cidadeSelecionada:{},
-                bairroSelecionado:{},
+                estadoSelecionado: {},
+                cidadeSelecionada: {},
+                bairroSelecionado: {},
                 cep: {
                     numero: "",
                     estado: "",
@@ -382,8 +380,8 @@
                 },
                 opcoes: {
                     cidades: [],
-                    estados:        this.$root.localidade.estados,
-                    estadosCreci:   this.$root.localidade.estados,
+                    estados: this.$root.localidade.estados,
+                    estadosCreci: this.$root.localidade.estados,
                     //estados:        this.$root.localidade.estados,
                     //estadosCreci:   this.$root.localidade.estados,
                     cidadesCreci: [],
@@ -395,7 +393,7 @@
 
         },
 
-        props: { },
+        props: {},
         watch: {
         },
         created: function () {
@@ -408,18 +406,18 @@
             this.$root.usuario.tipo = this.tipo;
             //c2("idTipo",this.$root.usuario.idTipo)
             //c2("tipo",this.$root.usuario.tipo)
-            window.setTimeout(() => { this.$root.usuario.idPlano = 2 } , 1000);
-            
+            window.setTimeout(() => { this.$root.usuario.idPlano = 2 }, 1000);
+
         },
         methods: {
 
 
             MudarTipoPessoa() {
 
-                if(this.$root.usuario.tipoPessoa == "PF")
-                    this.$root.usuario.cnpj="";
+                if (this.$root.usuario.tipoPessoa == "PF")
+                    this.$root.usuario.cnpj = "";
                 else
-                    this.$root.usuario.cpf="";
+                    this.$root.usuario.cpf = "";
 
                 window.setTimeout(() => this.$refs.documento.focus(), 300);
 
@@ -427,8 +425,8 @@
 
 
             MudarConta() {
-                this.$root.usuario.tokenConta="";
-                if(!this.contaNova)
+                this.$root.usuario.tokenConta = "";
+                if (!this.contaNova)
                     window.setTimeout(() => this.$refs.token.focus(), 300);
             },
 
@@ -453,15 +451,15 @@
 
                 window.setTimeout(() => {
 
-                        if (this.$root.usuario.tipoPessoa == "PF") {
-                            if (this.$validator.is(this.$root.usuario.cpf) && !this.$validator.IsCPF(this.$root.usuario.cpf))
-                                this.$tools.Alert("CPF inválido");
-                        }
-                        else {
-                            if (this.$validator.is(this.$root.usuario.cnpj) && !this.$validator.IsCNPJ(this.$root.usuario.cnpj))
-                                this.$tools.Alert("CNPJ inválido");
-                        }
-                },500);
+                    if (this.$root.usuario.tipoPessoa == "PF") {
+                        if (this.$validator.is(this.$root.usuario.cpf) && !this.$validator.IsCPF(this.$root.usuario.cpf))
+                            this.$tools.Alert("CPF inválido");
+                    }
+                    else {
+                        if (this.$validator.is(this.$root.usuario.cnpj) && !this.$validator.IsCNPJ(this.$root.usuario.cnpj))
+                            this.$tools.Alert("CNPJ inválido");
+                    }
+                }, 500);
 
 
             },
@@ -469,24 +467,24 @@
 
                 if (this.cep.numero !== this.$root.usuario.cep) {
 
-                    this.carregandoCEP      = true;
-                    this.carregandoEstados  = true;
-                    this.carregandoCidades  = true;
-                    this.carregandoBairros  = true;
+                    this.carregandoCEP = true;
+                    this.carregandoEstados = true;
+                    this.carregandoCidades = true;
+                    this.carregandoBairros = true;
 
-                    this.cep.cidade         = this.$root.usuario.cidade     = "";
-                    this.cep.logradouro     = this.$root.usuario.logradouro = "";
-                    this.cep.bairro         = this.$root.usuario.bairro     = "";
-                    this.cep.estado         = this.$root.usuario.estado     = "";
+                    this.cep.cidade = this.$root.usuario.cidade = "";
+                    this.cep.logradouro = this.$root.usuario.logradouro = "";
+                    this.cep.bairro = this.$root.usuario.bairro = "";
+                    this.cep.estado = this.$root.usuario.estado = "";
 
-                    this.$root.usuario.cep  = this.cep.numero;
-                    let res                 = await this.$sdata.BuscarEndereco(this.cep.numero);
+                    this.$root.usuario.cep = this.cep.numero;
+                    let res = await this.$sdata.BuscarEndereco(this.cep.numero);
 
                     if (this.$validator.is(res?.city)) {
-                        this.cep.cidade         = this.$root.usuario.cidade     = res.city;
-                        this.cep.logradouro     = this.$root.usuario.logradouro = res.address;
-                        this.cep.bairro         = this.$root.usuario.bairro     = res.neighborhood;
-                        this.cep.estado         = this.$root.usuario.estado     = res.state;
+                        this.cep.cidade = this.$root.usuario.cidade = res.city;
+                        this.cep.logradouro = this.$root.usuario.logradouro = res.address;
+                        this.cep.bairro = this.$root.usuario.bairro = res.neighborhood;
+                        this.cep.estado = this.$root.usuario.estado = res.state;
 
                         //this.estadoSelecionado  = this.opcoes.estados.filter((e)=> e.value == res.state)[0];
                         //this.cidadeSelecionada  = this.opcoes.estados.filter((e)=> e.value == res.state)[0];
@@ -497,10 +495,10 @@
                         //c2("cep",this.cep)
                     }
 
-                    this.carregandoCEP      = false;
-                    this.carregandoEstados  = false;
-                    this.carregandoCidades  = false;
-                    this.carregandoBairros  = false;
+                    this.carregandoCEP = false;
+                    this.carregandoEstados = false;
+                    this.carregandoCidades = false;
+                    this.carregandoBairros = false;
                 }
             },
 
@@ -509,15 +507,15 @@
 
             ObterCidades(estado) {
 
-                this.$root.usuario.cidade   =   this.$root.usuario.bairro   = "";
-                this.cidadeSelecionada      =   this.bairroSelecionado      = {};
+                this.$root.usuario.cidade = this.$root.usuario.bairro = "";
+                this.cidadeSelecionada = this.bairroSelecionado = {};
 
                 this.carregandoCidades = true;
                 this.opcoes.bairros = [];
                 this.opcoes.cidades = [];
                 var cidades = [];
 
-                c2("estado",estado)
+                c2("estado", estado)
                 if (this.$validator.is(estado)) {
 
                     var idEstado = this.opcoes.estados.filter((e) => e.uf == estado)[0].id;
@@ -525,10 +523,10 @@
 
                     axios.get(url).then((request) => {
                         if (request.data) {
-                                request.data.result.forEach((item, index) => {
-                                    cidades.push({ id: item.id, value: item.nome, label: item.label });
-                                });
-                                this.opcoes.cidades = cidades;
+                            request.data.result.forEach((item, index) => {
+                                cidades.push({ id: item.id, value: item.nome, label: item.label });
+                            });
+                            this.opcoes.cidades = cidades;
                         }
                     }).catch((error) => {
                         ce(error);
@@ -546,13 +544,13 @@
 
             ObterBairros(cidade) {
 
-                var idCidade = this.opcoes.cidades.filter((c)=>c.value == cidade)[0].id;
+                var idCidade = this.opcoes.cidades.filter((c) => c.value == cidade)[0].id;
 
-                this.$root.usuario.bairro   = "";
-                this.bairroSelecionado      = {};
+                this.$root.usuario.bairro = "";
+                this.bairroSelecionado = {};
 
                 //this.$root.usuario.cidade = cidade.label;
-                
+
                 this.carregandoBairros = true;
                 this.opcoes.bairros = [];
                 var bairros = [];
@@ -758,25 +756,8 @@
                     //	}).finally(() => {
 
                     //	});
-
-
-
-
-
-
                 }
             },
-
-
-
-
-
-
-
-
-
-
-
         }
 
     }

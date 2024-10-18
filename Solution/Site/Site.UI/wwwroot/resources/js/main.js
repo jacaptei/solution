@@ -64,7 +64,7 @@ $(document).ready(function () {
                     showTermsAndPolicyModal: false,
                     autoLogin       : false,
                     rememberMe      : false,
-                    onRequest       : false,
+                    onRequest: false,
                     title: {
                         label       : "HOME",
                         icon        : "fa fa-user",
@@ -112,7 +112,6 @@ $(document).ready(function () {
         beforeCreate: function () {
 		},
         created: function () {
-
             this.RestoreSession();
             this.localidade.estados = this.$sdata.forms.states;
 
@@ -270,8 +269,9 @@ $(document).ready(function () {
             window.location.hash.replace("/#", "");
             if (this.$validator.IsSet(tag)) {
                 tag = tag.split("?")[0];
-                if (tag != "imovel")
+                if (tag !== "imovel" && tag !== "convite") {
                     link = this.RouteTo(tag);
+                }
             }
             else
                 this.RouteTo({ name: name, route: link });
@@ -336,7 +336,7 @@ $(document).ready(function () {
                 const url = this.$api.BuildURL("autenticacao/validarautenticacao");
 
                 const validate = async () => {
-                    if (authToken && !this.userSessionIsRevoked) { // Verifica o estado antes de validar
+                    if (authToken && !this.userSessionIsRevoked) {
                         try {
                             const response = await axios.post(url, {}, {
                                 headers: { 'Authorization': `Bearer ${authToken}` }
@@ -346,12 +346,12 @@ $(document).ready(function () {
                             this.userSessionIsRevoked = true;
                             this.clearUserData();
                             console.error('Erro na requisição:', error);
-                            clearInterval(this.validationInterval); // Para o intervalo quando o erro ocorre
+                            clearInterval(this.validationInterval);
                         }
                     } else {
                         console.warn('Token inválido ou sessão revogada.');
                         this.SignOut();
-                        clearInterval(this.validationInterval); // Garante que o intervalo seja limpo
+                        clearInterval(this.validationInterval);
                     }
                 };
 
