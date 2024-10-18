@@ -10,15 +10,15 @@
 
                     <div v-for="(membro, index) in membros" :key="index" class="membro">
                         <div class="avatar-container">
-                            <el-avatar :src="membro.avatar || '../resources/images/icons/Jacaptei.svg'" size="medium" />
+                            <el-avatar :src="membro.avatar || '../resources/images/icons/Jacaptei.svg'"
+                                       size="medium" />
                         </div>
 
                         <div class="membro-info">
                             <p class="membro-nome">{{ membro.nome }}</p>
                             <span v-if="membro.donoConta" class="admin-badge">Admin</span>
                         </div>
-
-                        <el-button type="primary" size="small">View</el-button>
+                        <el-button type="primary" @click="abrirDialog(membro)" class="el-icon--right" :icon="Search">View</el-button>
                     </div>
                 </el-card>
             </el-col>
@@ -63,6 +63,26 @@
                     </div>
                 </el-card>
             </el-col>
+            <!-- Diálogo de Visualização -->
+            <el-dialog v-model="dialogVisible"
+                       title="Detalhes do Membro"
+                       width="500px"
+                       @close="limparDialog">
+                <div v-if="membroSelecionado">
+                    <p><strong>Nome:</strong> {{ membroSelecionado.nome }}</p>
+                    <p>
+                        <strong>Dono da Conta:</strong>
+                        {{ membroSelecionado.donoConta ? 'Sim' : 'Não' }}
+                    </p>
+                    <p><strong>Avatar:</strong></p>
+                    <el-avatar :src="membroSelecionado.avatar || '../resources/images/icons/Jacaptei.svg'"
+                               size="large" />
+                </div>
+
+                <span slot="footer" class="dialog-footer">
+                    <el-button @click="dialogVisible = false">Fechar</el-button>
+                </span>
+            </el-dialog>
         </el-row>
     </div>
 </template>
@@ -75,6 +95,8 @@
                 membros: [],
                 limiteUsuarios: 0,
                 idConta: "",
+                dialogVisible: false,
+                membroSelecionado: null,
             };
         },
         async created() {
@@ -103,7 +125,6 @@
                     if (response.data && response.data.result) {
                         const conta = response.data.result;
                         this.membros = (conta || []).sort((a, b) => b.donoConta - a.donoConta);
-                        console.log(this.membros[0].limiteUsuarios);
                         this.limiteUsuarios = this.membros[0].limiteUsuarios;
                     } else {
                         this.membros = [];
@@ -114,9 +135,18 @@
                 }
             },
 
+            abrirDialog(membro) {
+                this.membroSelecionado = membro; // Define o membro clicado
+                this.dialogVisible = true; // Abre o diálogo
+            },
+
+            limparDialog() {
+                this.membroSelecionado = null; // Limpa os dados ao fechar o diálogo
+            },
+
             async gerarLinkConvite() {
                 if (!this.permiteMaisCadastro) {
-                    this.$message.error('Limite de usuários atingido!');
+                    this.$message.error('Limite de usuários atingido não sendo possivel gerar o convite!');
                     return;
                 }
 
@@ -161,7 +191,7 @@
                     ? this.linkConvite
                     : `https://${this.linkConvite}`;
 
-                const message = encodeURIComponent(`Olá! Confira este link: ${linkConviteFormatted}`);
+                const message = encodeURIComponent(`Olá! Acesse esse link e faça seu cadastro: ${linkConviteFormatted}`);
                 const whatsappUrl = `https://wa.me/?text=${message}`;
 
                 window.open(whatsappUrl, '_blank');
@@ -173,7 +203,7 @@
                     : `https://${this.linkConvite}`;
 
                 const subject = encodeURIComponent("Convite para se juntar");
-                const body = encodeURIComponent(`Olá! Confira este link: ${linkConviteFormatted}`);
+                const body = encodeURIComponent(`Olá! Acesse esse link e faça seu cadastro: ${linkConviteFormatted}`);
                 const mailtoUrl = `mailto:?subject=${subject}&body=${body}`;
                 window.open(mailtoUrl, '_blank');
             }
@@ -198,6 +228,14 @@
     .membro-info {
         flex-grow: 1;
         margin-left: 10px;
+    }
+
+    .el-button {
+        transition: none !important;
+    }
+
+    .el-button:hover {
+        box-shadow: none !important;
     }
 
     .membro-nome {
