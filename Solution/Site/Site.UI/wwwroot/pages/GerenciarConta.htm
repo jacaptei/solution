@@ -58,11 +58,11 @@
                     </div>
                     <el-divider></el-divider>
                     <div class="invite-button-container">
-                        <el-button type="success" @click="abrirWhatsapp" class="social-button">
+                        <el-button type="success" :disabled="!permiteMaisCadastro" @click="abrirWhatsapp" class="social-button">
                             <img src="../resources/images/icons/whatsapp.svg" alt="WhatsApp" class="social-icon" />
                             WhatsApp
                         </el-button>
-                        <el-button type="medium" @click="abrirEmail" class="social-button">
+                        <el-button type="medium" :disabled="!permiteMaisCadastro" @click="abrirEmail" class="social-button">
                             <img src="../resources/images/icons/email.svg" alt="email" class="social-icon" />
                             E-mail
                         </el-button>
@@ -84,7 +84,6 @@
                     <el-avatar :src="membroSelecionado.avatar || '../resources/images/icons/Jacaptei.svg'"
                                size="large" />
                 </div>
-
                 <span slot="footer" class="dialog-footer">
                     <el-button @click="dialogVisible = false">Fechar</el-button>
                 </span>
