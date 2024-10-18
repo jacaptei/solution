@@ -1,61 +1,64 @@
 ﻿<template>
-    <el-row :gutter="20" style="margin: 10px">
-        <el-col :span="12">
-            <el-card shadow="hover" class="card membros-card">
-                <h3>Membros do Plano</h3>
-                <p>{{ membros.length }} de {{ limiteUsuarios }} parceiros cadastrados</p>
+    <div>
+        <el-row :gutter="20" style="margin: 10px">
+            <el-col :span="12">
+                <el-card shadow="hover" class="card membros-card">
+                    <h3>Membros do Plano</h3>
+                    <p>{{ membros.length }} de {{ limiteUsuarios }} parceiros cadastrados</p>
 
-                <el-divider></el-divider>
+                    <el-divider></el-divider>
 
-                <div v-for="(membro, index) in membros" :key="index" class="membro">
-                    <div class="avatar-container">
-                        <el-avatar :src="membro.avatar || 'https://cube.elemecdn.com/0/88/03b0d39583f48206768a7534e55bcpng.png'" size="medium" />
+                    <div v-for="(membro, index) in membros" :key="index" class="membro">
+                        <div class="avatar-container">
+                            <el-avatar :src="membro.avatar || '../resources/images/icons/Jacaptei.svg'" size="medium" />
+                        </div>
+
+                        <div class="membro-info">
+                            <p class="membro-nome">{{ membro.nome }}</p>
+                            <span v-if="membro.donoConta" class="admin-badge">Admin</span>
+                        </div>
+
+                        <el-button type="primary" size="small">View</el-button>
                     </div>
+                </el-card>
+            </el-col>
 
-                    <div class="membro-info">
-                        <p class="membro-nome">{{ membro.nome }}</p>
-                        <span v-if="membro.donoConta" class="admin-badge">Admin</span>
+            <el-col :span="12">
+                <el-card shadow="hover" class="invite-card">
+                    <h5><strong>Envie um convite para um colaborador da sua imobiliária se juntar ao time!</strong></h5>
+                    <p class="invite-description">
+                        Para convidar alguém, envie o link abaixo ou crie um convite usando um serviço de mensagem ou e-mail.
+                    </p>
+                    <div class="invite-input-container">
+                        <el-input v-model="linkConvite"
+                                  readonly
+                                  placeholder="Seu link de convite aqui"
+                                  class="link-input" disabled="true"
+                                  @click="copiarLinkDeConvite" >
+                            <template #prefix>
+                                <img src="../resources/images/icons/link.svg"
+                                     alt="linkAccount"
+                                     class="link-icon"
+                                     @click="copiarLinkDeConvite" />
+                            </template>
+                        </el-input>
+                        <el-button type="primary" @click="gerarLinkConvite" class="generate-button">Gerar Link de Convite</el-button>
                     </div>
-
-                    <el-button type="primary" size="small">View</el-button>
-                </div>
-            </el-card>
-        </el-col>
-
-        <el-col :span="12">
-            <el-card shadow="hover" class="invite-card">
-                <h5><strong>Envie um convite para um colaborador da sua imobiliária se juntar ao time!</strong></h5>
-                <p class="invite-description">
-                    Para convidar alguém, envie o link abaixo ou crie um convite usando um serviço de mensagem ou e-mail.
-                </p>
-                <div class="invite-input-container">
-                    <el-input v-model="linkConvite"
-                              readonly
-                              placeholder="Seu link de convite aqui"
-                              class="link-input" disabled="true">
-                        <template #prefix>
-                            <img src="../resources/images/icons/link.svg"
-                                 alt="linkAccount"
-                                 class="link-icon"
-                                 @click="copiarLinkDeConvite" />
-                        </template>
-                    </el-input>
-                    <el-button type="primary" @click="gerarLinkConvite" class="generate-button">Gerar Link de Convite</el-button>
-                </div>
-                <el-divider></el-divider>
-                <div class="invite-button-container">
-                    <el-button type="success" @click="abrirWhatsapp" class="social-button">
-                        <img src="../resources/images/icons/whatsapp.svg" alt="WhatsApp" class="social-icon" />
-                        WhatsApp
-                    </el-button>
-                    <el-button type="medium" @click="abrirEmail" class="social-button">
-                        <img src="../resources/images/icons/email.svg" alt="email" class="social-icon" />
-                        E-mail
-                    </el-button>
-                </div>
-            </el-card>
-        </el-col>
-    </el-row>
+                    <el-divider></el-divider>
+                    <div class="invite-button-container">
+                        <el-button type="success" @click="abrirWhatsapp" class="social-button">
+                            <img src="../resources/images/icons/whatsapp.svg" alt="WhatsApp" class="social-icon" />
+                            WhatsApp
+                        </el-button>
+                        <el-button type="medium" @click="abrirEmail" class="social-button">
+                            <img src="../resources/images/icons/email.svg" alt="email" class="social-icon" />
+                            E-mail
+                        </el-button>
+                    </div>
+                </el-card>
+            </el-col>
+        </el-row>
+    </div>
 </template>
 
 <script>
@@ -64,8 +67,11 @@
             return {
                 linkConvite: "",
                 membros: [],
-                limiteUsuarios: 6,
+                limiteUsuarios: 0,
+                idConta: "",
             };
+        },
+        async created() {
         },
         mounted() {
             this.obterUsuariosConta();
@@ -77,7 +83,10 @@
                 axios.get(url)
                     .then((request) => {
                         if (request.data && request.data.result) {
-                            this.membros = request.data.result;
+                            const conta = request.data.result;
+                            this.membros = (conta || []).sort((a, b) => b.donoConta - a.donoConta);
+                            console.log(this.membros[0].limiteUsuarios);
+                            this.limiteUsuarios = this.membros[0].limiteUsuarios;
                         } else {
                             this.membros = [];
                         }
@@ -92,7 +101,7 @@
             },
             async gerarLinkConvite() {
                 try {
-                    const url = this.$api.BuildURL(`parceiro/gerar-token?idConta=${this.$root.usuario.idConta}`);
+                    const url = this.$api.BuildURL(`parceiro/gerar-token?idConta=${this.$root.usuario.idConta}&tokenConta=${this.$root.usuario.tokenConta}`);
                     const response = await axios.get(url);
                     const { result } = response.data.result;
                     if (result) {
@@ -255,5 +264,11 @@
         padding: 2px 8px;
         border-radius: 12px;
         font-size: 0.8rem;
+    }
+
+    .el-avatar {
+        background-color: transparent !important;
+        border: none;
+        box-shadow: none;
     }
 </style>

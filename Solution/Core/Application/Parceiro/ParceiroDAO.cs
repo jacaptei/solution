@@ -11,6 +11,7 @@ using Npgsql;
 using Newtonsoft.Json;
 using RepoDb.Enumerations;
 using System.Transactions;
+using static System.Net.Mime.MediaTypeNames;
 
 namespace JaCaptei.Application
 {
@@ -904,6 +905,35 @@ namespace JaCaptei.Application
             return appReturn;
         }
 
+        public AppReturn VerificarLimiteUsuariosConta(string tokenConta)
+        {
+            var appReturn = new AppReturn();
+            try
+            {
+                using (var conn = new DBcontext().GetConn())
+                {
+                    var conta = conn.Query<Conta>(e => e.token == tokenConta).FirstOrDefault();
+
+                    if (conta != null && conta.id > 0)
+                    {
+                        if (conta.totalUsuarios >= conta.limiteUsuarios)
+                        {
+                            appReturn.AddException("Esta conta não contempla mais usuários.");
+                        }
+                    }
+                    else
+                    {
+                        appReturn.AddException("Token da conta não encontrado ou inválido (solicite o token da conta com o dono da mesma).");
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                appReturn.AddException("Ocorreu um erro ao verificar o limite de usuários: " + ex.Message);
+            }
+            return appReturn;
+        }
+
         public Parceiro ObterPorId(int id)
         {
 
@@ -954,7 +984,7 @@ namespace JaCaptei.Application
             }
         }
 
-        public bool ValidarToken(string token)
+        public bool ValidarTokenParaCadastro(string token)
         {
             if (string.IsNullOrWhiteSpace(token))
             {
@@ -973,6 +1003,25 @@ namespace JaCaptei.Application
             }
 
             return entityDB.tokenConvite == token;
+        }
+        public Conta ValidarGeracaoToken(string token)
+        {
+            if (string.IsNullOrWhiteSpace(token))
+            {
+                return null;
+            }
+
+            using (var conn = new DBcontext().GetConn())
+            {
+                var entityDB = conn.Query<Conta>(e => e.token == token).FirstOrDefault();
+
+                
+                if (entityDB == null || entityDB.tokenExpiraEm < DateTime.UtcNow)
+                {
+                    return null;
+                }
+                return entityDB;
+            }
         }
 
         public List<ContaId> ObterContaPorId(int idConta)
