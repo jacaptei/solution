@@ -393,6 +393,8 @@
                     this.results    = [];
                     this.resultsAll = [];
                     this.parceiros  = [];
+                    this.parceiros.push({id:0,value:"EXIBIR TODOS",label:"EXIBIR TODOS"});
+		            this.parceiros.push({id:this.$root.usuario.id,label:"MINHAS",value:"MINHAS"});
 
                     this.view = "request";
 
@@ -437,16 +439,12 @@
                             this.results.push(i);
 
                             if(this.parceiros.length == 0 || this.parceiros.filter((item)=>item.id == i.parceiro.id).length == 0){
-                              if(i.parceiro.id == this.$root.usuario.id)
-                                this.parceiros.unshift({id:i.parceiro.id,label:"MINHAS",value:"MINHAS"});
-                              else
-                                this.parceiros.push({id:i.parceiro.id,label:i.parceiro.nome,value:i.parceiro.apelido});
+                              if(i.parceiro.id != this.$root.usuario.id)
+                                    this.parceiros.push({id:i.parceiro.id,label:i.parceiro.nome,value:i.parceiro.apelido});
                             }
-
 
                         });
 
-                        this.parceiros.unshift(this.parceiroSelecionado);
 
                         this.view = "success";
                         //c(request);

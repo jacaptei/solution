@@ -16,20 +16,28 @@
                             </span>
                             <span class="text-h10">
                                 <span style="float:right">
-                                    Verificando inserida em
-                                    <span style="font-weight:300;font-size:15px;padding-right:20px">
-                                        {{$tools.FormatDateHour(item.data)}}
+
+                                <span style="font-weight:300;padding-right:20px">
+                                    Solicitado em {{$tools.FormatDateHour(item.data)}}
+                                </span>
+
+                                 <span v-if="item.idStatus < 9">
+                                        <b>Verificando</b>
                                     </span>
-                                    <span style="font-weight:600;font-size:17px">
-                                        <span v-if="item.horas == 0">há {{item.minutos}}min</span>
-                                        <span v-else-if="item.dias == 0">há {{item.horas}}h</span>
-                                        <span v-else-if="item.dias == 1">Ontem às {{$tools.GetHours(item.data)}}h</span>
-                                        <span v-else>Há {{item.dias}} dias</span>
+                                    <span v-else-if="item.idStatus == 9 || item.idStatus == 10">
+                                        <b>Encontrado</b> <i class="fa fa-thumbs-up" style="padding-left:10px"></i>
+                                    </span>
+                                    <span v-else-if="item.idStatus == 11">
+                                        <b>Não encontrado</b> <i class="fa fa-thumbs-down" style="padding-left:10px"></i>
+                                    </span>
+                                    <span v-else>
+                                        <span></span>
                                     </span>
                                     <span style="margin-left:15px;">
                                         <i class="fa fa-caret-down" v-if="item.acaocard != ('abrir-card'+item.id)"></i>
                                         <i class="fa fa-caret-up" v-else></i>
                                     </span>
+
                                 </span>
                             </span>
                         </div>
@@ -107,7 +115,7 @@
 
                                                     </div>
 
-                                                    <!--<div style="margin-top:10px;font-weight:500;color:#000">
+                                                    <div style="margin-top:10px;font-weight:500;color:#000">
                                                         <el-input :value="$validator.is(item.proprietarioCaptacao)? item.proprietarioCaptacao : '' " placeholder="aguardar" readonly input-style="color:#000">
                                                             <template #prepend>
                                                                 <div style="text-transform:uppercase;font-weight:660;width:110px;text-align:right;cursor:pointer;" @click="()=>{item.acao=='abrir-proprietario'?  item.acao='fechar-proprietario' :  item.acao='abrir-proprietario';}">
@@ -121,7 +129,7 @@
                                                                 </div>
                                                             </template>
                                                         </el-input>
-                                                     </div>-->
+                                                     </div>
 
                                                       <div v-if="item.acao=='abrir-proprietario'">
                                                             <q-card>
@@ -313,7 +321,13 @@
 
             },
 
+
             ObterStatusClass(item) {
+
+                return (item.idStatus == 3)? 'bg-yellow-9' : item.idStatus == 5? 'bg-yellow-9' :  item.idStatus == 11? 'bg-red' : 'bg-teal' ;
+
+
+                 /*
                 var classcolor = "";
                 if (item.agendado) {
                     if (item.idStatus == 5)
@@ -346,8 +360,10 @@
                         classcolor = 'bg-orange-9';
                 }
                 return classcolor;
-            },
 
+                */
+
+            },
 
         }
 

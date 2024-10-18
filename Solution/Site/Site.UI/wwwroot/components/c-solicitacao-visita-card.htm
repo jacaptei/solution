@@ -33,16 +33,16 @@
                             <span class="text-h10">
                                 <span style="float:right;">
                                     <span style="font-weight:300;padding-right:20px">
-                                       solicitado em {{$tools.FormatDateHour(item.data)}}
+                                       Solicitado em {{$tools.FormatDateHour(item.data)}}
                                     </span>
                                     <span v-if="item.concluido && !item.visitado" style="padding: 6px; border-radius: 10px; color: #fff;">
-                                            NÃO VISITADO <i class="fa fa-thumbs-down"></i> 
+                                            <b>NÃO VISITADO</b> <i class="fa fa-thumbs-down"></i> 
                                     </span>
                                     <span v-else-if="item.visitado" style="padding: 6px; border-radius: 10px; color: #fff;">
-                                            VISITADO <i class="fa fa-thumbs-up"></i> 
+                                            <b>VISITADO</b> <i class="fa fa-thumbs-up"></i> 
                                     </span>
                                     <span v-else-if="item.idStatus < 9">
-                                       Agendado
+                                       <b>Agendado</b>
                                     </span>
                                     <span v-else>
                                         <span></span>
@@ -483,6 +483,11 @@
             },
 
             ObterStatusClass(item) {
+
+                return (item.idStatus == 3)? 'bg-yellow-9' : item.idStatus == 5? 'bg-yellow-9' :  item.idStatus == 11? 'bg-red' : 'bg-teal' ;
+
+
+                 /*
                 var classcolor = "";
                 if (item.agendado) {
                     if (item.idStatus == 5)
@@ -515,6 +520,9 @@
                         classcolor = 'bg-orange-9';
                 }
                 return classcolor;
+
+                */
+
             },
 
 
