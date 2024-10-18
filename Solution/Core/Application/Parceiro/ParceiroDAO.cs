@@ -41,7 +41,6 @@ namespace JaCaptei.Application
 
         public AppReturn Adicionar(Parceiro entity)
         {
-
             Conta conta = new Conta();
             Plano plano = new Plano();
 
@@ -49,16 +48,16 @@ namespace JaCaptei.Application
             {
                 using (var trans = conn.EnsureOpen().BeginTransaction())
                 {
-
                     try
                     {
                         if (Utils.Validator.Not(entity.tokenConta))
                         {
-
                             plano = conn.Query<Plano>(e => e.id == entity.idPlano).FirstOrDefault();
 
-                            if (plano is null || plano?.id == 0)
+                            if (plano is null || plano.id == 0)
+                            {
                                 appReturn.AddException("Plano não encontrado.");
+                            }
                             else
                             {
                                 entity.donoConta = true;
@@ -77,7 +76,8 @@ namespace JaCaptei.Application
                                 conta.totalUsuarios = 1;
                                 conta.limiteUsuarios = (conta.idPlano == 4) ? 6 : (conta.idPlano == 3) ? 4 : 1;
 
-                                conta.data = conta.dataAtualizacao = Utils.Date.GetLocalDateTime();
+                                conta.data = Utils.Date.GetLocalDateTime();
+                                conta.dataAtualizacao = conta.data;
                                 conta.id = conn.Insert<Conta, int>(conta);
                             }
                         }
@@ -86,10 +86,13 @@ namespace JaCaptei.Application
                             entity.donoConta = false;
                             var tokenConta = Utils.String.RemoveAllSpaces(entity.tokenConta);
                             conta = conn.Query<Conta>(e => e.token == tokenConta).FirstOrDefault();
-                            if (conta is not null && conta?.id > 0)
+
+                            if (conta is not null && conta.id > 0)
                             {
                                 if (conta.totalUsuarios >= conta.limiteUsuarios)
+                                {
                                     appReturn.AddException("Esta conta não contempla mais usuários.");
+                                }
                                 else
                                 {
                                     conta.totalUsuarios += 1;
@@ -98,48 +101,43 @@ namespace JaCaptei.Application
                                 }
                             }
                             else
+                            {
                                 appReturn.AddException("Token da conta não encontrado ou inválido (solicite o token da conta com o dono da mesma).");
+                            }
                         }
 
-                        if (appReturn.status.success)
+                        if (appReturn.status.success && conta.id > 0 && Utils.Validator.Is(conta.token))
                         {
-                            if (conta.id > 0 && Utils.Validator.Is(conta.token))
-                            {
-                                entity.idPlano = conta.idPlano;
-                                entity.idConta = conta.id;
-                                entity.tokenConta = conta.token;
-                                entity.data = entity.dataAtualizacao = conta.data;
-                                entity.id = conn.Insert<Parceiro, int>(entity);
-                                entity.settings.idParceiro = entity.id;
-                                entity.settings.id = conn.Insert<ParceiroSettings, int>(entity.settings);
-                                trans.Commit();
-                            }
-                            else
-                            {
-                                trans.Rollback();
-                                appReturn.SetAsException("Falha ao criar conta");
-                            }
+                            entity.idPlano = conta.idPlano;
+                            entity.idConta = conta.id;
+                            entity.tokenConta = conta.token;
+
+                            entity.data = Utils.Date.GetLocalDateTime();
+                            entity.dataAtualizacao = entity.data;
+
+                            entity.id = conn.Insert<Parceiro, int>(entity);
+                            entity.settings.idParceiro = entity.id;
+                            entity.settings.id = conn.Insert<ParceiroSettings, int>(entity.settings);
+
+                            trans.Commit();
                         }
                         else
                         {
                             trans.Rollback();
-                            //appReturn.SetAsException("Falha ao criar conta");
+                            appReturn.SetAsException("Falha ao criar conta");
                         }
-
                     }
                     catch (Exception ex)
                     {
-                        appReturn.SetAsException("Falha ao inserir", ex);
                         trans.Rollback();
+                        appReturn.SetAsException("Falha ao inserir", ex);
                     }
                 }
             }
-
             entity.RemoverDadosSensiveis();
             appReturn.result = entity;
 
             return appReturn;
-
         }
 
 
