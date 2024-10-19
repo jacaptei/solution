@@ -36,15 +36,15 @@
                             <el-col :xs="24" class="input-form">
                                 <div>DATA DE NASCIMENTO</div>
                                 <div class="birth-date">
-                                    <el-select v-model="DiaNascimento" filterable placeholder="DIA" size="medium">
+                                    <el-select v-model="DiaNascimento" filterable placeholder="DIA" size="medium" :teleported="false">
                                         <el-option v-for="item in $sdata.forms.days" :key="item.value" :label="item.label" :value="item.value"></el-option>
                                     </el-select>
 
-                                    <el-select v-model="MesNascimento" filterable placeholder="MÊS" size="medium">
+                                    <el-select v-model="MesNascimento" filterable placeholder="MÊS" size="medium" :teleported="false">
                                         <el-option v-for="item in $sdata.forms.months" :key="item.value" :label="item.label" :value="item.value"></el-option>
                                     </el-select>
 
-                                    <el-select v-model="AnoNascimento" filterable placeholder="ANO" size="medium">
+                                    <el-select v-model="AnoNascimento" filterable placeholder="ANO" size="medium" :teleported="false">
                                         <el-option v-for="item in $sdata.forms.years" :key="item.value" :label="item.label" :value="item.value"></el-option>
                                     </el-select>
                                 </div>
@@ -52,7 +52,7 @@
 
                             <el-col :xs="24" :sm="24" :md="24" :lg="24" class="input-form">
                                 <div>SEXO <span></span></div>
-                                <el-select filterable v-model="sexo" class="m-4" placeholder="Selecionar" size="large" style="width:100%">
+                                <el-select filterable v-model="sexo" class="m-4" placeholder="Selecionar" size="large" style="width:100%" :teleported="false">
                                     <el-option v-for="item in opcoes.sexos" :key="item.id" :label="item.label" :value="item.value"></el-option>
                                 </el-select>
                             </el-col>
@@ -69,7 +69,7 @@
                                 <div style="height:40px" v-if="carregandoEstadosCreci">
                                     <c-loading size="30px" style="padding-left:5px"></c-loading>
                                 </div>
-                                <el-select v-else filterable v-model="creciEstado" class="m-4" placeholder="Selecionar" size="large" style="width:100%" @change="(item)=>{enableFilterButton = true;}">
+                                <el-select v-else filterable :teleported="false" v-model="creciEstado" class="m-4" placeholder="Selecionar" size="large" style="width:100%" @change="(item)=>{enableFilterButton = true;}">
                                     <el-option v-for="item in opcoes.estadosCreci" :key="item.id" :label="item.label" :value="item.uf"></el-option>
                                 </el-select>
                             </el-col>
