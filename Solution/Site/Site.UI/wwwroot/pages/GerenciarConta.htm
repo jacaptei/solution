@@ -1,93 +1,66 @@
 ﻿<template>
-    <div>
-        <el-row :gutter="20" style="margin: 10px">
-            <el-col :span="12">
-                <el-card shadow="hover" class="card membros-card">
-                        <h3>Membros do Plano</h3>
-                        <p>{{ membros.length }} de {{ limiteUsuarios }} parceiros cadastrados</p>
+    <div class="layout-container">
+        <el-row :gutter="20" style="margin: 10px; flex-wrap: wrap;">
+            <el-col :xs="24" :sm="24" :md="12" :lg="12"
+                    :span="12"
+                    class="col-responsive membros-card-container">
+                <el-card shadow="hover" class="membros-card">
+                    <h3>Membros do Plano</h3>
+                    <p>{{ membros.length }} de {{ limiteUsuarios }} parceiros cadastrados</p>
+                    <el-divider style="margin-bottom: 10px"></el-divider>
 
-                        <el-divider style="margin-bottom: 10px"></el-divider>
-
-                        <el-scrollbar height="430px">
-                            <div style="padding: 10px">
-                                <div v-for="(membro, index) in membros" :key="index" class="membro">
-                                    <div class="avatar-container">
-                                        <el-avatar :src="membro.avatar || '../resources/images/icons/Jacaptei.svg'"
-                                                   size="medium" />
-                                    </div>
-
-                                    <div class="membro-info">
-                                        <p class="membro-nome">{{ membro.nome }}</p>
-                                        <span v-if="membro.donoConta" class="admin-badge">Gestor</span>
-                                    </div>
-                                    <!--<el-button @click="abrirDialog(membro)" type="primary" >
-                                        Informações<el-icon class="el-icon--right"><Edit /></el-icon>
-                                    </el-button>-->
+                    <el-scrollbar height="430px">
+                        <div style="padding: 10px">
+                            <div v-for="(membro, index) in membros" :key="index" class="membro">
+                                <div class="avatar-container">
+                                    <el-avatar :src="membro.avatar || '../resources/images/icons/Jacaptei.svg'"
+                                               size="medium" />
+                                </div>
+                                <div class="membro-info">
+                                    <p class="membro-nome">{{ membro.nome }}</p>
+                                    <span v-if="membro.donoConta" class="admin-badge">Gestor</span>
                                 </div>
                             </div>
-                        </el-scrollbar>
+                        </div>
+                    </el-scrollbar>
                 </el-card>
             </el-col>
 
-            <el-col :span="12">
+            <el-col :xs="24" :sm="24" :md="12" :lg="12"
+                    :span="12"
+                    class="col-responsive invite-card-container">
                 <el-card shadow="hover" class="invite-card">
                     <h5><strong>Envie um convite para um colaborador da sua imobiliária se juntar ao time!</strong></h5>
                     <p class="invite-description">
                         Para convidar alguém, envie o link abaixo ou crie um convite usando um serviço de mensagem ou e-mail.
                     </p>
                     <div class="invite-input-container">
-                        <el-input v-model="linkConvite"
-                                  readonly
-                                  placeholder="Seu link de convite aqui"
-                                  class="link-input"
-                                  :disabled="!permiteMaisCadastro"
-                                  @click="copiarLinkDeConvite">
+                        <el-input v-model="linkConvite" readonly placeholder="Seu link de convite aqui"
+                                  class="link-input" :disabled="!permiteMaisCadastro" @click="copiarLinkDeConvite">
                             <template #prefix>
-                                <img src="../resources/images/icons/link.svg"
-                                     alt="linkAccount"
-                                     class="link-icon"
-                                     @click="copiarLinkDeConvite" />
+                                <img src="../resources/images/icons/link.svg" alt="linkAccount" class="link-icon" />
                             </template>
                         </el-input>
-                        <el-button type="primary"
-                                   :disabled="!permiteMaisCadastro"
-                                   @click="gerarLinkConvite"
-                                   class="generate-button">
+                        <el-button type="primary" :disabled="!permiteMaisCadastro"
+                                   @click="gerarLinkConvite" class="generate-button">
                             Gerar Link de Convite
                         </el-button>
                     </div>
                     <el-divider></el-divider>
                     <div class="invite-button-container">
-                        <el-button type="success" :disabled="!permiteMaisCadastro" @click="abrirWhatsapp" class="social-button">
+                        <el-button type="success" :disabled="!permiteMaisCadastro"
+                                   @click="abrirWhatsapp" class="social-button">
                             <img src="../resources/images/icons/whatsapp.svg" alt="WhatsApp" class="social-icon" />
                             WhatsApp
                         </el-button>
-                        <el-button type="medium" :disabled="!permiteMaisCadastro" @click="abrirEmail" class="social-button">
+                        <el-button type="medium" :disabled="!permiteMaisCadastro"
+                                   @click="abrirEmail" class="social-button">
                             <img src="../resources/images/icons/email.svg" alt="email" class="social-icon" />
                             E-mail
                         </el-button>
                     </div>
                 </el-card>
             </el-col>
-            <!-- Diálogo de Visualização -->
-            <el-dialog v-model="dialogVisible"
-                       title="Detalhes do Membro"
-                       width="500px"
-                       @close="limparDialog">
-                <div v-if="membroSelecionado">
-                    <p><strong>Nome:</strong> {{ membroSelecionado.nome }}</p>
-                    <p>
-                        <strong>Dono da Conta:</strong>
-                        {{ membroSelecionado.donoConta ? 'Sim' : 'Não' }}
-                    </p>
-                    <p><strong>Avatar:</strong></p>
-                    <el-avatar :src="membroSelecionado.avatar || '../resources/images/icons/Jacaptei.svg'"
-                               size="large" />
-                </div>
-                <span slot="footer" class="dialog-footer">
-                    <el-button @click="dialogVisible = false">Fechar</el-button>
-                </span>
-            </el-dialog>
         </el-row>
     </div>
 </template>
@@ -226,7 +199,7 @@
         align-items: center;
         justify-content: space-between;
         margin: 10px 0;
-/*        padding: 10px 0;*/
+        /*        padding: 10px 0;*/
         border-bottom: 1px solid #f0f0f0;
     }
 
@@ -240,9 +213,9 @@
         transition: none !important;
     }
 
-    .el-button:hover {
-        box-shadow: none !important;
-    }
+        .el-button:hover {
+            box-shadow: none !important;
+        }
 
     .membro-nome {
         font-weight: bold;
@@ -268,10 +241,10 @@
         border: 1px solid #e4e7ed; /* Cor da borda */
     }
 
-    .custom-input .el-icon-link {
-        color: #b0b0b0; /* Cor do ícone */
-        margin-left: 8px; /* Espaçamento à esquerda do ícone */
-    }
+        .custom-input .el-icon-link {
+            color: #b0b0b0; /* Cor do ícone */
+            margin-left: 8px; /* Espaçamento à esquerda do ícone */
+        }
 
     .invite-card {
         padding: 20px;
@@ -343,5 +316,60 @@
         background-color: transparent !important;
         border: none;
         box-shadow: none;
+    }
+
+    @media (max-width: 768px) {
+        .layout-container {
+            flex-direction: column; /* Empilha os elementos */
+        }
+
+        .invite-card-container {
+            margin-bottom: 10px;
+            order: -1; /* Move o card de convite para o topo */
+        }
+
+        .membros-card-container {
+            order: 0;
+        }
+
+        .invite-input-container,
+        .invite-button-container {
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .generate-button,
+        .social-button {
+            width: 100%;
+        }
+
+        .invite-input-container {
+            display: flex;
+            flex-direction: column; /* Alinha os botões verticalmente */
+            gap: 10px; /* Espaçamento entre os botões */
+            width: 100%;
+        }
+
+        .generate-button {
+            width: 100%;
+        }
+
+        .link-input {
+            margin-right: 0;
+        }
+
+        .invite-button-container {
+            display: flex;
+            flex-direction: column; /* Alinha os botões verticalmente */
+            gap: 10px;
+        }
+
+        .social-button {
+            width: 100%; /* Cada botão ocupa 100% da largura */
+        }
+
+        .el-button + .el-button {
+            margin-left: 0;
+        }
     }
 </style>

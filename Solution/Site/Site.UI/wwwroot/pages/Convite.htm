@@ -108,9 +108,28 @@
 
                         <el-row :gutter="20">
                             <el-col :md="24" style="margin-bottom:10px">
-                                <div style="display: flex; justify-content: flex-start; flex-direction: column">
-                                    <el-checkbox style="color: #FAFAF6" v-model="aceitouTermos">aceito os termos e condições de uso <a href="files/JaCaptei_Termos_de_Uso.pdf" target="_blank" style="font-weight:800;color:var(--s-accent-color)"> <i class="fa fa-up-right-from-square" style="padding-left:10px;padding-right:4px;font-size:14px;color:var(--s-accent-color)"></i> ver termos</a></el-checkbox>
-                                    <el-checkbox style="color: #FAFAF6" v-model="aceitouPoliticaPrivacidade">aceito a política de privacidade dos dados <a href="files/JaCaptei_Politica_Privacidade.pdf" target="_blank" style="font-weight:800;color:var(--s-accent-color)"> <i class="fa fa-up-right-from-square" style="padding-left:10px;padding-right:4px;font-size:14px;color:var(--s-accent-color)"></i> ver política</a></el-checkbox>
+                                <div class="checkbox-container">
+                                    <div class="checkbox-group">
+                                        <el-checkbox style="color: #FAFAF6" v-model="aceitouTermos">
+                                            Aceito os termos e condições de uso
+                                        </el-checkbox>
+                                        <a href="files/JaCaptei_Termos_de_Uso.pdf"
+                                           target="_blank"
+                                           class="link-term">
+                                            <i class="fa fa-up-right-from-square"></i> Ver termos
+                                        </a>
+                                    </div>
+
+                                    <div class="checkbox-group">
+                                        <el-checkbox style="color: #FAFAF6" v-model="aceitouPoliticaPrivacidade">
+                                            Aceito a política de privacidade dos dados
+                                        </el-checkbox>
+                                        <a href="files/JaCaptei_Politica_Privacidade.pdf"
+                                           target="_blank"
+                                           class="link-term">
+                                            <i class="fa fa-up-right-from-square"></i> Ver política
+                                        </a>
+                                    </div>
                                 </div>
                             </el-col>
                         </el-row>
@@ -564,6 +583,7 @@
         width: 100% !important;
         display: block;
     }
+
     .header {
         text-align: center;
         margin-bottom: 20px;
@@ -641,7 +661,7 @@
         margin-bottom: 10px;
     }
 
-    .el-dialog__body{
+    .el-dialog__body {
         padding-bottom: 0px;
         padding-top: 10px;
     }
@@ -657,17 +677,17 @@
         text-align: center;
     }
 
-    .dialog-footer .el-button {
-        background-color: #f56c6c;
-        border-color: #f56c6c;
-        color: white;
-        width: 100%;
-    }
+        .dialog-footer .el-button {
+            background-color: #f56c6c;
+            border-color: #f56c6c;
+            color: white;
+            width: 100%;
+        }
 
-    .dialog-footer .el-button:hover {
-        background-color: #d9534f;
-        border-color: #d43f3a;
-    }
+            .dialog-footer .el-button:hover {
+                background-color: #d9534f;
+                border-color: #d43f3a;
+            }
 
     .custom-dialog {
         text-align: center;
@@ -692,18 +712,49 @@
         border-radius: 8px;
     }
 
-    @media (max-width: 600px) {
+    .checkbox-container {
+        display: flex;
+        flex-direction: column;
+    }
+
+    .checkbox-group {
+        display: flex;
+        align-items: center;
+        gap: 10px; /* Espaçamento entre checkbox e link */
+        flex-wrap: wrap; /* Permite que o link quebre para baixo */
+    }
+
+    .link-term {
+        font-weight: 800;
+        color: var(--s-accent-color);
+        display: inline-flex;
+        align-items: center;
+        gap: 4px;
+    }
+
+    .link-term i {
+        font-size: 14px;
+        color: var(--s-accent-color);
+    }
+
+    @media (max-width: 768px) {
         .invite-form {
             padding: 15px;
-            
         }
 
         .birth-date {
             flex-direction: column;
+            width: 100%;
         }
 
         .submit-button {
             margin-top: 10px;
+        }
+
+        .checkbox-group {
+            flex-direction: column;
+            align-items: flex-start !important;
+            gap: 0px !important;
         }
     }
 </style>
