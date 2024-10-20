@@ -11,10 +11,10 @@ using ImovelImagem = JaCaptei.Model.Entities.ImovelImagem;
 
 namespace JaCaptei.Application.Integracao;
 
-public class ImoviewDAO: IDisposable {
+public class ImoviewDAO : IDisposable {
 
     private readonly NpgsqlConnection _conn;
-    public ImoviewDAO(NpgsqlConnection conn) 
+    public ImoviewDAO(NpgsqlConnection conn)
     {
         _conn = conn;
     }
@@ -31,10 +31,15 @@ public class ImoviewDAO: IDisposable {
         return res.FirstOrDefault();
     }
 
+    public async Task<IntegracaoImoview?> GetIntegracaoById(int id)
+    {
+        var res = await _conn.QueryAsync<IntegracaoImoview>(i => i.Id == id);
+        return res.FirstOrDefault();
+    }
 
     public async Task<bool> SaveIntegracao(IntegracaoImoview integracao)
     {
-        if(integracao.Id > 0)
+        if (integracao.Id > 0)
         {
             var fields = Field.Parse<IntegracaoImoview>(e => new { e.Status, e.DataAtualizacao, e.Bairros });
             await _conn.UpdateAsync<IntegracaoImoview>(integracao, fields);
@@ -106,13 +111,13 @@ public class ImoviewDAO: IDisposable {
              ImovelValores, ImovelEndereco, ImovelDisposicao,
              ImovelCaracteristicasInternas,
              ImovelCaracteristicasExternas, ImovelLazer>(
-             a  => a.idImovel   == idImovel,  // area
-             v  => v.idImovel   == idImovel,  // valor
-             e  => e.idImovel   == idImovel,  // endereco
-             d  => d.idImovel   == idImovel,  // dísposicao
-             ci => ci.idImovel  == idImovel,  // crsInternas
-             ce => ce.idImovel  == idImovel,  // crsInternas
-             l  => l.idImovel   == idImovel   // lazer 
+             a => a.idImovel == idImovel,  // area
+             v => v.idImovel == idImovel,  // valor
+             e => e.idImovel == idImovel,  // endereco
+             d => d.idImovel == idImovel,  // dísposicao
+             ci => ci.idImovel == idImovel,  // crsInternas
+             ce => ce.idImovel == idImovel,  // crsInternas
+             l => l.idImovel == idImovel   // lazer 
          );
 
         var tipo = await _conn.QueryAsync<ImovelTipo>(t => t.id == imovel.First().idTipo);
@@ -151,7 +156,7 @@ public class ImoviewDAO: IDisposable {
         //    importacoes.AddRange(res.ToList());
         //}
         const string queryImportPendentes = "SELECT ibi.* FROM public.\"IntegracaoImoview\" i inner join \"IntegracaoBairroImoview\" ib on i.id = ib.\"idIntegracao\" inner join \"ImportacaoBairroImoview\" ibi on ibi.\"idIntegracaoBairro\" = ib.id where i.id = @idIntegracao and ibi.status <> @status;";
-        var res = await _conn.ExecuteQueryAsync<ImportacaoBairroImoview>(queryImportPendentes, new { idIntegracao, status = StatusIntegracao.Concluido.GetDescription()});
+        var res = await _conn.ExecuteQueryAsync<ImportacaoBairroImoview>(queryImportPendentes, new { idIntegracao, status = StatusIntegracao.Concluido.GetDescription() });
         return res.ToList();
     }
 
@@ -191,11 +196,30 @@ public class ImoviewDAO: IDisposable {
         return res.FirstOrDefault();
     }
 
-    internal async Task<List<ImportacaoImovelImoview>> GetImportacaoImovelPendentes()
+    internal async Task<List<ImportacaoImovelImoview>> GetImportacaoImovelPendentes(int id = 0, bool process = false)
     {
-        var res = await _conn.QueryAsync<ImportacaoImovelImoview>(i => i.Status != StatusIntegracao.Concluido.GetDescription()
-        && i.Status != StatusIntegracao.Processando.GetDescription());
-        return res.ToList();
+        if (id == 0)
+        {
+            var res = await _conn.QueryAsync<ImportacaoImovelImoview>(i => i.Status != StatusIntegracao.Concluido.GetDescription()
+            && (process || i.Status != StatusIntegracao.Processando.GetDescription()));
+            return res.ToList();
+        }
+        else
+        {
+            var query = process ? @"SELECT ii.*
+FROM public.""ImportacaoImovelImoview"" ii
+inner join ""ImportacaoBairroImoview"" ibi on ibi.id = ii.""idImportacaoBairro""
+inner join ""IntegracaoBairroImoview"" ib on ib.id = ibi.""idIntegracaoBairro""
+WHERE ii.status != 'Concluido' and ib.""idIntegracao"" = @idIntegracao" :
+@"SELECT ii.*
+FROM public.""ImportacaoImovelImoview"" ii
+inner join ""ImportacaoBairroImoview"" ibi on ibi.id = ii.""idImportacaoBairro""
+inner join ""IntegracaoBairroImoview"" ib on ib.id = ibi.""idIntegracaoBairro""
+WHERE ii.status != 'Concluido' AND ii.status != 'Processando' and ib.""idIntegracao"" = @idIntegracao";
+
+            var res = (await _conn.ExecuteQueryAsync<ImportacaoImovelImoview>(query, new { idIntegracao = id })).ToList();
+            return res;
+        }
     }
 
     internal async Task<IntegracaoImoview?> GetIntegracaoImportacaoBairro(int idImportBairro)
@@ -326,5 +350,11 @@ INNER JOIN ""IntegracaoImoview"" i ON ib.""idIntegracao"" = i.id
 where ii.""codImovel"" = @cod and i.id = @idIntegracao";
         var res = await _conn.ExecuteQueryAsync<int>(queryIdImport, new { cod, idIntegracao });
         return res.FirstOrDefault();
+    }
+
+    internal async Task UpdateIntegracao(IntegracaoImoview integracao)
+    {
+        var fields = Field.Parse<IntegracaoImoview>(e => new { e.CodUsuario, e.CodUnidade, e.ChaveApi });
+        await _conn.UpdateAsync<IntegracaoImoview>(integracao, fields);
     }
 }

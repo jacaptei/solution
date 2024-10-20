@@ -58,5 +58,19 @@ namespace IntegrarVistaSoftFunction
             _logger.LogInformation("IdCliente: {IdCliente} Retorno: {resStr}", dto.IdCliente, resStr);
             return new OkObjectResult(res);
         }
+
+        [Function("ReprocessarIntegracao")]
+        public async Task<IActionResult> Run3([HttpTrigger(AuthorizationLevel.Anonymous, "post", Route = "integracao/cliente/integrar/reprocessar")] HttpRequest req)
+        {
+            _logger.LogInformation("Iniciando Reprocessamento de Integração...");
+            var rawRequestBody = await new StreamReader(req.Body).ReadToEndAsync();
+
+            var dto = JsonConvert.DeserializeObject<IntegracaoReprocessarVistaSoftDTO>(rawRequestBody);
+            var res = await _service.ReprocessarIntegracao(dto);
+            if (!res)
+                _logger.LogError("Erro ao reprocessar integração do cliente {Id}", dto.Id);
+            //_logger.LogInformation("IdCliente: {IdCliente} Retorno: {resStr}", dto.IdCliente, resStr);
+            return new OkObjectResult(res);
+        }
     }
 }

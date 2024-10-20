@@ -98,7 +98,39 @@ public class ImoviewController : ControllerBase
         return Ok(res);
     }
 
- }
+    [HttpPost("integracao/cliente/reprocessar")]
+    public async Task<ActionResult<IntegrarClienteResponse>> Reprocessar([FromBody] IntegracaoReprocessDTO dto)
+    {
+        var jsonInString = Newtonsoft.Json.JsonConvert.SerializeObject(dto);
+        var content = new StringContent(jsonInString, Encoding.UTF8, "application/json");
+        var client = _httpClientFactory.CreateClient("");
+        client.DefaultRequestHeaders.Add("Accept", "application/json");
+        var url = Config.settings.IntegracaoAzureUrl+"/reprocessar";
+        var result = await client.PostAsync(url, content);
+        var res = await result.Content.ReadAsStringAsync();
+        return Ok(res);
+    }
+
+    [HttpPost("integracao/cliente/atualizarcampos")]
+    public async Task<ActionResult<bool>> AtualizarCampos([FromBody] IntegracaoReprocessDTO dto)
+    {
+        var res = await _service.AtualizarCampos(dto);
+        return Ok(res);
+    }
+
+    [HttpPost("integracao/cliente/reprocessarimovel")]
+    public async Task<ActionResult<IntegrarClienteResponse>> Reprocessar([FromBody] ImovelReprocessDTO dto)
+    {
+        var jsonInString = Newtonsoft.Json.JsonConvert.SerializeObject(dto);
+        var content = new StringContent(jsonInString, Encoding.UTF8, "application/json");
+        var client = _httpClientFactory.CreateClient("");
+        client.DefaultRequestHeaders.Add("Accept", "application/json");
+        var url = Config.settings.IntegracaoAzureUrl + "/reprocessarimovel";
+        var result = await client.PostAsync(url, content);
+        var res = await result.Content.ReadAsStringAsync();
+        return Ok(res);
+    }
+}
 
 public record IntergracaoReq
 {

@@ -503,9 +503,14 @@ public class ImoviewService : IDisposable, IIntegracaoService
 
     private async Task<bool> SendImportQueue(ServiceBusSender sender, ImportacaoImovelEvent importacaoImovelEvent)
     {
+        return await SendQueue(sender, importacaoImovelEvent);
+    }
+
+    private async Task<bool> SendQueue<T>(ServiceBusSender sender, T req)
+    {
         await _busPolicy.ExecuteAsync(async () =>
         {
-            var body = Newtonsoft.Json.JsonConvert.SerializeObject(importacaoImovelEvent);
+            var body = Newtonsoft.Json.JsonConvert.SerializeObject(req);
             var message = new ServiceBusMessage(body);
             await sender.SendMessageAsync(message);
         });
@@ -903,6 +908,137 @@ public class ImoviewService : IDisposable, IIntegracaoService
                 await _retryPolicy.ExecuteAsync(() => _imoviewDAO.SaveImovelInativoEmail(ii));
             }
         }
+    }
+
+    public async Task<bool> ReprocessarIntegracao(IntegracaoReprocessDTO? dto)
+    {
+        if(dto == null) return false;
+        var integracao = await _retryPolicy.ExecuteAsync(() => _imoviewDAO.GetIntegracaoById(dto.Id));   
+        if(integracao == null) return false;
+        if(dto.CodUsuario != null) integracao.CodUsuario = dto.CodUsuario;
+        if(dto.CodUnidade != null) integracao.CodUnidade = dto.CodUnidade;
+        if(dto.ChaveApi != null) integracao.ChaveApi = dto.ChaveApi;
+        await _retryPolicy.ExecuteAsync(() => _imoviewDAO.UpdateIntegracao(integracao));
+        var integracaoEvent = new IntegracaoEvent()
+        {
+            IdCliente = integracao.IdCliente,
+            IdIntegracao = integracao.Id,
+            IdOperador = integracao.IdOperador
+        };
+        string connectionString = Config.settings.AzureMQ;
+        string queueName = "reprocessarintegracao";
+        await using var client = new ServiceBusClient(connectionString);
+        ServiceBusSender sender = client.CreateSender(queueName);
+        await SendQueue(sender, integracaoEvent);
+        return true;
+    }
+
+    public async Task<bool> ReprocessarFilaIntegracao(IntegracaoEvent? dto)
+    {
+        List<ImportacaoImovelImoview> importacoesImovel = await _retryPolicy.ExecuteAsync(() => _imoviewDAO.GetImportacaoImovelPendentes(dto.IdIntegracao, true));
+        if (importacoesImovel.Count < 1) return true;
+        string connectionString = Config.settings.AzureMQ;
+        string queueName = "importacaoimovel";
+        var importBairros = importacoesImovel.Select(i => i.IdImportacaoBairro).Distinct().ToList();
+        Dictionary<int, IntegracaoImoview?> integracaoImportBairro = [];
+        foreach (var importBairro in importBairros)
+        {
+            IntegracaoImoview? integracao = await _retryPolicy.ExecuteAsync(() => _imoviewDAO.GetIntegracaoImportacaoBairro(importBairro));
+            integracaoImportBairro.Add(importBairro, integracao);
+        }
+        await using var client = new ServiceBusClient(connectionString);
+        ServiceBusSender sender = client.CreateSender(queueName);
+        int sucesso = 0, erro = 0;
+        foreach (var importacao in importacoesImovel)
+        {
+            try
+            {
+                var integracao = integracaoImportBairro[importacao.IdImportacaoBairro];
+                if (integracao == null)
+                {
+                    _logger?.LogError("Erro ao reprocessar importacao: {id}, Integração não encontrada!", importacao.Id);
+                    continue;
+                }
+                if (importacao.Status == StatusIntegracao.Aguardando.GetDescription())
+                {
+                    var dataImportacao = importacao.DataAtualizacao != null && importacao.DataAtualizacao.Year > 2024 ? importacao.DataAtualizacao : importacao.DataInclusao;
+                    var diff = (DateTime.UtcNow - dataImportacao).TotalMinutes;
+                    if (diff < 30)
+                    {
+                        _logger?.LogInformation("Postegar fila para a importação: {id}", importacao.Id);
+                        continue;
+                    }
+                }
+                var importEvent = new ImportacaoImovelEvent()
+                {
+                    ChaveApi = integracao.ChaveApi,
+                    CodImovel = importacao.CodImovel,
+                    CodUnidade = integracao.CodUnidade,
+                    CodUsuario = integracao.CodUsuario,
+                    IdCliente = integracao.IdCliente,
+                    IdImovel = importacao.IdImovel,
+                    IdImportacaoBairro = importacao.IdImportacaoBairro,
+                    IdIntegracao = integracao.Id
+                };
+                await Task.Delay(_queueDelay);
+                var res = await SendImportQueue(sender, importEvent);
+                sucesso++;
+            }
+            catch (Exception ex)
+            {
+                erro++;
+                _logger?.LogError("Erro ao reprocessar importacao: {id}, erro: {ex}", importacao.Id, ex);
+            }
+        }
+        _logger?.LogInformation("Reprocessamento concluído. {sucesso} processados com sucesso. {erro} processados com erro.", sucesso, erro);
+
+        return true;
+    }
+
+    public async Task<bool> AtualizarCampos(IntegracaoReprocessDTO dto)
+    {
+        if (dto == null) return false;
+        var integracao = await _retryPolicy.ExecuteAsync(() => _imoviewDAO.GetIntegracaoById(dto.Id));
+        if (integracao == null) return false;
+        if (dto.CodUsuario != null) integracao.CodUsuario = dto.CodUsuario;
+        if (dto.CodUnidade != null) integracao.CodUnidade = dto.CodUnidade;
+        if (dto.ChaveApi != null) integracao.ChaveApi = dto.ChaveApi;
+        await _retryPolicy.ExecuteAsync(() => _imoviewDAO.UpdateIntegracao(integracao));
+        return true;
+    }
+
+    public async Task<bool> ReprocessarImovel(ImovelReprocessDTO? dto)
+    {
+        var importacao = await _retryPolicy.ExecuteAsync(() => _imoviewDAO.GetImportacaoImovel(dto.Id, dto.Cod));
+        if (importacao == null)
+        {
+            _logger?.LogWarning("Importacao de imovel {id} não encontrada, Imovel {cod}", dto.Id, dto.Cod);
+            return false;
+        }
+        IntegracaoImoview? integracao = await _retryPolicy.ExecuteAsync(() => _imoviewDAO.GetIntegracaoImportacaoBairro(importacao.IdImportacaoBairro));
+        if (integracao == null)
+        {
+            _logger?.LogWarning("Integracao não encontrada, Imovel {cod}", dto.Id, dto.Cod);
+            return false;
+        }
+        string connectionString = Config.settings.AzureMQ;
+        string queueName = "importacaoimovel";
+        await using var client = new ServiceBusClient(connectionString);
+        ServiceBusSender sender = client.CreateSender(queueName);
+        var importEvent = new ImportacaoImovelEvent()
+        {
+            ChaveApi = integracao.ChaveApi,
+            CodImovel = importacao.CodImovel,
+            CodUnidade = integracao.CodUnidade,
+            CodUsuario = integracao.CodUsuario,
+            IdCliente = integracao.IdCliente,
+            IdImovel = importacao.IdImovel,
+            IdImportacaoBairro = importacao.IdImportacaoBairro,
+            IdIntegracao = integracao.Id
+        };
+        await Task.Delay(_queueDelay);
+        var res = await SendImportQueue(sender, importEvent);
+        return true;
     }
 }
 

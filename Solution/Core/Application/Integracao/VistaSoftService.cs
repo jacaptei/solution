@@ -196,9 +196,14 @@ namespace JaCaptei.Application.Integracao
 
         private async Task<bool?> SendImportQueue(ServiceBusSender sender, ImportacaoImoveVistaSoftEvent import)
         {
+            return await SendQueue(sender, import);
+        }
+
+        private async Task<bool?> SendQueue<T>(ServiceBusSender sender, T req)
+        {
             await _busPolicy.ExecuteAsync(async () =>
             {
-                var body = Newtonsoft.Json.JsonConvert.SerializeObject(import);
+                var body = Newtonsoft.Json.JsonConvert.SerializeObject(req);
                 var message = new ServiceBusMessage(body);
                 await sender.SendMessageAsync(message);
             });
@@ -704,6 +709,87 @@ namespace JaCaptei.Application.Integracao
         public void Dispose()
         {
             _vistaSoftDAO.Dispose();
+        }
+
+        public async Task<bool> ReprocessarIntegracao(IntegracaoReprocessarVistaSoftDTO? dto)
+        {
+            if (dto == null) return false;
+            var integracao = await _retryPolicy.ExecuteAsync(() => _vistaSoftDAO.GetIntegracaoById(dto.Id));
+            if (integracao == null) return false;
+            if (dto.UrlApi != null) integracao.UrlApi = dto.UrlApi;
+            if (dto.ChaveApi != null) integracao.ChaveApi = dto.ChaveApi;
+            await _retryPolicy.ExecuteAsync(() => _vistaSoftDAO.UpdateIntegracao(integracao));
+            var integracaoEvent = new IntegracaoEvent()
+            {
+                IdCliente = integracao.IdCliente,
+                IdIntegracao = integracao.Id,
+                IdOperador = integracao.IdOperador
+            };
+            string connectionString = Config.settings.AzureMQ;
+            string queueName = "reprocessarintegracao";
+            await using var client = new ServiceBusClient(connectionString);
+            ServiceBusSender sender = client.CreateSender(queueName);
+            await SendQueue(sender, integracaoEvent);
+            return true;
+        }
+
+        public async Task ReprocessarFilaIntegracao(IntegracaoEvent dto)
+        {
+            List<ImportacaoImovelVistaSoft> importacoesImovel = await _retryPolicy.ExecuteAsync(() => _vistaSoftDAO.GetImportacaoImovelPendentes(dto.IdIntegracao));
+            if (importacoesImovel.Count < 1) return;
+            string connectionString = Config.settings.AzureMQ;
+            string queueName = "importacaoimovelvistasoft";
+            var importBairros = importacoesImovel.Select(i => i.IdImportacaoBairro).Distinct().ToList();
+            Dictionary<int, IntegracaoVistaSoft?> integracaoImportBairro = [];
+            foreach (var importBairro in importBairros)
+            {
+                IntegracaoVistaSoft? integracao = await _retryPolicy.ExecuteAsync(() => _vistaSoftDAO.GetIntegracaoImportacaoBairro(importBairro));
+                integracaoImportBairro.Add(importBairro, integracao);
+            }
+            await using var client = new ServiceBusClient(connectionString);
+            ServiceBusSender sender = client.CreateSender(queueName);
+            int sucesso = 0, erro = 0;
+            foreach (var importacao in importacoesImovel)
+            {
+                try
+                {
+                    var integracao = integracaoImportBairro[importacao.IdImportacaoBairro];
+                    if (integracao == null)
+                    {
+                        _logger?.LogError("Erro ao reprocessar importacao: {id}, Integração não encontrada!", importacao.Id);
+                        continue;
+                    }
+                    if (importacao.Status == StatusIntegracao.Aguardando.GetDescription())
+                    {
+                        var dataImportacao = importacao.DataAtualizacao != null && importacao.DataAtualizacao.Year > 2024 ? importacao.DataAtualizacao : importacao.DataInclusao;
+                        var diff = (DateTime.UtcNow - dataImportacao).TotalMinutes;
+                        if (diff < 30)
+                        {
+                            _logger?.LogInformation("Postegar fila para a importação: {id}", importacao.Id);
+                            continue;
+                        }
+                    }
+                    var importEvent = new ImportacaoImoveVistaSoftEvent()
+                    {
+                        ChaveApi = integracao.ChaveApi,
+                        CodImovel = importacao.CodImovel,
+                        UrlApi = integracao.UrlApi,
+                        IdCliente = integracao.IdCliente,
+                        IdImovel = importacao.IdImovel,
+                        IdImportacaoBairro = importacao.IdImportacaoBairro,
+                        IdIntegracao = integracao.Id
+                    };
+                    await Task.Delay(_queueDelay);
+                    var res = await SendImportQueue(sender, importEvent);
+                    sucesso++;
+                }
+                catch (Exception ex)
+                {
+                    erro++;
+                    _logger?.LogError("Erro ao reprocessar importacao: {id}, erro: {ex}", importacao.Id, ex);
+                }
+            }
+            _logger?.LogInformation("Reprocessamento concluído. {sucesso} processados com sucesso. {erro} processados com erro.", sucesso, erro);
         }
     }
 

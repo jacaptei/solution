@@ -45,7 +45,11 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ImportarVistaSoftFunction",
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ImportarImovelVistaSoftFunction", "ImportarImovelVistaSoftFunction\ImportarImovelVistaSoftFunction.csproj", "{D0A89EA6-CCB5-46CB-BCAC-0F69AF35B2F8}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ReprocessarImovelVistaSoftFunction", "ReprocessarImovelVistaSoftFunction\ReprocessarImovelVistaSoftFunction.csproj", "{C923C5C0-D79B-4FC3-9995-F5F7CAF71A34}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ReprocessarImovelVistaSoftFunction", "ReprocessarImovelVistaSoftFunction\ReprocessarImovelVistaSoftFunction.csproj", "{C923C5C0-D79B-4FC3-9995-F5F7CAF71A34}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ReprocessarIntegracaoImoviewFunction", "ReprocessarIntegracaoImoviewFunction\ReprocessarIntegracaoImoviewFunction.csproj", "{551DF742-2A09-4046-AC08-430D334868C7}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ReprocessarIntegracaoVistaSoftFunction", "ReprocessarIntegracaoVistaSoftFunction\ReprocessarIntegracaoVistaSoftFunction.csproj", "{1B9A51BB-42E8-4811-B28A-3406CF389B3B}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -162,6 +166,18 @@ Global
 		{C923C5C0-D79B-4FC3-9995-F5F7CAF71A34}.Release|Any CPU.Build.0 = Release|Any CPU
 		{C923C5C0-D79B-4FC3-9995-F5F7CAF71A34}.SITE|Any CPU.ActiveCfg = Debug|Any CPU
 		{C923C5C0-D79B-4FC3-9995-F5F7CAF71A34}.SITE|Any CPU.Build.0 = Debug|Any CPU
+		{551DF742-2A09-4046-AC08-430D334868C7}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{551DF742-2A09-4046-AC08-430D334868C7}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{551DF742-2A09-4046-AC08-430D334868C7}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{551DF742-2A09-4046-AC08-430D334868C7}.Release|Any CPU.Build.0 = Release|Any CPU
+		{551DF742-2A09-4046-AC08-430D334868C7}.SITE|Any CPU.ActiveCfg = Debug|Any CPU
+		{551DF742-2A09-4046-AC08-430D334868C7}.SITE|Any CPU.Build.0 = Debug|Any CPU
+		{1B9A51BB-42E8-4811-B28A-3406CF389B3B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{1B9A51BB-42E8-4811-B28A-3406CF389B3B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{1B9A51BB-42E8-4811-B28A-3406CF389B3B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{1B9A51BB-42E8-4811-B28A-3406CF389B3B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{1B9A51BB-42E8-4811-B28A-3406CF389B3B}.SITE|Any CPU.ActiveCfg = Debug|Any CPU
+		{1B9A51BB-42E8-4811-B28A-3406CF389B3B}.SITE|Any CPU.Build.0 = Debug|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -185,6 +201,8 @@ Global
 		{3A18F079-EBC1-4E66-BE53-355E4876B339} = {A6CFBE72-06D5-4D9E-95E8-5E6A6D215AC9}
 		{D0A89EA6-CCB5-46CB-BCAC-0F69AF35B2F8} = {A6CFBE72-06D5-4D9E-95E8-5E6A6D215AC9}
 		{C923C5C0-D79B-4FC3-9995-F5F7CAF71A34} = {A6CFBE72-06D5-4D9E-95E8-5E6A6D215AC9}
+		{551DF742-2A09-4046-AC08-430D334868C7} = {A6CFBE72-06D5-4D9E-95E8-5E6A6D215AC9}
+		{1B9A51BB-42E8-4811-B28A-3406CF389B3B} = {A6CFBE72-06D5-4D9E-95E8-5E6A6D215AC9}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {DAE772A6-FB90-42A9-AF93-1D2C7C58AC0A}

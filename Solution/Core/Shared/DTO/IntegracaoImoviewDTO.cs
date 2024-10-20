@@ -26,6 +26,20 @@ namespace JaCaptei.Model.DTO
         public List<BairroIntegracaoDTO> Bairros { get; set; }
     }
 
+    public class IntegracaoReprocessDTO
+    {
+        public int Id { get; set; }
+        public string? CodUsuario { get; set; }
+        public string? CodUnidade { get; set; }
+        public string? ChaveApi { get; set; }
+    }
+
+    public class ImovelReprocessDTO
+    {
+        public int Id { get; set; }
+        public string? Cod { get; set; }
+    }
+
     public class IntegracaoVistaSoftDTO
     {
         public int IdCliente { get; set; }
@@ -34,6 +48,13 @@ namespace JaCaptei.Model.DTO
         public int IdPlano { get; set; }
         public List<BairroIntegracaoDTO> Bairros { get; set; }
         public string UrlApi { get; set; }
+    }
+
+    public class IntegracaoReprocessarVistaSoftDTO
+    {
+        public int Id { get; set; }
+        public string? ChaveApi { get; set; }
+        public string? UrlApi { get; set; }
     }
 
     public record BairroIntegracaoDTO

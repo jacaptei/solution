@@ -8,6 +8,9 @@ using Npgsql;
 
 using RepoDb;
 
+using System;
+using System.Diagnostics;
+
 namespace JaCaptei.Application.Integracao
 {
     public class VistaSoftDAO: IDisposable
@@ -191,14 +194,38 @@ namespace JaCaptei.Application.Integracao
             return true;
         }
 
-        internal async Task<List<ImportacaoImovelVistaSoft>> GetImportacaoImovelPendentes()
+        internal async Task<List<ImportacaoImovelVistaSoft>> GetImportacaoImovelPendentes(int id = 0)
         {
-            throw new NotImplementedException();
+            var process = false;
+            if (id == 0)
+            {
+                var res = await _conn.QueryAsync<ImportacaoImovelVistaSoft>(i => i.Status != StatusIntegracao.Concluido.GetDescription()
+                && (process || i.Status != StatusIntegracao.Processando.GetDescription()));
+                return res.ToList();
+            }
+            else
+            {
+                var query = process ? @"SELECT ii.*
+FROM public.""ImportacaoImovelVistaSoft"" ii
+inner join ""ImportacaoBairroVistaSoft"" ibi on ibi.id = ii.""idImportacaoBairro""
+inner join ""IntegracaoBairroVistaSoft"" ib on ib.id = ibi.""idIntegracaoBairro""
+WHERE ii.status != 'Concluido' and ib.""idIntegracao"" = @idIntegracao" :
+    @"SELECT ii.*
+FROM public.""ImportacaoImovelVistaSoft"" ii
+inner join ""ImportacaoBairroVistaSoft"" ibi on ibi.id = ii.""idImportacaoBairro""
+inner join ""IntegracaoBairroVistaSoft"" ib on ib.id = ibi.""idIntegracaoBairro""
+WHERE ii.status != 'Concluido' AND ii.status != 'Processando' and ib.""idIntegracao"" = @idIntegracao";
+
+                var res = (await _conn.ExecuteQueryAsync<ImportacaoImovelVistaSoft>(query, new { idIntegracao = id })).ToList();
+                return res;
+            }
         }
 
-        internal async Task<IntegracaoVistaSoft?> GetIntegracaoImportacaoBairro(int importBairro)
+        internal async Task<IntegracaoVistaSoft?> GetIntegracaoImportacaoBairro(int idImportBairro)
         {
-            throw new NotImplementedException();
+            const string queryIntegracaoPorImportacaoId = "SELECT i.* FROM \"ImportacaoBairroVistaSoft\" ibi inner join \"IntegracaoBairroVistaSoft\" ib on ibi.\"idIntegracaoBairro\" = ib.id inner join \"IntegracaoVistaSoft\" i on ib.\"idIntegracao\" = i.id where ibi.id = @idImportBairro";
+            var integracao = (await _conn.ExecuteQueryAsync<IntegracaoVistaSoft>(queryIntegracaoPorImportacaoId, new { idImportBairro })).FirstOrDefault();
+            return integracao;
         }
 
         internal async Task<DateTime?> ObterUltimaAtualizacao()
@@ -249,6 +276,19 @@ WHERE i.id = @idIntegracao;";
             var reportStr = (await _conn.ExecuteQueryAsync<string>(queryReport, new { idIntegracao })).FirstOrDefault();
             var report = JsonConvert.DeserializeObject<IntegracaoReportVS>(reportStr);
             return report;
+        }
+
+        internal async Task<IntegracaoVistaSoft?> GetIntegracaoById(int id)
+        {
+            var res = await _conn.QueryAsync<IntegracaoVistaSoft>(i => i.Id == id);
+            return res.FirstOrDefault();
+        }
+
+        internal async Task<bool> UpdateIntegracao(IntegracaoVistaSoft integracao)
+        {
+            var fields = Field.Parse<IntegracaoVistaSoft>(e => new { e.UrlApi, e.ChaveApi });
+            await _conn.UpdateAsync<IntegracaoVistaSoft>(integracao, fields);
+            return true;
         }
     }
 }
