@@ -1,368 +1,4 @@
-﻿<script>
-    import { ref, onMounted, getCurrentInstance, watch, onBeforeUnmount } from 'vue';
-    export default {
-        setup() {
-            const options = ref({});
-            const crmTitle = ref('');
-            const acompanhar = ref([]);
-            const totalImoveis = ref(0);
-            const responseProp = ref('');
-            const collapseItems = ref([]);
-            const idIntegracao = ref(null);
-            const crmSelecionado = ref('');
-            const refreshInterval = ref(0);
-            const listaIntegracao = ref([]);
-            const quantidadeBairros = ref(0);
-            const listaCrmIntegracao = ref([]);
-            const filtrosVisiveis = ref(false);
-            const urlStatusIntegracao = ref('');
-            const fullscreenLoading = ref(false);
-            const instance = getCurrentInstance();
-            let intervalId = null;
-            const crmLabel = ref("");
-            const crmOptions = ref([
-                { nome: 'IMOVIEW', id: 1 },
-                { nome: 'VISTASOFT', id: 2 },
-            ]);
-            const optionsRefresh = ref([
-                { label: 'Desativar', value: 0 },
-                { label: '5 segundos', value: 5 },
-                { label: '10 segundos', value: 10 },
-                { label: '30 segundos', value: 30 },
-                { label: '1 minuto', value: 60 },
-                { label: '2 minutos', value: 120 },
-                { label: '5 minutos', value: 300 },
-                { label: '10 minutos', value: 600 },
-            ]);
-
-            const getResponse = (imovel) => {
-                const response = imovel[responseProp.value] || {};
-
-                if (typeof response === 'string') {
-                    try {
-                        const parsed = JSON.parse(response);
-
-                        if (parsed.message === 'Ok') parsed.message = 'Concluído';
-
-                        return parsed;
-                    } catch (e) {
-                        console.error('Erro ao parsear JSON:', e);
-                        return {}; // Retorna objeto vazio em caso de erro
-                    }
-                }
-
-                if (response.message === 'Ok') response.message = 'Concluído';
-
-                return response;
-            };
-
-            watch(acompanhar, (newVal) => {
-                totalImoveis.value = newVal.reduce((total, integracao) => {
-                    return total + integracao.bairros.reduce((bairroTotal, bairro) => {
-                        return bairroTotal + (bairro.bairro.imoveis ? bairro.bairro.imoveis.length : 0);
-                    }, 0);
-                }, 0);
-
-                quantidadeBairros.value = newVal[0]?.bairros.length || 0;
-            }, { deep: true });
-
-            watch(refreshInterval, (newValue) => {
-                startAutoRefresh();
-            });
-
-            watch(listaIntegracao, () => {
-                if (crmSelecionado.value) {
-                    filtrarStatusParceiroIntegracao(crmSelecionado.value);
-                } else {
-                    console.warn("CRM não está definido.");
-                }
-            });
-
-            watch(crmSelecionado, (newVal) => {
-                if (newVal === 1) {
-                    crmLabel.value = "Código do Imóvel Imoview";
-                    responseProp.value = "imoviewResponse";
-                    crmTitle.value = "IMOVIEW"
-                } else if (newVal === 2) {
-                    crmLabel.value = "Código do Imóvel Vistasoft";
-                    responseProp.value = "apiResponse";
-                    crmTitle.value = "VISTASOFT"
-                } else {
-                    crmLabel.value = "";
-                    responseProp.value = "";
-                }
-            });
-
-            const handleClick = async (row) => {
-                try {
-                    const urlReprocessamento = validarUrlParaReprocessarImovel(crmSelecionado.value);
-                    const response = await axios.post(urlReprocessamento, {
-                        id: row.id,
-                        cod: row.cod
-                    });
-                    if (response.data) {
-                        ElementPlus.ElMessage.success('Imovel em Fila de Processamento!');
-                    } else {
-                        ElementPlus.ElMessage.error({
-                            message: 'Oops, this is an error message.',
-                            showClose: true,
-                        });
-                    }
-                } catch (error) {
-                    console.error('Erro no reprocessamento:', error);
-                    ElementPlus.ElMessage.error('Erro ao reprocessar. Tente novamente mais tarde.');
-                }
-            };
-
-            onMounted(() => {
-                setTimeout(() => {
-                    filtrosVisiveis.value = true;
-                }, 300);
-            });
-
-            onBeforeUnmount(() => {
-                stopAutoRefresh();
-            });
-
-            const abrirModalFiltro = () => {
-                filtrosVisiveis.value = true;
-            };
-
-            const fecharModal = () => {
-                filtrosVisiveis.value = false;
-            };
-
-            const filtros = ref({
-                Integracao: 0,
-                Cliente: '',
-            });
-
-            const startAutoRefresh = () => {
-                if (intervalId) clearInterval(intervalId);
-                if (refreshInterval.value > 0) {
-                    intervalId = setInterval(refreshData, refreshInterval.value * 1000);
-                }
-            };
-
-            const stopAutoRefresh = () => {
-                if (intervalId) {
-                    clearInterval(intervalId);
-                    intervalId = null;
-                }
-            };
-
-            const filtrarParceiroIntegracao = async (crm) => {
-                crmSelecionado.value = crm;
-                const url = validarUrlParaBuscarParceiroIntegracao(crm);
-                if (!url) {
-                    console.error("URL inválida para o parceiro de integração.");
-                    return;
-                }
-                listaIntegracao.value = [];
-                await getListaIntegracoes(url);
-                isDisabled();
-            };
-
-            const filtrarStatusParceiroIntegracao = async (crm) => {
-                urlStatusIntegracao.value = validarUrlParaBuscarStatusIntegracao(crm);
-                if (!urlStatusIntegracao.value) {
-                    console.error("URL inválida para o parceiro de integração.");
-                    return;
-                }
-                isDisabled();
-            };
-
-            const isDisabled = () => {
-                return listaCrmIntegracao.value === 1 || listaCrmIntegracao.value === 2;
-            };
-
-            const formatarData = (dataISO) => {
-                if (!dataISO) return '';
-                const data = new Date(dataISO);
-                return data.toLocaleDateString('pt-BR', { timeZone: 'UTC' });  // Formato dd/mm/aaaa
-            };
-
-            const formatarHorario = (dataISO) => {
-                if (!dataISO) return '';
-                const data = new Date(dataISO);
-                return data.toLocaleTimeString('pt-BR', { timeZone: 'UTC', hour: '2-digit', minute: '2-digit' });  // Formato HH:mm
-            };
-
-            const formatarDataHora = (dataISO) => {
-                const data = new Date(dataISO);
-                const dataUTC3 = new Date(data.getTime() - (data.getTimezoneOffset() * 60000)); // Converter para UTC-3
-                const dataFormatada = dataUTC3.toLocaleDateString('pt-BR');
-                const horarioFormatado = dataUTC3.toLocaleTimeString('pt-BR', {
-                    hour: '2-digit',
-                    minute: '2-digit',
-                    timeZone: 'America/Sao_Paulo'
-                });
-                return `${dataFormatada} às ${horarioFormatado}`;
-            };
-
-            const validarUrlParaBuscarParceiroIntegracao = (crm) => {
-                switch (crm) {
-                    case 1:
-                        return instance.proxy.$api.BuildURL("api/imoview/integracao/listar");
-                    case 2:
-                        return instance.proxy.$api.BuildURL("api/vistasoft/integracao/listar");
-                    default:
-                        console.error("CRM inválido:", crm);
-                        return null;
-                }
-            };
-
-            const validarUrlParaBuscarStatusIntegracao = (crm) => {
-                switch (crm) {
-                    case 1:
-                        return instance.proxy.$api.BuildURL("api/imoview/integracao/status");
-                    case 2:
-                        return instance.proxy.$api.BuildURL("api/vistasoft/integracao/status");
-                    default:
-                        console.error("CRM inválido:", crm);
-                        return null;
-                }
-            };
-
-            const validarUrlParaReprocessarImovel = (crm) => {
-                switch (crm) {
-                    case 1:
-                        return instance.proxy.$api.BuildURL("api/imoview/integracao/cliente/reprocessarimovel");
-                    case 2:
-                        return instance.proxy.$api.BuildURL("api/vistasoft/integracao/cliente/reprocessarimovel");
-                    default:
-                        console.error("CRM inválido:", crm);
-                        return null;
-                }
-            };
-
-            const verificarStatusBairro = (bairro) => {
-                const imoveis = bairro.bairro?.imoveis;
-                const temErro = imoveis.some(imovel => getResponse(imovel).erro);
-                const temSucesso = imoveis.some(imovel => !getResponse(imovel).erro);
-                const temPendente = imoveis.some(imovel => imovel.status === 'Aguardando');
-                const emProcessamento = imoveis.some(imovel => imovel.status === 'Processando');
-
-                if (emProcessamento) return 'Processando';
-                if (temErro && temSucesso) return 'Concluído com Falhas';
-                if (temErro) return 'Erro';
-                if (temPendente) return 'Aguardando';
-                return 'Concluido';
-            };
-
-            const verificarStatusIntegracao = (integracao) => {
-                let statusIntegracao = "Concluido";
-                let temParcial = false;
-                let aguardando = false;
-                let emProcessamento = false;
-
-                integracao.bairros.forEach(bairro => {
-                    const statusBairro = verificarStatusBairro(bairro);
-                    if (statusBairro === "Erro") {
-                        statusIntegracao = "Erro";
-                    } else if (statusBairro === "Concluído com Falhas") {
-                        temParcial = true;
-                    } else if (statusBairro === "Aguardando") {
-                        aguardando = true;
-                    }
-                    else if (statusBairro === "Processando") {
-                        emProcessamento = true;
-                    }
-                });
-
-                if (aguardando) return "Aguardando";
-                if (emProcessamento) return "Processando";
-                if (temParcial) return "Concluído com Falhas";
-                return statusIntegracao;
-            };
-
-            const refreshData = async () => {
-                await Buscar();
-            };
-
-            const Buscar = async () => {
-                try {
-                    fullscreenLoading.value = true;
-                    filtros.value.Integracao = listaIntegracao.value.value;
-                    filtros.value.Cliente = listaIntegracao.value.label;
-                    const response = await axios.post(urlStatusIntegracao.value, filtros.value);
-                    acompanhar.value = [response.data];
-                    acompanhar.value = acompanhar.value.map(integracao => {
-                        return {
-                            ...integracao,
-                            status: verificarStatusIntegracao(integracao),
-                            bairros: integracao.bairros.map(bairro => {
-                                return {
-                                    ...bairro,
-                                    status: verificarStatusBairro(bairro)
-                                };
-                            })
-                        };
-                    });
-                    totalImoveis.value = acompanhar.value.reduce((total, integracao) => {
-                        if (Array.isArray(integracao.bairros) && integracao.bairros.length > 0) {
-                            return total + integracao.bairros.reduce((bairroTotal, bairro) => {
-                                return bairroTotal + (Array.isArray(bairro.bairro.imoveis) ? bairro.bairro.imoveis.length : 0);
-                            }, 0);
-                        }
-                        return total;
-                    }, 0);
-                    quantidadeBairros.value = acompanhar.value[0].bairros.length;
-                } catch (error) {
-                    console.error("Erro ao buscar integração:", error);
-                } finally {
-                    filtrosVisiveis.value = false;
-                    fullscreenLoading.value = false;;
-                }
-            };
-
-            const getListaIntegracoes = async (url) => {
-                try {
-                    const { data } = await axios.get(url);
-                    options.value = data.map(item => ({
-                        value: item.integracao,
-                        label: item.cliente
-                    }));
-                } catch (error) {
-                    console.error('Erro ao buscar integrações:', error);
-                }
-            };
-
-            return {
-                acompanhar,
-                filtrosVisiveis,
-                filtros,
-                Buscar,
-                idIntegracao,
-                listaIntegracao,
-                options,
-                abrirModalFiltro,
-                formatarData,
-                formatarHorario,
-                formatarDataHora,
-                fecharModal,
-                crmOptions,
-                listaCrmIntegracao,
-                filtrarParceiroIntegracao,
-                isDisabled,
-                totalImoveis,
-                quantidadeBairros,
-                refreshData,
-                fullscreenLoading,
-                optionsRefresh,
-                startAutoRefresh,
-                refreshInterval,
-                crmSelecionado,
-                crmLabel,
-                getResponse,
-                crmTitle,
-                handleClick,
-            };
-        },
-    };
-</script>
-
-<template>
+﻿<template>
     <div v-loading.fullscreen.lock="fullscreenLoading" element-loading-background="rgba(0, 0, 0, 0.7)">
         <div style="display: flex; justify-content: space-between; align-items: center; width: 100%; margin-bottom: 30px;">
             <div style="line-height: 1.6; font-size: 18px; color: #0072ff">
@@ -394,7 +30,8 @@
 
                 <el-button type="primary"
                            size="small"
-                           round>
+                           round
+                           @click="reprocessarIntegracao">
                     <div style="display: flex; width: 100%; align-content: center">
                         <div style="display: flex; width: 100%; align-items: center">
                             Reprocessar Integração
@@ -600,7 +237,7 @@
                                    :key="item.id"
                                    :label="item.nome"
                                    :value="item.id"
-                                   :disabled="item.disabled"/>
+                                   :disabled="item.disabled" />
                     </el-select>
                 </el-col>
                 <el-col :xs="24" :sm="24" :md="24" :lg="24" class="register-input">
@@ -619,7 +256,474 @@
             </div>
         </template>
     </el-dialog>
+    
+    <el-dialog v-model="reprocessarTodaAIntegracao" title="Filtro" width="500" align-center>
+        <div style="display: flex; width: 100%">
+            <el-row gutter=20>
+                <el-col :xs="24" :sm="12" :md="8" :lg="8" class="register-input">
+                    <div>CHAVE API<span></span></div>
+                    <el-form-item prop="chaveApi">
+                        <el-input style="width:100%"
+                                  v-model="chaveApi"
+                                  clearable
+                                  placeholder="Insira sua Chave API"
+                                  @change="handleChange"></el-input>
+                    </el-form-item>
+                </el-col>
+
+                <el-col v-if="isImoview" :xs="24" :sm="12" :md="8" :lg="8" class="register-input">
+                    <div>CÓDIGO USUÁRIO IMOVIEW<span></span></div>
+                    <el-form-item prop="codUsuario">
+                        <el-input style="width:100%"
+                                  clearable
+                                  v-model="codUsuario"
+                                  :placeholder="placeholderUsuarioText"></el-input>
+                    </el-form-item>
+                </el-col>
+
+                <el-col v-if="isImoview" :xs="24" :sm="12" :md="8" :lg="8" class="register-input">
+                    <div>UNIDADE<span></span></div>
+                    <el-form-item prop="codUnidade">
+                        <el-select v-model="codUnidade" filterable :clearable="true" class="m-4" placeholder="INFORME A UNIDADE" size="large" style="width:100%">
+                            <el-option v-for="item in opcoes.unidades" :key="item.id" :label="item.nome" :value="item.id"></el-option>
+                        </el-select>
+                    </el-form-item>
+                </el-col>
+
+                <el-col v-if="isVistaSoft" :xs="24" :sm="24" :md="16" :lg="16" class="register-input">
+                    <div>URL VISTASOFT<span></span></div>
+                    <el-form-item prop="urlApi">
+                        <el-input style="width:100%"
+                                  v-model="urlApi"
+                                  clearable
+                                  :placeholder="placeholderUrlVistaSoft"
+                                  @change="(value) => ValidarUrl(value)"></el-input>
+                    </el-form-item>
+                </el-col>
+            </el-row>
+        </div>
+
+        <template #footer>
+            <div class="dialog-footer">
+                <el-button @click="fecharModal">Cancelar</el-button>
+                <el-button type="primary" @click="Buscar">Aplicar Filtros</el-button>
+            </div>
+        </template>
+    </el-dialog>
 </template>
+
+<script>
+    import { ref, onMounted, getCurrentInstance, watch, onBeforeUnmount } from 'vue';
+    export default {
+        setup() {
+            const urlApi = ref('');
+            const options = ref({});
+            const cpfCnpj = ref('');
+            const crmTitle = ref('');
+            const chaveApi = ref('');
+            const codUsuario = ref('');
+            const codUnidade = ref('');
+            const acompanhar = ref([]);
+            const totalImoveis = ref(0);
+            const responseProp = ref('');
+            const isImoview = ref(false);
+            const collapseItems = ref([]);
+            const isVistaSoft = ref(false);
+            const idIntegracao = ref(null);
+            const crmSelecionado = ref('');
+            const refreshInterval = ref(0);
+            const listaIntegracao = ref([]);
+            const quantidadeBairros = ref(0);
+            const filtrosVisiveis = ref(false);
+            const listaCrmIntegracao = ref([]);
+            const idParceiroIntegracao = ref('');
+            const urlStatusIntegracao = ref('');
+            const fullscreenLoading = ref(false);
+            const instance = getCurrentInstance();
+            const reprocessarTodaAIntegracao = ref(false);
+            let intervalId = null;
+            const crmLabel = ref("");
+            const crmOptions = ref([
+                { nome: 'IMOVIEW', id: 1 },
+                { nome: 'VISTASOFT', id: 2 },
+            ]);
+            const optionsRefresh = ref([
+                { label: 'Desativar', value: 0 },
+                { label: '5 segundos', value: 5 },
+                { label: '10 segundos', value: 10 },
+                { label: '30 segundos', value: 30 },
+                { label: '1 minuto', value: 60 },
+                { label: '2 minutos', value: 120 },
+                { label: '5 minutos', value: 300 },
+                { label: '10 minutos', value: 600 },
+            ]);
+
+            const getResponse = (imovel) => {
+                const response = imovel[responseProp.value] || {};
+
+                if (typeof response === 'string') {
+                    try {
+                        const parsed = JSON.parse(response);
+
+                        if (parsed.message === 'Ok') parsed.message = 'Concluído';
+
+                        return parsed;
+                    } catch (e) {
+                        console.error('Erro ao parsear JSON:', e);
+                        return {}; // Retorna objeto vazio em caso de erro
+                    }
+                }
+
+                if (response.message === 'Ok') response.message = 'Concluído';
+
+                return response;
+            };
+
+            watch(acompanhar, (newVal) => {
+                totalImoveis.value = newVal.reduce((total, integracao) => {
+                    return total + integracao.bairros.reduce((bairroTotal, bairro) => {
+                        return bairroTotal + (bairro.bairro.imoveis ? bairro.bairro.imoveis.length : 0);
+                    }, 0);
+                }, 0);
+
+                quantidadeBairros.value = newVal[0]?.bairros.length || 0;
+            }, { deep: true });
+
+            watch(refreshInterval, (newValue) => {
+                startAutoRefresh();
+            });
+
+            watch(listaIntegracao, () => {
+                if (crmSelecionado.value) {
+                    filtrarStatusParceiroIntegracao(crmSelecionado.value);
+                } else {
+                    console.warn("CRM não está definido.");
+                }
+            });
+
+            watch(crmSelecionado, (newVal) => {
+                if (newVal === 1) {
+                    crmLabel.value = "Código do Imóvel Imoview";
+                    responseProp.value = "imoviewResponse";
+                    crmTitle.value = "IMOVIEW"
+                    isImoview.value = true;
+                } else if (newVal === 2) {
+                    crmLabel.value = "Código do Imóvel Vistasoft";
+                    responseProp.value = "apiResponse";
+                    crmTitle.value = "VISTASOFT"
+                    isVistaSoft.value = false;
+                } else {
+                    crmLabel.value = "";
+                    responseProp.value = "";
+                }
+            });
+
+            const carregarDadosParceiroIntegracao = () => {
+                try {
+                    getCurrentInstance.$api.BuildURL('parceiro/obterparceirointegracao');
+                    url = validarParceiroIntegracao(crmSelecionado.value);
+                    obterParceiroIntegracao = await axios.post(url, { cpfCnpj: cpfCnpj });
+                    const { data } = await axios.get(url);
+                    console.log(data);
+                } catch {
+
+                }
+            }
+
+            const handleClick = async (row) => {
+                try {
+                    const urlReprocessamento = validarUrlParaReprocessarImovel(crmSelecionado.value);
+                    const response = await axios.post(urlReprocessamento, {
+                        id: row.id,
+                        cod: row.cod
+                    });
+                    if (response.data) {
+                        ElementPlus.ElMessage.success('Imovel em Fila de Processamento!');
+                    } else {
+                        ElementPlus.ElMessage.error({
+                            message: 'Oops, this is an error message.',
+                            showClose: true,
+                        });
+                    }
+                } catch (error) {
+                    console.error('Erro no reprocessamento:', error);
+                    ElementPlus.ElMessage.error('Erro ao reprocessar. Tente novamente mais tarde.');
+                }
+            };
+
+            onMounted(() => {
+                setTimeout(() => {
+                    filtrosVisiveis.value = true;
+                }, 300);
+            });
+
+            onBeforeUnmount(() => {
+                stopAutoRefresh();
+            });
+
+            const abrirModalFiltro = () => {
+                filtrosVisiveis.value = true;
+            };
+
+            const fecharModal = () => {
+                filtrosVisiveis.value = false;
+            };
+
+            const filtros = ref({
+                Integracao: 0,
+                Cliente: '',
+            });
+
+            const reprocessarIntegracao = () => {
+                carregarDadosParceiroIntegracao();
+                reprocessarTodaAIntegracao.value = true;
+            }
+
+            const startAutoRefresh = () => {
+                if (intervalId) clearInterval(intervalId);
+                if (refreshInterval.value > 0) {
+                    intervalId = setInterval(refreshData, refreshInterval.value * 1000);
+                }
+            };
+
+            const stopAutoRefresh = () => {
+                if (intervalId) {
+                    clearInterval(intervalId);
+                    intervalId = null;
+                }
+            };
+
+            const filtrarParceiroIntegracao = async (crm) => {
+                crmSelecionado.value = crm;
+                const url = validarUrlParaBuscarParceiroIntegracao(crm);
+                if (!url) {
+                    console.error("URL inválida para o parceiro de integração.");
+                    return;
+                }
+                listaIntegracao.value = [];
+                await getListaIntegracoes(url);
+                isDisabled();
+            };
+
+            const filtrarStatusParceiroIntegracao = async (crm) => {
+                urlStatusIntegracao.value = validarUrlParaBuscarStatusIntegracao(crm);
+                if (!urlStatusIntegracao.value) {
+                    console.error("URL inválida para o parceiro de integração.");
+                    return;
+                }
+                isDisabled();
+            };
+
+            const isDisabled = () => {
+                return listaCrmIntegracao.value === 1 || listaCrmIntegracao.value === 2;
+            };
+
+            const formatarData = (dataISO) => {
+                if (!dataISO) return '';
+                const data = new Date(dataISO);
+                return data.toLocaleDateString('pt-BR', { timeZone: 'UTC' });  // Formato dd/mm/aaaa
+            };
+
+            const formatarHorario = (dataISO) => {
+                if (!dataISO) return '';
+                const data = new Date(dataISO);
+                return data.toLocaleTimeString('pt-BR', { timeZone: 'UTC', hour: '2-digit', minute: '2-digit' });  // Formato HH:mm
+            };
+
+            const formatarDataHora = (dataISO) => {
+                const data = new Date(dataISO);
+                const dataUTC3 = new Date(data.getTime() - (data.getTimezoneOffset() * 60000)); // Converter para UTC-3
+                const dataFormatada = dataUTC3.toLocaleDateString('pt-BR');
+                const horarioFormatado = dataUTC3.toLocaleTimeString('pt-BR', {
+                    hour: '2-digit',
+                    minute: '2-digit',
+                    timeZone: 'America/Sao_Paulo'
+                });
+                return `${dataFormatada} às ${horarioFormatado}`;
+            };
+
+            const validarUrlParaBuscarParceiroIntegracao = (crm) => {
+                switch (crm) {
+                    case 1:
+                        return instance.proxy.$api.BuildURL("api/imoview/integracao/listar");
+                    case 2:
+                        return instance.proxy.$api.BuildURL("api/vistasoft/integracao/listar");
+                    default:
+                        console.error("CRM inválido:", crm);
+                        return null;
+                }
+            };
+
+            const validarUrlParaBuscarStatusIntegracao = (crm) => {
+                switch (crm) {
+                    case 1:
+                        return instance.proxy.$api.BuildURL("api/imoview/integracao/status");
+                    case 2:
+                        return instance.proxy.$api.BuildURL("api/vistasoft/integracao/status");
+                    default:
+                        console.error("CRM inválido:", crm);
+                        return null;
+                }
+            };
+
+            const validarParceiroIntegracao = (crm) => {
+                switch (crm) {
+                    case 1:
+                        return this.$api.BuildURL('api/imoview/integracao/cliente');
+                    case 2:
+                        return this.$api.BuildURL('api/vistasoft/integracao/cliente');
+                    default:
+                        throw new Error('CRM inválido');
+                }
+            };
+
+            const validarUrlParaReprocessarImovel = (crm) => {
+                switch (crm) {
+                    case 1:
+                        return instance.proxy.$api.BuildURL("api/imoview/integracao/cliente/reprocessarimovel");
+                    case 2:
+                        return instance.proxy.$api.BuildURL("api/vistasoft/integracao/cliente/reprocessarimovel");
+                    default:
+                        console.error("CRM inválido:", crm);
+                        return null;
+                }
+            };
+
+            const verificarStatusBairro = (bairro) => {
+                const imoveis = bairro.bairro?.imoveis;
+                const temErro = imoveis.some(imovel => getResponse(imovel).erro);
+                const temSucesso = imoveis.some(imovel => !getResponse(imovel).erro);
+                const temPendente = imoveis.some(imovel => imovel.status === 'Aguardando');
+                const emProcessamento = imoveis.some(imovel => imovel.status === 'Processando');
+
+                if (emProcessamento) return 'Processando';
+                if (temErro && temSucesso) return 'Concluído com Falhas';
+                if (temErro) return 'Erro';
+                if (temPendente) return 'Aguardando';
+                return 'Concluido';
+            };
+
+            const verificarStatusIntegracao = (integracao) => {
+                let statusIntegracao = "Concluido";
+                let temParcial = false;
+                let aguardando = false;
+                let emProcessamento = false;
+
+                integracao.bairros.forEach(bairro => {
+                    const statusBairro = verificarStatusBairro(bairro);
+                    if (statusBairro === "Erro") {
+                        statusIntegracao = "Erro";
+                    } else if (statusBairro === "Concluído com Falhas") {
+                        temParcial = true;
+                    } else if (statusBairro === "Aguardando") {
+                        aguardando = true;
+                    }
+                    else if (statusBairro === "Processando") {
+                        emProcessamento = true;
+                    }
+                });
+
+                if (aguardando) return "Aguardando";
+                if (emProcessamento) return "Processando";
+                if (temParcial) return "Concluído com Falhas";
+                return statusIntegracao;
+            };
+
+            const refreshData = async () => {
+                await Buscar();
+            };
+
+            const Buscar = async () => {
+                try {
+                    fullscreenLoading.value = true;
+                    filtros.value.Integracao = listaIntegracao.value.value;
+                    filtros.value.Cliente = listaIntegracao.value.label;
+                    const response = await axios.post(urlStatusIntegracao.value, filtros.value);
+                    acompanhar.value = [response.data];
+                    acompanhar.value = acompanhar.value.map(integracao => {
+                        return {
+                            ...integracao,
+                            status: verificarStatusIntegracao(integracao),
+                            bairros: integracao.bairros.map(bairro => {
+                                return {
+                                    ...bairro,
+                                    status: verificarStatusBairro(bairro)
+                                };
+                            })
+                        };
+                    });
+                    totalImoveis.value = acompanhar.value.reduce((total, integracao) => {
+                        if (Array.isArray(integracao.bairros) && integracao.bairros.length > 0) {
+                            return total + integracao.bairros.reduce((bairroTotal, bairro) => {
+                                return bairroTotal + (Array.isArray(bairro.bairro.imoveis) ? bairro.bairro.imoveis.length : 0);
+                            }, 0);
+                        }
+                        return total;
+                    }, 0);
+                    quantidadeBairros.value = acompanhar.value[0].bairros.length;
+                    idParceiroIntegracao.value = acompanhar.idCliente;
+                    console.log(idParceiroIntegracao.value);
+                } catch (error) {
+                    console.error("Erro ao buscar integração:", error);
+                } finally {
+                    filtrosVisiveis.value = false;
+                    fullscreenLoading.value = false;;
+                }
+            };
+
+            const getListaIntegracoes = async (url) => {
+                try {
+                    const { data } = await axios.get(url);
+                    options.value = data.map(item => ({
+                        value: item.integracao,
+                        label: item.cliente
+                    }));
+                } catch (error) {
+                    console.error('Erro ao buscar integrações:', error);
+                }
+            };
+
+            return {
+                acompanhar,
+                filtrosVisiveis,
+                filtros,
+                Buscar,
+                idIntegracao,
+                listaIntegracao,
+                options,
+                abrirModalFiltro,
+                formatarData,
+                formatarHorario,
+                formatarDataHora,
+                fecharModal,
+                crmOptions,
+                listaCrmIntegracao,
+                filtrarParceiroIntegracao,
+                isDisabled,
+                totalImoveis,
+                quantidadeBairros,
+                refreshData,
+                fullscreenLoading,
+                optionsRefresh,
+                startAutoRefresh,
+                refreshInterval,
+                crmSelecionado,
+                crmLabel,
+                getResponse,
+                crmTitle,
+                handleClick,
+                reprocessarIntegracao,
+                reprocessarTodaAIntegracao,
+                urlApi,
+                chaveApi,
+                codUsuario,
+                codUnidade,
+                isImoview,
+                isVistaSoft,
+            };
+        },
+    };
+</script>
 
 <style>
     .el-card__body {

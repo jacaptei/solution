@@ -417,7 +417,6 @@
                 } else {
                     return false
                 }
-
             },
 
             async ObterCidades(estadoId, groupIndex) {
@@ -466,13 +465,10 @@
             handleChange(value) {
                 switch (this.opcoes.crm) {
                     case 1:
-                        // Chama a função BuscarUnidades quando CRM for igual a 1
                         return this.BuscarUnidades(value);
                     case 2:
-                        // CRM 2 não requer nenhuma ação, então apenas retorna
                         return;
                     default:
-                        // Lança um erro se o CRM não for válido
                         throw new Error('CRM inválido');
                 }
             },
@@ -566,7 +562,7 @@
                     url += '/';
                 }
 
-                return url; // Retorna a URL formatada
+                return url;
             },
 
             applyMask() {
