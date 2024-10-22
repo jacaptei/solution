@@ -65,7 +65,12 @@
                                                 <el-table-column label="Código do Imóvel JaCaptei" prop="cod" align="center" />
                                                 <el-table-column :label="crmLabel" align="center">
                                                     <template #default="scope">
-                                                        {{ getResponse(scope.row).Codigo }}
+                                                        <div v-if="crmLabel == 'Código do Imóvel Imoview'">
+                                                            {{ getResponse(scope.row).codigo }}
+                                                        </div>
+                                                        <div v-if="crmLabel == 'Código do Imóvel VistaSoft'">
+                                                            {{ getResponse(scope.row).Codigo }}
+                                                        </div>
                                                     </template>
                                                 </el-table-column>
                                                 <el-table-column label="Data de Importação" prop="data" width="150" align="center">
@@ -370,7 +375,7 @@
                         return parsed;
                     } catch (e) {
                         console.error('Erro ao parsear JSON:', e);
-                        return {}; // Retorna objeto vazio em caso de erro
+                        return {};
                     }
                 }
 
@@ -408,7 +413,7 @@
                     crmTitle.value = "IMOVIEW"
                     isImoview.value = true;
                 } else if (newVal === 2) {
-                    crmLabel.value = "Código do Imóvel Vistasoft";
+                    crmLabel.value = "Código do Imóvel VistaSoft";
                     responseProp.value = "apiResponse";
                     crmTitle.value = "VISTASOFT"
                     isVistaSoft.value = false;
@@ -418,7 +423,7 @@
                 }
             });
 
-            const carregarDadosParceiroIntegracao = () => {
+            const carregarDadosParceiroIntegracao = async() => {
                 try {
                     getCurrentInstance.$api.BuildURL('parceiro/obterparceirointegracao');
                     url = validarParceiroIntegracao(crmSelecionado.value);
@@ -433,7 +438,7 @@
             const handleClick = async (row) => {
                 try {
                     const urlReprocessamento = validarUrlParaReprocessarImovel(crmSelecionado.value);
-                    const response = await axios.post(urlReprocessamento, {
+                    const response = axios.post(urlReprocessamento, {
                         id: row.id,
                         cod: row.cod
                     });
