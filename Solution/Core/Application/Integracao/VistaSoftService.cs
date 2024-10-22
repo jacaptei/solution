@@ -726,7 +726,7 @@ namespace JaCaptei.Application.Integracao
                 IdOperador = integracao.IdOperador
             };
             string connectionString = Config.settings.AzureMQ;
-            string queueName = "reprocessarintegracao";
+            string queueName = "reprocessarintegracaovistasoft";
             await using var client = new ServiceBusClient(connectionString);
             ServiceBusSender sender = client.CreateSender(queueName);
             await SendQueue(sender, integracaoEvent);
@@ -790,6 +790,39 @@ namespace JaCaptei.Application.Integracao
                 }
             }
             _logger?.LogInformation("Reprocessamento concluído. {sucesso} processados com sucesso. {erro} processados com erro.", sucesso, erro);
+        }
+
+        public async Task<bool> ReprocessarImovel(ImovelReprocessDTO? dto)
+        {
+            var importacao = await _retryPolicy.ExecuteAsync(() => _vistaSoftDAO.GetImportacaoImovel(dto.Id, dto.Cod));
+            if (importacao == null)
+            {
+                _logger?.LogWarning("Importacao de imovel {id} não encontrada, Imovel {cod}", dto.Id, dto.Cod);
+                return false;
+            }
+            IntegracaoVistaSoft? integracao = await _retryPolicy.ExecuteAsync(() => _vistaSoftDAO.GetIntegracaoImportacaoBairro(importacao.IdImportacaoBairro));
+            if (integracao == null)
+            {
+                _logger?.LogWarning("Integracao não encontrada, Imovel {cod}", dto.Id, dto.Cod);
+                return false;
+            }
+            string connectionString = Config.settings.AzureMQ;
+            string queueName = "importacaoimovel";
+            await using var client = new ServiceBusClient(connectionString);
+            ServiceBusSender sender = client.CreateSender(queueName);
+            var importEvent = new ImportacaoImoveVistaSoftEvent()
+            {
+                ChaveApi = integracao.ChaveApi,
+                CodImovel = importacao.CodImovel,
+                UrlApi = integracao.UrlApi,
+                IdCliente = integracao.IdCliente,
+                IdImovel = importacao.IdImovel,
+                IdImportacaoBairro = importacao.IdImportacaoBairro,
+                IdIntegracao = integracao.Id
+            };
+            await Task.Delay(_queueDelay);
+            var res = await SendImportQueue(sender, importEvent);
+            return true;
         }
     }
 
