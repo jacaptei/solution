@@ -151,7 +151,7 @@
                             <el-table-column label="Bairro" prop="bairro.nome" />
                             <el-table-column label="Quantidade de Imoveis" prop="totalImoveisBairro" align="center">
                                 <template #default="bairroScope">
-                                    {{ bairroScope.row.bairro.imoveis.length }}
+                                    {{ bairroScope.row.bairro.imoveis?.length }}
                                 </template>
                             </el-table-column>
                             <el-table-column label="Status" align="center">
@@ -265,7 +265,7 @@
     <el-dialog v-model="reprocessarTodaAIntegracao" title="Filtro" width="500" align-center>
         <div style="display: flex; width: 100%">
             <el-row gutter=20>
-                <el-col :xs="24" :sm="12" :md="8" :lg="8" class="register-input">
+                <el-col :xs="24" :sm="24" :md="24" :lg="24" class="register-input">
                     <div>CHAVE API<span></span></div>
                     <el-form-item prop="chaveApi">
                         <el-input style="width:100%"
@@ -276,7 +276,7 @@
                     </el-form-item>
                 </el-col>
 
-                <el-col v-if="isImoview" :xs="24" :sm="12" :md="8" :lg="8" class="register-input">
+                <el-col v-if="isImoview" :xs="24" :sm="24" :md="24" :lg="24" class="register-input">
                     <div>CÓDIGO USUÁRIO IMOVIEW<span></span></div>
                     <el-form-item prop="codUsuario">
                         <el-input style="width:100%"
@@ -286,16 +286,16 @@
                     </el-form-item>
                 </el-col>
 
-                <el-col v-if="isImoview" :xs="24" :sm="12" :md="8" :lg="8" class="register-input">
+                <el-col v-if="isImoview" :xs="24" :sm="24" :md="24" :lg="24" class="register-input">
                     <div>UNIDADE<span></span></div>
                     <el-form-item prop="codUnidade">
                         <el-select v-model="codUnidade" filterable :clearable="true" class="m-4" placeholder="INFORME A UNIDADE" size="large" style="width:100%">
-                            <el-option v-for="item in opcoes.unidades" :key="item.id" :label="item.nome" :value="item.id"></el-option>
+                            <el-option v-for="item in unidades" :key="item.id" :label="item.nome" :value="item.id"></el-option>
                         </el-select>
                     </el-form-item>
                 </el-col>
 
-                <el-col v-if="isVistaSoft" :xs="24" :sm="24" :md="16" :lg="16" class="register-input">
+                <el-col v-if="isVistaSoft" :xs="24" :sm="24" :md="24" :lg="24" class="register-input">
                     <div>URL VISTASOFT<span></span></div>
                     <el-form-item prop="urlApi">
                         <el-input style="width:100%"
@@ -311,7 +311,7 @@
         <template #footer>
             <div class="dialog-footer">
                 <el-button @click="fecharModal">Cancelar</el-button>
-                <el-button type="primary" @click="Buscar">Aplicar Filtros</el-button>
+                <el-button type="primary" @click="Buscar">Reprocessar</el-button>
             </div>
         </template>
     </el-dialog>
@@ -323,7 +323,7 @@
         setup() {
             const urlApi = ref('');
             const options = ref({});
-            const cpfCnpj = ref('');
+            const documento = ref('');
             const crmTitle = ref('');
             const chaveApi = ref('');
             const codUsuario = ref('');
@@ -336,6 +336,7 @@
             const isVistaSoft = ref(false);
             const idIntegracao = ref(null);
             const crmSelecionado = ref('');
+            const unidades = ref([]);
             const refreshInterval = ref(0);
             const listaIntegracao = ref([]);
             const quantidadeBairros = ref(0);
@@ -407,33 +408,54 @@
             });
 
             watch(crmSelecionado, (newVal) => {
-                if (newVal === 1) {
-                    crmLabel.value = "Código do Imóvel Imoview";
-                    responseProp.value = "imoviewResponse";
-                    crmTitle.value = "IMOVIEW"
-                    isImoview.value = true;
-                } else if (newVal === 2) {
-                    crmLabel.value = "Código do Imóvel VistaSoft";
-                    responseProp.value = "apiResponse";
-                    crmTitle.value = "VISTASOFT"
-                    isVistaSoft.value = false;
-                } else {
-                    crmLabel.value = "";
-                    responseProp.value = "";
-                }
+                const isImoviewSelected = newVal === 1;
+                const isVistasoftSelected = newVal === 2;
+
+                crmLabel.value = isImoviewSelected
+                    ? "Código do Imóvel Imoview"
+                    : isVistasoftSelected
+                        ? "Código do Imóvel VistaSoft"
+                        : "";
+
+                responseProp.value = isImoviewSelected
+                    ? "imoviewResponse"
+                    : isVistasoftSelected
+                        ? "apiResponse"
+                        : "";
+
+                crmTitle.value = isImoviewSelected
+                    ? "IMOVIEW"
+                    : isVistasoftSelected
+                        ? "VISTASOFT"
+                        : "";
+
+                isImoview.value = isImoviewSelected;
+                isVistaSoft.value = isVistasoftSelected;
             });
 
             const carregarDadosParceiroIntegracao = async() => {
                 try {
-                    getCurrentInstance.$api.BuildURL('parceiro/obterparceirointegracao');
-                    url = validarParceiroIntegracao(crmSelecionado.value);
-                    obterParceiroIntegracao = await axios.post(url, { cpfCnpj: cpfCnpj });
-                    const { data } = await axios.get(url);
+                    const url = validarParceiroIntegracao(crmSelecionado.value);
+                    const { data } = await axios.post(url, { cpfCnpj: documento.value });
+                    urlApi.value = data.integracao.urlApi || null;
+                    chaveApi.value = data.integracao.chaveApi;
+                    codUsuario.value = data.integracao.codUsuario;
+                    codUnidade.value = data.integracao.codUnidade;
                     console.log(data);
-                } catch {
-
+                } catch (error) {
+                    console.error('Erro no reprocessamento:', error);
                 }
-            }
+            };
+
+            const reprocessarIntegracao = async () => {
+                try {
+                    carregarDadosParceiroIntegracao();
+                    reprocessarTodaAIntegracao.value = true;
+                } catch (error) {
+                    console.error('Erro no reprocessamento:', error);
+                }
+                
+            };
 
             const handleClick = async (row) => {
                 try {
@@ -479,10 +501,7 @@
                 Cliente: '',
             });
 
-            const reprocessarIntegracao = () => {
-                carregarDadosParceiroIntegracao();
-                reprocessarTodaAIntegracao.value = true;
-            }
+           
 
             const startAutoRefresh = () => {
                 if (intervalId) clearInterval(intervalId);
@@ -574,9 +593,9 @@
             const validarParceiroIntegracao = (crm) => {
                 switch (crm) {
                     case 1:
-                        return this.$api.BuildURL('api/imoview/integracao/cliente');
+                        return instance.proxy.$api.BuildURL('api/imoview/integracao/cliente');
                     case 2:
-                        return this.$api.BuildURL('api/vistasoft/integracao/cliente');
+                        return instance.proxy.$api.BuildURL('api/vistasoft/integracao/cliente');
                     default:
                         throw new Error('CRM inválido');
                 }
@@ -595,7 +614,12 @@
             };
 
             const verificarStatusBairro = (bairro) => {
-                const imoveis = bairro.bairro?.imoveis;
+                const imoveis = bairro?.bairro?.imoveis;
+                let erroReq = ""
+                if (!imoveis) {
+                    return erroReq = "Erro";
+                }
+
                 const temErro = imoveis.some(imovel => getResponse(imovel).erro);
                 const temSucesso = imoveis.some(imovel => !getResponse(imovel).erro);
                 const temPendente = imoveis.some(imovel => imovel.status === 'Aguardando');
@@ -603,9 +627,9 @@
 
                 if (emProcessamento) return 'Processando';
                 if (temErro && temSucesso) return 'Concluído com Falhas';
-                if (temErro) return 'Erro';
+                if (temErro || erroReq) return 'Erro';
                 if (temPendente) return 'Aguardando';
-                return 'Concluido';
+                return 'Concluído';
             };
 
             const verificarStatusIntegracao = (integracao) => {
@@ -645,6 +669,8 @@
                     filtros.value.Cliente = listaIntegracao.value.label;
                     const response = await axios.post(urlStatusIntegracao.value, filtros.value);
                     acompanhar.value = [response.data];
+                    quantidadeBairros.value = acompanhar.value[0].bairros.length;
+                    documento.value = acompanhar.value[0].cpfCnpj;
                     acompanhar.value = acompanhar.value.map(integracao => {
                         return {
                             ...integracao,
@@ -665,9 +691,7 @@
                         }
                         return total;
                     }, 0);
-                    quantidadeBairros.value = acompanhar.value[0].bairros.length;
-                    idParceiroIntegracao.value = acompanhar.idCliente;
-                    console.log(idParceiroIntegracao.value);
+                   
                 } catch (error) {
                     console.error("Erro ao buscar integração:", error);
                 } finally {
