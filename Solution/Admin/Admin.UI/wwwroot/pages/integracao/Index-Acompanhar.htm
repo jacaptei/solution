@@ -253,6 +253,7 @@
             const verificarStatusIntegracao = (integracao) => {
                 let statusIntegracao = "Concluido";
                 let temParcial = false;
+                let aguardando = false;
                 let emProcessamento = false;
 
                 integracao.bairros.forEach(bairro => {
@@ -261,11 +262,15 @@
                         statusIntegracao = "Erro";
                     } else if (statusBairro === "Concluído com Falhas") {
                         temParcial = true;
-                    } else if (statusBairro === "Processando") {
+                    } else if (statusBairro === "Aguardando") {
+                        aguardando = true;
+                    }
+                    else if (statusBairro === "Processando") {
                         emProcessamento = true;
                     }
                 });
 
+                if (aguardando) return "Aguardando";
                 if (emProcessamento) return "Processando";
                 if (temParcial) return "Concluído com Falhas";
                 return statusIntegracao;
@@ -482,18 +487,14 @@
                                                 <el-table-column label="Ação" align="center">
                                                     <template #default="scope">
                                                         <div style="display: flex; align-items: center; justify-content: center">
-                                                            <el-tooltip  content="Reprocessar Integração" placement="top">
-                                                                <el-dropdown>
-                                                                    <el-icon class="el-icon--right icon-clickable" style="font-size: 24px; color: #0072FF;">
-                                                                        <More />
-                                                                    </el-icon>
-                                                                    <template #dropdown>
-                                                                        <el-dropdown-menu>
-                                                                            <el-dropdown-item v-if="['Aguardando', 'Processando', 'Erro'].includes(scope.row.status)" @click="handleClick(scope.row)">Reprocessar Imóvel</el-dropdown-item>
-                                                                            <el-dropdown-item :icon="CircleCheck">Action 5</el-dropdown-item>
-                                                                        </el-dropdown-menu>
-                                                                    </template>
-                                                                </el-dropdown>
+                                                            <el-tooltip v-if="['Aguardando', 'Processando', 'Erro'].includes(scope.row.status)"
+                                                                        content="Reprocessar Integração"
+                                                                        placement="top">
+                                                                <el-icon class="el-icon--right icon-clickable"
+                                                                         style="font-size: 24px; color: #0072FF;"
+                                                                         @click="handleClick(scope.row)">
+                                                                    <Refresh />
+                                                                </el-icon>
                                                             </el-tooltip>
                                                         </div>
                                                     </template>
