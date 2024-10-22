@@ -87,6 +87,7 @@ public class IntegracaoReport
     public DateTime criadoEm { get; set; }
     public int integracao { get; set; }
     public DateTime atualizadoEm { get; set; }
+    public string cpfCnpj { get; set; }
 }
 
 public class IntegracaoReportVS
@@ -98,4 +99,5 @@ public class IntegracaoReportVS
     public DateTime criadoEm { get; set; }
     public int integracao { get; set; }
     public DateTime atualizadoEm { get; set; }
+    public string cpfCnpj { get; set; }
 }

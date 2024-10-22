@@ -56,7 +56,7 @@ public class ImoviewController : ControllerBase
     }
 
     [HttpPost("integracao/status")]
-    public async Task<ActionResult<IntegracaoReponseDTO>> GetIntegracaoCliente([FromBody] IntegracaoComboDTO integracao)
+    public async Task<ActionResult<IntegracaoReport>> GetIntegracaoCliente([FromBody] IntegracaoComboDTO integracao)
     {
         var integracaoReport = await _service.GetReportIntegracao(integracao);
         return Ok(integracaoReport);
