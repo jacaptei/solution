@@ -103,6 +103,12 @@ namespace JaCaptei.Application.Integracao
             return res.FirstOrDefault();
         }
 
+        internal async Task<ImportacaoImovelVistaSoft?> GetImportacaoImovel(int idImportacao)
+        {
+            var res = await _conn.QueryAsync<ImportacaoImovelVistaSoft>(i => i.Id == idImportacao);
+            return res.FirstOrDefault();
+        }
+
         internal async Task<List<IntegracaoBairroVistaSoft>> GetIntegracaoBairroPendetes(int idIntegracao)
         {
             var integracoesPendentes = await _conn.QueryAsync<IntegracaoBairroVistaSoft>
@@ -251,6 +257,7 @@ WHERE ii.status != 'Concluido' AND ii.status != 'Processando' and ib.""idIntegra
     'plano', pl.nome, 
     'status', i.status, 
     'atualizadoEm', i.""dataAtualizacao"",
+    'cpfCnpj', COALESCE(p.cnpj, p.cpf),
     'bairros', (SELECT jsonb_agg(
         jsonb_build_object(
             'bairro', jsonb_build_object('nome', ib.bairro ->> 'Nome', 'idCidade', ib.bairro ->> 'IdCidade'

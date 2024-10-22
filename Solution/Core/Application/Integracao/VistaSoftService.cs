@@ -794,7 +794,7 @@ namespace JaCaptei.Application.Integracao
 
         public async Task<bool> ReprocessarImovel(ImovelReprocessDTO? dto)
         {
-            var importacao = await _retryPolicy.ExecuteAsync(() => _vistaSoftDAO.GetImportacaoImovel(dto.Id, dto.Cod));
+            var importacao = await _retryPolicy.ExecuteAsync(() => _vistaSoftDAO.GetImportacaoImovel(dto.Id));
             if (importacao == null)
             {
                 _logger?.LogWarning("Importacao de imovel {id} não encontrada, Imovel {cod}", dto.Id, dto.Cod);
@@ -807,7 +807,7 @@ namespace JaCaptei.Application.Integracao
                 return false;
             }
             string connectionString = Config.settings.AzureMQ;
-            string queueName = "importacaoimovel";
+            string queueName = "importacaoimovelvistasoft";
             await using var client = new ServiceBusClient(connectionString);
             ServiceBusSender sender = client.CreateSender(queueName);
             var importEvent = new ImportacaoImoveVistaSoftEvent()

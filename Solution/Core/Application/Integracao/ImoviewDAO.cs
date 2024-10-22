@@ -166,6 +166,12 @@ public class ImoviewDAO : IDisposable {
         return res.FirstOrDefault();
     }
 
+    public async Task<ImportacaoImovelImoview?> GetImportacaoImovel(int idImportacao)
+    {
+        var res = await _conn.QueryAsync<ImportacaoImovelImoview>(i => i.Id == idImportacao);
+        return res.FirstOrDefault();
+    }
+
     public async Task<List<ImovelImagem>> ObterImagensImovel(int idImovel)
     {
         var list = await _conn.QueryAsync<ImovelImagem>(e => e.IdImovel == idImovel);
@@ -257,6 +263,7 @@ WHERE ii.status != 'Concluido' AND ii.status != 'Processando' and ib.""idIntegra
     'plano', pl.nome, 
     'status', i.status, 
     'atualizadoEm', i.""dataAtualizacao"",
+    'cpfCnpj', COALESCE(p.cnpj, p.cpf),
     'bairros', (SELECT jsonb_agg(
         jsonb_build_object(
             'bairro', jsonb_build_object('nome', ib.bairro ->> 'Nome', 'idCidade', ib.bairro ->> 'IdCidade'

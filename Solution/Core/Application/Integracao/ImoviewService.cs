@@ -1009,7 +1009,7 @@ public class ImoviewService : IDisposable, IIntegracaoService
 
     public async Task<bool> ReprocessarImovel(ImovelReprocessDTO? dto)
     {
-        var importacao = await _retryPolicy.ExecuteAsync(() => _imoviewDAO.GetImportacaoImovel(dto.Id, dto.Cod));
+        var importacao = await _retryPolicy.ExecuteAsync(() => _imoviewDAO.GetImportacaoImovel(dto.Id));
         if (importacao == null)
         {
             _logger?.LogWarning("Importacao de imovel {id} não encontrada, Imovel {cod}", dto.Id, dto.Cod);
