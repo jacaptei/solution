@@ -278,7 +278,7 @@
     </el-dialog>
     
     <el-dialog v-model="reprocessarTodaAIntegracao" title="Filtro" width="500" align-center>
-        <div style="display: flex; width: 100%; justify-content: center">
+        <div style="width: 100%; justify-content: center">
             <el-row gutter=20>
                 <el-col :xs="24" :sm="24" :md="24" :lg="24" class="register-input">
                     <div>CHAVE API<span></span></div>
@@ -469,9 +469,8 @@
             });
 
             const handleFieldChange = () => {
-                if (!initialValuesLoaded.value) return; // Garante que os valores iniciais foram carregados
+                if (!initialValuesLoaded.value) return;
 
-                // Reseta o array de campos alterados
                 changedFields.value = [];
 
                 // Verifica mudanças nos campos do Imoview
@@ -500,7 +499,6 @@
                     }
                 }
 
-                // Define a flag e imprime os campos alterados, se houver mudanças
                 if (changedFields.value.length > 0) {
                     salvarMudancasReprocessamento.value = true;
                     console.log("Campos alterados:", changedFields.value);
@@ -508,10 +506,6 @@
                     salvarMudancasReprocessamento.value = false;
                 }
             };
-
-            watch(chaveApi, (newValue) => {
-                handleFieldChange();
-            });
 
             watch(codUnidade, (newValue) => {
                 handleFieldChange();
@@ -522,24 +516,31 @@
             });
 
             watch(urlApi, (newValue) => {
+                if (newValue) {
+                    handleChangeApiKey();
+                    handleFieldChange();
+                }
+            });
+
+            watch(chaveApi, (newValue) => {
                 handleFieldChange();
             });
 
             const initialValues = {
+                urlApi: null,
                 chaveApi: null,
                 codUnidade: null,
-                listaUnidades: null,
                 codUsuario: null,
-                urlApi: null
+                listaUnidades: null,
             };
 
             const mudancaParceiroIntegracao = () => {
+                urlApi.value = "";
                 chaveApi.value = "";
                 codUnidade.value = "";
                 codUsuario.value = "";
                 listaUnidades.value = "";
-                urlApi.value = "";
-            }
+            };
 
             const carregarDadosParceiroIntegracao = async () => {
                 try {
@@ -573,8 +574,8 @@
 
             const SalvarAlteracoes = async () => {
                 try {
-                    const url = validarUrlSalvarAlteracoes(crmSelecionado.value);  // Obtém a URL correta
-                    const payloadAlteracoes = validarPayload(crmSelecionado.value);  // Gera o payload dinâmico
+                    const url = validarUrlSalvarAlteracoes(crmSelecionado.value);
+                    const payloadAlteracoes = validarPayload(crmSelecionado.value);
 
                     if (!payloadAlteracoes) {
                         throw new Error("Payload não foi gerado corretamente.");
@@ -582,7 +583,7 @@
 
                     console.log(payloadAlteracoes);
                     return;
-                    const { data } = await axios.post(url, payloadAlteracoes);  // Envia a requisição
+                    const { data } = await axios.post(url, payloadAlteracoes);
                     console.log("Alterações salvas com sucesso:", data);
                 } catch (error) {
                     console.error("Erro no salvamento das alterações:", error);
@@ -598,8 +599,6 @@
                     if (!payloadIntegracao) {
                         throw new Error("Payload não foi gerado corretamente.");
                     }
-                    console.log(payloadIntegracao);
-                    return;
                     const { data } = await axios.post(url, payloadIntegracao);
                 } catch (error) {
                     console.error("Erro ao Reprocessar a Integração:", error);
@@ -636,21 +635,40 @@
 
             const handleChangeApiKey = async () => {
                 try {
-                    if (chaveApi.value) {
-                        const url = validarUrlParaValidarChaveApi(crmSelecionado.value);
-                        const { data } = await axios.get(url);
+                    if (!chaveApi.value) {
+                        codUnidade.value = "";
+                        return;
+                    }
 
-                        if (data) {
+                    fullscreenLoading.value = true;
+
+                    const url = validarUrlParaValidarChaveApi(Number(crmSelecionado.value));
+                    const { data, status } = await axios.get(url);
+
+                    if (status === 200 && Array.isArray(data)) {
+                        if (crmSelecionado.value === 1) {
                             unidades.value = data;
-                            initialValues.codUnidade = data[0]?.id || "";
-                            codUnidade.value = initialValues.codUnidade;
+                            const unidadeId = data[0]?.id || "";
+                            initialValues.codUnidade = unidadeId;
+                            codUnidade.value = unidadeId;
+                        }
+                    } else if (crmSelecionado.value === 2) {
+                        if (data === true) {
+                            ElementPlus.ElMessage.success('Chave API e URL válidas!');
+                        } else {
+                            ElementPlus.ElMessage.warning('Chave API ou URL inválida.');
+                            urlApi.value = "";
                         }
                     } else {
-                        codUnidade.value = "";
+                        ElementPlus.ElMessage.error('A resposta da API foi inválida ou a chave não é válida.');
                     }
                 } catch (error) {
                     console.error("Erro ao verificar a chave API:", error);
+                    ElementPlus.ElMessage.error('Erro ao verificar a chave API. Tente novamente mais tarde.');
                     codUnidade.value = "";
+                    codUsuario.value = "";
+                } finally {
+                    fullscreenLoading.value = false;
                 }
             };
 
@@ -687,8 +705,6 @@
                         payload[campo] = valor;
                     }
                 });
-
-                console.log("Payload Imoview:", payload);
                 return payload;
             };
 
@@ -702,8 +718,6 @@
                         payload[campo] = valor;
                     }
                 });
-
-                console.log("Payload VistaSoft:", payload);
                 return payload;
             };
 

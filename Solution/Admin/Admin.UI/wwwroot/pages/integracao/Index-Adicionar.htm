@@ -87,7 +87,7 @@
                 <el-row style="width: 100%; display: flex; justify-content: flex-end; align-items: flex-end; margin-top: 20px">
                     <el-col :xs="24" :sm="12" :md="8" :lg="6" class="register-input" :disabled="disableFieldsForPartnerValidation" style="width: 100%; display: flex; justify-content: flex-end; align-items: center;">
                         <p>Total de bairros selecionados: {{ totalSelectedBairros }}</p>
-                        <div style="display: flex; width: 100%; align-items: flex-end;">
+                        <div v-if="this.permiteInclusaoNovosBairros" style="display: flex; width: 100%; align-items: flex-end;">
                             <span style="cursor:pointer; padding-left:20px; color:var(--s-color-green)" :disabled="disableFieldsForPartnerValidation" @click="addLocationGroup">
                                 <i class="fa fa-plus-circle"></i> ADICIONAR BAIRROS PARA INTEGRAÇÃO
                             </span>
@@ -203,6 +203,7 @@
                 crms: [{ nome: 'IMOVIEW', id: 1 }, { nome: 'VISTASOFT', id: 2 }],
                 unidades: [],
                 bairrosExistentesIntegracao: false,
+                permiteInclusaoNovosBairros:true,
                 chaveApi: this.$root.perfilIntegracao?.integracao?.chaveApi || '',
                 selectedCities: [],
                 bairrosByCity: {},
@@ -516,15 +517,26 @@
                             var chaveApiEncoded = encodeURIComponent(chaveApiString);
                             var url = this.$api.BuildURL(`api/vistasoft/validarchave?chave=${chaveApiEncoded}&url=${this.integracao.urlApi}`);
                             var response = await axios.get(url);
-                            if (response) {
+                            
+                            if (response.data) {
                                 this.fullscreenLoading = false;
                                 ElementPlus.ElMessage({
                                     showClose: true,
                                     message: 'Chave Api e URL Valida!',
                                     type: 'success',
                                 });
+                            } else {
+
+                                this.fullscreenLoading = false;
+                                ElementPlus.ElMessage({
+                                    showClose: true,
+                                    message: 'Chave Api/URL está Invalida, verifique os dados e tente novamente!',
+                                    type: 'warning',
+                                });
+                                this.integracao.urlApi = "";
+                                this.integracao.chaveApi = "";
+                                this.permiteInclusaoNovosBairros = false;
                             }
-                            return response;
                         } else {
                             this.integracao.codUnidade = "";
                             this.fullscreenLoading = false;
