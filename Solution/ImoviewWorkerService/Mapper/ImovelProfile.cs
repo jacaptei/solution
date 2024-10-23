@@ -5,6 +5,8 @@ using JaCaptei.Model.Entities;
 
 using System.Text.RegularExpressions;
 
+using static JaCaptei.Model.DTO.Endereco;
+
 namespace JaCaptei.Application.Mapper;
 
 public class ImovelDTOProfile : Profile
@@ -91,8 +93,8 @@ public class ImovelDTOProfile : Profile
             .ForMember(dest => dest.aceitapermuta, opt => opt.MapFrom(src => src.ImovelDisposicao.aceitaPermuta))
             .ForMember(dest => dest.naplanta, opt => opt.MapFrom(src => src.ImovelDisposicao.naPlanta))
             .ForMember(dest => dest.placa, opt => opt.MapFrom(src => src.ImovelDisposicao.placa))
-            .ForMember(dest => dest.rlvideo, opt => opt.MapFrom(src => "")) // src.Imovel.urlVideo
-            .ForMember(dest => dest.urlpublica, opt => opt.MapFrom(src => "")) // src.Imovel.urlPublica.Substring(0,100)
+            .ForMember(dest => dest.rlvideo, opt => opt.MapFrom(src => src.Imovel.urlVideo))
+            .ForMember(dest => dest.urlpublica, opt => opt.MapFrom(src => src.Imovel.urlPublica.Substring(0,100)))
 
             //.ForMember(dest => dest.identificadorchave,   opt => opt.MapFrom(src => src.Imovel.IdChave))
             //.ForMember(dest => dest.exclusivo,            opt => opt.MapFrom(src => src.ImovelDisposicao.exclusivo))
@@ -313,6 +315,7 @@ public class ImovelDTOProfile : Profile
 
     public static int ConvertToNumber(string input)
     {
+        // Use Regex to remove non-numeric characters
         string numericString = Regex.Replace(input, @"\D", "");
         return int.Parse(numericString);
     }

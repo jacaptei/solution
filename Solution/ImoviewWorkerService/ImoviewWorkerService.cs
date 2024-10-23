@@ -29,7 +29,18 @@ public class ImoviewWorkerService : BackgroundService
             {
                 _logger.LogInformation("Worker running at: {time}", DateTimeOffset.Now);
             }
-            await _service.FixEmailInativos();
+            var iEvent = new ImportacaoImovelEvent()
+            {
+                IdCliente = 59,
+                IdIntegracao = 1,
+                ChaveApi = "qnnYE4Fev/v2kRbZ5F9PgEGCkJI3Ixflcl0FADcTGyA=",
+                CodImovel = "8672",
+                CodUnidade = "6151",
+                CodUsuario = "5",
+                IdImovel = 455,
+                IdImportacaoBairro = 127
+            };
+            await _service.ImportarImovel(iEvent);
             //await Task.Delay(10000, stoppingToken);
             //string connectionString = Config.settings.AzureMQ;
             //string queueName = "integracaocliente";
