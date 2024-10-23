@@ -824,6 +824,17 @@ namespace JaCaptei.Application.Integracao
             var res = await SendImportQueue(sender, importEvent);
             return true;
         }
+
+        public async Task<bool> AtualizarCampos(IntegracaoReprocessarVistaSoftDTO dto)
+        {
+            if (dto == null) return false;
+            var integracao = await _retryPolicy.ExecuteAsync(() => _vistaSoftDAO.GetIntegracaoById(dto.Id));
+            if (integracao == null) return false;
+            if (dto.UrlApi != null) integracao.UrlApi = dto.UrlApi;
+            if (dto.ChaveApi != null) integracao.ChaveApi = dto.ChaveApi;
+            await _retryPolicy.ExecuteAsync(() => _vistaSoftDAO.UpdateIntegracao(integracao));
+            return true;
+        }
     }
 
     public record CategoriasVS

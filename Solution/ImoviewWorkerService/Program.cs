@@ -18,7 +18,7 @@ settings.CopyToStaticSettings();
 builder.Services.AddHostedService<ImoviewWorkerService>();
 builder.Services.AddHttpClient("imoview", client =>
 {
-    client.BaseAddress = new Uri("");
+    client.BaseAddress = new Uri("https://api.imoview.com.br/");
 });
 
 builder.Services.AddScoped<DBcontext>();

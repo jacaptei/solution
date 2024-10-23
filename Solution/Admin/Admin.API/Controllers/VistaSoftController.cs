@@ -105,6 +105,13 @@ namespace JaCaptei.Admin.API.Controllers
             var res = await result.Content.ReadAsStringAsync();
             return Ok(res);
         }
+
+        [HttpPost("integracao/cliente/atualizarcampos")]
+        public async Task<ActionResult<bool>> AtualizarCampos([FromBody] IntegracaoReprocessarVistaSoftDTO dto)
+        {
+            var res = await _service.AtualizarCampos(dto);
+            return Ok(res);
+        }
     }
 
     public record IntegracaoReponseDTO

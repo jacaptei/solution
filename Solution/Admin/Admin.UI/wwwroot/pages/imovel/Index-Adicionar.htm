@@ -430,13 +430,21 @@
                     <div>verificando imóveis...</div>
                     <div style="margin:10px;margin-top:20px"><c-loading></c-loading></div>
                 </el-col>
-                <el-col  :md="24" style="color:var(--s-color-primary);font-weight:700" v-if="existeImovelNaRegiao">
+                <el-col  :md="24" v-if="existeImovelNaRegiao && imoveisBuscaResult[0].excluido" style="color:#666;font-weight:700;border: 2px solid #666;padding:20px;">
+                          <el-alert title="Já consta imóvel excluído com essas características." description="" type="info" show-icon  />
+                         <div class="col-12" v-for="(item,index) in imoveisBuscaResult" style="margin:20px">
+                                <c-imovel-card :imovel="item"></c-imovel-card>
+                         </div>
+                        <div style="padding-left:35px">
+                          <q-btn label="PROSSEGUIR MESMO ASSIM" color="orange" @click="StepTo(3)"></q-btn>
+                        </div>
+                </el-col>
+                <el-col  :md="24" v-else-if="existeImovelNaRegiao" style="color:var(--s-color-primary);font-weight:700;border: 2px solid #EF5924;padding:20px;">
                         <div>
-                          <el-alert v-if="imoveisBuscaResult[0].excluido" title="Já consta imóvel excluído com essas características." description="" type="info" show-icon />
                           <el-alert v-else title="Já consta imóvel cadastrado com essas características." description="Verifique se não há erro no índice cadastral e endereço ou se o mesmo já foi cadastrado." type="warning" show-icon />
                         </div>
                          <div class="col-12" v-for="(item,index) in imoveisBuscaResult" style="margin:20px">
-                                        <c-imovel-card :imovel="item"></c-imovel-card>
+                                <c-imovel-card :imovel="item"></c-imovel-card>
                          </div>
                 </el-col>
             </el-row>
@@ -561,7 +569,7 @@
                             </el-col>-->
                             <el-col :md="24" style="margin-top:10px">
                                 Descrição do imóvel<br />
-                                <el-input @keyup.enter="CheckoutStep3()" v-model="imovel.descricao" maxlength="4000" autosize type="textarea"></el-input>
+                                <el-input @keyup.enter="CheckoutStep3()" v-model="imovel.descricao" maxlength="4000" :rows="4" type="textarea"></el-input>
                             </el-col>
                         </el-row>
 
@@ -1149,10 +1157,11 @@
 
                     await this.BuscarImoveisNaRegiao();
 
-                    if(this.imoveisBuscaResult?.length == 0){
+                    if(!this.existeImovelNaRegiao){
                         this.stepCaptions[2] = this.imovel.endereco.bairro + ', ' + this.imovel.endereco.cidade ;
                         this.StepTo(3);
                     }
+
                 }
             },
 
@@ -1422,6 +1431,9 @@
                     this.carregandoEstados  = false;
                     this.carregandoCidades  = false;
                     this.carregandoBairros  = false;
+
+                    this.existeImovelNaRegiao = false;
+
                 }
             },
 
@@ -1505,7 +1517,8 @@
 
 
                 this.buscaImovel.result.imoveis = this.imoveisBuscaResult = [];
-                
+                this.existeImovelNaRegiao = false;
+
                 if(
                     this.$validator.is(this.cep.numero ) ||
                     (

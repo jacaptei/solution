@@ -70,6 +70,7 @@ public class Endereco
     public string bloco { get; set; }
     public string pontoreferencia { get; set; }
     public string melhoracesso { get; set; }
+    public int cep { get; set; }
 }
 
 public class Lazer
