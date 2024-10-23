@@ -287,7 +287,7 @@
                                   v-model="chaveApi"
                                   clearable
                                   placeholder="Insira sua Chave API"
-                                  @change="handleChange"></el-input>
+                                  @change="handleChangeApiKey"></el-input>
                     </el-form-item>
                 </el-col>
 
@@ -331,8 +331,17 @@
         <template #footer>
             <div class="dialog-footer">
                 <el-button @click="fecharModal">Cancelar</el-button>
-                <el-button v-if="salvarMudancasReprocessamento" type="primary" @click="SalvarAlteracoes">Salvar Alterações</el-button>
-                <el-button v-if="!salvarMudancasReprocessamento" type="primary" @click="ReprocessarIntegracao">Reprocessar</el-button>
+                <el-button v-if="salvarMudancasReprocessamento"
+                           type="primary"
+                           @click="SalvarAlteracoes">
+                    Salvar Alterações
+                </el-button>
+
+                <el-button v-if="!salvarMudancasReprocessamento"
+                           type="primary"
+                           @click="ReprocessarIntegracao">
+                    Reprocessar
+                </el-button>
             </div>
         </template>
     </el-dialog>
@@ -359,6 +368,13 @@
             const isVistaSoft = ref(false);
             const crmSelecionado = ref('');
             const unidades = ref([]);
+            const urlApiChanged = ref([]);
+            const rules = ref({
+                chaveApi: [{ required: true, message: 'Por favor, insira a Chave API', trigger: 'blur' }],
+                codUnidade: [{ required: true, message: 'Por favor, selecione a Unidade', trigger: 'blur' }],
+                urlApi: [{ required: true, message: 'Por favor, insira a URL de Integração', trigger: 'blur' }],
+                codUsuario: [{ required: true, message: 'Por favor, insira o Código de Usuário', trigger: 'blur' }],
+            });
             const initialValuesLoaded = ref(true);
             const refreshInterval = ref(0);
             const salvarMudancasReprocessamento = ref(false);
@@ -420,7 +436,9 @@
             });
 
             watch(chaveApi, (newValue) => {
-                handleChangeApiKey();
+                if (crmSelecionado.value === 1) {
+                    handleChangeApiKey();
+                }
             });
 
             watch(unidades, (newValue) => {
@@ -478,23 +496,24 @@
                     if (chaveApi.value !== initialValues.chaveApi) {
                         changedFields.value.push({ campo: 'chaveApi', valor: chaveApi.value });
                     }
-                    if (codUnidade.value !== initialValues.codUnidade) {
+                    if (codUnidade.value !== initialValues.codUnidade && codUnidade.value !== "") {
                         changedFields.value.push({ campo: 'codUnidade', valor: codUnidade.value });
                     }
-                    if (codUsuario.value !== initialValues.codUsuario) {
+                    if (codUsuario.value !== initialValues.codUsuario && codUsuario.value !== "") {
                         changedFields.value.push({ campo: 'codUsuario', valor: codUsuario.value });
                     }
-                    if (listaUnidades.value !== initialValues.listaUnidades) {
+                    if (listaUnidades.value !== initialValues.listaUnidades && listaUnidades.value !== "") {
                         changedFields.value.push({ campo: 'listaUnidades', valor: listaUnidades.value });
                     }
                 }
 
                 // Verifica mudanças nos campos do VistaSoft
                 if (isVistaSoft.value) {
-                    if (chaveApi.value !== initialValues.chaveApi) {
+                    if (chaveApi.value !== initialValues.chaveApi && chaveApi.value !== "") {
                         changedFields.value.push({ campo: 'chaveApi', valor: chaveApi.value });
                     }
-                    if (urlApi.value !== initialValues.urlApi) {
+                    if (urlApi.value !== initialValues.urlApi && urlApi.value !== "") {
+                        urlApiChanged.value = true;
                         changedFields.value.push({ campo: 'urlApi', valor: urlApi.value });
                     }
                 }
@@ -627,49 +646,77 @@
                 }
             };
 
-            watch(chaveApi, (newValue) => {
-                if (newValue) {
-                    handleChangeApiKey();
-                }
-            });
-
             const handleChangeApiKey = async () => {
+                if (!chaveApi.value) {
+                    resetUnidade();
+                    return;
+                }
+
+                if (crmSelecionado.value === 2 && !isUrlApiChanged()) {
+                    console.log("URL não foi alterada. Não será necessário validar.");
+                    return;
+                }
+
                 try {
-                    if (!chaveApi.value) {
-                        codUnidade.value = "";
-                        return;
-                    }
-
                     fullscreenLoading.value = true;
+                    const { data, status } = await fetchApiKeyValidation();
 
-                    const url = validarUrlParaValidarChaveApi(Number(crmSelecionado.value));
-                    const { data, status } = await axios.get(url);
+                    if (status !== 200) throw new Error('Resposta inválida da API.');
 
-                    if (status === 200 && Array.isArray(data)) {
-                        if (crmSelecionado.value === 1) {
-                            unidades.value = data;
-                            const unidadeId = data[0]?.id || "";
-                            initialValues.codUnidade = unidadeId;
-                            codUnidade.value = unidadeId;
-                        }
-                    } else if (crmSelecionado.value === 2) {
-                        if (data === true) {
-                            ElementPlus.ElMessage.success('Chave API e URL válidas!');
-                        } else {
-                            ElementPlus.ElMessage.warning('Chave API ou URL inválida.');
-                            urlApi.value = "";
-                        }
-                    } else {
-                        ElementPlus.ElMessage.error('A resposta da API foi inválida ou a chave não é válida.');
-                    }
+                    processApiResponse(data);
                 } catch (error) {
-                    console.error("Erro ao verificar a chave API:", error);
-                    ElementPlus.ElMessage.error('Erro ao verificar a chave API. Tente novamente mais tarde.');
-                    codUnidade.value = "";
-                    codUsuario.value = "";
+                    handleApiError(error);
                 } finally {
                     fullscreenLoading.value = false;
                 }
+            };
+
+            // Funções auxiliares
+
+            const resetUnidade = () => {
+                codUnidade.value = "";
+            };
+
+            const isUrlApiChanged = () =>
+                changedFields.value.some(field => field.campo === 'urlApi');
+
+            const fetchApiKeyValidation = async () => {
+                const url = validarUrlParaValidarChaveApi(Number(crmSelecionado.value));
+                return axios.get(url);
+            };
+
+            const processApiResponse = (data) => {
+                if (crmSelecionado.value === 1) {
+                    handleCrm1Response(data);
+                } else if (crmSelecionado.value === 2) {
+                    handleCrm2Response(data);
+                }
+            };
+
+            const handleCrm1Response = (data) => {
+                if (Array.isArray(data)) {
+                    unidades.value = data;
+                    const unidadeId = data[0]?.id || "";
+                    initialValues.codUnidade = unidadeId;
+                    codUnidade.value = unidadeId;
+                } else {
+                    ElementPlus.ElMessage.error('A resposta da API foi inválida.');
+                }
+            };
+
+            const handleCrm2Response = (isValid) => {
+                if (isValid) {
+                    ElementPlus.ElMessage.success('Chave API e URL válidas!');
+                } else {
+                    ElementPlus.ElMessage.warning('Chave API ou URL inválida.');
+                    urlApi.value = "";
+                }
+            };
+
+            const handleApiError = (error) => {
+                console.error("Erro ao verificar a chave API:", error);
+                ElementPlus.ElMessage.error('Erro ao verificar a chave API. Tente novamente mais tarde.');
+                codUnidade.value = "";
             };
 
             onMounted(() => {
