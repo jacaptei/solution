@@ -270,7 +270,7 @@ WHERE ii.status != 'Concluido' AND ii.status != 'Processando' and ib.""idIntegra
 	'apiResponse', text(ii.""apiResponse"")
 	) )
 						FROM ""ImportacaoBairroVistaSoft"" ibi inner join ""ImportacaoImovelVistaSoft"" ii on ii.""idImportacaoBairro"" = ibi.id
-                        WHERE ibi.""idIntegracaoBairro"" = ib.""id"" and ii.status = 'Concluido')      
+                        WHERE ibi.""idIntegracaoBairro"" = ib.""id"")      
         ))
     ) 
     FROM ""IntegracaoBairroVistaSoft"" ib 
