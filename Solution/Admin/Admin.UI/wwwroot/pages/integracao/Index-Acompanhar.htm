@@ -352,6 +352,7 @@
             const acompanhar = ref([]);
             const totalImoveis = ref(0);
             const listaUnidades = ref([]);
+            const changedFields = ref([]);
             const responseProp = ref('');
             const isImoview = ref(false);
             const collapseItems = ref([]);
@@ -468,40 +469,43 @@
             });
 
             const handleFieldChange = () => {
-                if (!initialValuesLoaded.value) return; // Verifica se os valores iniciais foram carregados
+                if (!initialValuesLoaded.value) return; // Garante que os valores iniciais foram carregados
 
-                const changedFields = [];
+                // Reseta o array de campos alterados
+                changedFields.value = [];
 
+                // Verifica mudanças nos campos do Imoview
                 if (isImoview.value) {
                     if (chaveApi.value !== initialValues.chaveApi) {
-                        changedFields.push('chaveApi');
+                        changedFields.value.push({ campo: 'chaveApi', valor: chaveApi.value });
                     }
                     if (codUnidade.value !== initialValues.codUnidade) {
-                        changedFields.push('codUnidade');
+                        changedFields.value.push({ campo: 'codUnidade', valor: codUnidade.value });
                     }
                     if (codUsuario.value !== initialValues.codUsuario) {
-                        changedFields.push('codUsuario');
+                        changedFields.value.push({ campo: 'codUsuario', valor: codUsuario.value });
                     }
                     if (listaUnidades.value !== initialValues.listaUnidades) {
-                        changedFields.push('listaUnidades');
+                        changedFields.value.push({ campo: 'listaUnidades', valor: listaUnidades.value });
                     }
                 }
 
+                // Verifica mudanças nos campos do VistaSoft
                 if (isVistaSoft.value) {
                     if (chaveApi.value !== initialValues.chaveApi) {
-                        changedFields.push('chaveApi');
+                        changedFields.value.push({ campo: 'chaveApi', valor: chaveApi.value });
                     }
                     if (urlApi.value !== initialValues.urlApi) {
-                        changedFields.push('urlApi');
+                        changedFields.value.push({ campo: 'urlApi', valor: urlApi.value });
                     }
                 }
 
-                if (changedFields.length > 0) {
+                // Define a flag e imprime os campos alterados, se houver mudanças
+                if (changedFields.value.length > 0) {
                     salvarMudancasReprocessamento.value = true;
-
-                    console.log("Campos alterados:", changedFields);
+                    console.log("Campos alterados:", changedFields.value);
                 } else {
-                    salvarMudancasReprocessamento.value = false; // Reseta o indicador se não houver mudanças
+                    salvarMudancasReprocessamento.value = false;
                 }
             };
 
@@ -569,26 +573,39 @@
 
             const SalvarAlteracoes = async () => {
                 try {
-                    const url = validarUrlSalvarAlteracoes(crmSelecionado.value);
-                    const { data } = await axios.post(url);
-                    console.log(data);
+                    const url = validarUrlSalvarAlteracoes(crmSelecionado.value);  // Obtém a URL correta
+                    const payloadAlteracoes = validarPayload(crmSelecionado.value);  // Gera o payload dinâmico
+
+                    if (!payloadAlteracoes) {
+                        throw new Error("Payload não foi gerado corretamente.");
+                    }
+
+                    console.log(payloadAlteracoes);
+                    return;
+                    const { data } = await axios.post(url, payloadAlteracoes);  // Envia a requisição
+                    console.log("Alterações salvas com sucesso:", data);
                 } catch (error) {
-                    console.error('Erro no reprocessamento:', error);
-                    ElementPlus.ElMessage.error('Erro ao salvar as alterações. Tente novamente mais tarde.');
+                    console.error("Erro no salvamento das alterações:", error);
+                    ElementPlus.ElMessage.error("Erro ao salvar as alterações. Tente novamente mais tarde.");
                 }
             };
 
             const ReprocessarIntegracao = async () => {
                 try {
                     const url = validarUrlReprocessarImovel(crmSelecionado.value);
-                    const payloadIntegracao = validarPayloadReprocessarImovel(crmSelecionado.value);
-                    const { data } = await axios.post(url);
-                    console.log(data);
-                } catch {
-                    console.error('Erro ao Reprocessar a Integração:', error);
-                    ElementPlus.ElMessage.error('Erro ao Reprocessar a Integração:', error);
+                    const payloadIntegracao = validarPayload(crmSelecionado.value);
+
+                    if (!payloadIntegracao) {
+                        throw new Error("Payload não foi gerado corretamente.");
+                    }
+                    console.log(payloadIntegracao);
+                    return;
+                    const { data } = await axios.post(url, payloadIntegracao);
+                } catch (error) {
+                    console.error("Erro ao Reprocessar a Integração:", error);
+                    ElementPlus.ElMessage.error("Erro ao Reprocessar a Integração");
                 }
-            }
+            };
 
             const handleClick = async (row) => {
                 try {
@@ -660,32 +677,33 @@
                 Cliente: '',
             });
 
-            const createImoviewPayload = (id, codUsuario = null, codUnidade = null, chaveApi = null) => {
-                if (!id) {
-                    throw new Error("id é obrigatório");
-                }
+            const createImoviewPayload = (id) => {
+                if (!id) throw new Error("ID é obrigatório.");
 
-                const payload = {
-                    id: id,
-                    codUsuario: codUsuario,
-                    codUnidade: codUnidade,
-                    chaveApi: chaveApi
-                };
+                const payload = { id };
 
+                changedFields.value.forEach(({ campo, valor }) => {
+                    if (["codUsuario", "codUnidade", "chaveApi"].includes(campo)) {
+                        payload[campo] = valor;
+                    }
+                });
+
+                console.log("Payload Imoview:", payload);
                 return payload;
             };
 
-            const createVistaSoftPayload = (id, urlApi = null, chaveApi = null) => {
-                if (!id) {
-                    throw new Error("id é obrigatório");
-                }
+            const createVistaSoftPayload = (id) => {
+                if (!id) throw new Error("ID é obrigatório.");
 
-                const payload = {
-                    id: id,
-                    urlApi: urlApi,
-                    chaveApi: chaveApi
-                };
+                const payload = { id };
 
+                changedFields.value.forEach(({ campo, valor }) => {
+                    if (["urlApi", "chaveApi"].includes(campo)) {
+                        payload[campo] = valor;
+                    }
+                });
+
+                console.log("Payload VistaSoft:", payload);
                 return payload;
             };
 
@@ -793,17 +811,17 @@
                 }
             };
 
-            const validarPayloadReprocessarImovel = (crm) => {
+            const validarPayload = (crm) => {
                 switch (crm) {
                     case 1:
-                        return createImoviewPayload = (id, codUsuario = null, codUnidade = null, chaveApi = null);
+                        return createImoviewPayload(idIntegracao.value);
                     case 2:
-                        return ;
+                        return createVistaSoftPayload(idIntegracao.value);
                     default:
                         console.error("CRM inválido:", crm);
                         return null;
                 }
-            }
+            };
 
             const validarParceiroIntegracao = (crm) => {
                 switch (crm) {
@@ -909,7 +927,6 @@
                     const response = await axios.post(urlStatusIntegracao.value, filtros.value);
                     acompanhar.value = [response.data];
                     idIntegracao.value = acompanhar.value[0].integracao;
-                    console.log(idIntegracao.value);
                     quantidadeBairros.value = acompanhar.value[0].bairros.length;
                     documento.value = acompanhar.value[0].cpfCnpj;
                     acompanhar.value = acompanhar.value.map(integracao => {
