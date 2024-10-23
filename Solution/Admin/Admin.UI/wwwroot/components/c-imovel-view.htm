@@ -39,9 +39,9 @@
                                                         <span v-if="$validator.is(imovel.endereco.cidade)">, {{imovel.endereco.cidade}} </span>
                                                         <span v-if="$validator.is(imovel.endereco.estado)">, {{imovel.endereco.estado}}  </span>
                                                     </span>
-                                                    <span>
-                                                        <i class="fa fa-copy" style="padding-left:10px;color:#666;text-decoration:none" @click="$tools.Copy($tools.BuildAddressImovel(imovel))"></i>
-                                                    </span>
+                                                    <span><i class="fa fa-copy" style="padding-left:10px;color:#666;text-decoration:none" @click="$tools.Copy($tools.BuildAddressImovel(imovel))"></i></span>
+                                                    <br />
+                                                    <span v-if="$validator.is(imovel.endereco.cep)"   >CEP: {{imovel.endereco.cep}}   <i class="fa fa-copy" style="padding-left:10px;color:#666;text-decoration:none" @click="$tools.Copy(imovel.endereco.cep)"></i></span>
                                                 </div>
                                               </el-col>
                                           </el-row>
