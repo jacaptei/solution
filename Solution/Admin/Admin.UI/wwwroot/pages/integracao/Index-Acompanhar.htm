@@ -31,7 +31,7 @@
                 <el-button type="primary"
                            size="small"
                            round
-                           @click="reprocessarIntegracao">
+                           @click="openDialogReprocessarIntegracao">
                     <div style="display: flex; width: 100%; align-content: center">
                         <div style="display: flex; width: 100%; align-items: center">
                             Reprocessar Integração
@@ -78,6 +78,38 @@
                                                         {{ formatarDataHora(scope.row.data) }}
                                                     </template>
                                                 </el-table-column>
+                                                <el-table-column label="Resposta" align="center">
+                                                    <template #default="scope">
+                                                        <div v-if="getResponse(scope.row).erro">
+                                                            <span class="error">Erro: {{ getResponse(scope.row).mensagem || 'Erro desconhecido' }}</span>
+                                                            <el-icon v-else-if="scope.row.status === 'Erro'">
+                                                                <CircleCloseFilled color="red" />
+                                                            </el-icon>
+                                                        </div>
+                                                        <div v-else>
+                                                            <span>
+                                                                {{ getResponse(scope.row).mensagem || scope.row.status }}
+                                                                <el-icon v-if="scope.row.status === 'Concludo'">
+                                                                    <SuccessFilled color="green" />
+                                                                </el-icon>
+                                                                <el-icon v-else-if="scope.row.status === 'Concluído com Falhas'">
+                                                                    <WarnTriangleFilled color="orange" />
+                                                                </el-icon>
+                                                                <el-icon v-else-if="scope.row.status === 'Processando'">
+                                                                    <LoadingFilled color="blue" />
+                                                                </el-icon>
+                                                                <el-icon v-else-if="scope.row.status === 'Aguardando'">
+                                                                    <ClockFilled color="yellow" />
+                                                                </el-icon>
+                                                            </span>
+                                                        </div>
+                                                    </template>
+                                                </el-table-column>
+                                                <el-table-column label="Atualizado Em" prop="atualizadoEm" align="center">
+                                                    <template #default="scope">
+                                                        {{ formatarDataHora(scope.row.atualizadoEm) }}
+                                                    </template>
+                                                </el-table-column>
                                                 <el-table-column label="Status" prop="status" align="center">
                                                     <template #default="scope">
                                                         <div style="display: flex; align-items: center; justify-content: center">
@@ -106,23 +138,6 @@
                                                                     <ClockFilled color="yellow" />
                                                                 </el-icon>
                                                             </div>
-                                                        </div>
-                                                    </template>
-                                                </el-table-column>
-                                                <el-table-column label="Atualizado Em" prop="atualizadoEm" align="center">
-                                                    <template #default="scope">
-                                                        {{ formatarDataHora(scope.row.atualizadoEm) }}
-                                                    </template>
-                                                </el-table-column>
-                                                <el-table-column label="Resposta" align="center">
-                                                    <template #default="scope">
-                                                        <div v-if="getResponse(scope.row).erro">
-                                                            <span class="error">Erro: {{ getResponse(scope.row).mensagem || 'Erro desconhecido' }}</span>
-                                                        </div>
-                                                        <div v-else>
-                                                            <span>
-                                                                {{ getResponse(scope.row).message || scope.row.status }}
-                                                            </span>
                                                         </div>
                                                     </template>
                                                 </el-table-column>
@@ -158,7 +173,7 @@
                                 <template #default="bairroScope">
                                     <div style="display: flex; align-items: center; justify-content: center">
                                         <span style="margin-right:5px;">{{ bairroScope.row.status }}</span>
-                                        <el-icon v-if="bairroScope.row.status === 'Concluido'">
+                                        <el-icon v-if="bairroScope.row.status === 'Concluído'">
                                             <SuccessFilled color="green" />
                                         </el-icon>
                                         <el-icon v-else-if="bairroScope.row.status === 'Concluído com Falhas'">
@@ -247,7 +262,7 @@
                 </el-col>
                 <el-col :xs="24" :sm="24" :md="24" :lg="24" class="register-input">
                     <span>Parceiro Integração</span>
-                    <el-select :disabled="!isDisabled()" v-model="listaIntegracao" placeholder="Escolha o Parceiro" style="width: 100%">
+                    <el-select :disabled="!isDisabled()" @change="mudancaParceiroIntegracao" v-model="listaIntegracao" placeholder="Escolha o Parceiro" style="width: 100%">
                         <el-option v-for="item in options" :key="item.value" :label="item.label" :value="item" />
                     </el-select>
                 </el-col>
@@ -263,7 +278,7 @@
     </el-dialog>
     
     <el-dialog v-model="reprocessarTodaAIntegracao" title="Filtro" width="500" align-center>
-        <div style="display: flex; width: 100%">
+        <div style="display: flex; width: 100%; justify-content: center">
             <el-row gutter=20>
                 <el-col :xs="24" :sm="24" :md="24" :lg="24" class="register-input">
                     <div>CHAVE API<span></span></div>
@@ -276,7 +291,22 @@
                     </el-form-item>
                 </el-col>
 
-                <el-col v-if="isImoview" :xs="24" :sm="24" :md="24" :lg="24" class="register-input">
+                <el-col v-if="isImoview" :xs="24" :sm="24" :md="12" :lg="12" class="register-input">
+                    <div>UNIDADE<span></span></div>
+                    <el-form-item prop="codUnidade">
+                        <el-select v-model="codUnidade"
+                                   filterable
+                                   :clearable="true"
+                                   class="m-4"
+                                   placeholder="INFORME A UNIDADE"
+                                   size="large"
+                                   style="width:100%">
+                            <el-option v-for="item in listaUnidades" :key="item.id" :label="item.nome" :value="item.id"></el-option>
+                        </el-select>
+                    </el-form-item>
+                </el-col>
+
+                <el-col v-if="isImoview" :xs="24" :sm="24" :md="12" :lg="12" class="register-input">
                     <div>CÓDIGO USUÁRIO IMOVIEW<span></span></div>
                     <el-form-item prop="codUsuario">
                         <el-input style="width:100%"
@@ -286,23 +316,13 @@
                     </el-form-item>
                 </el-col>
 
-                <el-col v-if="isImoview" :xs="24" :sm="24" :md="24" :lg="24" class="register-input">
-                    <div>UNIDADE<span></span></div>
-                    <el-form-item prop="codUnidade">
-                        <el-select v-model="codUnidade" filterable :clearable="true" class="m-4" placeholder="INFORME A UNIDADE" size="large" style="width:100%">
-                            <el-option v-for="item in unidades" :key="item.id" :label="item.nome" :value="item.id"></el-option>
-                        </el-select>
-                    </el-form-item>
-                </el-col>
-
                 <el-col v-if="isVistaSoft" :xs="24" :sm="24" :md="24" :lg="24" class="register-input">
                     <div>URL VISTASOFT<span></span></div>
                     <el-form-item prop="urlApi">
                         <el-input style="width:100%"
                                   v-model="urlApi"
                                   clearable
-                                  :placeholder="placeholderUrlVistaSoft"
-                                  @change="(value) => ValidarUrl(value)"></el-input>
+                                  :placeholder="placeholderUrlVistaSoft"></el-input>
                     </el-form-item>
                 </el-col>
             </el-row>
@@ -311,7 +331,8 @@
         <template #footer>
             <div class="dialog-footer">
                 <el-button @click="fecharModal">Cancelar</el-button>
-                <el-button type="primary" @click="Buscar">Reprocessar</el-button>
+                <el-button v-if="salvarMudancasReprocessamento" type="primary" @click="SalvarAlteracoes">Salvar Alterações</el-button>
+                <el-button v-if="!salvarMudancasReprocessamento" type="primary" @click="ReprocessarIntegracao">Reprocessar</el-button>
             </div>
         </template>
     </el-dialog>
@@ -330,14 +351,16 @@
             const codUnidade = ref('');
             const acompanhar = ref([]);
             const totalImoveis = ref(0);
+            const listaUnidades = ref([]);
             const responseProp = ref('');
             const isImoview = ref(false);
             const collapseItems = ref([]);
             const isVistaSoft = ref(false);
-            const idIntegracao = ref(null);
             const crmSelecionado = ref('');
             const unidades = ref([]);
+            const initialValuesLoaded = ref(true);
             const refreshInterval = ref(0);
+            const salvarMudancasReprocessamento = ref(false);
             const listaIntegracao = ref([]);
             const quantidadeBairros = ref(0);
             const filtrosVisiveis = ref(false);
@@ -346,6 +369,7 @@
             const urlStatusIntegracao = ref('');
             const fullscreenLoading = ref(false);
             const instance = getCurrentInstance();
+            const idIntegracao = ref('');
             const reprocessarTodaAIntegracao = ref(false);
             let intervalId = null;
             const crmLabel = ref("");
@@ -370,18 +394,13 @@
                 if (typeof response === 'string') {
                     try {
                         const parsed = JSON.parse(response);
-
                         if (parsed.message === 'Ok') parsed.message = 'Concluído';
-
                         return parsed;
                     } catch (e) {
                         console.error('Erro ao parsear JSON:', e);
                         return {};
                     }
                 }
-
-                if (response.message === 'Ok') response.message = 'Concluído';
-
                 return response;
             };
 
@@ -397,6 +416,19 @@
 
             watch(refreshInterval, (newValue) => {
                 startAutoRefresh();
+            });
+
+            watch(chaveApi, (newValue) => {
+                handleChangeApiKey();
+            });
+
+            watch(unidades, (newValue) => {
+                if (Array.isArray(newValue)) {
+                    initialValues.listaUnidades = newValue;
+                    listaUnidades.value = initialValues.listaUnidades;
+                } else {
+                    console.warn("O valor de unidades não é um array:", newValue);
+                }
             });
 
             watch(listaIntegracao, () => {
@@ -417,6 +449,8 @@
                         ? "Código do Imóvel VistaSoft"
                         : "";
 
+                chaveApi.value = "";
+
                 responseProp.value = isImoviewSelected
                     ? "imoviewResponse"
                     : isVistasoftSelected
@@ -433,29 +467,128 @@
                 isVistaSoft.value = isVistasoftSelected;
             });
 
-            const carregarDadosParceiroIntegracao = async() => {
+            const handleFieldChange = () => {
+                if (!initialValuesLoaded.value) return; // Verifica se os valores iniciais foram carregados
+
+                const changedFields = [];
+
+                if (isImoview.value) {
+                    if (chaveApi.value !== initialValues.chaveApi) {
+                        changedFields.push('chaveApi');
+                    }
+                    if (codUnidade.value !== initialValues.codUnidade) {
+                        changedFields.push('codUnidade');
+                    }
+                    if (codUsuario.value !== initialValues.codUsuario) {
+                        changedFields.push('codUsuario');
+                    }
+                    if (listaUnidades.value !== initialValues.listaUnidades) {
+                        changedFields.push('listaUnidades');
+                    }
+                }
+
+                if (isVistaSoft.value) {
+                    if (chaveApi.value !== initialValues.chaveApi) {
+                        changedFields.push('chaveApi');
+                    }
+                    if (urlApi.value !== initialValues.urlApi) {
+                        changedFields.push('urlApi');
+                    }
+                }
+
+                if (changedFields.length > 0) {
+                    salvarMudancasReprocessamento.value = true;
+
+                    console.log("Campos alterados:", changedFields);
+                } else {
+                    salvarMudancasReprocessamento.value = false; // Reseta o indicador se não houver mudanças
+                }
+            };
+
+            watch(chaveApi, (newValue) => {
+                handleFieldChange();
+            });
+
+            watch(codUnidade, (newValue) => {
+                handleFieldChange();
+            });
+
+            watch(codUsuario, (newValue) => {
+                handleFieldChange();
+            });
+
+            watch(urlApi, (newValue) => {
+                handleFieldChange();
+            });
+
+            const initialValues = {
+                chaveApi: null,
+                codUnidade: null,
+                listaUnidades: null,
+                codUsuario: null,
+                urlApi: null
+            };
+
+            const mudancaParceiroIntegracao = () => {
+                chaveApi.value = "";
+                codUnidade.value = "";
+                codUsuario.value = "";
+                listaUnidades.value = "";
+                urlApi.value = "";
+            }
+
+            const carregarDadosParceiroIntegracao = async () => {
                 try {
                     const url = validarParceiroIntegracao(crmSelecionado.value);
                     const { data } = await axios.post(url, { cpfCnpj: documento.value });
-                    urlApi.value = data.integracao.urlApi || null;
-                    chaveApi.value = data.integracao.chaveApi;
-                    codUsuario.value = data.integracao.codUsuario;
-                    codUnidade.value = data.integracao.codUnidade;
-                    console.log(data);
+
+                    initialValues.chaveApi = data.integracao.chaveApi;
+                    initialValues.codUsuario = data.integracao.codUsuario;
+                    initialValues.urlApi = data.integracao.urlApi || null;
+
+                    chaveApi.value = initialValues.chaveApi;
+                    codUsuario.value = initialValues.codUsuario;
+                    urlApi.value = initialValues.urlApi;
+
+                    initialValuesLoaded.value = true;
+
                 } catch (error) {
                     console.error('Erro no reprocessamento:', error);
                 }
             };
 
-            const reprocessarIntegracao = async () => {
+            const openDialogReprocessarIntegracao = async () => {
                 try {
-                    carregarDadosParceiroIntegracao();
+                    await carregarDadosParceiroIntegracao();
                     reprocessarTodaAIntegracao.value = true;
                 } catch (error) {
                     console.error('Erro no reprocessamento:', error);
                 }
-                
+
             };
+
+            const SalvarAlteracoes = async () => {
+                try {
+                    const url = validarUrlSalvarAlteracoes(crmSelecionado.value);
+                    const { data } = await axios.post(url);
+                    console.log(data);
+                } catch (error) {
+                    console.error('Erro no reprocessamento:', error);
+                    ElementPlus.ElMessage.error('Erro ao salvar as alterações. Tente novamente mais tarde.');
+                }
+            };
+
+            const ReprocessarIntegracao = async () => {
+                try {
+                    const url = validarUrlReprocessarImovel(crmSelecionado.value);
+                    const payloadIntegracao = validarPayloadReprocessarImovel(crmSelecionado.value);
+                    const { data } = await axios.post(url);
+                    console.log(data);
+                } catch {
+                    console.error('Erro ao Reprocessar a Integração:', error);
+                    ElementPlus.ElMessage.error('Erro ao Reprocessar a Integração:', error);
+                }
+            }
 
             const handleClick = async (row) => {
                 try {
@@ -475,6 +608,32 @@
                 } catch (error) {
                     console.error('Erro no reprocessamento:', error);
                     ElementPlus.ElMessage.error('Erro ao reprocessar. Tente novamente mais tarde.');
+                }
+            };
+
+            watch(chaveApi, (newValue) => {
+                if (newValue) {
+                    handleChangeApiKey();
+                }
+            });
+
+            const handleChangeApiKey = async () => {
+                try {
+                    if (chaveApi.value) {
+                        const url = validarUrlParaValidarChaveApi(crmSelecionado.value);
+                        const { data } = await axios.get(url);
+
+                        if (data) {
+                            unidades.value = data;
+                            initialValues.codUnidade = data[0]?.id || "";
+                            codUnidade.value = initialValues.codUnidade;
+                        }
+                    } else {
+                        codUnidade.value = "";
+                    }
+                } catch (error) {
+                    console.error("Erro ao verificar a chave API:", error);
+                    codUnidade.value = "";
                 }
             };
 
@@ -501,7 +660,34 @@
                 Cliente: '',
             });
 
-           
+            const createImoviewPayload = (id, codUsuario = null, codUnidade = null, chaveApi = null) => {
+                if (!id) {
+                    throw new Error("id é obrigatório");
+                }
+
+                const payload = {
+                    id: id,
+                    codUsuario: codUsuario,
+                    codUnidade: codUnidade,
+                    chaveApi: chaveApi
+                };
+
+                return payload;
+            };
+
+            const createVistaSoftPayload = (id, urlApi = null, chaveApi = null) => {
+                if (!id) {
+                    throw new Error("id é obrigatório");
+                }
+
+                const payload = {
+                    id: id,
+                    urlApi: urlApi,
+                    chaveApi: chaveApi
+                };
+
+                return payload;
+            };
 
             const startAutoRefresh = () => {
                 if (intervalId) clearInterval(intervalId);
@@ -590,6 +776,35 @@
                 }
             };
 
+            const validarUrlParaValidarChaveApi = (crm) => {
+                if (!chaveApi.value) {
+                    console.error("Chave API não está definida.");
+                    return null;
+                }
+                const chaveApiEncoded = encodeURIComponent(chaveApi.value);
+                switch (crm) {
+                    case 1:
+                        return instance.proxy.$api.BuildURL(`api/imoview/unidades?chave=${chaveApiEncoded}`);
+                    case 2:
+                        return instance.proxy.$api.BuildURL(`api/vistasoft/validarchave?chave=${chaveApiEncoded}&url=${urlApi.value}`);
+                    default:
+                        console.error("CRM inválido:", crm);
+                        return null;
+                }
+            };
+
+            const validarPayloadReprocessarImovel = (crm) => {
+                switch (crm) {
+                    case 1:
+                        return createImoviewPayload = (id, codUsuario = null, codUnidade = null, chaveApi = null);
+                    case 2:
+                        return ;
+                    default:
+                        console.error("CRM inválido:", crm);
+                        return null;
+                }
+            }
+
             const validarParceiroIntegracao = (crm) => {
                 switch (crm) {
                     case 1:
@@ -607,6 +822,30 @@
                         return instance.proxy.$api.BuildURL("api/imoview/integracao/cliente/reprocessarimovel");
                     case 2:
                         return instance.proxy.$api.BuildURL("api/vistasoft/integracao/cliente/reprocessarimovel");
+                    default:
+                        console.error("CRM inválido:", crm);
+                        return null;
+                }
+            };
+
+            const validarUrlSalvarAlteracoes = (crm) => {
+                switch (crm) {
+                    case 1:
+                        return instance.proxy.$api.BuildURL("api/imoview/integracao/cliente/atualizarcampos");
+                    case 2:
+                        return instance.proxy.$api.BuildURL("api/vistasoft/integracao/cliente/atualizarcampos");
+                    default:
+                        console.error("CRM inválido:", crm);
+                        return null;
+                }
+            };
+
+            const validarUrlReprocessarImovel = (crm) => {
+                switch (crm) {
+                    case 1:
+                        return instance.proxy.$api.BuildURL("api/imoview/integracao/cliente/reprocessar");
+                    case 2:
+                        return instance.proxy.$api.BuildURL("api/vistasoft/integracao/cliente/reprocessar");
                     default:
                         console.error("CRM inválido:", crm);
                         return null;
@@ -669,6 +908,8 @@
                     filtros.value.Cliente = listaIntegracao.value.label;
                     const response = await axios.post(urlStatusIntegracao.value, filtros.value);
                     acompanhar.value = [response.data];
+                    idIntegracao.value = acompanhar.value[0].integracao;
+                    console.log(idIntegracao.value);
                     quantidadeBairros.value = acompanhar.value[0].bairros.length;
                     documento.value = acompanhar.value[0].cpfCnpj;
                     acompanhar.value = acompanhar.value.map(integracao => {
@@ -691,7 +932,7 @@
                         }
                         return total;
                     }, 0);
-                   
+
                 } catch (error) {
                     console.error("Erro ao buscar integração:", error);
                 } finally {
@@ -741,7 +982,7 @@
                 getResponse,
                 crmTitle,
                 handleClick,
-                reprocessarIntegracao,
+                ReprocessarIntegracao,
                 reprocessarTodaAIntegracao,
                 urlApi,
                 chaveApi,
@@ -749,6 +990,11 @@
                 codUnidade,
                 isImoview,
                 isVistaSoft,
+                listaUnidades,
+                mudancaParceiroIntegracao,
+                salvarMudancasReprocessamento,
+                SalvarAlteracoes,
+                openDialogReprocessarIntegracao,
             };
         },
     };
