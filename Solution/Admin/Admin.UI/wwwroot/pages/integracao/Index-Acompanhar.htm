@@ -8,14 +8,30 @@
             </div>
 
             <div style="display: flex; align-items: center; gap: 8px;">
-                <el-icon @click="abrirModalFiltro" style="cursor: pointer; color: #409EFF; font-size: 24px;">
-                    <Filter />
-                </el-icon>
-
                 <el-icon @click="refreshData" style="cursor: pointer; color: #409EFF; font-size: 24px;">
                     <Refresh />
                 </el-icon>
 
+                <el-icon @click="abrirModalFiltro" style="cursor: pointer; color: #409EFF; font-size: 24px;">
+                    <Filter />
+                </el-icon>
+
+                <el-button type="primary"
+                           size="small"
+                           round
+                           style="border-radius: 5px; margin-left: 3px"
+                           @click="openDialogReprocessarIntegracao">
+                    <div style="display: flex; width: 100%; align-content: center">
+                        <div style="display: flex; width: 100%; align-items: center">
+                            Reprocessar Integração
+                        </div>
+                        <!--<div style="display: flex; width: 100%; justify-content: center">
+                <el-icon style="cursor: pointer; color: #ffffff; font-size: 18px;">
+                    <Refresh />
+                </el-icon>
+            </div>-->
+                    </div>
+                </el-button>
 
                 <el-select v-model="refreshInterval"
                            placeholder="Selecione o intervalo"
@@ -27,22 +43,6 @@
                                :label="item.label"
                                :value="item.value" />
                 </el-select>
-
-                <el-button type="primary"
-                           size="small"
-                           round
-                           @click="openDialogReprocessarIntegracao">
-                    <div style="display: flex; width: 100%; align-content: center">
-                        <div style="display: flex; width: 100%; align-items: center">
-                            Reprocessar Integração
-                        </div>
-                        <div style="display: flex; width: 100%; justify-content: center">
-                            <el-icon style="cursor: pointer; color: #ffffff; font-size: 18px;">
-                                <Refresh />
-                            </el-icon>
-                        </div>
-                    </div>
-                </el-button>
             </div>
         </div>
 
@@ -80,8 +80,8 @@
                                                 </el-table-column>
                                                 <el-table-column label="Resposta" align="center">
                                                     <template #default="scope">
-                                                        <div v-if="getResponse(scope.row).erro">
-                                                            <span class="error">Erro: {{ getResponse(scope.row).mensagem || 'Erro desconhecido' }}</span>
+                                                        <div v-if="getResponse(scope.row).erro || getResponse(scope.row).status === 400">
+                                                            <span class="error">Erro: {{ getResponse(scope.row).mensagem || getResponse(scope.row).message }}</span>
                                                             <el-icon v-else-if="scope.row.status === 'Erro'">
                                                                 <CircleCloseFilled color="red" />
                                                             </el-icon>
@@ -125,7 +125,7 @@
                                                                 <div v-else>
                                                                     <span style="margin-right: 5px;" class="error">{{ scope.row.status }}</span>
                                                                 </div>
-                                                                <el-icon v-if="scope.row.status === 'Concluido'">
+                                                                <el-icon v-if="scope.row.status === 'Concluido' || scope.row.status === 'Concluído'">
                                                                     <SuccessFilled color="green" />
                                                                 </el-icon>
                                                                 <el-icon v-else-if="scope.row.status === 'Erro'">
@@ -224,7 +224,7 @@
                     <div style="display: flex; align-items: center; justify-content: center">
                         <div style="display: flex; align-items: center; justify-content: center">
                             <span style="margin-right:5px;">{{ scope.row.status }}</span>
-                            <el-icon v-if="scope.row.status === 'Concluido'">
+                            <el-icon v-if="scope.row.status === 'Concluido' || scope.row.status === 'Concluído'">
                                 <SuccessFilled color="green" />
                             </el-icon>
                             <el-icon v-else-if="scope.row.status === 'Concluído com Falhas'">
@@ -276,7 +276,7 @@
             </div>
         </template>
     </el-dialog>
-    
+
     <el-dialog v-model="reprocessarTodaAIntegracao" title="Filtro" width="500" align-center>
         <el-form :model="{ chaveApi, codUnidade, urlApi, codUsuario }" :rules="rules" ref="form">
             <div style="width: 100%; justify-content: center">
@@ -336,7 +336,7 @@
 
         <template #footer>
             <div class="dialog-footer">
-                <el-button @click="fecharModal">Cancelar</el-button>
+                <el-button @click="fecharModalReprocessamento">Cancelar</el-button>
 
                 <el-button v-if="salvarMudancasReprocessamento"
                            type="primary"
@@ -409,7 +409,6 @@
 
             const getResponse = (imovel) => {
                 const response = imovel[responseProp.value] || {};
-
                 if (typeof response === 'string') {
                     try {
                         const parsed = JSON.parse(response);
@@ -522,7 +521,6 @@
 
                 if (changedFields.value.length > 0) {
                     salvarMudancasReprocessamento.value = true;
-                    console.log("Campos alterados:", changedFields.value);
                 } else {
                     salvarMudancasReprocessamento.value = false;
                 }
@@ -595,45 +593,63 @@
                 }
             };
 
+            const fecharModalReprocessamento = () => {
+                try {
+                    reprocessarTodaAIntegracao.value = false;
+                } catch (error) {
+                    console.error('Erro ao fechar modal reprocessamento:', error);
+                }
+            }
+
             const SalvarAlteracoes = async (payloadAlteracoes) => {
+                fullscreenLoading.value = true;
                 try {
                     const url = validarUrlSalvarAlteracoes(crmSelecionado.value);
 
                     if (!payloadAlteracoes) {
                         throw new Error("Payload não foi gerado corretamente.");
                     }
-
                     const { data } = await axios.post(url, payloadAlteracoes);
                     ElementPlus.ElMessage.success("Alteração Salva com Sucesso!");
                     salvarMudancasReprocessamento.value = false;
                 } catch (error) {
                     console.error("Erro no salvamento das alterações:", error);
                     ElementPlus.ElMessage.error("Erro ao salvar as alterações. Tente novamente mais tarde.");
+                } finally {
+                    fullscreenLoading.value = false;
                 }
             };
 
             const ReprocessarIntegracao = async (payloadIntegracao) => {
+                fullscreenLoading.value = true;
                 try {
-                    fullscreenLoading.value = true;
                     const url = validarUrlReprocessarImovel(crmSelecionado.value);
 
                     if (!payloadIntegracao) {
                         throw new Error("Payload não foi gerado corretamente.");
                     }
-                    fullscreenLoading.value = false;
-                    return;
                     const { data } = await axios.post(url, payloadIntegracao);
-
+                    if (data) {
+                        ElementPlus.ElMessage.success('Importação em fila de processamento!');
+                    } else {
+                        ElementPlus.ElMessage.error({
+                            message: 'Ocorreu algum error ao reprocessar!',
+                            showClose: true,
+                        });
+                    }
                 } catch (error) {
                     console.error("Erro ao Reprocessar a Integração:", error);
                     ElementPlus.ElMessage.error("Erro ao Reprocessar a Integração");
+                } finally {
+                    fullscreenLoading.value = false;
                 }
             };
 
             const handleClick = async (row) => {
+                fullscreenLoading.value = true;
                 try {
                     const urlReprocessamento = validarUrlParaReprocessarImovel(crmSelecionado.value);
-                    const response = axios.post(urlReprocessamento, {
+                    const response = await axios.post(urlReprocessamento, {
                         id: row.id,
                         cod: row.cod
                     });
@@ -641,15 +657,17 @@
                         ElementPlus.ElMessage.success('Imovel em Fila de Processamento!');
                     } else {
                         ElementPlus.ElMessage.error({
-                            message: 'Oops, this is an error message.',
+                            message: 'Ocorreu algum error ao reprocessar o imóvel!',
                             showClose: true,
                         });
                     }
                 } catch (error) {
                     console.error('Erro no reprocessamento:', error);
                     ElementPlus.ElMessage.error('Erro ao reprocessar. Tente novamente mais tarde.');
+                } finally {
+                    fullscreenLoading.value = false;
                 }
-            };
+            };;
 
             const handleChangeApiKey = async () => {
                 if (!chaveApi.value) {
@@ -953,8 +971,8 @@
                     return erroReq = "Erro";
                 }
 
-                const temErro = imoveis.some(imovel => getResponse(imovel).erro);
-                const temSucesso = imoveis.some(imovel => !getResponse(imovel).erro);
+                const temErro = imoveis.some(imovel => getResponse(imovel).erro || getResponse(imovel).status === 400);
+                const temSucesso = imoveis.some(imovel => !getResponse(imovel).erro || getResponse(imovel).status === 200);
                 const temPendente = imoveis.some(imovel => imovel.status === 'Aguardando');
                 const emProcessamento = imoveis.some(imovel => imovel.status === 'Processando');
 
@@ -966,28 +984,37 @@
             };
 
             const verificarStatusIntegracao = (integracao) => {
-                let statusIntegracao = "Concluido";
+                let statusIntegracao = "Concluído";
                 let temParcial = false;
+                let temErro = false;
                 let aguardando = false;
                 let emProcessamento = false;
 
                 integracao.bairros.forEach(bairro => {
                     const statusBairro = verificarStatusBairro(bairro);
                     if (statusBairro === "Erro") {
-                        statusIntegracao = "Erro";
+                        temErro = true;
                     } else if (statusBairro === "Concluído com Falhas") {
                         temParcial = true;
                     } else if (statusBairro === "Aguardando") {
                         aguardando = true;
-                    }
-                    else if (statusBairro === "Processando") {
+                    } else if (statusBairro === "Processando") {
                         emProcessamento = true;
                     }
                 });
 
-                if (aguardando) return "Aguardando";
+                if (temErro && (temParcial || statusIntegracao === "Concluído")) {
+                    return "Concluído com Falhas";
+                }
+
+                if (!temErro && temParcial) {
+                    return "Concluído com Falhas";
+                }
+
                 if (emProcessamento) return "Processando";
-                if (temParcial) return "Concluído com Falhas";
+                if (aguardando) return "Aguardando";
+                if (temErro) return "Erro";
+
                 return statusIntegracao;
             };
 
@@ -1033,8 +1060,6 @@
                     fullscreenLoading.value = false;;
                 }
             };
-
-            
 
             const getListaIntegracoes = async (url) => {
                 try {
@@ -1092,6 +1117,7 @@
                 openDialogReprocessarIntegracao,
                 submitForm,
                 form,
+                fecharModalReprocessamento,
             };
         },
     };
@@ -1137,5 +1163,13 @@
         background-color: #fef0f0 !important;
         border-color: #fbc4c4 !important;
         color: #f56c6c !important;
+    }
+
+    .el-button:focus, .el-button:hover {
+        background-color: #0072FF !important;
+    }
+
+    .el-form-item.is-error .el-input__wrapper {
+        box-shadow: 0 0 0 1px #FF0000 inset;
     }
 </style>
