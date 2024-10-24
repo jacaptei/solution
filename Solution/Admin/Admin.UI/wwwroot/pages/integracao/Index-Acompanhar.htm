@@ -278,68 +278,75 @@
     </el-dialog>
     
     <el-dialog v-model="reprocessarTodaAIntegracao" title="Filtro" width="500" align-center>
-        <div style="width: 100%; justify-content: center">
-            <el-row gutter=20>
-                <el-col :xs="24" :sm="24" :md="24" :lg="24" class="register-input">
-                    <div>CHAVE API<span></span></div>
-                    <el-form-item prop="chaveApi">
-                        <el-input style="width:100%"
-                                  v-model="chaveApi"
-                                  clearable
-                                  placeholder="Insira sua Chave API"
-                                  @change="handleChangeApiKey"></el-input>
-                    </el-form-item>
-                </el-col>
+        <el-form :model="{ chaveApi, codUnidade, urlApi, codUsuario }" :rules="rules" ref="form">
+            <div style="width: 100%; justify-content: center">
+                <el-row gutter=20>
+                    <el-col :xs="24" :sm="24" :md="24" :lg="24" class="register-input">
+                        <div>CHAVE API<span></span></div>
+                        <el-form-item prop="chaveApi"
+                                      :rules="[{ required: true, message: 'Por favor, insira a Chave API', trigger: 'blur' }]">
+                            <el-input style="width:100%"
+                                      v-model="chaveApi"
+                                      clearable
+                                      placeholder="Insira sua Chave API"
+                                      @change="handleChangeApiKey"></el-input>
+                        </el-form-item>
+                    </el-col>
 
-                <el-col v-if="isImoview" :xs="24" :sm="24" :md="12" :lg="12" class="register-input">
-                    <div>UNIDADE<span></span></div>
-                    <el-form-item prop="codUnidade">
-                        <el-select v-model="codUnidade"
-                                   filterable
-                                   :clearable="true"
-                                   class="m-4"
-                                   placeholder="INFORME A UNIDADE"
-                                   size="large"
-                                   style="width:100%">
-                            <el-option v-for="item in listaUnidades" :key="item.id" :label="item.nome" :value="item.id"></el-option>
-                        </el-select>
-                    </el-form-item>
-                </el-col>
+                    <el-col v-if="isImoview" :xs="24" :sm="24" :md="12" :lg="12" class="register-input">
+                        <div>UNIDADE<span></span></div>
+                        <el-form-item prop="codUnidade"
+                                      :rules="[{ required: true, message: 'Por favor, selecione a Unidade', trigger: 'blur' }]">
+                            <el-select v-model="codUnidade"
+                                       filterable
+                                       :clearable="true"
+                                       class="m-4"
+                                       placeholder="INFORME A UNIDADE"
+                                       size="large"
+                                       style="width:100%">
+                                <el-option v-for="item in listaUnidades" :key="item.id" :label="item.nome" :value="item.id"></el-option>
+                            </el-select>
+                        </el-form-item>
+                    </el-col>
 
-                <el-col v-if="isImoview" :xs="24" :sm="24" :md="12" :lg="12" class="register-input">
-                    <div>CÓDIGO USUÁRIO IMOVIEW<span></span></div>
-                    <el-form-item prop="codUsuario">
-                        <el-input style="width:100%"
-                                  clearable
-                                  v-model="codUsuario"
-                                  :placeholder="placeholderUsuarioText"></el-input>
-                    </el-form-item>
-                </el-col>
+                    <el-col v-if="isImoview" :xs="24" :sm="24" :md="12" :lg="12" class="register-input">
+                        <div>CÓDIGO USUÁRIO IMOVIEW<span></span></div>
+                        <el-form-item prop="codUsuario"
+                                      :rules="[{ required: true, message: 'Por favor, insira o Código de Usuário', trigger: 'blur' }]">
+                            <el-input style="width:100%"
+                                      clearable
+                                      v-model="codUsuario"
+                                      :placeholder="placeholderUsuarioText"></el-input>
+                        </el-form-item>
+                    </el-col>
 
-                <el-col v-if="isVistaSoft" :xs="24" :sm="24" :md="24" :lg="24" class="register-input">
-                    <div>URL VISTASOFT<span></span></div>
-                    <el-form-item prop="urlApi">
-                        <el-input style="width:100%"
-                                  v-model="urlApi"
-                                  clearable
-                                  :placeholder="placeholderUrlVistaSoft"></el-input>
-                    </el-form-item>
-                </el-col>
-            </el-row>
-        </div>
+                    <el-col v-if="isVistaSoft" :xs="24" :sm="24" :md="24" :lg="24" class="register-input">
+                        <div>URL VISTASOFT<span></span></div>
+                        <el-form-item prop="urlApi"
+                                      :rules="[{ required: true, message: 'Por favor, insira a URL de Integração', trigger: 'blur' }]">
+                            <el-input style="width:100%"
+                                      v-model="urlApi"
+                                      clearable
+                                      :placeholder="placeholderUrlVistaSoft"></el-input>
+                        </el-form-item>
+                    </el-col>
+                </el-row>
+            </div>
+        </el-form>
 
         <template #footer>
             <div class="dialog-footer">
                 <el-button @click="fecharModal">Cancelar</el-button>
+
                 <el-button v-if="salvarMudancasReprocessamento"
                            type="primary"
-                           @click="SalvarAlteracoes">
+                           @click="submitForm(SalvarAlteracoes)">
                     Salvar Alterações
                 </el-button>
 
                 <el-button v-if="!salvarMudancasReprocessamento"
                            type="primary"
-                           @click="ReprocessarIntegracao">
+                           @click="submitForm(ReprocessarIntegracao)">
                     Reprocessar
                 </el-button>
             </div>
@@ -363,18 +370,13 @@
             const listaUnidades = ref([]);
             const changedFields = ref([]);
             const responseProp = ref('');
+            const form = ref(null);
             const isImoview = ref(false);
             const collapseItems = ref([]);
             const isVistaSoft = ref(false);
             const crmSelecionado = ref('');
             const unidades = ref([]);
             const urlApiChanged = ref([]);
-            const rules = ref({
-                chaveApi: [{ required: true, message: 'Por favor, insira a Chave API', trigger: 'blur' }],
-                codUnidade: [{ required: true, message: 'Por favor, selecione a Unidade', trigger: 'blur' }],
-                urlApi: [{ required: true, message: 'Por favor, insira a URL de Integração', trigger: 'blur' }],
-                codUsuario: [{ required: true, message: 'Por favor, insira o Código de Usuário', trigger: 'blur' }],
-            });
             const initialValuesLoaded = ref(true);
             const refreshInterval = ref(0);
             const salvarMudancasReprocessamento = ref(false);
@@ -496,23 +498,23 @@
                     if (chaveApi.value !== initialValues.chaveApi) {
                         changedFields.value.push({ campo: 'chaveApi', valor: chaveApi.value });
                     }
-                    if (codUnidade.value !== initialValues.codUnidade && codUnidade.value !== "") {
+                    if (codUnidade.value !== initialValues.codUnidade) {
                         changedFields.value.push({ campo: 'codUnidade', valor: codUnidade.value });
                     }
-                    if (codUsuario.value !== initialValues.codUsuario && codUsuario.value !== "") {
+                    if (codUsuario.value !== initialValues.codUsuario) {
                         changedFields.value.push({ campo: 'codUsuario', valor: codUsuario.value });
                     }
-                    if (listaUnidades.value !== initialValues.listaUnidades && listaUnidades.value !== "") {
+                    if (listaUnidades.value !== initialValues.listaUnidades) {
                         changedFields.value.push({ campo: 'listaUnidades', valor: listaUnidades.value });
                     }
                 }
 
                 // Verifica mudanças nos campos do VistaSoft
                 if (isVistaSoft.value) {
-                    if (chaveApi.value !== initialValues.chaveApi && chaveApi.value !== "") {
+                    if (chaveApi.value !== initialValues.chaveApi) {
                         changedFields.value.push({ campo: 'chaveApi', valor: chaveApi.value });
                     }
-                    if (urlApi.value !== initialValues.urlApi && urlApi.value !== "") {
+                    if (urlApi.value !== initialValues.urlApi) {
                         urlApiChanged.value = true;
                         changedFields.value.push({ campo: 'urlApi', valor: urlApi.value });
                     }
@@ -583,42 +585,45 @@
 
             const openDialogReprocessarIntegracao = async () => {
                 try {
+                    fullscreenLoading.value = true;
                     await carregarDadosParceiroIntegracao();
                     reprocessarTodaAIntegracao.value = true;
+                    fullscreenLoading.value = false;
                 } catch (error) {
+                    fullscreenLoading.value = false;
                     console.error('Erro no reprocessamento:', error);
                 }
-
             };
 
-            const SalvarAlteracoes = async () => {
+            const SalvarAlteracoes = async (payloadAlteracoes) => {
                 try {
                     const url = validarUrlSalvarAlteracoes(crmSelecionado.value);
-                    const payloadAlteracoes = validarPayload(crmSelecionado.value);
 
                     if (!payloadAlteracoes) {
                         throw new Error("Payload não foi gerado corretamente.");
                     }
 
-                    console.log(payloadAlteracoes);
-                    return;
                     const { data } = await axios.post(url, payloadAlteracoes);
-                    console.log("Alterações salvas com sucesso:", data);
+                    ElementPlus.ElMessage.success("Alteração Salva com Sucesso!");
+                    salvarMudancasReprocessamento.value = false;
                 } catch (error) {
                     console.error("Erro no salvamento das alterações:", error);
                     ElementPlus.ElMessage.error("Erro ao salvar as alterações. Tente novamente mais tarde.");
                 }
             };
 
-            const ReprocessarIntegracao = async () => {
+            const ReprocessarIntegracao = async (payloadIntegracao) => {
                 try {
+                    fullscreenLoading.value = true;
                     const url = validarUrlReprocessarImovel(crmSelecionado.value);
-                    const payloadIntegracao = validarPayload(crmSelecionado.value);
 
                     if (!payloadIntegracao) {
                         throw new Error("Payload não foi gerado corretamente.");
                     }
+                    fullscreenLoading.value = false;
+                    return;
                     const { data } = await axios.post(url, payloadIntegracao);
+
                 } catch (error) {
                     console.error("Erro ao Reprocessar a Integração:", error);
                     ElementPlus.ElMessage.error("Erro ao Reprocessar a Integração");
@@ -670,8 +675,6 @@
                     fullscreenLoading.value = false;
                 }
             };
-
-            // Funções auxiliares
 
             const resetUnidade = () => {
                 codUnidade.value = "";
@@ -741,6 +744,18 @@
                 Integracao: 0,
                 Cliente: '',
             });
+
+            const submitForm = (action) => {
+                form.value.validate((valid) => {
+                    if (valid) {
+                        const payload = isImoview.value ? createImoviewPayload(idIntegracao.value) : createVistaSoftPayload(idIntegracao.value);
+                        action(payload);
+                    } else {
+                        console.error("Formulário inválido. Verifique se todos os campos estão preenchidos.");
+                        ElementPlus.ElMessage.warning('Formulário inválido. Verifique os campos.');
+                    }
+                });
+            };
 
             const createImoviewPayload = (id) => {
                 if (!id) throw new Error("ID é obrigatório.");
@@ -1019,6 +1034,8 @@
                 }
             };
 
+            
+
             const getListaIntegracoes = async (url) => {
                 try {
                     const { data } = await axios.get(url);
@@ -1073,6 +1090,8 @@
                 salvarMudancasReprocessamento,
                 SalvarAlteracoes,
                 openDialogReprocessarIntegracao,
+                submitForm,
+                form,
             };
         },
     };
