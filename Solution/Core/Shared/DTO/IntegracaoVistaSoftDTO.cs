@@ -154,7 +154,7 @@
         public string Mobiliado { get; set; } // CI
 
         public string Elevador { get; set; } // CE
-        public string Elevadores { get; set; } // CE
+        //public string Elevadores { get; set; } // CE
         public string EspacoGourmet { get; set; } // CI
         public string Jardim { get; set; } // CE
         public string Lavanderia { get; set; } // CE

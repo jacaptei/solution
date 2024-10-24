@@ -84,7 +84,7 @@ public class ImovelDTOProfile : Profile
             .ForMember(dest => dest.Mobiliado,               opt => opt.MapFrom(src => src.Caracteristicas.Mobiliado))
 
             .ForMember(dest => dest.Elevador,                opt => opt.MapFrom(src => src.InfraEstrutura.Elevador))
-            .ForMember(dest => dest.Elevadores,              opt => opt.MapFrom(src => src.InfraEstrutura.Elevadores))
+            //.ForMember(dest => dest.Elevadores,              opt => opt.MapFrom(src => src.InfraEstrutura.Elevadores))
             .ForMember(dest => dest.EspacoGourmet,           opt => opt.MapFrom(src => src.InfraEstrutura.EspacoGourmet))
             .ForMember(dest => dest.Jardim,                  opt => opt.MapFrom(src => src.InfraEstrutura.Jardim))
             .ForMember(dest => dest.Lavanderia,              opt => opt.MapFrom(src => src.InfraEstrutura.Lavanderia))
