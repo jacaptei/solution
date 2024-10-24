@@ -106,6 +106,19 @@ namespace JaCaptei.Admin.API.Controllers
             return Ok(res);
         }
 
+        [HttpPost("integracao/cliente/reprocessarimovel")]
+        public async Task<ActionResult<IntegrarClienteResponse>> ReprocessarImovel([FromBody] ImovelReprocessDTO dto)
+        {
+            var jsonInString = Newtonsoft.Json.JsonConvert.SerializeObject(dto);
+            var content = new StringContent(jsonInString, Encoding.UTF8, "application/json");
+            var client = _httpClientFactory.CreateClient("");
+            client.DefaultRequestHeaders.Add("Accept", "application/json");
+            var url = Config.settings.IntegracaoVSAzureUrl + "/reprocessarimovel";
+            var result = await client.PostAsync(url, content);
+            var res = await result.Content.ReadAsStringAsync();
+            return Ok(res);
+        }
+
         [HttpPost("integracao/cliente/atualizarcampos")]
         public async Task<ActionResult<bool>> AtualizarCampos([FromBody] IntegracaoReprocessarVistaSoftDTO dto)
         {
